@@ -11,7 +11,7 @@ pkgs.buildGo124Module {
   version = "0.0.1";
   src = ./../../.;
   subPackages = ["cmd/conneroh"];
-  vendorSha256 = "";
+  vendorHash = "";
   meta = {
     description = "Personal Website";
     homepage = "https://github.com/conneroisu/conneroh.com";

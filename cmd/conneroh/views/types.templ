@@ -1,0 +1,15 @@
+package views
+
+import "github.com/conneroisu/conneroh.com/cmd/conneroh/layouts"
+
+templ Page(comp templ.Component) {
+	@layouts.Layout("Page") {
+		@comp
+	}
+}
+
+templ Morpher(comp templ.Component) {
+	@layouts.Morpher() {
+		@comp
+	}
+}

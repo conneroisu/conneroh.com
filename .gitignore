@@ -3,3 +3,4 @@
 .devenv*
 .pre-commit-config.json
 node_modules
+.env

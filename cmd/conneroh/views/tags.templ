@@ -1,0 +1,11 @@
+package views
+
+import "github.com/conneroisu/conneroh.com/internal/data/master"
+
+templ Tag(tag *master.FullTag) {
+	<h1>{ tag.Name }</h1>
+}
+
+templ Tags(tags *[]master.FullTag) {
+	<div>hello tags()</div>
+}

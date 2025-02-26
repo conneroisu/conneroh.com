@@ -1,0 +1,38 @@
+package views
+
+import (
+	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
+	"github.com/conneroisu/conneroh.com/internal/data/master"
+)
+
+templ Project(project *master.FullProject) {
+	<div>hello Project()</div>
+}
+
+templ Projects(
+	fullProjects *[]master.FullProject,
+) {
+	<div
+		class="uk-column-1-2@s uk-column-1-3@m uk-column-1-4@l uk-grid-match uk-margin-auto@m  uk-margin-auto"
+		uk-grid
+		uk-grid="masonry: pack"
+		uk-margin
+	>
+		for _, project := range *fullProjects {
+			<a class="uk-card uk-card-secondary uk-link-toggle uk-card-body" href={ templ.URL("/projects/" + project.Slug) }>
+				<article class="uk-article">
+					<div data-src={ "/projects/" + project.Slug + "/cover.jpg" } uk-img="loading: eager"></div>
+					<h1 class="uk-article-title uk-link-reset uk-link-text bg">
+						{ project.Name }
+					</h1>
+					<p class="uk-margin uk-text-lead">
+						{ project.Description }
+					</p>
+					<div class="lg:max-w-200 md:max-w-100 @sm:max-w-10">
+						@components.TagSections(project.Tags)
+					</div>
+				</article>
+			</a>
+		}
+	</div>
+}
