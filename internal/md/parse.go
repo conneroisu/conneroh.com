@@ -52,7 +52,10 @@ var (
 )
 
 // Parse parses markdown to html.
-func Parse(source []byte) (string, error) {
+func Parse(
+	name string,
+	source []byte,
+) (string, error) {
 	var (
 		buf     bytes.Buffer
 		ctx     = parser.NewContext()
@@ -65,7 +68,9 @@ func Parse(source []byte) (string, error) {
 	}
 	d := frontmatter.Get(ctx)
 	if d == nil {
-		return "", &FrontMatterMissingError{}
+		return "", &FrontMatterMissingError{
+			fileName: name,
+		}
 	}
 	err = d.Decode(&fM)
 	if err != nil {

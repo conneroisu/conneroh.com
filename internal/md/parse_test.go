@@ -28,7 +28,7 @@ Inline math $\frac{1}{2}$
 `
 
 func TestParse(t *testing.T) {
-	actual, err := Parse([]byte(input))
+	actual, err := Parse("hello.md", []byte(input))
 	t.Log(actual)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, actual)
