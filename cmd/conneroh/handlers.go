@@ -70,7 +70,12 @@ func Projects(
 	return func(w http.ResponseWriter, r *http.Request) error {
 		templ.Handler(
 			views.Page(views.Projects(
+				fullPosts,
 				fullProjects,
+				fullTags,
+				fullPostSlugMap,
+				fullProjectSlugMap,
+				fullTagSlugMap,
 			)),
 		).ServeHTTP(w, r)
 		return nil
@@ -81,24 +86,31 @@ func Projects(
 func Project(
 	ctx context.Context,
 	db *data.Database[master.Queries],
-	_ *[]master.FullPost,
-	_ *[]master.FullProject,
-	_ *[]master.FullTag,
-	_ *map[string]master.FullPost,
-	projects *map[string]master.FullProject,
-	_ *map[string]master.FullTag,
+	fullPosts *[]master.FullPost,
+	fullProjects *[]master.FullProject,
+	fullTags *[]master.FullTag,
+	fullPostSlugMap *map[string]master.FullPost,
+	fullProjectSlugMap *map[string]master.FullProject,
+	fullTagSlugMap *map[string]master.FullTag,
 ) (routing.APIFn, error) {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		id := r.PathValue("id")
 		if id == "" {
 			return routing.ErrMissingParam{}
 		}
-		proj, ok := (*projects)[id]
+		proj, ok := (*fullProjectSlugMap)[id]
 		if !ok {
 			return routing.ErrNotFound{URL: r.URL}
 		}
 		templ.Handler(
-			views.Page(views.Project(&proj)),
+			views.Page(views.Project(&proj,
+				fullPosts,
+				fullProjects,
+				fullTags,
+				fullPostSlugMap,
+				fullProjectSlugMap,
+				fullTagSlugMap,
+			)),
 		).ServeHTTP(w, r)
 		return nil
 	}, nil
@@ -109,11 +121,11 @@ func Posts(
 	_ context.Context,
 	_ *data.Database[master.Queries],
 	fullPosts *[]master.FullPost,
-	_ *[]master.FullProject,
-	_ *[]master.FullTag,
-	_ *map[string]master.FullPost,
-	_ *map[string]master.FullProject,
-	_ *map[string]master.FullTag,
+	fullProjects *[]master.FullProject,
+	fullTags *[]master.FullTag,
+	fullPostSlugMap *map[string]master.FullPost,
+	fullProjectSlugMap *map[string]master.FullProject,
+	fullTagSlugMap *map[string]master.FullTag,
 ) (routing.APIFn, error) {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		// Get tag filters from the URL query
@@ -133,7 +145,7 @@ func Posts(
 		ctx = context.WithValue(ctx, currentURLContextKey, r.URL.String())
 
 		// Render the posts template with filtered posts
-		component := views.Posts(&filteredPosts)
+		component := views.Posts(&filteredPosts, fullProjects, fullTags, fullPostSlugMap, fullProjectSlugMap, fullTagSlugMap)
 		handler := templ.Handler(component)
 		handler.ServeHTTP(w, r.WithContext(ctx))
 		return nil
@@ -233,24 +245,24 @@ func filterPostsByTags(posts []master.FullPost, includeTags, excludeTags []strin
 func Post(
 	_ context.Context,
 	_ *data.Database[master.Queries],
-	_ *[]master.FullPost,
-	_ *[]master.FullProject,
-	_ *[]master.FullTag,
-	posts *map[string]master.FullPost,
-	_ *map[string]master.FullProject,
-	_ *map[string]master.FullTag,
+	fullPosts *[]master.FullPost,
+	fullProjects *[]master.FullProject,
+	fullTags *[]master.FullTag,
+	fullPostSlugMap *map[string]master.FullPost,
+	fullProjectSlugMap *map[string]master.FullProject,
+	fullTagSlugMap *map[string]master.FullTag,
 ) (routing.APIFn, error) {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		id := r.PathValue("id")
 		if id == "" {
 			return routing.ErrMissingParam{ID: id, View: "Post"}
 		}
-		post, ok := (*posts)[id]
+		post, ok := (*fullPostSlugMap)[id]
 		if !ok {
 			return routing.ErrNotFound{URL: r.URL}
 		}
 		templ.Handler(
-			views.Page(views.Post(&post)),
+			views.Page(views.Post(&post, fullPosts, fullProjects, fullTags, fullPostSlugMap, fullProjectSlugMap, fullTagSlugMap)),
 		).ServeHTTP(w, r)
 		return nil
 	}, nil
@@ -260,16 +272,23 @@ func Post(
 func Tags(
 	_ context.Context,
 	_ *data.Database[master.Queries],
-	_ *[]master.FullPost,
-	_ *[]master.FullProject,
+	fullPosts *[]master.FullPost,
+	fullProjects *[]master.FullProject,
 	fullTags *[]master.FullTag,
-	_ *map[string]master.FullPost,
-	_ *map[string]master.FullProject,
-	_ *map[string]master.FullTag,
+	fullPostSlugMap *map[string]master.FullPost,
+	fullProjectSlugMap *map[string]master.FullProject,
+	fullTagSlugMap *map[string]master.FullTag,
 ) (routing.APIFn, error) {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		templ.Handler(
-			views.Page(views.Tags(fullTags)),
+			views.Page(views.Tags(
+				fullPosts,
+				fullProjects,
+				fullTags,
+				fullPostSlugMap,
+				fullProjectSlugMap,
+				fullTagSlugMap,
+			)),
 		).ServeHTTP(w, r)
 		return nil
 	}, nil
@@ -279,24 +298,32 @@ func Tags(
 func Tag(
 	_ context.Context,
 	_ *data.Database[master.Queries],
-	_ *[]master.FullPost,
-	_ *[]master.FullProject,
-	_ *[]master.FullTag,
-	_ *map[string]master.FullPost,
-	_ *map[string]master.FullProject,
-	tags *map[string]master.FullTag,
+	fullPosts *[]master.FullPost,
+	fullProjects *[]master.FullProject,
+	fullTags *[]master.FullTag,
+	fullPostSlugMap *map[string]master.FullPost,
+	fullProjectSlugMap *map[string]master.FullProject,
+	fullTagSlugMap *map[string]master.FullTag,
 ) (routing.APIFn, error) {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		id := r.PathValue("id")
 		if id == "" {
 			return routing.ErrMissingParam{ID: id, View: "Tag"}
 		}
-		tag, ok := (*tags)[id]
+		tag, ok := (*fullTagSlugMap)[id]
 		if !ok {
 			return routing.ErrNotFound{URL: r.URL}
 		}
 		templ.Handler(
-			views.Page(views.Tag(&tag)),
+			views.Page(views.Tag(
+				&tag,
+				fullPosts,
+				fullProjects,
+				fullTags,
+				fullPostSlugMap,
+				fullProjectSlugMap,
+				fullTagSlugMap,
+			)),
 		).ServeHTTP(w, r)
 		return nil
 	}, nil
@@ -313,18 +340,11 @@ func Morph(
 	fullProjectSlugMap *map[string]master.FullProject,
 	fullTagSlugMap *map[string]master.FullTag,
 ) (routing.APIFn, error) {
-	var morphMap = map[string]templ.Component{
-		"projects": views.Projects(fullProjects),
-		"posts":    views.Posts(fullPosts),
-		"tags":     views.Tags(fullTags),
-		"home": views.Home(
-			fullPosts,
-			fullProjects,
-			fullTags,
-			fullPostSlugMap,
-			fullProjectSlugMap,
-			fullTagSlugMap,
-		),
+	var morphMap = map[string]func(fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, fullTags *[]master.FullTag, fullPostsSlugMap *map[string]master.FullPost, fullProjectsSlugMap *map[string]master.FullProject, fullTagsSlugMap *map[string]master.FullTag) templ.Component{
+		"projects": views.Projects,
+		"posts":    views.Posts,
+		"tags":     views.Tags,
+		"home":     views.Home,
 	}
 	return func(w http.ResponseWriter, r *http.Request) error {
 		view := r.PathValue("view")
@@ -332,7 +352,14 @@ func Morph(
 		if !ok {
 			return fmt.Errorf("unknown view: %s", view)
 		}
-		morphed := views.Morpher(val)
+		morphed := views.Morpher(val(
+			fullPosts,
+			fullProjects,
+			fullTags,
+			fullPostSlugMap,
+			fullProjectSlugMap,
+			fullTagSlugMap,
+		))
 		err := morphed.Render(r.Context(), w)
 		if err != nil {
 			return err
@@ -345,12 +372,12 @@ func Morph(
 func Morphs(
 	_ context.Context,
 	_ *data.Database[master.Queries],
-	_ *[]master.FullPost,
-	_ *[]master.FullProject,
-	_ *[]master.FullTag,
-	posts *map[string]master.FullPost,
-	projects *map[string]master.FullProject,
-	tags *map[string]master.FullTag,
+	fullPosts *[]master.FullPost,
+	fullProjects *[]master.FullProject,
+	fullTags *[]master.FullTag,
+	fullPostSlugMap *map[string]master.FullPost,
+	fullProjectSlugMap *map[string]master.FullProject,
+	fullTagSlugMap *map[string]master.FullTag,
 ) (routing.APIFn, error) {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		var (
@@ -359,31 +386,55 @@ func Morphs(
 		)
 		switch view {
 		case "project":
-			proj, ok := (*projects)[id]
+			proj, ok := (*fullProjectSlugMap)[id]
 			if !ok {
 				return routing.ErrNotFound{URL: r.URL}
 			}
-			morphed := views.Morpher(views.Project(&proj))
+			morphed := views.Morpher(views.Project(
+				&proj,
+				fullPosts,
+				fullProjects,
+				fullTags,
+				fullPostSlugMap,
+				fullProjectSlugMap,
+				fullTagSlugMap,
+			))
 			err := morphed.Render(r.Context(), w)
 			if err != nil {
 				return err
 			}
 		case "post":
-			post, ok := (*posts)[id]
+			post, ok := (*fullPostSlugMap)[id]
 			if !ok {
 				return routing.ErrNotFound{URL: r.URL}
 			}
-			morphed := views.Morpher(views.Post(&post))
+			morphed := views.Morpher(views.Post(
+				&post,
+				fullPosts,
+				fullProjects,
+				fullTags,
+				fullPostSlugMap,
+				fullProjectSlugMap,
+				fullTagSlugMap,
+			))
 			err := morphed.Render(r.Context(), w)
 			if err != nil {
 				return err
 			}
 		case "tag":
-			tag, ok := (*tags)[id]
+			tag, ok := (*fullTagSlugMap)[id]
 			if !ok {
 				return routing.ErrNotFound{URL: r.URL}
 			}
-			morphed := views.Morpher(views.Tag(&tag))
+			morphed := views.Morpher(views.Tag(
+				&tag,
+				fullPosts,
+				fullProjects,
+				fullTags,
+				fullPostSlugMap,
+				fullProjectSlugMap,
+				fullTagSlugMap,
+			))
 			err := morphed.Render(r.Context(), w)
 			if err != nil {
 				return err

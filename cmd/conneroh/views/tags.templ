@@ -2,10 +2,25 @@ package views
 
 import "github.com/conneroisu/conneroh.com/internal/data/master"
 
-templ Tag(tag *master.FullTag) {
+templ Tag(
+	tag *master.FullTag,
+	fullPosts *[]master.FullPost,
+	fullProjects *[]master.FullProject,
+	fullTags *[]master.FullTag,
+	fullPostsSlugMap *map[string]master.FullPost,
+	fullProjectsSlugMap *map[string]master.FullProject,
+	fullTagsSlugMap *map[string]master.FullTag,
+) {
 	<h1>{ tag.Name }</h1>
 }
 
-templ Tags(tags *[]master.FullTag) {
+templ Tags(
+	fullPosts *[]master.FullPost,
+	fullProjects *[]master.FullProject,
+	fullTags *[]master.FullTag,
+	fullPostsSlugMap *map[string]master.FullPost,
+	fullProjectsSlugMap *map[string]master.FullProject,
+	fullTagsSlugMap *map[string]master.FullTag,
+) {
 	<div>hello tags()</div>
 }

@@ -6,7 +6,14 @@ import (
 	"time"
 )
 
-templ Posts(posts *[]master.FullPost) {
+templ Posts(
+	posts *[]master.FullPost,
+	fullProjects *[]master.FullProject,
+	fullTags *[]master.FullTag,
+	fullPostsSlugMap *map[string]master.FullPost,
+	fullProjectsSlugMap *map[string]master.FullProject,
+	fullTagsSlugMap *map[string]master.FullTag,
+) {
 	<script type="module">
 // This code will implement posts filtering by +tag and -tag
 // Function to parse URL query params and extract tag filters
@@ -348,7 +355,15 @@ func formatTags(tags []master.Tag) string {
 }
 
 // Individual Post component
-templ Post(post *master.FullPost) {
+templ Post(
+	post *master.FullPost,
+	fullPosts *[]master.FullPost,
+	fullProjects *[]master.FullProject,
+	fullTags *[]master.FullTag,
+	fullPostSlugMap *map[string]master.FullPost,
+	fullProjectSlugMap *map[string]master.FullProject,
+	fullTagSlugMap *map[string]master.FullTag,
+) {
 	<article class="container mx-auto px-4 py-8 max-w-3xl">
 		<div class="mb-8">
 			<h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-4">{ post.Title }</h1>

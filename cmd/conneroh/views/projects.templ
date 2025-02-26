@@ -5,7 +5,15 @@ import (
 	"github.com/conneroisu/conneroh.com/internal/data/master"
 )
 
-templ Project(project *master.FullProject) {
+templ Project(
+	project *master.FullProject,
+	fullPosts *[]master.FullPost,
+	fullProjects *[]master.FullProject,
+	fullTags *[]master.FullTag,
+	fullPostsSlugMap *map[string]master.FullPost,
+	fullProjectsSlugMap *map[string]master.FullProject,
+	fullTagsSlugMap *map[string]master.FullTag,
+) {
 	<div class="container mx-auto px-4 py-8 max-w-4xl">
 		<header class="mb-8">
 			<h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-4">{ project.Name }</h1>
@@ -43,7 +51,14 @@ templ Project(project *master.FullProject) {
 	</div>
 }
 
-templ Projects(fullProjects *[]master.FullProject) {
+templ Projects(
+	fullPosts *[]master.FullPost,
+	fullProjects *[]master.FullProject,
+	fullTags *[]master.FullTag,
+	fullPostsSlugMap *map[string]master.FullPost,
+	fullProjectsSlugMap *map[string]master.FullProject,
+	fullTagsSlugMap *map[string]master.FullTag,
+) {
 	<div
 		class="container mx-auto px-4 py-8"
 		x-data="{
