@@ -59,16 +59,23 @@ func Home(
 func Projects(
 	ctx context.Context,
 	db *data.Database[master.Queries],
-	_ *[]master.FullPost,
+	fullPosts *[]master.FullPost,
 	fullProjects *[]master.FullProject,
-	_ *[]master.FullTag,
-	_ *map[string]master.FullPost,
-	_ *map[string]master.FullProject,
-	_ *map[string]master.FullTag,
+	fullTags *[]master.FullTag,
+	fullPostSlugMap *map[string]master.FullPost,
+	fullProjectSlugMap *map[string]master.FullProject,
+	fullTagSlugMap *map[string]master.FullTag,
 ) (routing.APIFn, error) {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		templ.Handler(
-			views.Page(views.Projects(fullProjects)),
+			views.Page(views.Projects(
+				fullPosts,
+				fullProjects,
+				fullTags,
+				fullPostSlugMap,
+				fullProjectSlugMap,
+				fullTagSlugMap,
+			)),
 		).ServeHTTP(w, r)
 		return nil
 	}, nil

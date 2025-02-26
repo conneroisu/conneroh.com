@@ -1,42 +1,19 @@
 package views
 
-import (
-"github.com/axzilla/templui/pkg/components"
-"github.com/conneroisu/conneroh.com/internal/data/master"
-)
+import "github.com/conneroisu/conneroh.com/internal/data/master"
 
-templ Project(project *master.FullProject) {
-<div>hello Project()</div>
+templ Project(
+	project *master.FullProject,
+) {
+	<div>hello Project()</div>
 }
 
 templ Projects(
-fullProjects *[]master.FullProject,
+	fullPosts *[]master.FullPost,
+	fullProjects *[]master.FullProject,
+	fullTags *[]master.FullTag,
+	fullPostSlugMap *map[string]master.FullPost,
+	fullProjectSlugMap *map[string]master.FullProject,
+	fullTagSlugMap *map[string]master.FullTag,
 ) {
-<div class="uk-column-1-2@s uk-column-1-3@m uk-column-1-4@l uk-grid-match uk-margin-auto@m  uk-margin-auto" uk-grid
-	uk-grid="masonry: pack" uk-margin>
-	for _, project := range *fullProjects {
-	@components.Card(components.CardProps{Class: "w-2/3"}) {
-	@components.CardImage(components.CardImageProps{
-	Src: "/assets/img/card_placeholder.jpeg",
-	Alt: "Card image",
-	Position: components.CardImageTop,
-	AspectRatio: "16/9",
-	})
-	@components.CardHeader() {
-	@components.CardTitle() {
-	{ project.Name }
-	}
-	@components.CardDescription() {
-	{ project.Description }
-	}
-	}
-	@components.CardContent() {
-	{ project.Description }
-	}
-	@components.CardFooter() {
-	@components.Button(components.ButtonProps{Text: "Read"})
-	}
-	}
-	}
-</div>
 }
