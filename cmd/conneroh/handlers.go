@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/a-h/templ"
 	static "github.com/conneroisu/conneroh.com/cmd/conneroh/_static"
@@ -69,12 +70,7 @@ func Projects(
 	return func(w http.ResponseWriter, r *http.Request) error {
 		templ.Handler(
 			views.Page(views.Projects(
-				fullPosts,
 				fullProjects,
-				fullTags,
-				fullPostSlugMap,
-				fullProjectSlugMap,
-				fullTagSlugMap,
 			)),
 		).ServeHTTP(w, r)
 		return nil
@@ -120,11 +116,117 @@ func Posts(
 	_ *map[string]master.FullTag,
 ) (routing.APIFn, error) {
 	return func(w http.ResponseWriter, r *http.Request) error {
-		templ.Handler(
-			views.Page(views.Posts(fullPosts)),
-		).ServeHTTP(w, r)
+		// Get tag filters from the URL query
+		tagsParam := r.URL.Query().Get("tags")
+
+		// Parse +tag and -tag filters
+		includeTags, excludeTags := parseTagFilters(tagsParam)
+
+		// Apply filtering
+		filteredPosts := *fullPosts
+		if len(includeTags) > 0 || len(excludeTags) > 0 {
+			filteredPosts = filterPostsByTags(*fullPosts, includeTags, excludeTags)
+		}
+
+		// Set up context for the tag parameter
+		ctx := context.WithValue(r.Context(), tagsParamContextKey, tagsParam)
+		ctx = context.WithValue(ctx, currentURLContextKey, r.URL.String())
+
+		// Render the posts template with filtered posts
+		component := views.Posts(&filteredPosts)
+		handler := templ.Handler(component)
+		handler.ServeHTTP(w, r.WithContext(ctx))
 		return nil
 	}, nil
+}
+
+// Context keys for passing data to templates
+type contextKey string
+
+const tagsParamContextKey contextKey = "tagsParam"
+const currentURLContextKey contextKey = "currentURL"
+
+// parseTagFilters extracts include and exclude tags from the tag parameter
+func parseTagFilters(tagsParam string) (includeTags, excludeTags []string) {
+	if tagsParam == "" {
+		return nil, nil
+	}
+
+	tags := strings.Fields(tagsParam)
+	for _, tag := range tags {
+		tag = strings.TrimSpace(tag)
+		if strings.HasPrefix(tag, "+") {
+			if tagName := strings.TrimPrefix(tag, "+"); tagName != "" {
+				includeTags = append(includeTags, strings.ToLower(tagName))
+			}
+		} else if strings.HasPrefix(tag, "-") {
+			if tagName := strings.TrimPrefix(tag, "-"); tagName != "" {
+				excludeTags = append(excludeTags, strings.ToLower(tagName))
+			}
+		} else if tag != "" {
+			// If no prefix, assume include
+			includeTags = append(includeTags, strings.ToLower(tag))
+		}
+	}
+	return includeTags, excludeTags
+}
+
+// filterPostsByTags filters posts based on include and exclude tag lists
+func filterPostsByTags(posts []master.FullPost, includeTags, excludeTags []string) []master.FullPost {
+	if len(includeTags) == 0 && len(excludeTags) == 0 {
+		return posts // No filtering needed
+	}
+
+	var filtered []master.FullPost
+	for _, post := range posts {
+		// Convert post tags to lowercase for case-insensitive matching
+		postTags := make([]string, 0, len(post.Tags))
+		for _, tag := range post.Tags {
+			postTags = append(postTags, strings.ToLower(tag.Name))
+		}
+
+		// Check if post should be excluded
+		excluded := false
+		for _, excludeTag := range excludeTags {
+			for _, postTag := range postTags {
+				if postTag == excludeTag {
+					excluded = true
+					break
+				}
+			}
+			if excluded {
+				break
+			}
+		}
+		if excluded {
+			continue
+		}
+
+		// Check if post should be included
+		if len(includeTags) > 0 {
+			allTagsFound := true
+			for _, includeTag := range includeTags {
+				tagFound := false
+				for _, postTag := range postTags {
+					if postTag == includeTag {
+						tagFound = true
+						break
+					}
+				}
+				if !tagFound {
+					allTagsFound = false
+					break
+				}
+			}
+			if !allTagsFound {
+				continue
+			}
+		}
+
+		filtered = append(filtered, post)
+	}
+
+	return filtered
 }
 
 // Post is the post handler.

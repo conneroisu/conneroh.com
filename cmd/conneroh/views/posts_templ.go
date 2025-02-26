@@ -35,7 +35,7 @@ func Posts(posts *[]master.FullPost) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<script type=\"module\">\n\ndocument.addEventListener('alpine:init', () => {\n\tAlpine.data('postsManager', () => ({\n\t\tposts: [],\n\t\tsearchQuery: '',\n\t\tselectedTag: '',\n\t\ttags: [],\n\t\tisLoading: true,\n\t\tdarkMode: localStorage.getItem('darkMode') === 'true' ||\n\t\t\twindow.matchMedia('(prefers-color-scheme: dark)').matches,\n\n\t\tinit() {\n\t\t\t// Initialize posts from the rendered template data\n\t\t\tthis.posts = Array.from(document.querySelectorAll('[data-post-id]')).map(post => {\n\t\t\t\treturn {\n\t\t\t\t\tid: post.getAttribute('data-post-id'),\n\t\t\t\t\ttitle: post.getAttribute('data-post-title'),\n\t\t\t\t\tdescription: post.getAttribute('data-post-description'),\n\t\t\t\t\tslug: post.getAttribute('data-post-slug'),\n\t\t\t\t\tdate: post.getAttribute('data-post-date'),\n\t\t\t\t\tbanner: post.getAttribute('data-post-banner'),\n\t\t\t\t\ttags: JSON.parse(post.getAttribute('data-post-tags') || '[]')\n\t\t\t\t};\n\t\t\t});\n\n\t\t\t// Extract all unique tags\n\t\t\tconst allTags = new Set();\n\t\t\tthis.posts.forEach(post => {\n\t\t\t\tif (post.tags) {\n\t\t\t\t\tpost.tags.forEach(tag => tag.name && allTags.add(tag.name));\n\t\t\t\t}\n\t\t\t});\n\t\t\tthis.tags = Array.from(allTags);\n\n\t\t\t// Check URL parameters for any pre-selected filters\n\t\t\tconst urlParams = new URLSearchParams(window.location.search);\n\t\t\tthis.searchQuery = urlParams.get('q') || '';\n\t\t\tthis.selectedTag = urlParams.get('tag') || '';\n\n\t\t\t// Image loading handling\n\t\t\tthis.handleImageLoading();\n\n\t\t\t// Set loading state to false\n\t\t\tsetTimeout(() => this.isLoading = false, 300);\n\n\t\t\t// Setup dark mode\n\t\t\tthis.setupDarkMode();\n\t\t},\n\n\t\tfilteredPosts() {\n\t\t\treturn this.posts.filter(post => {\n\t\t\t\tconst matchesSearch = this.searchQuery === '' ||\n\t\t\t\t\tpost.title.toLowerCase().includes(this.searchQuery.toLowerCase()) ||\n\t\t\t\t\tpost.description.toLowerCase().includes(this.searchQuery.toLowerCase());\n\n\t\t\t\tconst matchesTag = this.selectedTag === '' ||\n\t\t\t\t\t(post.tags && post.tags.some(tag => tag.name === this.selectedTag));\n\n\t\t\t\treturn matchesSearch && matchesTag;\n\t\t\t});\n\t\t},\n\n\t\tupdateURL() {\n\t\t\t// Update URL with current filters without page reload\n\t\t\tconst params = new URLSearchParams();\n\t\t\tif (this.searchQuery) params.set('q', this.searchQuery);\n\t\t\tif (this.selectedTag) params.set('tag', this.selectedTag);\n\n\t\t\tconst newURL = window.location.pathname +\n\t\t\t\t(params.toString() ? '?' + params.toString() : '');\n\n\t\t\twindow.history.replaceState({}, '', newURL);\n\t\t},\n\n\t\thandleImageLoading() {\n\t\t\t// Lazy load images and handle errors\n\t\t\tthis.$nextTick(() => {\n\t\t\t\tdocument.querySelectorAll('.post-image').forEach(img => {\n\t\t\t\t\timg.onerror = () => {\n\t\t\t\t\t\timg.src = '/dist/placeholder.jpg';\n\t\t\t\t\t\timg.classList.add('placeholder-image');\n\t\t\t\t\t};\n\n\t\t\t\t\t// Fade in images as they load\n\t\t\t\t\timg.onload = () => {\n\t\t\t\t\t\timg.classList.add('loaded');\n\t\t\t\t\t};\n\t\t\t\t});\n\t\t\t});\n\t\t},\n\n\t\tsetupDarkMode() {\n\t\t\t// Apply dark mode if needed\n\t\t\tif (this.darkMode) {\n\t\t\t\tdocument.documentElement.classList.add('dark');\n\t\t\t} else {\n\t\t\t\tdocument.documentElement.classList.remove('dark');\n\t\t\t}\n\n\t\t\t// Listen for system preference changes\n\t\t\twindow.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {\n\t\t\t\tthis.darkMode = e.matches;\n\t\t\t\tthis.applyDarkMode();\n\t\t\t});\n\t\t},\n\n\t\ttoggleDarkMode() {\n\t\t\tthis.darkMode = !this.darkMode;\n\t\t\tlocalStorage.setItem('darkMode', this.darkMode);\n\t\t\tthis.applyDarkMode();\n\t\t},\n\n\t\tapplyDarkMode() {\n\t\t\tif (this.darkMode) {\n\t\t\t\tdocument.documentElement.classList.add('dark');\n\t\t\t} else {\n\t\t\t\tdocument.documentElement.classList.remove('dark');\n\t\t\t}\n\t\t},\n\n\t\tclearFilters() {\n\t\t\tthis.searchQuery = '';\n\t\t\tthis.selectedTag = '';\n\t\t\tthis.updateURL();\n\t\t}\n\t}));\n});\n</script><div class=\"container mx-auto px-4 py-8\" x-data=\"{\n\t\tposts: [],\n\t\tsearchQuery: &#39;&#39;,\n\t\tselectedTag: &#39;&#39;,\n\t\ttags: [],\n\t\tinit() {\n\t\t\t// Initialize posts from the rendered template data\n\t\t\tthis.posts = Array.from(document.querySelectorAll(&#39;[data-post-id]&#39;)).map(post =&gt; {\n\t\t\t\treturn {\n\t\t\t\t\tid: post.getAttribute(&#39;data-post-id&#39;),\n\t\t\t\t\ttitle: post.getAttribute(&#39;data-post-title&#39;),\n\t\t\t\t\tdescription: post.getAttribute(&#39;data-post-description&#39;),\n\t\t\t\t\tslug: post.getAttribute(&#39;data-post-slug&#39;),\n\t\t\t\t\tdate: post.getAttribute(&#39;data-post-date&#39;),\n\t\t\t\t\tbanner: post.getAttribute(&#39;data-post-banner&#39;),\n\t\t\t\t\ttags: JSON.parse(post.getAttribute(&#39;data-post-tags&#39;) || &#39;[]&#39;)\n\t\t\t\t};\n\t\t\t});\n\t\t\t\n\t\t\t// Extract all unique tags\n\t\t\tconst allTags = new Set();\n\t\t\tthis.posts.forEach(post =&gt; {\n\t\t\t\tpost.tags.forEach(tag =&gt; allTags.add(tag.name));\n\t\t\t});\n\t\t\tthis.tags = Array.from(allTags);\n\t\t},\n\t\tfilteredPosts() {\n\t\t\treturn this.posts.filter(post =&gt; {\n\t\t\t\tconst matchesSearch = this.searchQuery === &#39;&#39; || \n\t\t\t\t\tpost.title.toLowerCase().includes(this.searchQuery.toLowerCase()) ||\n\t\t\t\t\tpost.description.toLowerCase().includes(this.searchQuery.toLowerCase());\n\t\t\t\t\n\t\t\t\tconst matchesTag = this.selectedTag === &#39;&#39; ||\n\t\t\t\t\tpost.tags.some(tag =&gt; tag.name === this.selectedTag);\n\t\t\t\t\n\t\t\t\treturn matchesSearch &amp;&amp; matchesTag;\n\t\t\t});\n\t\t}\n\t}\"><h1 class=\"text-3xl font-bold mb-6 text-gray-900 dark:text-white\">Blog Posts</h1><!-- Search and Filter Controls --><div class=\"flex flex-col md:flex-row justify-between mb-8 gap-4\"><div class=\"relative w-full md:w-1/2\"><input type=\"text\" x-model=\"searchQuery\" placeholder=\"Search posts...\" class=\"w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white\"><div class=\"absolute right-3 top-2.5 text-gray-400\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-5 w-5\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z\"></path></svg></div></div><div class=\"w-full md:w-1/3\"><select x-model=\"selectedTag\" class=\"w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white\"><option value=\"\">All Tags</option><template x-for=\"tag in tags\" :key=\"tag\"><option x-text=\"tag\" :value=\"tag\"></option></template></select></div></div><!-- Results info --><p class=\"text-sm text-gray-500 dark:text-gray-400 mb-4\" x-text=\"`Showing ${filteredPosts().length} of ${posts.length} posts`\"></p><!-- Posts Grid --><div class=\"grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6\"><!-- Hidden data elements for Alpine to process -->")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<script type=\"module\">\n// This code will implement posts filtering by +tag and -tag\n// Function to parse URL query params and extract tag filters\nfunction parseTagFilters(queryString) {\n  const params = new URLSearchParams(queryString);\n  const tags = params.get('tags') || '';\n  \n  const includeTags = [];\n  const excludeTags = [];\n  \n  // Parse the tags parameter for +tag and -tag patterns\n  const tagPatterns = tags.split(/\\s+/).filter(tag => tag.trim().length > 0);\n  \n  tagPatterns.forEach(pattern => {\n    if (pattern.startsWith('+')) {\n      const tag = pattern.substring(1).trim();\n      if (tag) includeTags.push(tag);\n    } else if (pattern.startsWith('-')) {\n      const tag = pattern.substring(1).trim();\n      if (tag) excludeTags.push(tag);\n    } else {\n      // If no prefix, assume include\n      if (pattern.trim()) includeTags.push(pattern.trim());\n    }\n  });\n  \n  return { includeTags, excludeTags };\n}\n\n// Function to filter posts based on tags\nfunction filterPostsByTags(posts, includeTags, excludeTags) {\n  if (includeTags.length === 0 && excludeTags.length === 0) {\n    return posts; // No filtering needed\n  }\n  \n  return posts.filter(post => {\n    const postTags = post.tags.map(tag => tag.name.toLowerCase());\n    \n    // Check if post should be excluded\n    if (excludeTags.length > 0) {\n      const shouldExclude = excludeTags.some(tag => \n        postTags.includes(tag.toLowerCase())\n      );\n      if (shouldExclude) return false;\n    }\n    \n    // Check if post should be included\n    if (includeTags.length > 0) {\n      const shouldInclude = includeTags.every(tag => \n        postTags.includes(tag.toLowerCase())\n      );\n      return shouldInclude;\n    }\n    \n    // If we have excludes but no includes, keep all posts that weren't excluded\n    return true;\n  });\n}\n\n// Function to generate tag filter UI\nfunction generateTagFilterUI(allTags, currentIncludeTags, currentExcludeTags) {\n  let html = '<div class=\"tag-filter-container\">';\n  html += '<h3>Filter by Tags</h3>';\n  \n  // Show current filters\n  if (currentIncludeTags.length > 0 || currentExcludeTags.length > 0) {\n    html += '<div class=\"current-filters\">';\n    html += '<span>Current filters: </span>';\n    \n    currentIncludeTags.forEach(tag => {\n      html += `<span class=\"filter-tag include\">+${tag} <a href=\"#\" class=\"remove-filter\" data-tag=\"${tag}\" data-action=\"remove-include\">×</a></span>`;\n    });\n    \n    currentExcludeTags.forEach(tag => {\n      html += `<span class=\"filter-tag exclude\">-${tag} <a href=\"#\" class=\"remove-filter\" data-tag=\"${tag}\" data-action=\"remove-exclude\">×</a></span>`;\n    });\n    \n    html += '<a href=\"?tags=\" class=\"clear-filters\">Clear all filters</a>';\n    html += '</div>';\n  }\n  \n  // Available tags to filter by\n  html += '<div class=\"available-tags\">';\n  allTags.forEach(tag => {\n    const isIncluded = currentIncludeTags.includes(tag.toLowerCase());\n    const isExcluded = currentExcludeTags.includes(tag.toLowerCase());\n    \n    if (!isIncluded && !isExcluded) {\n      html += `<span class=\"tag\">\n        ${tag}\n        <a href=\"?tags=${encodeURIComponent(currentTagsParam(currentIncludeTags, currentExcludeTags) + ' +' + tag)}\" class=\"include-tag\">+</a>\n        <a href=\"?tags=${encodeURIComponent(currentTagsParam(currentIncludeTags, currentExcludeTags) + ' -' + tag)}\" class=\"exclude-tag\">-</a>\n      </span>`;\n    }\n  });\n  html += '</div>';\n  \n  html += '</div>';\n  return html;\n}\n\n// Helper to reconstruct current tags parameter\nfunction currentTagsParam(includeTags, excludeTags) {\n  let tagsParam = '';\n  \n  includeTags.forEach(tag => {\n    tagsParam += ' +' + tag;\n  });\n  \n  excludeTags.forEach(tag => {\n    tagsParam += ' -' + tag;\n  });\n  \n  return tagsParam.trim();\n}\n\n// Main code to integrate with the posts view\ndocument.addEventListener('alpine:init', () => {\n  Alpine.data('postFilters', () => ({\n    queryString: window.location.search,\n    allTags: [],\n    includeTags: [],\n    excludeTags: [],\n    \n    init() {\n      // Extract all unique tags from posts\n      this.allTags = [...new Set(\n        Array.from(document.querySelectorAll('[data-post-tags]'))\n          .map(el => JSON.parse(el.getAttribute('data-post-tags') || '[]'))\n          .flat()\n          .map(tag => tag.name)\n      )];\n      \n      // Parse current filters\n      const { includeTags, excludeTags } = parseTagFilters(this.queryString);\n      this.includeTags = includeTags;\n      this.excludeTags = excludeTags;\n      \n      // Apply filters to Alpine.js data\n      this.$watch('filteredPosts', (posts) => {\n        const filtered = filterPostsByTags(posts, this.includeTags, this.excludeTags);\n        return filtered;\n      });\n    },\n    \n    toggleIncludeTag(tag) {\n      if (this.includeTags.includes(tag)) {\n        this.includeTags = this.includeTags.filter(t => t !== tag);\n      } else {\n        this.includeTags.push(tag);\n        // Remove from exclude if it's there\n        this.excludeTags = this.excludeTags.filter(t => t !== tag);\n      }\n      this.updateURL();\n    },\n    \n    toggleExcludeTag(tag) {\n      if (this.excludeTags.includes(tag)) {\n        this.excludeTags = this.excludeTags.filter(t => t !== tag);\n      } else {\n        this.excludeTags.push(tag);\n        // Remove from include if it's there\n        this.includeTags = this.includeTags.filter(t => t !== tag);\n      }\n      this.updateURL();\n    },\n    \n    updateURL() {\n      let tagsParam = currentTagsParam(this.includeTags, this.excludeTags);\n      \n      // Update the URL\n      const url = new URL(window.location);\n      if (tagsParam) {\n        url.searchParams.set('tags', tagsParam);\n      } else {\n        url.searchParams.delete('tags');\n      }\n      \n      window.history.pushState({}, '', url);\n    }\n  }));\n});\n</script><div class=\"container mx-auto px-4 py-8\" x-data=\"{\n\t\tposts: [],\n\t\tsearchQuery: &#39;&#39;,\n\t\tselectedTag: &#39;&#39;,\n\t\ttags: [],\n\t\tinit() {\n\t\t\t// Initialize posts from the rendered template data\n\t\t\tthis.posts = Array.from(document.querySelectorAll(&#39;[data-post-id]&#39;)).map(post =&gt; {\n\t\t\t\treturn {\n\t\t\t\t\tid: post.getAttribute(&#39;data-post-id&#39;),\n\t\t\t\t\ttitle: post.getAttribute(&#39;data-post-title&#39;),\n\t\t\t\t\tdescription: post.getAttribute(&#39;data-post-description&#39;),\n\t\t\t\t\tslug: post.getAttribute(&#39;data-post-slug&#39;),\n\t\t\t\t\tdate: post.getAttribute(&#39;data-post-date&#39;),\n\t\t\t\t\tbanner: post.getAttribute(&#39;data-post-banner&#39;),\n\t\t\t\t\ttags: JSON.parse(post.getAttribute(&#39;data-post-tags&#39;) || &#39;[]&#39;)\n\t\t\t\t};\n\t\t\t});\n\t\t\t\n\t\t\t// Extract all unique tags\n\t\t\tconst allTags = new Set();\n\t\t\tthis.posts.forEach(post =&gt; {\n\t\t\t\tpost.tags.forEach(tag =&gt; allTags.add(tag.name));\n\t\t\t});\n\t\t\tthis.tags = Array.from(allTags);\n\t\t},\n\t\tfilteredPosts() {\n\t\t\treturn this.posts.filter(post =&gt; {\n\t\t\t\tconst matchesSearch = this.searchQuery === &#39;&#39; || \n\t\t\t\t\tpost.title.toLowerCase().includes(this.searchQuery.toLowerCase()) ||\n\t\t\t\t\tpost.description.toLowerCase().includes(this.searchQuery.toLowerCase());\n\t\t\t\t\n\t\t\t\tconst matchesTag = this.selectedTag === &#39;&#39; ||\n\t\t\t\t\tpost.tags.some(tag =&gt; tag.name === this.selectedTag);\n\t\t\t\t\n\t\t\t\treturn matchesSearch &amp;&amp; matchesTag;\n\t\t\t});\n\t\t}\n\t}\"><h1 class=\"text-3xl font-bold mb-6 text-gray-900 dark:text-white\">Blog Posts</h1><!-- Search and Filter Controls --><div class=\"flex flex-col md:flex-row justify-between mb-8 gap-4\"><div class=\"relative w-full md:w-1/2\"><input type=\"text\" x-model=\"searchQuery\" placeholder=\"Search posts...\" class=\"w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white\"><div class=\"absolute right-3 top-2.5 text-gray-400\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-5 w-5\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z\"></path></svg></div></div><div class=\"w-full md:w-1/3\"><select x-model=\"selectedTag\" class=\"w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white\"><option value=\"\">All Tags</option><template x-for=\"tag in tags\" :key=\"tag\"><option x-text=\"tag\" :value=\"tag\"></option></template></select></div></div><!-- Results info --><p class=\"text-sm text-gray-500 dark:text-gray-400 mb-4\" x-text=\"`Showing ${filteredPosts().length} of ${posts.length} posts`\"></p><!-- Posts Grid --><div class=\"grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6\"><!-- Hidden data elements for Alpine to process -->")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -48,7 +48,7 @@ func Posts(posts *[]master.FullPost) templ.Component {
 				var templ_7745c5c3_Var2 string
 				templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", post.ID))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 219, Col: 47}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 273, Col: 47}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 				if templ_7745c5c3_Err != nil {
@@ -61,7 +61,7 @@ func Posts(posts *[]master.FullPost) templ.Component {
 				var templ_7745c5c3_Var3 string
 				templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(post.Title)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 220, Col: 34}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 274, Col: 34}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 				if templ_7745c5c3_Err != nil {
@@ -74,7 +74,7 @@ func Posts(posts *[]master.FullPost) templ.Component {
 				var templ_7745c5c3_Var4 string
 				templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(post.Description)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 221, Col: 46}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 275, Col: 46}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 				if templ_7745c5c3_Err != nil {
@@ -87,7 +87,7 @@ func Posts(posts *[]master.FullPost) templ.Component {
 				var templ_7745c5c3_Var5 string
 				templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(post.Slug)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 222, Col: 32}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 276, Col: 32}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 				if templ_7745c5c3_Err != nil {
@@ -100,7 +100,7 @@ func Posts(posts *[]master.FullPost) templ.Component {
 				var templ_7745c5c3_Var6 string
 				templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(formatDate(post.CreatedAt))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 223, Col: 49}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 277, Col: 49}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 				if templ_7745c5c3_Err != nil {
@@ -113,7 +113,7 @@ func Posts(posts *[]master.FullPost) templ.Component {
 				var templ_7745c5c3_Var7 string
 				templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(post.BannerUrl)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 224, Col: 39}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 278, Col: 39}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 				if templ_7745c5c3_Err != nil {
@@ -126,7 +126,7 @@ func Posts(posts *[]master.FullPost) templ.Component {
 				var templ_7745c5c3_Var8 string
 				templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(formatTags(post.Tags))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 225, Col: 44}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 279, Col: 44}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 				if templ_7745c5c3_Err != nil {
@@ -198,7 +198,7 @@ func Post(post *master.FullPost) templ.Component {
 		var templ_7745c5c3_Var10 string
 		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(post.Title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 300, Col: 81}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 354, Col: 81}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 		if templ_7745c5c3_Err != nil {
@@ -211,7 +211,7 @@ func Post(post *master.FullPost) templ.Component {
 		var templ_7745c5c3_Var11 string
 		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(time.Unix(post.CreatedAt, 0).Format("2006-01-02"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 302, Col: 70}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 356, Col: 70}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 		if templ_7745c5c3_Err != nil {
@@ -224,7 +224,7 @@ func Post(post *master.FullPost) templ.Component {
 		var templ_7745c5c3_Var12 string
 		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(formatDate(post.CreatedAt))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 303, Col: 33}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 357, Col: 33}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 		if templ_7745c5c3_Err != nil {
@@ -237,7 +237,7 @@ func Post(post *master.FullPost) templ.Component {
 		var templ_7745c5c3_Var13 string
 		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(readTime(post.Content))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 306, Col: 34}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 360, Col: 34}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 		if templ_7745c5c3_Err != nil {
@@ -264,7 +264,7 @@ func Post(post *master.FullPost) templ.Component {
 			var templ_7745c5c3_Var15 string
 			templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(tag.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 314, Col: 16}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 368, Col: 16}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 			if templ_7745c5c3_Err != nil {
@@ -287,7 +287,7 @@ func Post(post *master.FullPost) templ.Component {
 			var templ_7745c5c3_Var16 string
 			templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(post.BannerUrl)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 320, Col: 25}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 374, Col: 25}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 			if templ_7745c5c3_Err != nil {
@@ -300,7 +300,7 @@ func Post(post *master.FullPost) templ.Component {
 			var templ_7745c5c3_Var17 string
 			templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(post.Title)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 321, Col: 21}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 375, Col: 21}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 			if templ_7745c5c3_Err != nil {
@@ -345,7 +345,7 @@ func Post(post *master.FullPost) templ.Component {
 				var templ_7745c5c3_Var19 string
 				templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(project.Name)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 339, Col: 76}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 393, Col: 76}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 				if templ_7745c5c3_Err != nil {
@@ -358,7 +358,7 @@ func Post(post *master.FullPost) templ.Component {
 				var templ_7745c5c3_Var20 string
 				templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(project.Description)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 340, Col: 94}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 394, Col: 94}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 				if templ_7745c5c3_Err != nil {
