@@ -8,7 +8,11 @@ package views
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-import "github.com/conneroisu/conneroh.com/internal/data/master"
+import (
+	"fmt"
+	"github.com/conneroisu/conneroh.com/internal/data/master"
+	"time"
+)
 
 func Posts(posts *[]master.FullPost) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
@@ -31,29 +35,141 @@ func Posts(posts *[]master.FullPost) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		for _, post := range *posts {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<script type=\"module\">\n\ndocument.addEventListener('alpine:init', () => {\n\tAlpine.data('postsManager', () => ({\n\t\tposts: [],\n\t\tsearchQuery: '',\n\t\tselectedTag: '',\n\t\ttags: [],\n\t\tisLoading: true,\n\t\tdarkMode: localStorage.getItem('darkMode') === 'true' ||\n\t\t\twindow.matchMedia('(prefers-color-scheme: dark)').matches,\n\n\t\tinit() {\n\t\t\t// Initialize posts from the rendered template data\n\t\t\tthis.posts = Array.from(document.querySelectorAll('[data-post-id]')).map(post => {\n\t\t\t\treturn {\n\t\t\t\t\tid: post.getAttribute('data-post-id'),\n\t\t\t\t\ttitle: post.getAttribute('data-post-title'),\n\t\t\t\t\tdescription: post.getAttribute('data-post-description'),\n\t\t\t\t\tslug: post.getAttribute('data-post-slug'),\n\t\t\t\t\tdate: post.getAttribute('data-post-date'),\n\t\t\t\t\tbanner: post.getAttribute('data-post-banner'),\n\t\t\t\t\ttags: JSON.parse(post.getAttribute('data-post-tags') || '[]')\n\t\t\t\t};\n\t\t\t});\n\n\t\t\t// Extract all unique tags\n\t\t\tconst allTags = new Set();\n\t\t\tthis.posts.forEach(post => {\n\t\t\t\tif (post.tags) {\n\t\t\t\t\tpost.tags.forEach(tag => tag.name && allTags.add(tag.name));\n\t\t\t\t}\n\t\t\t});\n\t\t\tthis.tags = Array.from(allTags);\n\n\t\t\t// Check URL parameters for any pre-selected filters\n\t\t\tconst urlParams = new URLSearchParams(window.location.search);\n\t\t\tthis.searchQuery = urlParams.get('q') || '';\n\t\t\tthis.selectedTag = urlParams.get('tag') || '';\n\n\t\t\t// Image loading handling\n\t\t\tthis.handleImageLoading();\n\n\t\t\t// Set loading state to false\n\t\t\tsetTimeout(() => this.isLoading = false, 300);\n\n\t\t\t// Setup dark mode\n\t\t\tthis.setupDarkMode();\n\t\t},\n\n\t\tfilteredPosts() {\n\t\t\treturn this.posts.filter(post => {\n\t\t\t\tconst matchesSearch = this.searchQuery === '' ||\n\t\t\t\t\tpost.title.toLowerCase().includes(this.searchQuery.toLowerCase()) ||\n\t\t\t\t\tpost.description.toLowerCase().includes(this.searchQuery.toLowerCase());\n\n\t\t\t\tconst matchesTag = this.selectedTag === '' ||\n\t\t\t\t\t(post.tags && post.tags.some(tag => tag.name === this.selectedTag));\n\n\t\t\t\treturn matchesSearch && matchesTag;\n\t\t\t});\n\t\t},\n\n\t\tupdateURL() {\n\t\t\t// Update URL with current filters without page reload\n\t\t\tconst params = new URLSearchParams();\n\t\t\tif (this.searchQuery) params.set('q', this.searchQuery);\n\t\t\tif (this.selectedTag) params.set('tag', this.selectedTag);\n\n\t\t\tconst newURL = window.location.pathname +\n\t\t\t\t(params.toString() ? '?' + params.toString() : '');\n\n\t\t\twindow.history.replaceState({}, '', newURL);\n\t\t},\n\n\t\thandleImageLoading() {\n\t\t\t// Lazy load images and handle errors\n\t\t\tthis.$nextTick(() => {\n\t\t\t\tdocument.querySelectorAll('.post-image').forEach(img => {\n\t\t\t\t\timg.onerror = () => {\n\t\t\t\t\t\timg.src = '/dist/placeholder.jpg';\n\t\t\t\t\t\timg.classList.add('placeholder-image');\n\t\t\t\t\t};\n\n\t\t\t\t\t// Fade in images as they load\n\t\t\t\t\timg.onload = () => {\n\t\t\t\t\t\timg.classList.add('loaded');\n\t\t\t\t\t};\n\t\t\t\t});\n\t\t\t});\n\t\t},\n\n\t\tsetupDarkMode() {\n\t\t\t// Apply dark mode if needed\n\t\t\tif (this.darkMode) {\n\t\t\t\tdocument.documentElement.classList.add('dark');\n\t\t\t} else {\n\t\t\t\tdocument.documentElement.classList.remove('dark');\n\t\t\t}\n\n\t\t\t// Listen for system preference changes\n\t\t\twindow.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {\n\t\t\t\tthis.darkMode = e.matches;\n\t\t\t\tthis.applyDarkMode();\n\t\t\t});\n\t\t},\n\n\t\ttoggleDarkMode() {\n\t\t\tthis.darkMode = !this.darkMode;\n\t\t\tlocalStorage.setItem('darkMode', this.darkMode);\n\t\t\tthis.applyDarkMode();\n\t\t},\n\n\t\tapplyDarkMode() {\n\t\t\tif (this.darkMode) {\n\t\t\t\tdocument.documentElement.classList.add('dark');\n\t\t\t} else {\n\t\t\t\tdocument.documentElement.classList.remove('dark');\n\t\t\t}\n\t\t},\n\n\t\tclearFilters() {\n\t\t\tthis.searchQuery = '';\n\t\t\tthis.selectedTag = '';\n\t\t\tthis.updateURL();\n\t\t}\n\t}));\n});\n</script><div class=\"container mx-auto px-4 py-8\" x-data=\"{\n\t\tposts: [],\n\t\tsearchQuery: &#39;&#39;,\n\t\tselectedTag: &#39;&#39;,\n\t\ttags: [],\n\t\tinit() {\n\t\t\t// Initialize posts from the rendered template data\n\t\t\tthis.posts = Array.from(document.querySelectorAll(&#39;[data-post-id]&#39;)).map(post =&gt; {\n\t\t\t\treturn {\n\t\t\t\t\tid: post.getAttribute(&#39;data-post-id&#39;),\n\t\t\t\t\ttitle: post.getAttribute(&#39;data-post-title&#39;),\n\t\t\t\t\tdescription: post.getAttribute(&#39;data-post-description&#39;),\n\t\t\t\t\tslug: post.getAttribute(&#39;data-post-slug&#39;),\n\t\t\t\t\tdate: post.getAttribute(&#39;data-post-date&#39;),\n\t\t\t\t\tbanner: post.getAttribute(&#39;data-post-banner&#39;),\n\t\t\t\t\ttags: JSON.parse(post.getAttribute(&#39;data-post-tags&#39;) || &#39;[]&#39;)\n\t\t\t\t};\n\t\t\t});\n\t\t\t\n\t\t\t// Extract all unique tags\n\t\t\tconst allTags = new Set();\n\t\t\tthis.posts.forEach(post =&gt; {\n\t\t\t\tpost.tags.forEach(tag =&gt; allTags.add(tag.name));\n\t\t\t});\n\t\t\tthis.tags = Array.from(allTags);\n\t\t},\n\t\tfilteredPosts() {\n\t\t\treturn this.posts.filter(post =&gt; {\n\t\t\t\tconst matchesSearch = this.searchQuery === &#39;&#39; || \n\t\t\t\t\tpost.title.toLowerCase().includes(this.searchQuery.toLowerCase()) ||\n\t\t\t\t\tpost.description.toLowerCase().includes(this.searchQuery.toLowerCase());\n\t\t\t\t\n\t\t\t\tconst matchesTag = this.selectedTag === &#39;&#39; ||\n\t\t\t\t\tpost.tags.some(tag =&gt; tag.name === this.selectedTag);\n\t\t\t\t\n\t\t\t\treturn matchesSearch &amp;&amp; matchesTag;\n\t\t\t});\n\t\t}\n\t}\"><h1 class=\"text-3xl font-bold mb-6 text-gray-900 dark:text-white\">Blog Posts</h1><!-- Search and Filter Controls --><div class=\"flex flex-col md:flex-row justify-between mb-8 gap-4\"><div class=\"relative w-full md:w-1/2\"><input type=\"text\" x-model=\"searchQuery\" placeholder=\"Search posts...\" class=\"w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white\"><div class=\"absolute right-3 top-2.5 text-gray-400\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-5 w-5\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z\"></path></svg></div></div><div class=\"w-full md:w-1/3\"><select x-model=\"selectedTag\" class=\"w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white\"><option value=\"\">All Tags</option><template x-for=\"tag in tags\" :key=\"tag\"><option x-text=\"tag\" :value=\"tag\"></option></template></select></div></div><!-- Results info --><p class=\"text-sm text-gray-500 dark:text-gray-400 mb-4\" x-text=\"`Showing ${filteredPosts().length} of ${posts.length} posts`\"></p><!-- Posts Grid --><div class=\"grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6\"><!-- Hidden data elements for Alpine to process -->")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if posts != nil {
+			for _, post := range *posts {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, " <div class=\"hidden\" data-post-id=\"")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var2 string
+				templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", post.ID))
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 219, Col: 47}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\" data-post-title=\"")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var3 string
+				templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(post.Title)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 220, Col: 34}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" data-post-description=\"")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var4 string
+				templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(post.Description)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 221, Col: 46}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" data-post-slug=\"")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var5 string
+				templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(post.Slug)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 222, Col: 32}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" data-post-date=\"")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var6 string
+				templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(formatDate(post.CreatedAt))
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 223, Col: 49}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" data-post-banner=\"")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var7 string
+				templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(post.BannerUrl)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 224, Col: 39}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\" data-post-tags=\"")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var8 string
+				templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(formatTags(post.Tags))
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 225, Col: 44}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "\"></div>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
 			}
-			var templ_7745c5c3_Var2 string
-			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(post.Slug)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 8, Col: 14}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</div>")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<!-- Template for displaying posts --><template x-for=\"post in filteredPosts()\" :key=\"post.id\"><div class=\"bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300\"><a :href=\"`/post/${post.slug}`\" class=\"block\"><img :src=\"post.banner || &#39;/dist/placeholder.jpg&#39;\" :alt=\"post.title\" class=\"w-full h-48 object-cover object-center\"><div class=\"p-6\"><div class=\"flex justify-between items-start mb-2\"><h2 class=\"text-xl font-semibold text-gray-900 dark:text-white\" x-text=\"post.title\"></h2><span class=\"text-sm text-gray-500 dark:text-gray-400\" x-text=\"post.date\"></span></div><p class=\"text-gray-600 dark:text-gray-300 mb-4 line-clamp-3\" x-text=\"post.description\"></p><div class=\"flex flex-wrap gap-2\"><template x-for=\"tag in post.tags\" :key=\"tag.id\"><span class=\"inline-block px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200\" x-text=\"tag.name\" @click.stop=\"selectedTag = tag.name\"></span></template></div></div></a></div></template><!-- Empty state --><div class=\"col-span-full py-12 text-center text-gray-500 dark:text-gray-400\" x-show=\"filteredPosts().length === 0\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-12 w-12 mx-auto mb-4\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"currentColor\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z\"></path></svg><p class=\"text-lg\">No posts match your search</p><button @click=\"searchQuery = &#39;&#39;; selectedTag = &#39;&#39;;\" class=\"mt-4 px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline\">Clear filters</button></div></div></div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
 		}
 		return nil
 	})
 }
 
+// Helper functions for formatting data for Alpine.js
+func formatDate(timestamp int64) string {
+	t := time.Unix(timestamp, 0)
+	return t.Format("Jan 02, 2006")
+}
+
+func formatTags(tags []master.Tag) string {
+	// This is a simplified representation - in a real app, you might want to use a JSON library
+	if len(tags) == 0 {
+		return "[]"
+	}
+
+	result := "["
+	for i, tag := range tags {
+		if i > 0 {
+			result += ","
+		}
+		result += fmt.Sprintf(`{"id":%d,"name":"%s","slug":"%s"}`, tag.ID, tag.Name, tag.Slug)
+	}
+	result += "]"
+	return result
+}
+
+// Individual Post component
 func Post(post *master.FullPost) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -70,17 +186,211 @@ func Post(post *master.FullPost) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var3 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var3 == nil {
-			templ_7745c5c3_Var3 = templ.NopComponent
+		templ_7745c5c3_Var9 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var9 == nil {
+			templ_7745c5c3_Var9 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<article class=\"uk-article\"><h1 class=\"uk-article-title\"></h1><p class=\"uk-article-meta\"></p></article><progress id=\"js-progressbar\" class=\"uk-progress\" value=\"10\" max=\"100\"></progress><script>\n  UIkit.util.ready(function () {\n    var bar = document.getElementById(\"js-progressbar\");\n    if (!bar) return;\n\n    var animate = setInterval(function () {\n      bar.value += 10;\n\n      if (bar.value >= bar.max) {\n        clearInterval(animate);\n      }\n    }, 1000);\n  });\n</script>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<article class=\"container mx-auto px-4 py-8 max-w-3xl\"><div class=\"mb-8\"><h1 class=\"text-4xl font-bold text-gray-900 dark:text-white mb-4\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var10 string
+		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(post.Title)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 300, Col: 81}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</h1><div class=\"flex items-center text-gray-500 dark:text-gray-400 mb-6\"><time datetime=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var11 string
+		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(time.Unix(post.CreatedAt, 0).Format("2006-01-02"))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 302, Col: 70}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var12 string
+		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(formatDate(post.CreatedAt))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 303, Col: 33}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</time> <span class=\"mx-2\">•</span> <span>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var13 string
+		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(readTime(post.Content))
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 306, Col: 34}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, " min read</span></div><div class=\"flex flex-wrap gap-2 mb-8\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		for _, tag := range post.Tags {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<a href=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var14 templ.SafeURL = templ.SafeURL(fmt.Sprintf("/tag/%s", tag.Slug))
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var14)))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "\" class=\"inline-block px-3 py-1 text-sm font-medium rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var15 string
+			templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(tag.Name)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 314, Col: 16}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</a>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "</div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if post.BannerUrl != "" {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "<img src=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var16 string
+			templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(post.BannerUrl)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 320, Col: 25}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "\" alt=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var17 string
+			templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(post.Title)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 321, Col: 21}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "\" class=\"w-full h-64 md:h-96 object-cover object-center rounded-lg shadow-md mb-8\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "</div><div class=\"prose prose-lg dark:prose-invert max-w-none\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templ.Raw(post.Content).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "</div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if len(post.Projects) > 0 {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "<div class=\"mt-12 border-t border-gray-200 dark:border-gray-700 pt-8\"><h2 class=\"text-2xl font-bold text-gray-900 dark:text-white mb-4\">Related Projects</h2><div class=\"grid grid-cols-1 md:grid-cols-2 gap-4\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			for _, project := range post.Projects {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "<a href=\"")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var18 templ.SafeURL = templ.SafeURL(fmt.Sprintf("/project/%s", project.Slug))
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var18)))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "\" class=\"flex items-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors\"><div><h3 class=\"font-medium text-gray-900 dark:text-white\">")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var19 string
+				templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(project.Name)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 339, Col: 76}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "</h3><p class=\"text-gray-500 dark:text-gray-400 text-sm line-clamp-2\">")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var20 string
+				templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(project.Description)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 340, Col: 94}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "</p></div></a>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, "</div></div>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "</article>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		return nil
 	})
+}
+
+func readTime(content string) string {
+	// Rough estimate - 200 words per minute reading speed
+	words := len(content) / 5 // Average word length is 5 characters
+	minutes := words / 200
+
+	if minutes < 1 {
+		return "1"
+	}
+	return fmt.Sprintf("%d", minutes)
 }
 
 var _ = templruntime.GeneratedTemplate
