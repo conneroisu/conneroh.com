@@ -1,7 +1,172 @@
 package views
 
-import "github.com/conneroisu/conneroh.com/internal/data/master"
+import (
+	"fmt"
+	"github.com/conneroisu/conneroh.com/internal/data/master"
+	"strings"
+)
 
+var hasCommon bool
+
+// Tags shows all available tags
+templ Tags(
+	fullPosts *[]master.FullPost,
+	fullProjects *[]master.FullProject,
+	fullTags *[]master.FullTag,
+	fullPostsSlugMap *map[string]master.FullPost,
+	fullProjectsSlugMap *map[string]master.FullProject,
+	fullTagsSlugMap *map[string]master.FullTag,
+) {
+	<div
+		class="container mx-auto px-4 py-8"
+		x-data="{
+			tags: [],
+			searchQuery: '',
+			selectedSection: '',
+			sections: [],
+			isLoading: true,
+			init() {
+				// Initialize the tags from the data attributes in the rendered HTML
+				this.tags = Array.from(document.querySelectorAll('[data-tag-id]')).map(tag => {
+					return {
+						id: tag.getAttribute('data-tag-id'),
+						name: tag.getAttribute('data-tag-name'),
+						description: tag.getAttribute('data-tag-description'),
+						slug: tag.getAttribute('data-tag-slug'),
+						section: tag.getAttribute('data-tag-section'),
+						postsCount: parseInt(tag.getAttribute('data-tag-posts-count') || '0'),
+						projectsCount: parseInt(tag.getAttribute('data-tag-projects-count') || '0')
+					};
+				});
+				
+				// Extract all unique sections
+				const allSections = new Set();
+				this.tags.forEach(tag => {
+					if (tag.section) allSections.add(tag.section);
+				});
+				this.sections = Array.from(allSections);
+				
+				// Set loading state to false
+				setTimeout(() => this.isLoading = false, 300);
+			},
+			filteredTags() {
+				return this.tags.filter(tag => {
+					const matchesSearch = this.searchQuery === '' || 
+						tag.name.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+						tag.description.toLowerCase().includes(this.searchQuery.toLowerCase());
+					
+					const matchesSection = this.selectedSection === '' || tag.section === this.selectedSection;
+					
+					return matchesSearch && matchesSection;
+				});
+			}
+		}"
+	>
+		<h1 class="text-3xl font-bold mb-6 text-gray-900 dark:text-white">Tags</h1>
+		<!-- Search and Filter Controls -->
+		<div class="flex flex-col md:flex-row justify-between mb-8 gap-4">
+			<div class="relative w-full md:w-1/2">
+				<input
+					type="text"
+					x-model="searchQuery"
+					placeholder="Search tags..."
+					class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+				/>
+				<div class="absolute right-3 top-2.5 text-gray-400">
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+					</svg>
+				</div>
+			</div>
+			<div class="w-full md:w-1/3">
+				<select
+					x-model="selectedSection"
+					class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+				>
+					<option value="">All Sections</option>
+					<template x-for="section in sections" :key="section">
+						<option x-text="section" :value="section"></option>
+					</template>
+				</select>
+			</div>
+		</div>
+		<!-- Results info -->
+		<p class="text-sm text-gray-500 dark:text-gray-400 mb-4" x-text="`Showing ${filteredTags().length} of ${tags.length} tags`"></p>
+		<!-- Loading state -->
+		<div x-show="isLoading" class="flex justify-center py-12">
+			<div class="animate-pulse flex space-x-4">
+				<div class="rounded-full bg-gray-300 dark:bg-gray-700 h-12 w-12"></div>
+				<div class="flex-1 space-y-4 py-1">
+					<div class="h-4 bg-gray-300 dark:bg-gray-700 rounded w-3/4"></div>
+					<div class="space-y-2">
+						<div class="h-4 bg-gray-300 dark:bg-gray-700 rounded"></div>
+						<div class="h-4 bg-gray-300 dark:bg-gray-700 rounded w-5/6"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- Hidden tag data for Alpine -->
+		if fullTags != nil {
+			// Create a nested map for sections
+			nestedTags := tags.NestedSort(*fullTags)
+			for _, tag := range *fullTags {
+				section := "misc"
+				if strings.Contains(tag.Name, "/") {
+					section = strings.Split(tag.Name, "/")[0]
+				}
+				<div
+					class="hidden"
+					data-tag-id={ fmt.Sprintf("%d", tag.ID) }
+					data-tag-name={ tag.Name }
+					data-tag-description={ tag.Description }
+					data-tag-slug={ tag.Slug }
+					data-tag-posts-count={ fmt.Sprintf("%d", len(tag.Posts)) }
+					data-tag-projects-count={ fmt.Sprintf("%d", len(tag.Projects)) }
+				></div>
+			}
+		}
+		<!-- Tags Grid -->
+		<div x-show="!isLoading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+			<template x-for="tag in filteredTags()" :key="tag.id">
+				<a :href="`/tag/${tag.slug}`" class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+					<div class="p-6">
+						<div class="flex items-center justify-between mb-3">
+							<h2 class="text-xl font-semibold text-gray-900 dark:text-white" x-text="tag.name"></h2>
+							<div class="bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center h-8 w-8">
+								<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+								</svg>
+							</div>
+						</div>
+						<p class="text-gray-600 dark:text-gray-300 mb-4 line-clamp-2" x-text="tag.description"></p>
+						<div class="flex items-center justify-between text-sm">
+							<span class="text-gray-500 dark:text-gray-400" x-text="`${tag.postsCount} posts`"></span>
+							<span class="text-gray-500 dark:text-gray-400" x-text="`${tag.projectsCount} projects`"></span>
+						</div>
+					</div>
+				</a>
+			</template>
+		</div>
+		<!-- Empty state -->
+		<div
+			class="py-12 text-center text-gray-500 dark:text-gray-400"
+			x-show="!isLoading && filteredTags().length === 0"
+		>
+			<svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+			</svg>
+			<p class="text-lg">No tags match your search</p>
+			<button
+				@click="searchQuery = ''; selectedSection = '';"
+				class="mt-4 px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline"
+			>
+				Clear filters
+			</button>
+		</div>
+	</div>
+}
+
+// Tag component for displaying a single tag and its associated content
 templ Tag(
 	tag *master.FullTag,
 	fullPosts *[]master.FullPost,
@@ -11,16 +176,156 @@ templ Tag(
 	fullProjectsSlugMap *map[string]master.FullProject,
 	fullTagsSlugMap *map[string]master.FullTag,
 ) {
-	<h1>{ tag.Name }</h1>
-}
-
-templ Tags(
-	fullPosts *[]master.FullPost,
-	fullProjects *[]master.FullProject,
-	fullTags *[]master.FullTag,
-	fullPostsSlugMap *map[string]master.FullPost,
-	fullProjectsSlugMap *map[string]master.FullProject,
-	fullTagsSlugMap *map[string]master.FullTag,
-) {
-	<div>hello tags()</div>
+	<div class="container mx-auto px-4 py-8 max-w-4xl">
+		<header class="text-center mb-12">
+			<div class="inline-block mb-4 bg-blue-100 dark:bg-blue-900 p-4 rounded-full">
+				<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+				</svg>
+			</div>
+			<h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-4">{ tag.Name }</h1>
+			<p class="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">{ tag.Description }</p>
+		</header>
+		<div x-data="{ activeTab: 'posts' }" class="mb-8">
+			<!-- Tabs -->
+			<div class="border-b border-gray-200 dark:border-gray-700 mb-6">
+				<nav class="flex space-x-8">
+					<button
+						@click="activeTab = 'posts'"
+						:class="{ 'border-blue-500 text-blue-600 dark:text-blue-500': activeTab === 'posts', 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300': activeTab !== 'posts' }"
+						class="py-4 px-1 border-b-2 font-medium text-sm sm:text-base"
+					>
+						Posts ({ fmt.Sprintf("%d", len(tag.Posts)) })
+					</button>
+					<button
+						@click="activeTab = 'projects'"
+						:class="{ 'border-blue-500 text-blue-600 dark:text-blue-500': activeTab === 'projects', 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300': activeTab !== 'projects' }"
+						class="py-4 px-1 border-b-2 font-medium text-sm sm:text-base"
+					>
+						Projects ({ fmt.Sprintf("%d", len(tag.Projects)) })
+					</button>
+					<button
+						@click="activeTab = 'related'"
+						:class="{ 'border-blue-500 text-blue-600 dark:text-blue-500': activeTab === 'related', 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300': activeTab !== 'related' }"
+						class="py-4 px-1 border-b-2 font-medium text-sm sm:text-base"
+					>
+						Related Tags
+					</button>
+				</nav>
+			</div>
+			<!-- Posts Tab -->
+			<div x-show="activeTab === 'posts'">
+				if len(tag.Posts) > 0 {
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+						for _, post := range tag.Posts {
+							<a href={ templ.SafeURL(fmt.Sprintf("/post/%s", post.Slug)) } class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+								if post.BannerUrl != "" {
+									<img src={ post.BannerUrl } alt={ post.Title } class="w-full h-40 object-cover"/>
+								} else {
+									<div class="w-full h-40 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+										<svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+										</svg>
+									</div>
+								}
+								<div class="p-6">
+									<h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">{ post.Title }</h2>
+									<p class="text-gray-600 dark:text-gray-300 mb-4 line-clamp-2">{ post.Description }</p>
+									<div class="flex justify-between items-center">
+										<span class="text-blue-600 dark:text-blue-400 hover:underline text-sm font-medium">Read more</span>
+										<span class="text-sm text-gray-500 dark:text-gray-400">{ formatDate(post.CreatedAt) }</span>
+									</div>
+								</div>
+							</a>
+						}
+					</div>
+				} else {
+					<div class="text-center py-12 text-gray-500 dark:text-gray-400">
+						<svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+						</svg>
+						<p>No posts found with this tag</p>
+					</div>
+				}
+			</div>
+			<!-- Projects Tab -->
+			<div x-show="activeTab === 'projects'" x-cloak>
+				if len(tag.Projects) > 0 {
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+						for _, project := range tag.Projects {
+							<a href={ templ.SafeURL(fmt.Sprintf("/project/%s", project.Slug)) } class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-300">
+								<h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">{ project.Name }</h2>
+								<p class="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">{ project.Description }</p>
+								<div class="flex justify-between items-center">
+									<span class="text-blue-600 dark:text-blue-400 hover:underline text-sm font-medium">View project</span>
+									if project.CreatedAt != nil {
+										<span class="text-sm text-gray-500 dark:text-gray-400">{ formatDate(*project.CreatedAt) }</span>
+									}
+								</div>
+							</a>
+						}
+					</div>
+				} else {
+					<div class="text-center py-12 text-gray-500 dark:text-gray-400">
+						<svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+						</svg>
+						<p>No projects found with this tag</p>
+					</div>
+				}
+			</div>
+			<!-- Related Tags Tab -->
+			<div x-show="activeTab === 'related'" x-cloak>
+				if fullTags != nil {
+					<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+						for _, relatedTag := range *fullTags {
+							// Skip the current tag
+							if relatedTag.ID == tag.ID {
+								continue
+							}
+							// Check if tags have common posts or projects
+							for _, post := range tag.Posts {
+								hasCommon := false
+								for _, relatedPost := range relatedTag.Posts {
+									if post.ID == relatedPost.ID {
+										hasCommon = true
+										break
+									}
+								}
+								if hasCommon {
+									break
+								}
+							}
+							if !hasCommon {
+								for _, project := range tag.Projects {
+									for _, relatedProject := range relatedTag.Projects {
+										if project.ID == relatedProject.ID {
+											hasCommon = true
+											break
+										}
+									}
+									if hasCommon {
+										break
+									}
+								}
+							}
+							if hasCommon {
+								<a href={ templ.SafeURL(fmt.Sprintf("/tag/%s", relatedTag.Slug)) } class="bg-white dark:bg-gray-800 rounded-lg p-4 hover:shadow-md transition-shadow duration-300 flex items-center">
+									<div class="text-gray-400 dark:text-gray-500 mr-3">
+										<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+										</svg>
+									</div>
+									<div>
+										<h3 class="font-medium text-gray-900 dark:text-white">{ relatedTag.Name }</h3>
+										<p class="text-xs text-gray-500 dark:text-gray-400 line-clamp-1">{ fmt.Sprintf("%d posts, %d projects", len(relatedTag.Posts), len(relatedTag.Projects)) }</p>
+									</div>
+								</a>
+							}
+						}
+					</div>
+				}
+			</div>
+		</div>
+	</div>
 }
