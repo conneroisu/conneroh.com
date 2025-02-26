@@ -4,6 +4,7 @@ go 1.24.0
 
 require (
 	github.com/a-h/templ v0.3.833
+	github.com/axzilla/templui v0.31.0
 	github.com/go-playground/validator/v10 v10.25.0
 	github.com/litao91/goldmark-mathjax v0.0.0-20210217064022-a43cf739a50f
 	github.com/stretchr/testify v1.10.0
@@ -19,6 +20,7 @@ require (
 
 require (
 	github.com/BurntSushi/toml v1.2.1 // indirect
+	github.com/Oudwins/tailwind-merge-go v0.2.0 // indirect
 	github.com/alecthomas/chroma/v2 v2.2.0 // indirect
 	github.com/antlr4-go/antlr/v4 v4.13.0 // indirect
 	github.com/coder/websocket v1.8.12 // indirect
