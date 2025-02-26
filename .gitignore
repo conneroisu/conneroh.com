@@ -4,3 +4,9 @@
 .pre-commit-config.json
 node_modules
 .env
+tmp
+test.db
+*.wlf
+*.log
+.DS_Store
+.vscode

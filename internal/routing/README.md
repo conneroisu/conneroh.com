@@ -25,7 +25,7 @@ Package routing provides implementations for routing.
 
 
 <a name="APIFn"></a>
-## type [APIFn](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/main.go#L12>)
+## type APIFn
 
 APIFn is a function that handles an API request.
 
@@ -34,7 +34,7 @@ type APIFn func(http.ResponseWriter, *http.Request) error
 ```
 
 <a name="APIHandler"></a>
-## type [APIHandler](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/main.go#L15-L24>)
+## type APIHandler
 
 APIHandler is a function that returns an APIFn.
 
@@ -52,7 +52,7 @@ type APIHandler func(
 ```
 
 <a name="APIMap"></a>
-## type [APIMap](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/main.go#L27>)
+## type APIMap
 
 APIMap is a map of API functions.
 
@@ -61,7 +61,7 @@ type APIMap map[string]APIHandler
 ```
 
 <a name="APIMap.AddRoutes"></a>
-### func \(APIMap\) [AddRoutes](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/main.go#L30-L40>)
+### func \(APIMap\) AddRoutes
 
 ```go
 func (m APIMap) AddRoutes(ctx context.Context, mux *http.ServeMux, db *data.Database[master.Queries], fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, fullTags *[]master.FullTag, postsSlugMap *map[string]master.FullPost, projectsSlugMap *map[string]master.FullProject, tagsSlugMap *map[string]master.FullTag) error
@@ -70,7 +70,7 @@ func (m APIMap) AddRoutes(ctx context.Context, mux *http.ServeMux, db *data.Data
 AddRoutes adds all routes to the router.
 
 <a name="ErrMissingParam"></a>
-## type [ErrMissingParam](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/errors.go#L23-L26>)
+## type ErrMissingParam
 
 ErrMissingParam is an error that is returned when a required parameter is missing.
 
@@ -82,7 +82,7 @@ type ErrMissingParam struct {
 ```
 
 <a name="ErrMissingParam.Error"></a>
-### func \(ErrMissingParam\) [Error](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/errors.go#L29>)
+### func \(ErrMissingParam\) Error
 
 ```go
 func (e ErrMissingParam) Error() string
@@ -91,7 +91,7 @@ func (e ErrMissingParam) Error() string
 Error implements the error interface on ErrMissingParam.
 
 <a name="ErrNotFound"></a>
-## type [ErrNotFound](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/errors.go#L9-L11>)
+## type ErrNotFound
 
 ErrNotFound is an error that is returned when a resource is not found.
 
@@ -102,7 +102,7 @@ type ErrNotFound struct {
 ```
 
 <a name="ErrNotFound.Error"></a>
-### func \(ErrNotFound\) [Error](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/errors.go#L14>)
+### func \(ErrNotFound\) Error
 
 ```go
 func (e ErrNotFound) Error() string

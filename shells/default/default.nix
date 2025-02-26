@@ -24,7 +24,7 @@ in
       nixd
 
       # Go Tools
-      go
+      go_1_24
       air
       templ
       pprof
@@ -50,6 +50,7 @@ in
       sqldiff
       inputs.sqlcquash.packages."${pkgs.system}".default
       sleek
+      nodePackages.typescript-language-server
 
       # Infra
       flyctl

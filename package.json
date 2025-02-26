@@ -3,6 +3,7 @@
   "module": "index.js",
   "type": "module",
   "devDependencies": {
+    "@types/alpinejs": "^3.13.11",
     "@types/bun": "latest"
   },
   "peerDependencies": {

@@ -24,7 +24,7 @@ Package md contains the implementation of a markdown parser/renderer.
 
 
 <a name="Parse"></a>
-## func [Parse](<https://github.com/conneroisu/conneroh.com/blob/main/internal/md/parse.go#L55>)
+## func Parse
 
 ```go
 func Parse(source []byte) (string, error)
@@ -33,7 +33,7 @@ func Parse(source []byte) (string, error)
 Parse parses markdown to html.
 
 <a name="FrontMatter"></a>
-## type [FrontMatter](<https://github.com/conneroisu/conneroh.com/blob/main/internal/md/parse.go#L22-L26>)
+## type FrontMatter
 
 FrontMatter is the frontmatter of a markdown document.
 
@@ -46,7 +46,7 @@ type FrontMatter struct {
 ```
 
 <a name="FrontMatterMissingError"></a>
-## type [FrontMatterMissingError](<https://github.com/conneroisu/conneroh.com/blob/main/internal/md/errors.go#L4-L5>)
+## type FrontMatterMissingError
 
 FrontMatterMissingError is returned when the front matter is missing from the markdown file.
 
@@ -56,7 +56,7 @@ type FrontMatterMissingError struct {
 ```
 
 <a name="FrontMatterMissingError.Error"></a>
-### func \(FrontMatterMissingError\) [Error](<https://github.com/conneroisu/conneroh.com/blob/main/internal/md/errors.go#L8>)
+### func \(FrontMatterMissingError\) Error
 
 ```go
 func (e FrontMatterMissingError) Error() string
