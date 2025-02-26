@@ -6,12 +6,31 @@ import (
 	"net/http"
 	"strings"
 
+	"slices"
+
 	"github.com/a-h/templ"
 	static "github.com/conneroisu/conneroh.com/cmd/conneroh/_static"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/views"
 	"github.com/conneroisu/conneroh.com/internal/data"
 	"github.com/conneroisu/conneroh.com/internal/data/master"
 	"github.com/conneroisu/conneroh.com/internal/routing"
+)
+
+const tagsParamContextKey contextKey = "tagsParam"
+const currentURLContextKey contextKey = "currentURL"
+
+type (
+	fullFn func(
+		fullPosts *[]master.FullPost,
+		fullProjects *[]master.FullProject,
+		fullTags *[]master.FullTag,
+		fullPostsSlugMap *map[string]master.FullPost,
+		fullProjectsSlugMap *map[string]master.FullProject,
+		fullTagsSlugMap *map[string]master.FullTag,
+	) templ.Component
+
+	// Context keys for passing data to templates
+	contextKey string
 )
 
 // Dist is the dist handler for serving/distributing static files.
@@ -152,12 +171,6 @@ func Posts(
 	}, nil
 }
 
-// Context keys for passing data to templates
-type contextKey string
-
-const tagsParamContextKey contextKey = "tagsParam"
-const currentURLContextKey contextKey = "currentURL"
-
 // parseTagFilters extracts include and exclude tags from the tag parameter
 func parseTagFilters(tagsParam string) (includeTags, excludeTags []string) {
 	if tagsParam == "" {
@@ -200,11 +213,8 @@ func filterPostsByTags(posts []master.FullPost, includeTags, excludeTags []strin
 		// Check if post should be excluded
 		excluded := false
 		for _, excludeTag := range excludeTags {
-			for _, postTag := range postTags {
-				if postTag == excludeTag {
-					excluded = true
-					break
-				}
+			if slices.Contains(postTags, excludeTag) {
+				excluded = true
 			}
 			if excluded {
 				break
@@ -218,13 +228,7 @@ func filterPostsByTags(posts []master.FullPost, includeTags, excludeTags []strin
 		if len(includeTags) > 0 {
 			allTagsFound := true
 			for _, includeTag := range includeTags {
-				tagFound := false
-				for _, postTag := range postTags {
-					if postTag == includeTag {
-						tagFound = true
-						break
-					}
-				}
+				tagFound := slices.Contains(postTags, includeTag)
 				if !tagFound {
 					allTagsFound = false
 					break
@@ -262,7 +266,15 @@ func Post(
 			return routing.ErrNotFound{URL: r.URL}
 		}
 		templ.Handler(
-			views.Page(views.Post(&post, fullPosts, fullProjects, fullTags, fullPostSlugMap, fullProjectSlugMap, fullTagSlugMap)),
+			views.Page(views.Post(
+				&post,
+				fullPosts,
+				fullProjects,
+				fullTags,
+				fullPostSlugMap,
+				fullProjectSlugMap,
+				fullTagSlugMap,
+			)),
 		).ServeHTTP(w, r)
 		return nil
 	}, nil
@@ -340,7 +352,7 @@ func Morph(
 	fullProjectSlugMap *map[string]master.FullProject,
 	fullTagSlugMap *map[string]master.FullTag,
 ) (routing.APIFn, error) {
-	var morphMap = map[string]func(fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, fullTags *[]master.FullTag, fullPostsSlugMap *map[string]master.FullPost, fullProjectsSlugMap *map[string]master.FullProject, fullTagsSlugMap *map[string]master.FullTag) templ.Component{
+	var morphMap = map[string]fullFn{
 		"projects": views.Projects,
 		"posts":    views.Posts,
 		"tags":     views.Tags,
