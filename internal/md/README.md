@@ -17,17 +17,17 @@ Package md contains the implementation of a markdown parser/renderer.
 
 ## Index
 
-- [func Parse\(source \[\]byte\) \(string, error\)](<#Parse>)
+- [func Parse\(name string, source \[\]byte\) \(string, error\)](<#Parse>)
 - [type FrontMatter](<#FrontMatter>)
 - [type FrontMatterMissingError](<#FrontMatterMissingError>)
   - [func \(e FrontMatterMissingError\) Error\(\) string](<#FrontMatterMissingError.Error>)
 
 
 <a name="Parse"></a>
-## func [Parse](<https://github.com/conneroisu/conneroh/blob/main/internal/md/parse.go#L55>)
+## func [Parse](<https://github.com/conneroisu/conneroh/blob/main/internal/md/parse.go#L55-L58>)
 
 ```go
-func Parse(source []byte) (string, error)
+func Parse(name string, source []byte) (string, error)
 ```
 
 Parse parses markdown to html.
@@ -46,17 +46,18 @@ type FrontMatter struct {
 ```
 
 <a name="FrontMatterMissingError"></a>
-## type [FrontMatterMissingError](<https://github.com/conneroisu/conneroh/blob/main/internal/md/errors.go#L4-L5>)
+## type [FrontMatterMissingError](<https://github.com/conneroisu/conneroh/blob/main/internal/md/errors.go#L4-L6>)
 
 FrontMatterMissingError is returned when the front matter is missing from the markdown file.
 
 ```go
 type FrontMatterMissingError struct {
+    // contains filtered or unexported fields
 }
 ```
 
 <a name="FrontMatterMissingError.Error"></a>
-### func \(FrontMatterMissingError\) [Error](<https://github.com/conneroisu/conneroh/blob/main/internal/md/errors.go#L8>)
+### func \(FrontMatterMissingError\) [Error](<https://github.com/conneroisu/conneroh/blob/main/internal/md/errors.go#L9>)
 
 ```go
 func (e FrontMatterMissingError) Error() string
