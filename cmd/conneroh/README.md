@@ -18,7 +18,7 @@ Package conneroh provides implementations for conneroh.
 
 - [func AddRoutes\(ctx context.Context, h \*http.ServeMux, db \*data.Database\[master.Queries\]\) error](<#AddRoutes>)
 - [func Dist\(\_ context.Context, \_ \*data.Database\[master.Queries\], \_ \*\[\]master.FullPost, \_ \*\[\]master.FullProject, \_ \*\[\]master.FullTag, \_ \*map\[string\]master.FullPost, \_ \*map\[string\]master.FullProject, \_ \*map\[string\]master.FullTag\) \(routing.APIFn, error\)](<#Dist>)
-- [func Home\(ctx context.Context, db \*data.Database\[master.Queries\], fullPosts \*\[\]master.FullPost, fullProjects \*\[\]master.FullProject, fullTags \*\[\]master.FullTag, \_ \*map\[string\]master.FullPost, \_ \*map\[string\]master.FullProject, \_ \*map\[string\]master.FullTag\) \(routing.APIFn, error\)](<#Home>)
+- [func Home\(ctx context.Context, db \*data.Database\[master.Queries\], fullPosts \*\[\]master.FullPost, fullProjects \*\[\]master.FullProject, fullTags \*\[\]master.FullTag, fullPostsSlugMap map\[string\]master.FullPost, fullProjectsSlugMap map\[string\]master.FullProject, fullTagsSlugMap map\[string\]master.FullTag\) \(routing.APIFn, error\)](<#Home>)
 - [func Morph\(ctx context.Context, db \*data.Database\[master.Queries\], fullPosts \*\[\]master.FullPost, fullProjects \*\[\]master.FullProject, fullTags \*\[\]master.FullTag, \_ \*map\[string\]master.FullPost, \_ \*map\[string\]master.FullProject, \_ \*map\[string\]master.FullTag\) \(routing.APIFn, error\)](<#Morph>)
 - [func Morphs\(\_ context.Context, \_ \*data.Database\[master.Queries\], \_ \*\[\]master.FullPost, \_ \*\[\]master.FullProject, \_ \*\[\]master.FullTag, posts \*map\[string\]master.FullPost, projects \*map\[string\]master.FullProject, tags \*map\[string\]master.FullTag\) \(routing.APIFn, error\)](<#Morphs>)
 - [func NewServer\(ctx context.Context, db \*data.Database\[master.Queries\]\) http.Handler](<#NewServer>)
@@ -53,7 +53,7 @@ Dist is the dist handler for serving/distributing static files.
 ## func Home
 
 ```go
-func Home(ctx context.Context, db *data.Database[master.Queries], fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, fullTags *[]master.FullTag, _ *map[string]master.FullPost, _ *map[string]master.FullProject, _ *map[string]master.FullTag) (routing.APIFn, error)
+func Home(ctx context.Context, db *data.Database[master.Queries], fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, fullTags *[]master.FullTag, fullPostsSlugMap map[string]master.FullPost, fullProjectsSlugMap map[string]master.FullProject, fullTagsSlugMap map[string]master.FullTag) (routing.APIFn, error)
 ```
 
 Home is the home page handler.

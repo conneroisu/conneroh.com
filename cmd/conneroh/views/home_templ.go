@@ -8,7 +8,16 @@ package views
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-func Home() templ.Component {
+import "github.com/conneroisu/conneroh.com/internal/data/master"
+
+func Home(
+	fullPosts *[]master.FullPost,
+	fullProjects *[]master.FullProject,
+	fullTags *[]master.FullTag,
+	fullPostsSlugMap map[string]master.FullPost,
+	fullProjectsSlugMap map[string]master.FullProject,
+	fullTagsSlugMap map[string]master.FullTag,
+) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {

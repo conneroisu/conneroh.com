@@ -37,15 +37,19 @@ func Home(
 	fullPosts *[]master.FullPost,
 	fullProjects *[]master.FullProject,
 	fullTags *[]master.FullTag,
-	_ *map[string]master.FullPost,
-	_ *map[string]master.FullProject,
-	_ *map[string]master.FullTag,
+	fullPostsSlugMap map[string]master.FullPost,
+	fullProjectsSlugMap map[string]master.FullProject,
+	fullTagsSlugMap map[string]master.FullTag,
 ) (routing.APIFn, error) {
 	return func(w http.ResponseWriter, r *http.Request) error {
-		templ.Handler(
-			views.Page(views.Home()),
-		).ServeHTTP(w, r)
-		return nil
+		templ.Handler(views.Page(views.Home(
+			fullPosts,
+			fullProjects,
+			fullTags,
+			fullPostsSlugMap,
+			fullProjectsSlugMap,
+			fullTagsSlugMap,
+		))).ServeHTTP(w, r)
 	}, nil
 
 }
