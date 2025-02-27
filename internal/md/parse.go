@@ -41,6 +41,9 @@ var (
 					extension.Apostrophe: []byte("’"),
 				}),
 			),
+			extension.NewFootnote(
+				extension.WithFootnoteIDPrefix("fn"),
+			),
 			mathjax.MathJax,
 			&anchor.Extender{
 				Position: anchor.Before,
