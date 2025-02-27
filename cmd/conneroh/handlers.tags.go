@@ -22,17 +22,18 @@ func Tags(
 	fullProjectSlugMap *map[string]master.FullProject,
 	fullTagSlugMap *map[string]master.FullTag,
 ) (routing.APIFn, error) {
+	handler := templ.Handler(
+		views.Page(views.Tags(
+			fullPosts,
+			fullProjects,
+			fullTags,
+			fullPostSlugMap,
+			fullProjectSlugMap,
+			fullTagSlugMap,
+		)),
+	)
 	return func(w http.ResponseWriter, r *http.Request) error {
-		templ.Handler(
-			views.Page(views.Tags(
-				fullPosts,
-				fullProjects,
-				fullTags,
-				fullPostSlugMap,
-				fullProjectSlugMap,
-				fullTagSlugMap,
-			)),
-		).ServeHTTP(w, r)
+		handler.ServeHTTP(w, r)
 		return nil
 	}, nil
 }

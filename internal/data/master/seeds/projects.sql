@@ -1,5 +1,5 @@
-INSERT INTO
-    projects (name, slug, description, created_at, updated_at)
+INSERT
+    OR IGNORE INTO projects (name, slug, description, created_at, updated_at)
 VALUES
     (
         'Project 1',
@@ -7,33 +7,21 @@ VALUES
         'Project 1 is a project. It is the first project.',
         '1577836800',
         '1577836800'
-    );
-
-INSERT INTO
-    projects (name, slug, description, created_at, updated_at)
-VALUES
+    ),
     (
         'Project 2',
         'project-2',
         'Project 2 is a project. It is the second project.',
         '1577836800',
         '1577836800'
-    );
-
-INSERT INTO
-    projects (name, slug, description, created_at, updated_at)
-VALUES
+    ),
     (
         'Project 3',
         'project-3',
         'Project 3 is a project. It is the third project.',
         '1577836800',
         '1577836800'
-    );
-
-INSERT INTO
-    projects (name, slug, description, created_at, updated_at)
-VALUES
+    ),
     (
         'Project 4',
         'project-4',

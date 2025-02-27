@@ -42,7 +42,7 @@ func Posts(
 		ctx = context.WithValue(ctx, currentURLContextKey, r.URL.String())
 
 		// Render the posts template with filtered posts
-		component := views.Posts(&filteredPosts, fullProjects, fullTags, fullPostSlugMap, fullProjectSlugMap, fullTagSlugMap)
+		component := views.Page(views.Posts(&filteredPosts, fullProjects, fullTags, fullPostSlugMap, fullProjectSlugMap, fullTagSlugMap))
 		handler := templ.Handler(component)
 		handler.ServeHTTP(w, r.WithContext(ctx))
 		return nil

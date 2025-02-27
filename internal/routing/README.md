@@ -27,7 +27,7 @@ Package routing provides implementations for routing.
 
 <a name="APIFn"></a>
 
-## type [APIFn](https://github.com/conneroisu/conneroh/blob/main/internal/routing/main.go#L12)
+## type [APIFn](https://github.com/conneroisu/conneroh/blob/main/internal/routing/main.go#L13)
 
 APIFn is a function that handles an API request.
 
@@ -37,7 +37,7 @@ type APIFn func(http.ResponseWriter, *http.Request) error
 
 <a name="APIHandler"></a>
 
-## type [APIHandler](https://github.com/conneroisu/conneroh/blob/main/internal/routing/main.go#L15-L24)
+## type [APIHandler](https://github.com/conneroisu/conneroh/blob/main/internal/routing/main.go#L16-L25)
 
 APIHandler is a function that returns an APIFn.
 
@@ -56,7 +56,7 @@ type APIHandler func(
 
 <a name="APIMap"></a>
 
-## type [APIMap](https://github.com/conneroisu/conneroh/blob/main/internal/routing/main.go#L27)
+## type [APIMap](https://github.com/conneroisu/conneroh/blob/main/internal/routing/main.go#L28)
 
 APIMap is a map of API functions.
 
@@ -66,7 +66,7 @@ type APIMap map[string]APIHandler
 
 <a name="APIMap.AddRoutes"></a>
 
-### func \(APIMap\) [AddRoutes](https://github.com/conneroisu/conneroh/blob/main/internal/routing/main.go#L30-L40)
+### func \(APIMap\) [AddRoutes](https://github.com/conneroisu/conneroh/blob/main/internal/routing/main.go#L31-L41)
 
 ```go
 func (m APIMap) AddRoutes(ctx context.Context, mux *http.ServeMux, db *data.Database[master.Queries], fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, fullTags *[]master.FullTag, postsSlugMap *map[string]master.FullPost, projectsSlugMap *map[string]master.FullProject, tagsSlugMap *map[string]master.FullTag) error

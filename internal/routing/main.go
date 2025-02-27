@@ -2,6 +2,7 @@ package routing
 
 import (
 	"context"
+	"log/slog"
 	"net/http"
 
 	"github.com/conneroisu/conneroh.com/internal/data"
@@ -39,12 +40,22 @@ func (m APIMap) AddRoutes(
 	tagsSlugMap *map[string]master.FullTag,
 ) error {
 	for path, fn := range m {
-		h, err := fn(ctx, db, fullPosts, fullProjects, fullTags, postsSlugMap, projectsSlugMap, tagsSlugMap)
+		h, err := fn(
+			ctx,
+			db,
+			fullPosts,
+			fullProjects,
+			fullTags,
+			postsSlugMap,
+			projectsSlugMap,
+			tagsSlugMap,
+		)
 		if err != nil {
 			return err
 		}
 		mux.HandleFunc(path, func(w http.ResponseWriter, r *http.Request) {
 			if err := h(w, r); err != nil {
+				slog.Error("error handling request", "err", err)
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 			}
 		})

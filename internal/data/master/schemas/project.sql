@@ -1,7 +1,7 @@
 -- dialect: sqlite
 CREATE TABLE IF NOT EXISTS projects (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
+    name TEXT NOT NULL UNIQUE,
     slug TEXT NOT NULL,
     description TEXT NOT NULL,
     created_at INTEGER DEFAULT (unixepoch('now')),

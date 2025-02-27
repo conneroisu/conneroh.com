@@ -11,6 +11,7 @@ import (
 
 var routeMap = routing.APIMap{
 	"GET /dist/":                      Dist,
+	"GET /favicon.ico":                Favicon,
 	"GET /{$}":                        Home,
 	"GET /projects":                   Projects,
 	"GET /posts":                      Posts,
@@ -50,7 +51,6 @@ func AddRoutes(
 	}
 	postSlugMap, err := db.Queries.FullPostsSlugMapGet(ctx)
 	if err != nil {
-
 		return err
 	}
 	return routeMap.AddRoutes(

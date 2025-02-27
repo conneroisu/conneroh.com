@@ -47,6 +47,27 @@ func Dist(
 	}, nil
 }
 
+// Favicon returns the favicon.
+func Favicon(
+	_ context.Context,
+	_ *data.Database[master.Queries],
+	_ *[]master.FullPost,
+	_ *[]master.FullProject,
+	_ *[]master.FullTag,
+	_ *map[string]master.FullPost,
+	_ *map[string]master.FullProject,
+	_ *map[string]master.FullTag,
+) (routing.APIFn, error) {
+	return func(w http.ResponseWriter, r *http.Request) error {
+		// write the dist.Favicon to the writer
+		_, err := w.Write([]byte(static.Favicon))
+		if err != nil {
+			return err
+		}
+		return nil
+	}, nil
+}
+
 // Home is the home page handler.
 func Home(
 	ctx context.Context,

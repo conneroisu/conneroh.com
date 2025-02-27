@@ -8,3 +8,6 @@ import (
 
 //go:embed dist/*
 var Dist embed.FS
+
+//go:embed dist/favicon.ico
+var Favicon string

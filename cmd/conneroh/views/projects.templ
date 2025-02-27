@@ -17,13 +17,15 @@ templ Project(
 	<div class="container mx-auto px-4 py-8 max-w-4xl">
 		<header class="mb-8">
 			<h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-4">{ project.Name }</h1>
-			<div class="flex flex-wrap gap-2 mb-6">
-				for _, tag := range project.Tags {
-					<span class="inline-block px-3 py-1 text-sm font-medium rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-						{ tag.Name }
-					</span>
-				}
-			</div>
+			if len(project.Tags) > 0 {
+				<div class="flex flex-wrap gap-2 mb-6">
+					for _, tag := range project.Tags {
+						<span class="inline-block px-3 py-1 text-sm font-medium rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+							{ tag.Name }
+						</span>
+					}
+				</div>
+			}
 		</header>
 		<div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden p-6 mb-8">
 			<h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-4">About this project</h2>
@@ -78,15 +80,11 @@ templ Projects(
 						tags: JSON.parse(project.getAttribute('data-project-tags') || '[]')
 					};
 				});
-				
-				// Extract all unique tags
 				const allTags = new Set();
 				this.projects.forEach(project => {
 					project.tags.forEach(tag => tag.name && allTags.add(tag.name));
 				});
 				this.tags = Array.from(allTags);
-
-				// Check URL parameters for pre-selected filters
 				const urlParams = new URLSearchParams(window.location.search);
 				this.searchQuery = urlParams.get('q') || '';
 				this.selectedTag = urlParams.get('tag') || '';
@@ -99,7 +97,6 @@ templ Projects(
 					const matchesSearch = this.searchQuery === '' || 
 						project.name.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
 						project.description.toLowerCase().includes(this.searchQuery.toLowerCase());
-					
 					const matchesTag = this.selectedTag === '' ||
 						(project.tags && project.tags.some(tag => tag.name === this.selectedTag));
 					

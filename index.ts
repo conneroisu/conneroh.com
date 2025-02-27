@@ -1,4 +1,5 @@
 import "htmx.org";
+import htmx from "htmx.org";
 import Alpine from "alpinejs";
 
 declare global {
@@ -6,6 +7,9 @@ declare global {
     Alpine: typeof Alpine;
   }
 }
+htmx.on("htmx:sendError", function (evt: any) {
+  alert("Error: Page not found (404).");
+});
 
 type Post = {
   id: number;
