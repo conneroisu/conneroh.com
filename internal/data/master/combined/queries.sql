@@ -182,9 +182,9 @@ ORDER BY
 
 -- name: ProjectCreate :one
 INSERT INTO
-    projects (name, slug, description)
+    projects (name, slug, description, content)
 VALUES
-    (?, ?, ?) RETURNING *;
+    (?, ?, ?, ?) RETURNING *;
 
 -- name: ProjectsListByTag :many
 SELECT
@@ -203,7 +203,8 @@ UPDATE
 SET
     name = ?,
     slug = ?,
-    description = ?
+    description = ?,
+    content = ?
 WHERE
     id = ? RETURNING *;
 

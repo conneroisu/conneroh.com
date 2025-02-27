@@ -37,6 +37,7 @@ CREATE TABLE IF NOT EXISTS projects (
     name TEXT NOT NULL UNIQUE,
     slug TEXT NOT NULL,
     description TEXT NOT NULL,
+    content TEXT NOT NULL,
     created_at INTEGER DEFAULT (unixepoch('now')),
     updated_at INTEGER DEFAULT (unixepoch('now'))
 );
@@ -64,7 +65,6 @@ CREATE TABLE IF NOT EXISTS tags (
     description TEXT NOT NULL,
     slug TEXT NOT NULL UNIQUE,
     icon TEXT NOT NULL DEFAULT 'nf-fa-tag',
-    classes TEXT NOT NULL DEFAULT 'uk-badge-secondary',
     created_at INTEGER NOT NULL DEFAULT (unixepoch('now')),
     updated_at INTEGER NOT NULL DEFAULT (unixepoch('now'))
 );

@@ -209,7 +209,7 @@ func (q *Queries) PostProjectDelete(ctx context.Context, postID int64, projectID
 
 const postProjectListByPost = `-- name: PostProjectListByPost :many
 SELECT
-    p.id, p.name, p.slug, p.description, p.created_at, p.updated_at
+    p.id, p.name, p.slug, p.description, p.content, p.created_at, p.updated_at
 FROM
     post_projects pp
     JOIN projects p ON pp.project_id = p.id
@@ -222,7 +222,7 @@ ORDER BY
 // PostProjectListByPost
 //
 //	SELECT
-//	    p.id, p.name, p.slug, p.description, p.created_at, p.updated_at
+//	    p.id, p.name, p.slug, p.description, p.content, p.created_at, p.updated_at
 //	FROM
 //	    post_projects pp
 //	    JOIN projects p ON pp.project_id = p.id
@@ -244,6 +244,7 @@ func (q *Queries) PostProjectListByPost(ctx context.Context, postID int64) ([]Pr
 			&i.Name,
 			&i.Slug,
 			&i.Description,
+			&i.Content,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -676,31 +677,38 @@ func (q *Queries) PostsListByTag(ctx context.Context, tagID int64) ([]Post, erro
 
 const projectCreate = `-- name: ProjectCreate :one
 INSERT INTO
-    projects (name, slug, description)
+    projects (name, slug, description, content)
 VALUES
-    (?, ?, ?) RETURNING id, name, slug, description, created_at, updated_at
+    (?, ?, ?, ?) RETURNING id, name, slug, description, content, created_at, updated_at
 `
 
 type ProjectCreateParams struct {
 	Name        string `db:"name" json:"name"`
 	Slug        string `db:"slug" json:"slug"`
 	Description string `db:"description" json:"description"`
+	Content     string `db:"content" json:"content"`
 }
 
 // ProjectCreate
 //
 //	INSERT INTO
-//	    projects (name, slug, description)
+//	    projects (name, slug, description, content)
 //	VALUES
-//	    (?, ?, ?) RETURNING id, name, slug, description, created_at, updated_at
+//	    (?, ?, ?, ?) RETURNING id, name, slug, description, content, created_at, updated_at
 func (q *Queries) ProjectCreate(ctx context.Context, arg ProjectCreateParams) (Project, error) {
-	row := q.db.QueryRowContext(ctx, projectCreate, arg.Name, arg.Slug, arg.Description)
+	row := q.db.QueryRowContext(ctx, projectCreate,
+		arg.Name,
+		arg.Slug,
+		arg.Description,
+		arg.Content,
+	)
 	var i Project
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
 		&i.Slug,
 		&i.Description,
+		&i.Content,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -709,7 +717,7 @@ func (q *Queries) ProjectCreate(ctx context.Context, arg ProjectCreateParams) (P
 
 const projectGetByID = `-- name: ProjectGetByID :one
 SELECT
-    id, name, slug, description, created_at, updated_at
+    id, name, slug, description, content, created_at, updated_at
 FROM
     projects
 WHERE
@@ -721,7 +729,7 @@ LIMIT
 // ProjectGetByID
 //
 //	SELECT
-//	    id, name, slug, description, created_at, updated_at
+//	    id, name, slug, description, content, created_at, updated_at
 //	FROM
 //	    projects
 //	WHERE
@@ -736,6 +744,7 @@ func (q *Queries) ProjectGetByID(ctx context.Context, id int64) (Project, error)
 		&i.Name,
 		&i.Slug,
 		&i.Description,
+		&i.Content,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -744,7 +753,7 @@ func (q *Queries) ProjectGetByID(ctx context.Context, id int64) (Project, error)
 
 const projectGetBySlug = `-- name: ProjectGetBySlug :one
 SELECT
-    id, name, slug, description, created_at, updated_at
+    id, name, slug, description, content, created_at, updated_at
 FROM
     projects
 WHERE
@@ -756,7 +765,7 @@ LIMIT
 // ProjectGetBySlug
 //
 //	SELECT
-//	    id, name, slug, description, created_at, updated_at
+//	    id, name, slug, description, content, created_at, updated_at
 //	FROM
 //	    projects
 //	WHERE
@@ -771,6 +780,7 @@ func (q *Queries) ProjectGetBySlug(ctx context.Context, slug string) (Project, e
 		&i.Name,
 		&i.Slug,
 		&i.Description,
+		&i.Content,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -1019,15 +1029,17 @@ UPDATE
 SET
     name = ?,
     slug = ?,
-    description = ?
+    description = ?,
+    content = ?
 WHERE
-    id = ? RETURNING id, name, slug, description, created_at, updated_at
+    id = ? RETURNING id, name, slug, description, content, created_at, updated_at
 `
 
 type ProjectUpdateParams struct {
 	Name        string `db:"name" json:"name"`
 	Slug        string `db:"slug" json:"slug"`
 	Description string `db:"description" json:"description"`
+	Content     string `db:"content" json:"content"`
 	ID          int64  `db:"id" json:"id"`
 }
 
@@ -1038,14 +1050,16 @@ type ProjectUpdateParams struct {
 //	SET
 //	    name = ?,
 //	    slug = ?,
-//	    description = ?
+//	    description = ?,
+//	    content = ?
 //	WHERE
-//	    id = ? RETURNING id, name, slug, description, created_at, updated_at
+//	    id = ? RETURNING id, name, slug, description, content, created_at, updated_at
 func (q *Queries) ProjectUpdate(ctx context.Context, arg ProjectUpdateParams) (Project, error) {
 	row := q.db.QueryRowContext(ctx, projectUpdate,
 		arg.Name,
 		arg.Slug,
 		arg.Description,
+		arg.Content,
 		arg.ID,
 	)
 	var i Project
@@ -1054,6 +1068,7 @@ func (q *Queries) ProjectUpdate(ctx context.Context, arg ProjectUpdateParams) (P
 		&i.Name,
 		&i.Slug,
 		&i.Description,
+		&i.Content,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -1062,7 +1077,7 @@ func (q *Queries) ProjectUpdate(ctx context.Context, arg ProjectUpdateParams) (P
 
 const projectsList = `-- name: ProjectsList :many
 SELECT
-    id, name, slug, description, created_at, updated_at
+    id, name, slug, description, content, created_at, updated_at
 FROM
     projects
 ORDER BY
@@ -1072,7 +1087,7 @@ ORDER BY
 // ProjectsList
 //
 //	SELECT
-//	    id, name, slug, description, created_at, updated_at
+//	    id, name, slug, description, content, created_at, updated_at
 //	FROM
 //	    projects
 //	ORDER BY
@@ -1091,6 +1106,7 @@ func (q *Queries) ProjectsList(ctx context.Context) ([]Project, error) {
 			&i.Name,
 			&i.Slug,
 			&i.Description,
+			&i.Content,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -1109,7 +1125,7 @@ func (q *Queries) ProjectsList(ctx context.Context) ([]Project, error) {
 
 const projectsListByPost = `-- name: ProjectsListByPost :many
 SELECT
-    p.id, p.name, p.slug, p.description, p.created_at, p.updated_at
+    p.id, p.name, p.slug, p.description, p.content, p.created_at, p.updated_at
 FROM
     projects p
     JOIN project_posts pp ON p.id = pp.project_id
@@ -1122,7 +1138,7 @@ ORDER BY
 // ProjectsListByPost
 //
 //	SELECT
-//	    p.id, p.name, p.slug, p.description, p.created_at, p.updated_at
+//	    p.id, p.name, p.slug, p.description, p.content, p.created_at, p.updated_at
 //	FROM
 //	    projects p
 //	    JOIN project_posts pp ON p.id = pp.project_id
@@ -1144,6 +1160,7 @@ func (q *Queries) ProjectsListByPost(ctx context.Context, postID int64) ([]Proje
 			&i.Name,
 			&i.Slug,
 			&i.Description,
+			&i.Content,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -1162,7 +1179,7 @@ func (q *Queries) ProjectsListByPost(ctx context.Context, postID int64) ([]Proje
 
 const projectsListByTag = `-- name: ProjectsListByTag :many
 SELECT
-    p.id, p.name, p.slug, p.description, p.created_at, p.updated_at
+    p.id, p.name, p.slug, p.description, p.content, p.created_at, p.updated_at
 FROM
     projects p
     JOIN project_tags pt ON p.id = pt.project_id
@@ -1175,7 +1192,7 @@ ORDER BY
 // ProjectsListByTag
 //
 //	SELECT
-//	    p.id, p.name, p.slug, p.description, p.created_at, p.updated_at
+//	    p.id, p.name, p.slug, p.description, p.content, p.created_at, p.updated_at
 //	FROM
 //	    projects p
 //	    JOIN project_tags pt ON p.id = pt.project_id
@@ -1197,6 +1214,7 @@ func (q *Queries) ProjectsListByTag(ctx context.Context, tagID int64) ([]Project
 			&i.Name,
 			&i.Slug,
 			&i.Description,
+			&i.Content,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -1217,7 +1235,7 @@ const tagCreate = `-- name: TagCreate :one
 INSERT INTO
     tags (name, description, slug)
 VALUES
-    (?, ?, ?) RETURNING id, name, description, slug, icon, classes, created_at, updated_at
+    (?, ?, ?) RETURNING id, name, description, slug, icon, created_at, updated_at
 `
 
 type TagCreateParams struct {
@@ -1231,7 +1249,7 @@ type TagCreateParams struct {
 //	INSERT INTO
 //	    tags (name, description, slug)
 //	VALUES
-//	    (?, ?, ?) RETURNING id, name, description, slug, icon, classes, created_at, updated_at
+//	    (?, ?, ?) RETURNING id, name, description, slug, icon, created_at, updated_at
 func (q *Queries) TagCreate(ctx context.Context, arg TagCreateParams) (Tag, error) {
 	row := q.db.QueryRowContext(ctx, tagCreate, arg.Name, arg.Description, arg.Slug)
 	var i Tag
@@ -1241,7 +1259,6 @@ func (q *Queries) TagCreate(ctx context.Context, arg TagCreateParams) (Tag, erro
 		&i.Description,
 		&i.Slug,
 		&i.Icon,
-		&i.Classes,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -1250,7 +1267,7 @@ func (q *Queries) TagCreate(ctx context.Context, arg TagCreateParams) (Tag, erro
 
 const tagGetByID = `-- name: TagGetByID :one
 SELECT
-    id, name, description, slug, icon, classes, created_at, updated_at
+    id, name, description, slug, icon, created_at, updated_at
 FROM
     tags
 WHERE
@@ -1262,7 +1279,7 @@ LIMIT
 // TagGetByID
 //
 //	SELECT
-//	    id, name, description, slug, icon, classes, created_at, updated_at
+//	    id, name, description, slug, icon, created_at, updated_at
 //	FROM
 //	    tags
 //	WHERE
@@ -1278,7 +1295,6 @@ func (q *Queries) TagGetByID(ctx context.Context, id int64) (Tag, error) {
 		&i.Description,
 		&i.Slug,
 		&i.Icon,
-		&i.Classes,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -1287,7 +1303,7 @@ func (q *Queries) TagGetByID(ctx context.Context, id int64) (Tag, error) {
 
 const tagGetByName = `-- name: TagGetByName :one
 SELECT
-    id, name, description, slug, icon, classes, created_at, updated_at
+    id, name, description, slug, icon, created_at, updated_at
 FROM
     tags
 WHERE
@@ -1299,7 +1315,7 @@ LIMIT
 // TagGetByName
 //
 //	SELECT
-//	    id, name, description, slug, icon, classes, created_at, updated_at
+//	    id, name, description, slug, icon, created_at, updated_at
 //	FROM
 //	    tags
 //	WHERE
@@ -1315,7 +1331,6 @@ func (q *Queries) TagGetByName(ctx context.Context, name string) (Tag, error) {
 		&i.Description,
 		&i.Slug,
 		&i.Icon,
-		&i.Classes,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -1442,7 +1457,7 @@ func (q *Queries) TagPostsGetByTagID(ctx context.Context, tagID int64) ([]TagPos
 
 const tagsListAlphabetical = `-- name: TagsListAlphabetical :many
 SELECT
-    id, name, description, slug, icon, classes, created_at, updated_at
+    id, name, description, slug, icon, created_at, updated_at
 FROM
     tags
 ORDER BY
@@ -1452,7 +1467,7 @@ ORDER BY
 // TagsListAlphabetical
 //
 //	SELECT
-//	    id, name, description, slug, icon, classes, created_at, updated_at
+//	    id, name, description, slug, icon, created_at, updated_at
 //	FROM
 //	    tags
 //	ORDER BY
@@ -1472,7 +1487,6 @@ func (q *Queries) TagsListAlphabetical(ctx context.Context) ([]Tag, error) {
 			&i.Description,
 			&i.Slug,
 			&i.Icon,
-			&i.Classes,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -1491,7 +1505,7 @@ func (q *Queries) TagsListAlphabetical(ctx context.Context) ([]Tag, error) {
 
 const tagsListByPost = `-- name: TagsListByPost :many
 SELECT
-    t.id, t.name, t.description, t.slug, t.icon, t.classes, t.created_at, t.updated_at
+    t.id, t.name, t.description, t.slug, t.icon, t.created_at, t.updated_at
 FROM
     tags t
     JOIN post_tags pt ON t.id = pt.tag_id
@@ -1504,7 +1518,7 @@ ORDER BY
 // TagsListByPost
 //
 //	SELECT
-//	    t.id, t.name, t.description, t.slug, t.icon, t.classes, t.created_at, t.updated_at
+//	    t.id, t.name, t.description, t.slug, t.icon, t.created_at, t.updated_at
 //	FROM
 //	    tags t
 //	    JOIN post_tags pt ON t.id = pt.tag_id
@@ -1527,7 +1541,6 @@ func (q *Queries) TagsListByPost(ctx context.Context, postID int64) ([]Tag, erro
 			&i.Description,
 			&i.Slug,
 			&i.Icon,
-			&i.Classes,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -1546,7 +1559,7 @@ func (q *Queries) TagsListByPost(ctx context.Context, postID int64) ([]Tag, erro
 
 const tagsListByProject = `-- name: TagsListByProject :many
 SELECT
-    t.id, t.name, t.description, t.slug, t.icon, t.classes, t.created_at, t.updated_at
+    t.id, t.name, t.description, t.slug, t.icon, t.created_at, t.updated_at
 FROM
     tags t
     JOIN project_tags pt ON t.id = pt.tag_id
@@ -1559,7 +1572,7 @@ ORDER BY
 // TagsListByProject
 //
 //	SELECT
-//	    t.id, t.name, t.description, t.slug, t.icon, t.classes, t.created_at, t.updated_at
+//	    t.id, t.name, t.description, t.slug, t.icon, t.created_at, t.updated_at
 //	FROM
 //	    tags t
 //	    JOIN project_tags pt ON t.id = pt.tag_id
@@ -1582,7 +1595,6 @@ func (q *Queries) TagsListByProject(ctx context.Context, projectID int64) ([]Tag
 			&i.Description,
 			&i.Slug,
 			&i.Icon,
-			&i.Classes,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {

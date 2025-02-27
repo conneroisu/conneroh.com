@@ -116,7 +116,7 @@ func (q *Queries) seedProjects(ctx context.Context, projectsFS fs.FS) error {
 
 		// Parse frontmatter
 		var frontMatter md.ProjectFrontMatter
-		_, err = md.ParseWithFrontMatter(path, content, &frontMatter)
+		parsedContent, err := md.ParseWithFrontMatter(path, content, &frontMatter)
 		if err != nil {
 			return fmt.Errorf("error parsing frontmatter for %s: %w", path, err)
 		}
@@ -124,6 +124,7 @@ func (q *Queries) seedProjects(ctx context.Context, projectsFS fs.FS) error {
 			Name:        frontMatter.Title,
 			Slug:        frontMatter.Slug,
 			Description: frontMatter.Description,
+			Content:     string(parsedContent),
 		})
 		if err != nil {
 			// If project already exists, just log and continue

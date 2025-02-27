@@ -30,6 +30,7 @@ type Project struct {
 	Name        string `db:"name" json:"name"`
 	Slug        string `db:"slug" json:"slug"`
 	Description string `db:"description" json:"description"`
+	Content     string `db:"content" json:"content"`
 	CreatedAt   *int64 `db:"created_at" json:"created_at"`
 	UpdatedAt   *int64 `db:"updated_at" json:"updated_at"`
 }
@@ -50,7 +51,6 @@ type Tag struct {
 	Description string `db:"description" json:"description"`
 	Slug        string `db:"slug" json:"slug"`
 	Icon        string `db:"icon" json:"icon"`
-	Classes     string `db:"classes" json:"classes"`
 	CreatedAt   int64  `db:"created_at" json:"created_at"`
 	UpdatedAt   int64  `db:"updated_at" json:"updated_at"`
 }
