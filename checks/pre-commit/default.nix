@@ -21,6 +21,7 @@ inputs.pre-commit-hooks.lib.${pkgs.system}.run {
       excludes = [
         "flake.lock"
         ".*_dist/"
+        ".*node_modules/"
       ];
     };
   };

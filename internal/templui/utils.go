@@ -29,7 +29,7 @@ func TwIf(class string, condition bool) string {
 	return ""
 }
 
-// mergeAttributes merges multiple Attributes into one
+// MergeAttributes merges multiple Attributes into one
 func MergeAttributes(attrs ...templ.Attributes) templ.Attributes {
 	merged := templ.Attributes{}
 	for _, attr := range attrs {

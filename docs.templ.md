@@ -5016,3 +5016,85 @@ templ Page(data chan SlotContents) {
 <video loop autoplay controls src="/img/shadowdom.webm" />
 
 See https://github.com/a-h/templ/tree/main/examples/suspense for a full working example.
+
+**Understanding Why Functions Are Typically Placed at the End of most Files in Templ**
+
+When working with the templ engine in Go, it's important to understand how function definitions are handled within a templ file. Unlike traditional Go files where functions can be interleaved with logic, templ encourages a structure where function definitions appear at the end of the file for better readability and maintainability.
+
+### **Why Are Functions Often Placed at the End?**
+
+1. **Improved Readability and Usability**
+
+   - Placing functions at the end keeps the main template logic upfront, making it easier to read and understand.
+   - This avoids the need to inline function definitions within the template blocks, which can make the code cluttered and harder to follow.
+
+2. **Separation of Concerns**
+
+   - Template blocks are responsible for rendering structured HTML, while functions handle data transformations, formatting, or auxiliary logic.
+   - Placing functions at the end makes it clear that they serve as utilities rather than being part of the core rendering logic.
+
+3. **Optional but Recommended Practice**
+   - While templ does not require functions to be placed at the end, doing so helps avoid inline definitions and improves maintainability.
+   - It also allows functions to be easily located when modifications are needed without searching through the template logic.
+
+### **Example of Templ Function Placement**
+
+In a templ file, you might have a structure like this:
+
+```go
+// Define a templ block
+templ Tags(
+    fullTags *[]master.FullTag
+) {
+    <div>
+        if fullTags != nil {
+            for _, tag := range *fullTags {
+                <p>{ templ.EscapeString(getTagSection(tag.Name)) }</p>
+            }
+        }
+    </div>
+}
+
+// Functions are placed at the end for readability
+func getTagSection(tagName string) string {
+    if strings.Contains(tagName, "/") {
+        return strings.Split(tagName, "/")[0]
+    }
+    return "misc"
+}
+```
+
+### **Example of Unreadability with Inline Functions**
+
+If functions were placed inline within the template block, the code could become difficult to read:
+
+```go
+// Define a templ block with inline function
+templ Tags(
+    fullTags *[]master.FullTag
+) {
+    <div>
+        if fullTags != nil {
+            for _, tag := range *fullTags {
+                <p>
+                    {
+                    templ.EscapeString(
+                        func(tagName string) string {
+                            if strings.Contains(tagName, "/") {
+                                return strings.Split(tagName, "/")[0]
+                            }
+                            return "misc"
+                        }(tag.Name))
+                    }
+                </p>
+            }
+        }
+    </div>
+}
+```
+
+Here, the function `getTagSection` is defined inside the loop, which not only reduces readability but also introduces unnecessary function redefinition on each iteration.
+
+### **Conclusion**
+
+While templ does not enforce placing function definitions at the end of a file, doing so enhances readability and usability. By keeping template logic upfront and separating utility functions, the structure remains clean and maintainable, making templ a more efficient and reliable tool for Go-based HTML templating.
