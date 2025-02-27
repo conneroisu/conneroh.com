@@ -2,6 +2,7 @@ package views
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/conneroisu/conneroh.com/internal/data/master"
@@ -39,4 +40,35 @@ func formatTags(tags []master.Tag) string {
 	}
 	result += "]"
 	return result
+}
+
+// Helper function to determine the section for a tag
+func getTagSection(tagName string) string {
+	if strings.Contains(tagName, "/") {
+		return strings.Split(tagName, "/")[0]
+	}
+	return "misc"
+}
+
+// Helper function to check if two tags have common posts or projects
+func haveCommonItems(tag1 *master.FullTag, tag2 *master.FullTag) bool {
+	// Check for common posts
+	for _, post := range tag1.Posts {
+		for _, relatedPost := range tag2.Posts {
+			if post.ID == relatedPost.ID {
+				return true
+			}
+		}
+	}
+
+	// Check for common projects
+	for _, project := range tag1.Projects {
+		for _, relatedProject := range tag2.Projects {
+			if project.ID == relatedProject.ID {
+				return true
+			}
+		}
+	}
+
+	return false
 }
