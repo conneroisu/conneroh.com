@@ -10,11 +10,21 @@ templ Layout(title string) {
 			<meta name="robots" content="index, follow"/>
 			<meta name="revisit-after" content="7 days"/>
 			<meta name="language" content="English"/>
+			<link rel="stylesheet" href="/dist/style.css"/>
+			<style>
+
+@font-face {
+  font-family: "NerdFontsSymbols Nerd Font";
+  src: url("/NF.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+}
+
+			</style>
 			<script src="https://cdn.tailwindcss.com"></script>
 			<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 			<script src="https://unpkg.com/htmx.org@1.9.6"></script>
 			<script type="module" src="/dist/index.js"></script>
-			<link rel="stylesheet" href="/dist/style.css"/>
 		</head>
 		<body class="bg-white dark:bg-gray-900">
 			@header()
