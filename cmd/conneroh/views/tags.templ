@@ -33,6 +33,7 @@ templ Tags(
 						slug: tag.getAttribute('data-tag-slug'),
 						section: tag.getAttribute('data-tag-section'),
 						postsCount: parseInt(tag.getAttribute('data-tag-posts-count') || '0'),
+						icon: tag.getAttribute('data-tag-icon'),
 						projectsCount: parseInt(tag.getAttribute('data-tag-projects-count') || '0')
 					};
 				});
@@ -93,6 +94,7 @@ templ Tags(
 					data-tag-slug={ tag.Slug }
 					data-tag-section={ templ.EscapeString(getTagSection(tag.Name)) }
 					data-tag-posts-count={ fmt.Sprintf("%d", len(tag.Posts)) }
+					data-tag-icon={ "nf " + tag.Icon + " text-white" }
 					data-tag-projects-count={ fmt.Sprintf("%d", len(tag.Projects)) }
 				></div>
 			}
@@ -105,9 +107,7 @@ templ Tags(
 						<div class="flex items-center justify-between mb-3">
 							<h2 class="text-xl font-semibold text-gray-900 dark:text-white" x-text="tag.name"></h2>
 							<div class="bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center h-8 w-8">
-								<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
-								</svg>
+								<i :class="tag.icon"></i>
 							</div>
 						</div>
 						<p class="text-gray-600 dark:text-gray-300 mb-4 line-clamp-2" x-text="tag.description"></p>
@@ -136,10 +136,8 @@ templ Tag(
 ) {
 	<div class="container mx-auto px-4 py-8 max-w-4xl">
 		<header class="text-center mb-12">
-			<div class="inline-block mb-4 bg-blue-100 dark:bg-blue-900 p-4 rounded-full">
-				<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
-				</svg>
+			<div class="inline-block mb-4 bg-blue-100 dark:bg-blue-900 p-4 rounded-full w-14">
+				<i class={ "nf " + tag.Icon + " text-white" }></i>
 			</div>
 			<h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-4">{ tag.Name }</h1>
 			<p class="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">{ tag.Description }</p>
