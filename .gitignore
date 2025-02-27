@@ -2,6 +2,7 @@
 .direnv
 .devenv*
 .pre-commit-config.json
+.pre-commit-config.yaml
 node_modules
 .env
 tmp
