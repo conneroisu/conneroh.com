@@ -25,6 +25,7 @@ inputs.pre-commit-hooks.lib.${pkgs.system}.run {
       ];
       args = [
         "--ignore-path=.gitignore"
+        "--log-level=debug"
       ];
     };
   };
