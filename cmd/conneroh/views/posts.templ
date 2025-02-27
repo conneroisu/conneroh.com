@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/layouts"
 	"github.com/conneroisu/conneroh.com/internal/data/master"
-	"github.com/conneroisu/conneroh.com/internal/md"
-	"log/slog"
 	"time"
 )
 
@@ -163,7 +161,7 @@ templ Post(
 			}
 		</div>
 		<div class="prose prose-lg dark:prose-invert max-w-none">
-			@templ.Raw(getContent(post))
+			@templ.Raw(post.Content)
 		</div>
 		if len(post.Projects) > 0 {
 			<div class="mt-12 border-t border-gray-200 dark:border-gray-700 pt-8">
@@ -184,13 +182,4 @@ templ Post(
 			</div>
 		}
 	</article>
-}
-
-func getContent(post *master.FullPost) string {
-	val, err := md.Parse(post.Title, []byte(post.Content))
-	if err != nil {
-		slog.Error("Error parsing post content", "err", err)
-		return post.Content
-	}
-	return val
 }

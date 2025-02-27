@@ -72,7 +72,6 @@ Package master contains the master schema for the database.
   - [func \(q \*Queries\) ProjectsList\(ctx context.Context\) \(\[\]Project, error\)](<#Queries.ProjectsList>)
   - [func \(q \*Queries\) ProjectsListByPost\(ctx context.Context, postID int64\) \(\[\]Project, error\)](<#Queries.ProjectsListByPost>)
   - [func \(q \*Queries\) ProjectsListByTag\(ctx context.Context, tagID int64\) \(\[\]Project, error\)](<#Queries.ProjectsListByTag>)
-  - [func \(q \*Queries\) SeedFromEmbedded\(ctx context.Context\) error](<#Queries.SeedFromEmbedded>)
   - [func \(q \*Queries\) TagCreate\(ctx context.Context, arg TagCreateParams\) \(Tag, error\)](<#Queries.TagCreate>)
   - [func \(q \*Queries\) TagGetByID\(ctx context.Context, id int64\) \(Tag, error\)](<#Queries.TagGetByID>)
   - [func \(q \*Queries\) TagGetByName\(ctx context.Context, name string\) \(Tag, error\)](<#Queries.TagGetByName>)
@@ -992,15 +991,6 @@ WHERE
 ORDER BY
     p.created_at DESC
 ```
-
-<a name="Queries.SeedFromEmbedded"></a>
-### func \(\*Queries\) [SeedFromEmbedded](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/seedmd.go#L15>)
-
-```go
-func (q *Queries) SeedFromEmbedded(ctx context.Context) error
-```
-
-SeedFromEmbedded reads the embedded doc files and seeds the database with them.
 
 <a name="Queries.TagCreate"></a>
 ### func \(\*Queries\) [TagCreate](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1253>)

@@ -65,11 +65,10 @@ func Run(
 	)
 
 	db, err := data.NewDb(master.New, &data.Config{
-		Schema:           master.Schema,
-		URI:              "file://dummy",
-		Seed:             master.Seed,
-		FileName:         "test.db",
-		SeedMarkdownDocs: true,
+		Schema:   master.Schema,
+		URI:      "file://dummy",
+		Seed:     master.Seed,
+		FileName: "test.db",
 	})
 	if err != nil {
 		return err

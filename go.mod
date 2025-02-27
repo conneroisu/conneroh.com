@@ -8,6 +8,7 @@ require (
 	github.com/axzilla/templui v0.31.0
 	github.com/go-playground/validator/v10 v10.25.0
 	github.com/litao91/goldmark-mathjax v0.0.0-20210217064022-a43cf739a50f
+	github.com/quail-ink/goldmark-enclave v0.1.5
 	github.com/stretchr/testify v1.10.0
 	github.com/tursodatabase/libsql-client-go v0.0.0-20240902231107-85af5b9d094d
 	github.com/yuin/goldmark v1.7.8
