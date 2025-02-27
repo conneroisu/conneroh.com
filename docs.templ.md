@@ -66,9 +66,7 @@ func main() {
 ```
 
 ```html title="Output"
-<button>
- Click me
-</button>
+<button>Click me</button>
 ```
 
 :::warning
@@ -179,12 +177,13 @@ templ teamInviteComponent(model InviteComponentViewModel) {
         }
 }
 ```
+
 # Testing
 
 To test that data is rendered as expected, there are two main ways to do it:
 
-* Expectation testing - testing that specific expectations are met by the output.
-* Snapshot testing - testing that outputs match a pre-written output.
+- Expectation testing - testing that specific expectations are met by the output.
+- Snapshot testing - testing that outputs match a pre-written output.
 
 ## Expectation testing
 
@@ -273,7 +272,7 @@ To test the posts, we can use the same approach. We test that the posts are rend
 
 ### Testing whole pages
 
-Next, we may want to go a level higher and test the entire page. 
+Next, we may want to go a level higher and test the entire page.
 
 Pages are also templ components, so the tests are structured in the same way.
 
@@ -303,6 +302,7 @@ In the error case, the test asserts that the error message was displayed, while 
 Testing it again here would make the code resistant to refactoring and rework, but then again, we might have missed actually passing the posts we got back from the database to the posts template, so it’s a matter of risk appetite vs refactor resistance.
 
 Note the switch to the table-driven testing format, a popular approach in Go for testing multiple scenarios with the same test code.
+
 ```go
 func TestPostsHandler(t *testing.T) {
     tests := []struct {
@@ -403,6 +403,7 @@ func Test(t *testing.T) {
 	}
 }
 ```
+
 # If/else
 
 templ uses standard Go `if`/`else` statements which can be used to conditionally render components and elements.
@@ -431,10 +432,9 @@ func main() {
 ```
 
 ```html title="Output"
-<div>
- Welcome back!
-</div>
+<div>Welcome back!</div>
 ```
+
 # Using React with templ
 
 templ is great for server-side rendering. Combined with [HTMX](https://htmx.org/), it's even more powerful, since HTMX can be used to replace elements within the page with updated HTML fetched from the server, providing many of the benefits of React with reduced overall complexity. See [/server-side-rendering/htmx](/server-side-rendering/htmx) for an example.
@@ -452,9 +452,9 @@ First, lets start by rendering simple React components.
 To use React components in your templ app, create your React components using TSX (TypeScript) or JSX as usual.
 
 ```tsx title="react/components.tsx"
-export const Header = () => (<h1>React component Header</h1>);
+export const Header = () => <h1>React component Header</h1>;
 
-export const Body = () => (<div>This is client-side content from React</div>);
+export const Body = () => <div>This is client-side content from React</div>;
 ```
 
 ### Create a templ page
@@ -488,21 +488,21 @@ templ page() {
 Write TypeScript or JavaScript to render the React components into the HTML elements that are rendered by templ.
 
 ```typescript title="react/index.ts"
-import { createRoot } from 'react-dom/client';
-import { Header, Body } from './components';
+import { createRoot } from "react-dom/client";
+import { Header, Body } from "./components";
 
 // Render the React component into the templ page at the react-header.
-const headerRoot = document.getElementById('react-header');
+const headerRoot = document.getElementById("react-header");
 if (!headerRoot) {
-	throw new Error('Could not find element with id react-header');
+  throw new Error("Could not find element with id react-header");
 }
 const headerReactRoot = createRoot(headerRoot);
 headerReactRoot.render(Header());
 
 // Add the body React component.
-const contentRoot = document.getElementById('react-content');
+const contentRoot = document.getElementById("react-content");
 if (!contentRoot) {
-	throw new Error('Could not find element with id react-content');
+  throw new Error("Could not find element with id react-content");
 }
 const contentReactRoot = createRoot(contentRoot);
 contentReactRoot.render(Body());
@@ -591,12 +591,12 @@ export const Hello = (name: string) => (
 
 ```typescript title="react/index.ts"
 // Update the import to add the new Hello React component.
-import { Header, Body, Hello } from './components';
+import { Header, Body, Hello } from "./components";
 
 // Previous script contents...
-  
+
 export function renderHello(e: HTMLElement) {
-  const name = e.getAttribute('data-name') ?? "";
+  const name = e.getAttribute("data-name") ?? "";
   createRoot(e).render(Hello(name));
 }
 ```
@@ -678,19 +678,19 @@ The HTML that's rendered is:
     <div data-name="Alice">
       <script>
         // Place the React component into the parent div.
-        bundle.renderHello(document.currentScript.closest('div'));
+        bundle.renderHello(document.currentScript.closest("div"));
       </script>
     </div>
     <div data-name="Bob">
       <script>
         // Place the React component into the parent div.
-	bundle.renderHello(document.currentScript.closest('div'));
+        bundle.renderHello(document.currentScript.closest("div"));
       </script>
     </div>
     <div data-name="Charlie">
       <script>
         // Place the React component into the parent div.
-	bundle.renderHello(document.currentScript.closest('div'));
+        bundle.renderHello(document.currentScript.closest("div"));
       </script>
     </div>
   </body>
@@ -711,6 +711,7 @@ Hello Charlie (Client-side React, rendering server-side data)
 ## Example code
 
 See https://github.com/a-h/templ/tree/main/examples/integration-react for a complete example.
+
 # Attributes
 
 ## Constant attributes
@@ -748,7 +749,7 @@ Rendering the `page` component results in:
 ```
 
 :::note
-String values are automatically HTML attribute encoded. This is a security measure, but may make the values (especially JSON appear) look strange to you, since some characters may be converted into HTML entities. However, it is correct HTML and won't affect the behavior. 
+String values are automatically HTML attribute encoded. This is a security measure, but may make the values (especially JSON appear) look strange to you, since some characters may be converted into HTML entities. However, it is correct HTML and won't affect the behavior.
 :::
 
 It's also possible to use function calls in string attribute expressions.
@@ -800,13 +801,12 @@ templ component() {
 ```
 
 ```html title="Output"
-<hr noshade>
+<hr noshade />
 ```
 
 :::note
 templ is aware that `<hr/>` is a void element, and renders `<hr>` instead.
 :::
-
 
 To set boolean attributes using variables or template parameters, a question mark after the attribute name is used to denote that the attribute is boolean.
 
@@ -817,7 +817,7 @@ templ component() {
 ```
 
 ```html title="Output"
-<hr>
+<hr />
 ```
 
 ## Conditional attributes
@@ -844,10 +844,10 @@ Use the `{ attrMap... }` syntax in the open tag of an element to append a dynami
 
 It's possible to spread any variable of type `templ.Attributes`. `templ.Attributes` is a `map[string]any` type definition.
 
-* If the value is a `string`, the attribute is added with the string value, e.g. `<div name="value">`.
-* If the value is a `bool`, the attribute is added as a boolean attribute if the value is true, e.g. `<div name>`.
-* If the value is a `templ.KeyValue[string, bool]`, the attribute is added if the boolean is true, e.g. `<div name="value">`.
-* If the value is a `templ.KeyValue[bool, bool]`, the attribute is added if both boolean values are true, as `<div name>`.
+- If the value is a `string`, the attribute is added with the string value, e.g. `<div name="value">`.
+- If the value is a `bool`, the attribute is added as a boolean attribute if the value is true, e.g. `<div name>`.
+- If the value is a `templ.KeyValue[string, bool]`, the attribute is added if the boolean is true, e.g. `<div name="value">`.
+- If the value is a `templ.KeyValue[bool, bool]`, the attribute is added if both boolean values are true, as `<div name>`.
 
 ```templ
 templ component(shouldBeUsed bool, attrs templ.Attributes) {
@@ -860,13 +860,13 @@ templ component(shouldBeUsed bool, attrs templ.Attributes) {
 }
 
 templ usage() {
-  @component(false, templ.Attributes{"data-testid": "paragraph"}) 
+  @component(false, templ.Attributes{"data-testid": "paragraph"})
 }
 ```
 
 ```html title="Output"
 <p data-testid="paragraph">Text</p>
-<hr>
+<hr />
 ```
 
 ## URL attributes
@@ -967,6 +967,7 @@ templ SearchBox() {
 	<search-webcomponent suggestions={ countriesJSON() } />
 }
 ```
+
 # Template composition
 
 Templates can be composed using the import expression.
@@ -992,15 +993,9 @@ templ right() {
 ```
 
 ```html title="Output"
-<div>
- Left
-</div>
-<div>
- Middle
-</div>
-<div>
- Right
-</div>
+<div>Left</div>
+<div>Middle</div>
+<div>Right</div>
 ```
 
 ## Children
@@ -1027,9 +1022,7 @@ The use of the `{ children... }` expression in the child component.
 
 ```html title="output"
 <div id="wrapper">
- <div>
-  Inserted from the top
- </div>
+  <div>Inserted from the top</div>
 </div>
 ```
 
@@ -1065,9 +1058,7 @@ func main() {
 
 ```html title="output"
 <div id="wrapper">
- <div>
-  Inserted from Go code
- </div>
+  <div>Inserted from Go code</div>
 </div>
 ```
 
@@ -1149,10 +1140,10 @@ func main() {
 
 ```html title="output"
 <div id="heading">
-	<h1>Heading</h1>
+  <h1>Heading</h1>
 </div>
 <div id="contents">
-	<p>Dynamic contents</p>
+  <p>Dynamic contents</p>
 </div>
 ```
 
@@ -1198,10 +1189,10 @@ func main() {
 
 ```html title="output"
 <div id="heading">
-	<h1>Heading</h1>
+  <h1>Heading</h1>
 </div>
 <div id="contents">
-	<p>Dynamic contents</p>
+  <p>Dynamic contents</p>
 </div>
 ```
 
@@ -1287,6 +1278,7 @@ templ Home() {
 :::tip
 To import a component from another Go module, you must first import the module by using the `go get <module>` command. Then, you can import the component as you would any other Go package.
 :::
+
 # Statements
 
 ## Control flow
@@ -1297,9 +1289,9 @@ These Go statements can be used to conditionally render child elements, or to it
 
 For individual implementation guides see:
 
-* [if/else](/syntax-and-usage/if-else)
-* [switch](/syntax-and-usage/switch)
-* [for loops](/syntax-and-usage/loops)
+- [if/else](/syntax-and-usage/if-else)
+- [switch](/syntax-and-usage/switch)
+- [for loops](/syntax-and-usage/loops)
 
 ## if/switch/for within text
 
@@ -1321,8 +1313,8 @@ templ showHelloIfTrue(b bool) {
 
 If you need to start a text block with the words `if`, `switch`, or `for`:
 
-* Use a Go string expression.
-* Capitalise `if`, `switch`, or `for`.
+- Use a Go string expression.
+- Capitalise `if`, `switch`, or `for`.
 
 ```templ title="paragraph.templ"
 package main
@@ -1348,7 +1340,7 @@ For example, the following code causes the templ parser to return an error:
 package main
 
 templ showIfTrue(b bool) {
-	if b 
+	if b
 	  <p>Hello</p>
 	}
 }
@@ -1374,8 +1366,8 @@ This also applies to `for` and `switch` statements.
 
 To resolve the issue:
 
-* Use a Go string expression.
-* Capitalise `if`, `switch`, or `for`.
+- Use a Go string expression.
+- Capitalise `if`, `switch`, or `for`.
 
 ```templ title="paragraph.templ"
 package main
@@ -1388,6 +1380,7 @@ templ display(price float64, count int) {
 	<p>{ fmt.Sprintf("%f for %d", price, count) }</p>
 }
 ```
+
 # Elements
 
 templ elements are used to render HTML within templ components.
@@ -1414,9 +1407,7 @@ func main() {
 ```
 
 ```html title="Output"
-<button class="button">
- Click me
-</button>
+<button class="button">Click me</button>
 ```
 
 :::info
@@ -1469,6 +1460,7 @@ func main() {
 ```html title="Output"
 <button value="John">Say Hello</button>
 ```
+
 # Basic syntax
 
 ## Package name and imports
@@ -1523,7 +1515,7 @@ templ headerTemplate(name string) {
 
 Within a templ element, expressions can be used to render strings. Content is automatically escaped using context-aware HTML encoding rules to protect against XSS and CSS injection attacks.
 
-String literals, variables and functions that return a string can be used. 
+String literals, variables and functions that return a string can be used.
 
 ### Literals
 
@@ -1539,16 +1531,17 @@ templ component() {
 ```
 
 ```html title="Output"
-<div>print this</div><div>and this</div>
+<div>print this</div>
+<div>and this</div>
 ```
 
 ### Variables
 
 Any Go string variable can be used, for example:
 
-* A string function parameter.
-* A field on a struct.
-* A variable or constant string that is in scope.
+- A string function parameter.
+- A field on a struct.
+- A variable or constant string that is in scope.
 
 ```templ title="/main.templ"
 package main
@@ -1569,7 +1562,7 @@ const exclamation = "!"
 
 func main() {
   p := Person{ Name: "John" }
-  component := greet("Hello", p) 
+  component := greet("Hello", p)
   component.Render(context.Background(), os.Stdout)
 }
 ```
@@ -1618,8 +1611,11 @@ templ component() {
 ```
 
 ```html title="Output"
-<div>&lt;/div&gt;&lt;script&gt;alert(&#39;hello!&#39;)&lt;/script&gt;&lt;div&gt;</div>
+<div>
+  &lt;/div&gt;&lt;script&gt;alert(&#39;hello!&#39;)&lt;/script&gt;&lt;div&gt;
+</div>
 ```
+
 # CSS style management
 
 ## HTML class and style attributes
@@ -1634,7 +1630,7 @@ templ button(text string) {
 
 ```html title="Output"
 <button class="button is-primary" style="background-color: red">
- Click me
+  Click me
 </button>
 ```
 
@@ -1658,14 +1654,14 @@ templ button(style1, style2 string, text string) {
 
 The style attribute supports use of the following types:
 
-* `string` - A string containing CSS properties, e.g. `background-color: red`.
-* `templ.SafeCSS` - A value containing CSS properties and values that will not be sanitized, e.g. `background-color: red; text-decoration: underline`
-* `map[string]string` - A map of string keys to string values, e.g. `map[string]string{"color": "red"}`
-* `map[string]templ.SafeCSSProperty` - A map of string keys to values, where the values will not be sanitized.
-* `templ.KeyValue[string, string]` - A single CSS key/value.
-* `templ.KeyValue[string, templ.SafeCSSProperty` - A CSS key/value, but the value will not be sanitized.
-* `templ.KeyValue[string, bool]` - A map where the CSS in the key is only included in the output if the boolean value is true.
-* `templ.KeyValue[templ.SafeCSS, bool]` - A map where the CSS in the key is only included if the boolean value is true.
+- `string` - A string containing CSS properties, e.g. `background-color: red`.
+- `templ.SafeCSS` - A value containing CSS properties and values that will not be sanitized, e.g. `background-color: red; text-decoration: underline`
+- `map[string]string` - A map of string keys to string values, e.g. `map[string]string{"color": "red"}`
+- `map[string]templ.SafeCSSProperty` - A map of string keys to values, where the values will not be sanitized.
+- `templ.KeyValue[string, string]` - A single CSS key/value.
+- `templ.KeyValue[string, templ.SafeCSSProperty` - A CSS key/value, but the value will not be sanitized.
+- `templ.KeyValue[string, bool]` - A map where the CSS in the key is only included in the output if the boolean value is true.
+- `templ.KeyValue[templ.SafeCSS, bool]` - A map where the CSS in the key is only included if the boolean value is true.
 
 Finally, a function value that returns any of the above types can be used.
 
@@ -1717,7 +1713,7 @@ templ ProgressBar(percent int) {
 
 ```html title="Output (percent=75)"
 <div style="transition:width 0.3s ease;width:75%;" class="progress-bar">
-    <div class="progress-fill"></div>
+  <div class="progress-fill"></div>
 </div>
 ```
 
@@ -1740,10 +1736,11 @@ templ TextInput(value string, hasError bool) {
 ```
 
 ```html title="Output (hasError=true)"
-<input 
-    type="text" 
-    value="" 
-    style="border-color: #ff3860; background-color: #fff5f7; padding: 0.5em 1em;">
+<input
+  type="text"
+  value=""
+  style="border-color: #ff3860; background-color: #fff5f7; padding: 0.5em 1em;"
+/>
 ```
 
 #### Bypassing sanitization
@@ -1769,19 +1766,17 @@ templ DraggableElement(x, y int) {
 ```
 
 ```html title="Output (x=10, y=20)"
-<div style="transform: translate(20px, 40px);">
-    Drag me
-</div>
+<div style="transform: translate(20px, 40px);">Drag me</div>
 ```
 
 ### Pattern use cases
 
-| Pattern | Best For | Example Use Case |
-|---------|----------|------------------|
-| **Maps** | Dynamic style sets requiring multiple computed values | Progress indicators, theme switching |
-| **KeyValue** | Conditional style toggling | Form validation, interactive states |
-| **Functions** | Complex style generation | Animations, data visualizations |
-| **Direct Strings** | Simple static styles | Basic formatting, utility classes |
+| Pattern            | Best For                                              | Example Use Case                     |
+| ------------------ | ----------------------------------------------------- | ------------------------------------ |
+| **Maps**           | Dynamic style sets requiring multiple computed values | Progress indicators, theme switching |
+| **KeyValue**       | Conditional style toggling                            | Form validation, interactive states  |
+| **Functions**      | Complex style generation                              | Animations, data visualizations      |
+| **Direct Strings** | Simple static styles                                  | Basic formatting, utility classes    |
 
 ### Sanitization behaviour
 
@@ -1797,7 +1792,7 @@ templ UnsafeExample() {
 
 ```html title="Output"
 <div style="background-image:zTemplUnsafeCSSPropertyValue;">
-    Dangerous content
+  Dangerous content
 </div>
 ```
 
@@ -1812,9 +1807,7 @@ templ SafeEmbed() {
 ```
 
 ```html title="Output"
-<div style="background-image: url(/safe.png);">
-    Trusted content
-</div>
+<div style="background-image: url(/safe.png);">Trusted content</div>
 ```
 
 :::note
@@ -1827,7 +1820,7 @@ Invalid values are automatically sanitized:
 
 ```templ
 templ InvalidButton() {
-    <button style={ 
+    <button style={
         map[string]string{
             "": "invalid-property",
             "color": "</style>",
@@ -1837,8 +1830,10 @@ templ InvalidButton() {
 ```
 
 ```html title="Output"
-<button style="zTemplUnsafeCSSPropertyName:zTemplUnsafeCSSPropertyValue;color:zTemplUnsafeCSSPropertyValue;">
-    Click me
+<button
+  style="zTemplUnsafeCSSPropertyName:zTemplUnsafeCSSPropertyValue;color:zTemplUnsafeCSSPropertyValue;"
+>
+  Click me
 </button>
 ```
 
@@ -1872,13 +1867,13 @@ templ button(text string, className string) {
 
 Toggle addition of CSS classes to an element based on a boolean value by passing:
 
-* A `string` containing the name of a class to apply.
-* A `templ.KV` value containing the name of the class to add to the element, and a boolean that determines whether the class is added to the attribute at render time.
-  * `templ.KV("is-primary", true)`
-  * `templ.KV("hover:red", true)`
-* A map of string class names to a boolean that determines if the class is added to the class attribute value at render time:
-  * `map[string]bool`
-  * `map[CSSClass]bool`
+- A `string` containing the name of a class to apply.
+- A `templ.KV` value containing the name of the class to add to the element, and a boolean that determines whether the class is added to the attribute at render time.
+  - `templ.KV("is-primary", true)`
+  - `templ.KV("hover:red", true)`
+- A map of string class names to a boolean that determines if the class is added to the class attribute value at render time:
+  - `map[string]bool`
+  - `map[CSSClass]bool`
 
 ```templ title="component.templ"
 package main
@@ -1906,9 +1901,7 @@ func main() {
 ```
 
 ```html title="Output"
-<button class="button">
- Click me
-</button>
+<button class="button">Click me</button>
 ```
 
 ## CSS elements
@@ -1936,17 +1929,15 @@ templ page() {
 
 ```html title="Output"
 <style type="text/css">
-	p {
-		font-family: sans-serif;
-	}
-	.button {
-		background-color: black;
-		foreground-color: white;
-	}
+  p {
+    font-family: sans-serif;
+  }
+  .button {
+    background-color: black;
+    foreground-color: white;
+  }
 </style>
-<p>
-	Paragraph contents.
-</p>
+<p>Paragraph contents.</p>
 ```
 
 :::tip
@@ -1986,11 +1977,12 @@ templ button(text string, isPrimary bool) {
 
 ```html title="Output"
 <style type="text/css">
- .className_f179{background-color:#ffffff;color:#ff0000;}
+  .className_f179 {
+    background-color: #ffffff;
+    color: #ff0000;
+  }
 </style>
-<button class="button className_f179">
- Click me
-</button>
+<button class="button className_f179">Click me</button>
 ```
 
 :::info
@@ -2020,11 +2012,15 @@ templ index() {
 
 ```html title="Output"
 <style type="text/css">
- .loading_a3cc{width:50%;}
+  .loading_a3cc {
+    width: 50%;
+  }
 </style>
 <div class="loading_a3cc"></div>
 <style type="text/css">
- .loading_9ccc{width:100%;}
+  .loading_9ccc {
+    width: 100%;
+  }
 </style>
 <div class="loading_9ccc"></div>
 ```
@@ -2055,7 +2051,7 @@ To save bandwidth, templ can provide a global stylesheet that includes the outpu
 
 To provide a global stylesheet, use templ's CSS middleware, and register templ classes on application startup.
 
-The middleware adds a HTTP route to the web server (`/styles/templ.css` by default) that renders the `text/css` classes that would otherwise be added to `<style>` tags when components are rendered. 
+The middleware adds a HTTP route to the web server (`/styles/templ.css` by default) that renders the `text/css` classes that would otherwise be added to `<style>` tags when components are rendered.
 
 For example, to stop the `className` CSS class from being added to the output, the HTTP middleware can be used.
 
@@ -2068,6 +2064,7 @@ http.ListenAndServe(":8000", handler)
 :::caution
 Don't forget to add a `<link rel="stylesheet" href="/styles/templ.css">` to your HTML to include the generated CSS class names!
 :::
+
 # Comments
 
 # HTML comments
@@ -2108,6 +2105,7 @@ templ hello(name string) {
 	<p>{greeting} { name }</p>
 }
 ```
+
 # Rendering raw HTML
 
 To render HTML that has come from a trusted source, bypassing all HTML escaping and security mechanisms that templ includes, use the `templ.Raw` function.
@@ -2132,13 +2130,14 @@ templ Example() {
 ```
 
 ```html title="Output"
-<!DOCTYPE html>
+<!doctype html>
 <html>
-	<body>
-		<div>Hello, World!</div>
-	</body>
+  <body>
+    <div>Hello, World!</div>
+  </body>
 </html>
 ```
+
 # For loops
 
 Use the standard Go `for` loop for iteration.
@@ -2162,6 +2161,7 @@ templ nameList(items []Item) {
   <li>C</li>
 </ul>
 ```
+
 # Using with `html/template`
 
 Templ components can be used with the Go standard library [`html/template`](https://pkg.go.dev/html/template) package.
@@ -2194,15 +2194,15 @@ func main() {
 ```
 
 ```html title="Output"
-<!DOCTYPE html>
+<!doctype html>
 <html>
-	<body>
-		<div>Hello, World!</div>
-	</body>
+  <body>
+    <div>Hello, World!</div>
+  </body>
 </html>
 ```
 
-## Using a templ component with	`html/template`
+## Using a templ component with `html/template`
 
 To use a templ component within a `html/template`, use the `templ.ToGoHTML` function to render the component into a `template.HTML value`.
 
@@ -2244,13 +2244,14 @@ func main() {
 ```
 
 ```html title="Output"
-<!DOCTYPE html>
+<!doctype html>
 <html>
-	<body>
-		<div>Hello, World!</div>
-	</body>
+  <body>
+    <div>Hello, World!</div>
+  </body>
 </html>
 ```
+
 # Using JavaScript with templ
 
 ## Script tags
@@ -2296,7 +2297,6 @@ The data passed to the `alert` function is JSON encoded, so if `data.Message` wa
 
 HTML element `on*` attributes pass an event object to the function. To pass the event object to a function, use `templ.JSExpression`.
 
-
 :::warning
 `templ.JSExpression` bypasses JSON encoding, so the string value is output directly to the HTML - this can be a security risk if the data is not trusted, e.g. the data is user input, not a compile-time constant.
 :::
@@ -2315,10 +2315,10 @@ The output would be:
 
 ```html title="output.html"
 <script>
-	function clickHandler(event, message) {
-		alert(message);
-		event.preventDefault();
-	}
+  function clickHandler(event, message) {
+    alert(message);
+    event.preventDefault();
+  }
 </script>
 <button onclick="clickHandler(event, 'message from Go')">Show event</button>
 ```
@@ -2364,14 +2364,16 @@ templ body(data any) {
 ```
 
 ```html title="output.html"
-<button id="alerter" alert-data="{&quot;msg&quot;:&quot;Hello, from the attribute data&quot;}">Show alert</button>
+<button id="alerter" alert-data='{"msg":"Hello, from the attribute data"}'>
+  Show alert
+</button>
 ```
 
 The data in the attribute can then be accessed from client-side JavaScript.
 
 ```javascript
-const button = document.getElementById('alerter');
-const data = JSON.parse(button.getAttribute('alert-data'));
+const button = document.getElementById("alerter");
+const data = JSON.parse(button.getAttribute("alert-data"));
 ```
 
 [alpine.js](https://alpinejs.dev/) uses `x-*` attributes to pass data to the client:
@@ -2395,13 +2397,15 @@ templ body(data any) {
 ```
 
 ```html title="output.html"
-<script id="id" type="application/json">{"msg":"Hello, from the script data"}</script>
+<script id="id" type="application/json">
+  { "msg": "Hello, from the script data" }
+</script>
 ```
 
 The data in the script tag can then be accessed from client-side JavaScript.
 
 ```javascript
-const data = JSON.parse(document.getElementById('id').textContent);
+const data = JSON.parse(document.getElementById("id").textContent);
 ```
 
 ## Avoiding inline event handlers
@@ -2487,6 +2491,7 @@ templ hello(label, name string) {
   </div>
 }
 ```
+
 :::
 
 ## Importing scripts
@@ -2532,6 +2537,7 @@ mux := http.NewServeMux()
 mux.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets"))))
 http.ListenAndServe("localhost:8080", mux)
 ```
+
 :::
 
 ## Working with NPM projects
@@ -2699,11 +2705,21 @@ After building and running the executable, running `curl http://localhost:8080/`
 
 ```html title="Output"
 <html>
-	<body>
-		<script>function __templ_printToConsole_5a85(content){console.log(content)}</script>
-		<script>__templ_printToConsole_5a85("2023-11-11 01:01:40.983381358 +0000 UTC")</script>
-		<script>__templ_printToConsole_5a85("Again: 2023-11-11 01:01:40.983381358 +0000 UTC")</script>
-	</body>
+  <body>
+    <script>
+      function __templ_printToConsole_5a85(content) {
+        console.log(content);
+      }
+    </script>
+    <script>
+      __templ_printToConsole_5a85("2023-11-11 01:01:40.983381358 +0000 UTC");
+    </script>
+    <script>
+      __templ_printToConsole_5a85(
+        "Again: 2023-11-11 01:01:40.983381358 +0000 UTC",
+      );
+    </script>
+  </body>
 </html>
 ```
 
@@ -2728,6 +2744,7 @@ templ page() {
 	</html>
 }
 ```
+
 # Context
 
 ## What problems does `context` solve?
@@ -2770,10 +2787,10 @@ Context is not strongly typed, and errors only show at runtime, not compile time
 
 Some data is useful for many components throughout the hierarchy, for example:
 
-* Whether the current user is logged in or not.
-* The username of the current user.
-* The locale of the user (used for localization).
-* Theme preferences (e.g. light vs dark).
+- Whether the current user is logged in or not.
+- The username of the current user.
+- The locale of the user (used for localization).
+- Theme preferences (e.g. light vs dark).
 
 One way to pass this information is to create a `Settings` struct and pass it through the stack as a parameter.
 
@@ -2948,11 +2965,21 @@ templ page() {
 ```html title="Output"
 <script>
   function hello(name) {
-    alert('Hello, ' + name + '!');
+    alert("Hello, " + name + "!");
   }
 </script>
-<input type="button" value="Hello User" data-name="user" onclick="hello(this.getAttribute('data-name'))">
-<input type="button" value="Hello World" data-name="world" onclick="hello(this.getAttribute('data-name'))">
+<input
+  type="button"
+  value="Hello User"
+  data-name="user"
+  onclick="hello(this.getAttribute('data-name'))"
+/>
+<input
+  type="button"
+  value="Hello World"
+  data-name="world"
+  onclick="hello(this.getAttribute('data-name'))"
+/>
 ```
 
 :::tip
@@ -3011,6 +3038,7 @@ templ button() {
   <button>Click me</button>
 }
 ```
+
 # Switch
 
 templ uses standard Go `switch` statements which can be used to conditionally render components and elements.
@@ -3044,10 +3072,9 @@ func main() {
 ```
 
 ```html title="Output"
-<span>
- Unknown user
-</span>
+<span> Unknown user </span>
 ```
+
 # Raw Go
 
 For some more advanced use cases it may be useful to write Go code statements in your template.
@@ -3072,20 +3099,23 @@ templ nameList(items []Item) {
 ```html title="Output"
 <p>A</p>
 ```
+
 # Experimental packages
 
 Experimental Packages for templ are available at https://github.com/templ-go/x/
 
 :::warning
+
 - Packages in this module are experimental and may be removed at any time.
 - There is no guarantee of compatibility with future versions.
 - There is no guarantee of stability.
 - Use at your own risk.
-:::
+  :::
 
 ## Approval Process
 
 As of right now, there is no formal approval process for packages to be stabilized and moved into https://github.com/a-h/templ. Feel free to contribute via GitHub discussions at https://github.com/a-h/templ/discussions
+
 # urlbuilder
 
 A simple URL builder to construct a `templ.SafeURL`.
@@ -3117,6 +3147,7 @@ See [URL Attributes](/syntax-and-usage/attributes#url-attributes) for more infor
 ## Feedback
 
 Please leave your feedback on this feature at https://github.com/a-h/templ/discussions/867
+
 # FAQ
 
 ## How can I migrate from templ version 0.1.x to templ 0.2.x syntax?
@@ -3124,6 +3155,7 @@ Please leave your feedback on this feature at https://github.com/a-h/templ/discu
 Versions of templ &lt;= v0.2.663 include a `templ migrate` command that can migrate v1 syntax to v2.
 
 The v1 syntax used some extra characters for variable injection, e.g. `{%= name %}` whereas the latest (v2) syntax uses a single pair of braces within HTML, e.g. `{ name }`.
+
 # Media and talks
 
 # Go Podcast 2024
@@ -3236,13 +3268,14 @@ func main() {
 ```html title="Output"
 <script nonce="randomly generated nonce">
   function __templ_onLoad_5a85() {
-    alert("Hello, world!")
+    alert("Hello, world!");
   }
 </script>
 <script nonce="randomly generated nonce">
-  __templ_onLoad_5a85()
+  __templ_onLoad_5a85();
 </script>
 ```
+
 # Code signing
 
 Binaries are created by the GitHub Actions workflow at https://github.com/a-h/templ/blob/main/.github/workflows/release.yml
@@ -3250,6 +3283,7 @@ Binaries are created by the GitHub Actions workflow at https://github.com/a-h/te
 Binaries are signed by cosign. The public key is stored in the repository at https://github.com/a-h/templ/blob/main/cosign.pub
 
 Instructions for key verification at https://docs.sigstore.dev/verifying/verify/
+
 # Injection attacks
 
 templ is designed to prevent user-provided data from being used to inject vulnerabilities.
@@ -3258,28 +3292,24 @@ templ is designed to prevent user-provided data from being used to inject vulner
 
 ```html
 templ Example() {
-  <script>
-    function showAlert() {
-      alert("hello");
-    }
-  </script>
-  <style type="text/css">
-    /* Only CSS is allowed */
-  </style>
+<script>
+  function showAlert() {
+    alert("hello");
+  }
+</script>
+<style type="text/css">
+  /* Only CSS is allowed */
+</style>
 }
 ```
 
 `onClick` attributes, and other `on*` attributes are used to execute JavaScript. To prevent user data from being unescaped, `on*` attributes accept a `templ.ComponentScript`.
 
 ```html
-script onClickHandler(msg string) {
-  alert(msg);
-}
-
-templ Example(msg string) {
-  <div onClick={ onClickHandler(msg) }>
-    { "will be HTML encoded using templ.Escape" }
-  </div>
+script onClickHandler(msg string) { alert(msg); } templ Example(msg string) {
+<div onClick="{" onClickHandler(msg) }>
+  { "will be HTML encoded using templ.Escape" }
+</div>
 }
 ```
 
@@ -3307,8 +3337,8 @@ Rendered output:
 
 ```html
 templ Example() {
-  <div>Node text is not modified at all.</div>
-  <div>{ "will be escaped using templ.EscapeString" }</div>
+<div>Node text is not modified at all.</div>
+<div>{ "will be escaped using templ.EscapeString" }</div>
 }
 ```
 
@@ -3326,7 +3356,7 @@ Within css blocks, property names, and constant CSS property values are not sani
 
 ```css
 css className() {
-	background-color: #ffffff;
+  background-color: #ffffff;
 }
 ```
 
@@ -3337,6 +3367,7 @@ css className() {
 	color: { red };
 }
 ```
+
 # Hosting on AWS Lambda
 
 AWS Lambda is a great way to host templ applications.
@@ -3435,6 +3466,7 @@ The example CDK stack includes a deployment process that updates the contents of
 ## Deployed example
 
 To see the deployed sample application running on AWS Lambda, visit https://d3qfg6xxljj3ky.cloudfront.net
+
 # Hosting using Docker
 
 Applications that use templ can be deployed using the same techniques and platforms as any other Go application.
@@ -3547,6 +3579,7 @@ https://invite.slack.golangbridge.org/
 ## GitHub Discussion
 
 https://github.com/a-h/templ/discussions
+
 # Blog example
 
 This example demonstrates building a static blog with templ.
@@ -3739,69 +3772,50 @@ public/2023/05/01/may-day/index.html
 The `index.html` contains links to all of the posts.
 
 ```html title="index.html"
-<title>
- My Website
-</title>
-<h1>
- My Website
-</h1>
+<title>My Website</title>
+<h1>My Website</h1>
 <div>
- <a href="2023/01/01/happy-new-year/">
-  Happy New Year!
- </a>
+  <a href="2023/01/01/happy-new-year/"> Happy New Year! </a>
 </div>
 <div>
- <a href="2023/05/01/may-day/">
-  May Day
- </a>
+  <a href="2023/05/01/may-day/"> May Day </a>
 </div>
 ```
 
 While each content page contains the HTML generated from the markdown, and the surrounding template.
 
 ```html title="2023/05/01/may-day/index.html"
-<title>
- May Day
-</title>
-<h1>
- May Day
-</h1>
+<title>May Day</title>
+<h1>May Day</h1>
 <div class="content">
- <p>
-  May Day is an ancient spring festival celebrated on the first of May in the United Kingdom, embracing the arrival of warmer weather and the renewal of life.
- </p>
- <p>
-  Top May Day Activities in the UK:
- </p>
- <ul>
-  <li>
-   Dancing around the Maypole, a traditional folk activity
-  </li>
-  <li>
-   Attending local village fetes and fairs
-  </li>
-  <li>
-   Watching or participating in Morris dancing performances
-  </li>
-  <li>
-   Enjoying the public holiday known as Early May Bank Holiday
-  </li>
- </ul>
+  <p>
+    May Day is an ancient spring festival celebrated on the first of May in the
+    United Kingdom, embracing the arrival of warmer weather and the renewal of
+    life.
+  </p>
+  <p>Top May Day Activities in the UK:</p>
+  <ul>
+    <li>Dancing around the Maypole, a traditional folk activity</li>
+    <li>Attending local village fetes and fairs</li>
+    <li>Watching or participating in Morris dancing performances</li>
+    <li>Enjoying the public holiday known as Early May Bank Holiday</li>
+  </ul>
 </div>
 ```
 
 The files in the `public` directory can then be hosted in any static website hosting provider.
+
 # Deploying static files
 
 Once you have built static HTML files with templ, you can serve them on any static site hosting platform, or use a web server to serve them.
 
 Ways you could host your site include:
 
-* Fly.io
-* Netlify
-* Vercel
-* AWS Amplify
-* Firebase Hosting
+- Fly.io
+- Netlify
+- Vercel
+- AWS Amplify
+- Firebase Hosting
 
 Typically specialist static hosting services are more cost-effective than VM or Docker-based services, due to the less complex compute and networking requirements.
 
@@ -3906,6 +3920,7 @@ go run *.go
 ```html title="hello.html"
 <div>Hello, John</div>
 ```
+
 # Running your first templ application
 
 Let's update the previous application to serve HTML over HTTP instead of writing it to the terminal.
@@ -3928,7 +3943,7 @@ import (
 
 func main() {
 	component := hello("John")
-	
+
 	http.Handle("/", templ.Handler(component))
 
 	fmt.Println("Listening on :3000")
@@ -3953,6 +3968,7 @@ curl localhost:3000
 ```html name="Output"
 <div>Hello, John</div>
 ```
+
 # Creating a simple templ component
 
 To create a templ component, first create a new Go project.
@@ -4045,12 +4061,12 @@ In this way, templ can be used to generate HTML files that can be hosted as stat
 
 Create components that render fragments of HTML and compose them to create screens, pages, documents, or apps.
 
-* Server-side rendering: Deploy as a serverless function, Docker container, or standard Go program.
-* Static rendering: Create static HTML files to deploy however you choose.
-* Compiled code: Components are compiled into performant Go code.
-* Use Go: Call any Go code, and use standard `if`, `switch`, and `for` statements.
-* No JavaScript: Does not require any client or server-side JavaScript.
-* Great developer experience: Ships with IDE autocompletion.
+- Server-side rendering: Deploy as a serverless function, Docker container, or standard Go program.
+- Static rendering: Create static HTML files to deploy however you choose.
+- Compiled code: Components are compiled into performant Go code.
+- Use Go: Call any Go code, and use standard `if`, `switch`, and `for` statements.
+- No JavaScript: Does not require any client or server-side JavaScript.
+- Great developer experience: Ships with IDE autocompletion.
 
 ```templ
 package main
@@ -4281,6 +4297,7 @@ func main() {
 	server.ListenAndServe()
 }
 ```
+
 # Internationalization
 
 templ can be used with 3rd party internationalization libraries.
@@ -4376,6 +4393,7 @@ templ page() {
 	</html>
 }
 ```
+
 # Web frameworks
 
 Templ is framework agnostic but that does not mean it can not be used with Go frameworks and other tools.
@@ -4482,6 +4500,7 @@ templ CSRF() {
 ### `template/html`
 
 See [Using with Go templates](../syntax-and-usage/using-with-go-templates)
+
 # Creating an HTTP server with templ
 
 ### Static pages
@@ -4853,6 +4872,7 @@ templ counts(global, session int) {
 The example can be viewed at https://d3qfg6xxljj3ky.cloudfront.net
 
 Complete source code including AWS CDK code to set up the infrastructure is available at https://github.com/a-h/templ/tree/main/examples/counter
+
 # HTTP Streaming
 
 The default behaviour of the `templ.Handler` is to render the template to a buffer and then write the buffer to the response.

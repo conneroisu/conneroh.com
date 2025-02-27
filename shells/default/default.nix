@@ -97,6 +97,27 @@ in
 
           wait
       '')
+      (pkgs.writeShellScriptBin "format" ''
+        export REPO_ROOT=$(git rev-parse --show-toplevel) # needed
+        go fmt $REPO_ROOT/...
+
+        git ls-files \
+            --others \
+            --exclude-standard \
+            --cached \
+            -- '*.cc' '*.h' '*.proto' \
+            | xargs clang-format -i
+
+        git ls-files \
+          --others \
+          --exclude-standard \
+          --cached \
+          -- '*.js' '*.ts' '*.css' '*.md' '*.json' \
+          | xargs prettier --write
+
+        golines -l -w --max-len=80 --shorten-comments  --ignored-dirs=.devenv .
+
+      '')
 
       (pkgs.writeShellScriptBin "run" ''air'')
     ];
