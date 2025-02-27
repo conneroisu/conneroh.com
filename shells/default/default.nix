@@ -16,8 +16,11 @@
   buildWithSpecificGo = pkg: pkg.override {inherit buildGoModule;};
 in
   mkShell {
-    shellHook = ''export REPO_ROOT=$(git rev-parse --show-toplevel)'';
-
+    shellHook = ''
+      export REPO_ROOT=$(git rev-parse --show-toplevel)
+      ${inputs.self.checks.${pkgs.system}.pre-commit.shellHook}
+    '';
+    buildInputs = inputs.self.checks.${pkgs.system}.pre-commit.enabledPackages;
     packages = with pkgs; [
       # Nix
       alejandra
@@ -94,6 +97,7 @@ in
 
           wait
       '')
+
       (pkgs.writeShellScriptBin "run" ''air'')
     ];
   }

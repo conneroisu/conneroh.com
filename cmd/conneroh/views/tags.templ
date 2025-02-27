@@ -106,7 +106,6 @@ templ Tags(
 		<!-- Hidden tag data for Alpine -->
 		if fullTags != nil {
 			// Create a nested map for sections
-			nestedTags := tags.NestedSort(*fullTags)
 			for _, tag := range *fullTags {
 				<div
 					class="hidden"
@@ -114,7 +113,7 @@ templ Tags(
 					data-tag-name={ tag.Name }
 					data-tag-description={ tag.Description }
 					data-tag-slug={ tag.Slug }
-					data-tag-section={ getTagSection(tag.Name) }
+					data-tag-section={ templ.EscapeString(getTagSection(tag.Name)) }
 					data-tag-posts-count={ fmt.Sprintf("%d", len(tag.Posts)) }
 					data-tag-projects-count={ fmt.Sprintf("%d", len(tag.Projects)) }
 				></div>
