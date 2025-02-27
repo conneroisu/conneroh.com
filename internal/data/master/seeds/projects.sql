@@ -42,8 +42,8 @@ VALUES
         '1577836800'
     );
 
-INSERT INTO
-    tags (name, slug, description)
+INSERT
+    OR IGNORE INTO tags (name, slug, description)
 VALUES
     (
         'Tag 1',

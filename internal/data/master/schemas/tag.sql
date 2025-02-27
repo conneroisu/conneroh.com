@@ -1,7 +1,7 @@
 -- dialect: sqlite
 CREATE TABLE IF NOT EXISTS tags (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
+    name TEXT NOT NULL UNIQUE,
     description TEXT NOT NULL,
     slug TEXT NOT NULL,
     icon TEXT NOT NULL DEFAULT 'tag',
