@@ -23,6 +23,9 @@ inputs.pre-commit-hooks.lib.${pkgs.system}.run {
         ".*_dist/"
         ".*node_modules/"
       ];
+      args = [
+        "--ignore-path=.gitignore"
+      ];
     };
   };
 }
