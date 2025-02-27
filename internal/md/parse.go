@@ -14,6 +14,7 @@ import (
 	"go.abhg.dev/goldmark/anchor"
 	"go.abhg.dev/goldmark/frontmatter"
 	"go.abhg.dev/goldmark/hashtag"
+	"go.abhg.dev/goldmark/mermaid"
 	"go.abhg.dev/goldmark/wikilink"
 )
 
@@ -27,26 +28,49 @@ type (
 )
 
 var (
-	extensions = []goldmark.Extender{
-		extension.GFM,
-		mathjax.MathJax,
-		&anchor.Extender{},
-		&frontmatter.Extender{
-			Formats: []frontmatter.Format{frontmatter.YAML},
-		},
-		&hashtag.Extender{
-			Variant: hashtag.ObsidianVariant,
-		},
-		&wikilink.Extender{},
-		highlighting.NewHighlighting(highlighting.WithStyle("monokai")),
-	}
-
 	md = goldmark.New(
-		goldmark.WithExtensions(extensions...),
-		goldmark.WithParserOptions(parser.WithAutoHeadingID()),
+		goldmark.WithExtensions(
+			extension.GFM,
+			extension.Footnote,
+			extension.Strikethrough,
+			extension.Table,
+			extension.TaskList,
+			extension.DefinitionList,
+			extension.NewTypographer(
+				extension.WithTypographicSubstitutions(extension.TypographicSubstitutions{
+					extension.Apostrophe: []byte("’"),
+				}),
+			),
+			mathjax.MathJax,
+			&anchor.Extender{
+				Position: anchor.Before,
+				Texter:   anchor.Text("#"),
+				Attributer: anchor.Attributes{
+					"class": "anchor permalink p-4",
+				},
+			},
+			&mermaid.Extender{
+				RenderMode: mermaid.RenderModeClient,
+			},
+			&frontmatter.Extender{
+				Formats: []frontmatter.Format{frontmatter.YAML},
+			},
+			&hashtag.Extender{
+				Variant: hashtag.ObsidianVariant,
+			},
+			&wikilink.Extender{},
+			highlighting.NewHighlighting(highlighting.WithStyle("monokai")),
+		),
+		goldmark.WithParserOptions(
+			parser.WithAutoHeadingID(),
+			parser.WithAttribute(),
+			// parser.WithParagraphTransformers(ps),
+		),
 		goldmark.WithRendererOptions(
 			html.WithHardWraps(),
-			html.WithXHTML(),
+			// html.WithXHTML(),
+			extension.WithFootnoteBacklinkClass("footnote-backref"),
+			extension.WithFootnoteLinkClass("footnote-ref"),
 		),
 	)
 )
@@ -108,10 +132,12 @@ func Parse(
 }
 
 // ParseWithFrontMatter parses markdown to html and decodes the frontmatter into the provided target struct.
-func ParseWithFrontMatter(
+func ParseWithFrontMatter[
+	T *PostFrontMatter | *ProjectFrontMatter | *TagFrontMatter,
+](
 	name string,
 	source []byte,
-	frontMatterTarget interface{},
+	frontMatterTarget T,
 ) (string, error) {
 	var (
 		buf bytes.Buffer
@@ -136,14 +162,12 @@ func ParseWithFrontMatter(
 	}
 
 	// Validate the frontmatter struct if it's not nil
-	if frontMatterTarget != nil {
-		v := validator.New(validator.WithRequiredStructEnabled())
-		if err := v.Struct(frontMatterTarget); err != nil {
-			if _, ok := err.(*validator.InvalidValidationError); ok {
-				return "", err
-			}
+	v := validator.New(validator.WithRequiredStructEnabled())
+	if err := v.Struct(frontMatterTarget); err != nil {
+		if _, ok := err.(*validator.InvalidValidationError); ok {
 			return "", err
 		}
+		return "", err
 	}
 
 	return buf.String(), nil

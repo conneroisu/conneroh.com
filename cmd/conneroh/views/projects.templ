@@ -35,7 +35,6 @@ templ Project(
 			</div>
 			<div class="prose prose-lg dark:prose-invert max-w-none">
 				<p class="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line">{ project.Description }</p>
-				@templ.Raw(project.Content)
 				if project.CreatedAt != nil {
 					<div class="mt-6 flex items-center text-sm text-gray-500 dark:text-gray-400">
 						<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -44,6 +43,12 @@ templ Project(
 						<span>Created: { formatDate(*project.CreatedAt) }</span>
 					</div>
 				}
+			</div>
+		</div>
+		<div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden p-6 mb-8">
+			<h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Content</h2>
+			<div class="text-gray-700 dark:text-gray-300">
+				@templ.Raw(project.Content)
 			</div>
 		</div>
 		if len(project.Posts) > 0 {

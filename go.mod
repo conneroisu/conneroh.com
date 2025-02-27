@@ -3,6 +3,7 @@ module github.com/conneroisu/conneroh.com
 go 1.24.0
 
 require (
+	github.com/Oudwins/tailwind-merge-go v0.2.0
 	github.com/a-h/templ v0.3.833
 	github.com/axzilla/templui v0.31.0
 	github.com/go-playground/validator/v10 v10.25.0
@@ -14,13 +15,13 @@ require (
 	go.abhg.dev/goldmark/anchor v0.1.1
 	go.abhg.dev/goldmark/frontmatter v0.2.0
 	go.abhg.dev/goldmark/hashtag v0.3.1
+	go.abhg.dev/goldmark/mermaid v0.5.0
 	go.abhg.dev/goldmark/wikilink v0.6.0
 	modernc.org/sqlite v1.36.0
 )
 
 require (
 	github.com/BurntSushi/toml v1.2.1 // indirect
-	github.com/Oudwins/tailwind-merge-go v0.2.0 // indirect
 	github.com/alecthomas/chroma/v2 v2.2.0 // indirect
 	github.com/antlr4-go/antlr/v4 v4.13.0 // indirect
 	github.com/coder/websocket v1.8.12 // indirect

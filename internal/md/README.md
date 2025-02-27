@@ -17,7 +17,7 @@ Package md contains the implementation of a markdown parser/renderer.
 ## Index
 
 - [func Parse\(name string, source \[\]byte\) \(string, error\)](<#Parse>)
-- [func ParseWithFrontMatter\(name string, source \[\]byte, frontMatterTarget interface\{\}\) \(string, error\)](<#ParseWithFrontMatter>)
+- [func ParseWithFrontMatter\[T \*PostFrontMatter | \*ProjectFrontMatter | \*TagFrontMatter\]\(name string, source \[\]byte, frontMatterTarget T\) \(string, error\)](<#ParseWithFrontMatter>)
 - [type FrontMatter](<#FrontMatter>)
 - [type FrontMatterMissingError](<#FrontMatterMissingError>)
   - [func \(e FrontMatterMissingError\) Error\(\) string](<#FrontMatterMissingError.Error>)
@@ -27,7 +27,7 @@ Package md contains the implementation of a markdown parser/renderer.
 
 
 <a name="Parse"></a>
-## func [Parse](<https://github.com/conneroisu/conneroh/blob/main/internal/md/parse.go#L55-L58>)
+## func [Parse](<https://github.com/conneroisu/conneroh/blob/main/internal/md/parse.go#L79-L82>)
 
 ```go
 func Parse(name string, source []byte) (string, error)
@@ -36,16 +36,16 @@ func Parse(name string, source []byte) (string, error)
 Parse parses markdown to html.
 
 <a name="ParseWithFrontMatter"></a>
-## func [ParseWithFrontMatter](<https://github.com/conneroisu/conneroh/blob/main/internal/md/parse.go#L111-L115>)
+## func [ParseWithFrontMatter](<https://github.com/conneroisu/conneroh/blob/main/internal/md/parse.go#L135-L141>)
 
 ```go
-func ParseWithFrontMatter(name string, source []byte, frontMatterTarget interface{}) (string, error)
+func ParseWithFrontMatter[T *PostFrontMatter | *ProjectFrontMatter | *TagFrontMatter](name string, source []byte, frontMatterTarget T) (string, error)
 ```
 
 ParseWithFrontMatter parses markdown to html and decodes the frontmatter into the provided target struct.
 
 <a name="FrontMatter"></a>
-## type [FrontMatter](<https://github.com/conneroisu/conneroh/blob/main/internal/md/parse.go#L22-L26>)
+## type [FrontMatter](<https://github.com/conneroisu/conneroh/blob/main/internal/md/parse.go#L23-L27>)
 
 FrontMatter is the frontmatter of a markdown document.
 
@@ -78,7 +78,7 @@ func (e FrontMatterMissingError) Error() string
 Error implements the error interface on FrontMatterMissingError.
 
 <a name="PostFrontMatter"></a>
-## type [PostFrontMatter](<https://github.com/conneroisu/conneroh/blob/main/internal/md/posts.go#L4-L10>)
+## type [PostFrontMatter](<https://github.com/conneroisu/conneroh/blob/main/internal/md/frontmatters.go#L12-L18>)
 
 PostFrontMatter is the frontmatter of a post markdown document.
 
@@ -93,7 +93,7 @@ type PostFrontMatter struct {
 ```
 
 <a name="ProjectFrontMatter"></a>
-## type [ProjectFrontMatter](<https://github.com/conneroisu/conneroh/blob/main/internal/md/projects.go#L4-L9>)
+## type [ProjectFrontMatter](<https://github.com/conneroisu/conneroh/blob/main/internal/md/frontmatters.go#L4-L9>)
 
 ProjectFrontMatter is the frontmatter of a project markdown document.
 
@@ -107,7 +107,7 @@ type ProjectFrontMatter struct {
 ```
 
 <a name="TagFrontMatter"></a>
-## type [TagFrontMatter](<https://github.com/conneroisu/conneroh/blob/main/internal/md/tags.go#L4-L9>)
+## type [TagFrontMatter](<https://github.com/conneroisu/conneroh/blob/main/internal/md/frontmatters.go#L21-L26>)
 
 TagFrontMatter is the frontmatter of a tag markdown document.
 

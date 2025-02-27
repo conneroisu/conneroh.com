@@ -5,11 +5,11 @@ tags: ["programming-languages/go", "microservices", "framework", "backend"]
 slug: gomicro
 ---
 
-# Go Microservices Framework
+# Go Microservices Framework {#id .className attrName=attrValue class="p-20"}
 
 A lightweight, extensible framework for building production-ready microservices using Go.
 
-## Features
+## Features {#id .className attrName=attrValue class="p-20"}
 
 - **Service Discovery**: Automatic registration and discovery of services
 - **Circuit Breaking**: Built-in circuit breakers to prevent cascading failures
@@ -18,7 +18,7 @@ A lightweight, extensible framework for building production-ready microservices 
 - **Middleware Support**: Easily add authentication, rate limiting, etc.
 - **Configuration**: Dynamic configuration with environment variables and files
 
-## Getting Started
+## Getting Started {#id .className attrName=attrValue class="p-20"}
 
 ```go
 package main
@@ -46,6 +46,6 @@ func main() {
 }
 ```
 
-## Architecture
+## Architecture {#id .className attrName=attrValue class="p-20"}
 
 The framework is built with a layered architecture
