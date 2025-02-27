@@ -22,7 +22,6 @@ templ Posts(
 		selectedTag: '',
 		tags: [],
 		init() {
-			// Initialize posts from the rendered template data
 			this.posts = Array.from(document.querySelectorAll('[data-post-id]')).map(post => {
 				return {
 					id: post.getAttribute('data-post-id'),
@@ -34,8 +33,6 @@ templ Posts(
 					tags: JSON.parse(post.getAttribute('data-post-tags') || '[]')
 				};
 			});
-			
-			// Extract all unique tags
 			const allTags = new Set();
 			this.posts.forEach(post => {
 				post.tags.forEach(tag => allTags.add(tag.name));
