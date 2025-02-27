@@ -6,6 +6,7 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	mathjax "github.com/litao91/goldmark-mathjax"
+	enclave "github.com/quailyquaily/goldmark-enclave"
 	"github.com/yuin/goldmark"
 	highlighting "github.com/yuin/goldmark-highlighting/v2"
 	"github.com/yuin/goldmark/extension"
@@ -41,6 +42,7 @@ var (
 					extension.Apostrophe: []byte("’"),
 				}),
 			),
+			enclave.New(),
 			extension.NewFootnote(
 				extension.WithFootnoteIDPrefix("fn"),
 			),
