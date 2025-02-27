@@ -71,7 +71,7 @@ func NewDb[
 				fmt.Errorf("failed to open db: %v", err)
 		}
 		if len(config.Schema) > 0 {
-			for _, schem := range strings.Split(config.Schema, ";") {
+			for schem := range strings.SplitSeq(config.Schema, ";") {
 				if len(strings.TrimSpace(schem)) == 0 {
 					continue
 				}
@@ -83,7 +83,7 @@ func NewDb[
 			}
 		}
 		if len(config.Seed) > 0 {
-			for _, seed := range strings.Split(config.Seed, ";") {
+			for seed := range strings.SplitSeq(config.Seed, ";") {
 				if len(strings.TrimSpace(seed)) == 0 {
 					continue
 				}
@@ -105,7 +105,7 @@ func NewDb[
 				fmt.Errorf("failed to open db: %v", err)
 		}
 		if len(config.Schema) > 0 {
-			for _, schem := range strings.Split(config.Schema, ";") {
+			for schem := range strings.SplitSeq(config.Schema, ";") {
 				if len(strings.TrimSpace(schem)) == 0 {
 					continue
 				}
@@ -117,7 +117,7 @@ func NewDb[
 			}
 		}
 		if len(config.Seed) > 0 {
-			for _, seed := range strings.Split(config.Seed, ";") {
+			for seed := range strings.SplitSeq(config.Seed, ";") {
 				if len(strings.TrimSpace(seed)) == 0 {
 					continue
 				}
