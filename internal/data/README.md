@@ -25,7 +25,7 @@ Package data provides implementations for data.
 
 
 <a name="Config"></a>
-## type [Config](<https://github.com/conneroisu/conneroh/blob/main/internal/data/databases.go#L36-L41>)
+## type [Config](<https://github.com/conneroisu/conneroh.com/blob/main/internal/data/databases.go#L36-L41>)
 
 Config is a struct that holds the configuration for a database.
 
@@ -39,7 +39,7 @@ type Config struct {
 ```
 
 <a name="Database"></a>
-## type [Database](<https://github.com/conneroisu/conneroh/blob/main/internal/data/databases.go#L28-L33>)
+## type [Database](<https://github.com/conneroisu/conneroh.com/blob/main/internal/data/databases.go#L28-L33>)
 
 Database is a struct that holds the sql database and the queries. It uses generics to hold the appropriate type of query struct.
 
@@ -53,7 +53,7 @@ type Database[
 ```
 
 <a name="NewDb"></a>
-### func [NewDb](<https://github.com/conneroisu/conneroh/blob/main/internal/data/databases.go#L47-L52>)
+### func [NewDb](<https://github.com/conneroisu/conneroh.com/blob/main/internal/data/databases.go#L47-L52>)
 
 ```go
 func NewDb[Q master.Queries](newFunc func(generic.DBTX) *Q, config *Config) (*Database[Q], error)
@@ -62,7 +62,7 @@ func NewDb[Q master.Queries](newFunc func(generic.DBTX) *Q, config *Config) (*Da
 NewDb sets up the database using the URI and optional options. Using generics to return the appropriate type of query struct, it creates a new database struct with the sql database and the queries struct utilizing the URI and optional options provided.
 
 <a name="Database[Q].Close"></a>
-### func \(\*Database\[Q\]\) [Close](<https://github.com/conneroisu/conneroh/blob/main/internal/data/databases.go#L144>)
+### func \(\*Database\[Q\]\) [Close](<https://github.com/conneroisu/conneroh.com/blob/main/internal/data/databases.go#L144>)
 
 ```go
 func (d *Database[Q]) Close() error

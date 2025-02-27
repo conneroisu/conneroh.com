@@ -18,7 +18,7 @@ Package tags provides implementations for tags.
 
 
 <a name="NestedSort"></a>
-## func [NestedSort](<https://github.com/conneroisu/conneroh/blob/main/internal/tags/nested.go#L10>)
+## func [NestedSort](<https://github.com/conneroisu/conneroh.com/blob/main/internal/tags/nested.go#L10>)
 
 ```go
 func NestedSort(tags []master.Tag) map[string][]master.Tag

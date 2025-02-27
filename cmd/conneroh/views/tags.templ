@@ -6,8 +6,6 @@ import (
 	"strings"
 )
 
-var hasCommon bool
-
 // Tags shows all available tags
 templ Tags(
 	fullPosts *[]master.FullPost,
@@ -110,16 +108,13 @@ templ Tags(
 			// Create a nested map for sections
 			nestedTags := tags.NestedSort(*fullTags)
 			for _, tag := range *fullTags {
-				section := "misc"
-				if strings.Contains(tag.Name, "/") {
-					section = strings.Split(tag.Name, "/")[0]
-				}
 				<div
 					class="hidden"
 					data-tag-id={ fmt.Sprintf("%d", tag.ID) }
 					data-tag-name={ tag.Name }
 					data-tag-description={ tag.Description }
 					data-tag-slug={ tag.Slug }
+					data-tag-section={ getTagSection(tag.Name) }
 					data-tag-posts-count={ fmt.Sprintf("%d", len(tag.Posts)) }
 					data-tag-projects-count={ fmt.Sprintf("%d", len(tag.Projects)) }
 				></div>
@@ -283,33 +278,7 @@ templ Tag(
 							if relatedTag.ID == tag.ID {
 								continue
 							}
-							// Check if tags have common posts or projects
-							for _, post := range tag.Posts {
-								hasCommon := false
-								for _, relatedPost := range relatedTag.Posts {
-									if post.ID == relatedPost.ID {
-										hasCommon = true
-										break
-									}
-								}
-								if hasCommon {
-									break
-								}
-							}
-							if !hasCommon {
-								for _, project := range tag.Projects {
-									for _, relatedProject := range relatedTag.Projects {
-										if project.ID == relatedProject.ID {
-											hasCommon = true
-											break
-										}
-									}
-									if hasCommon {
-										break
-									}
-								}
-							}
-							if hasCommon {
+							if haveCommonItems(tag, &relatedTag) {
 								<a href={ templ.SafeURL(fmt.Sprintf("/tag/%s", relatedTag.Slug)) } class="bg-white dark:bg-gray-800 rounded-lg p-4 hover:shadow-md transition-shadow duration-300 flex items-center">
 									<div class="text-gray-400 dark:text-gray-500 mr-3">
 										<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -328,4 +297,35 @@ templ Tag(
 			</div>
 		</div>
 	</div>
+}
+
+// Helper function to determine the section for a tag
+func getTagSection(tagName string) string {
+	if strings.Contains(tagName, "/") {
+		return strings.Split(tagName, "/")[0]
+	}
+	return "misc"
+}
+
+// Helper function to check if two tags have common posts or projects
+func haveCommonItems(tag1 *master.FullTag, tag2 *master.FullTag) bool {
+	// Check for common posts
+	for _, post := range tag1.Posts {
+		for _, relatedPost := range tag2.Posts {
+			if post.ID == relatedPost.ID {
+				return true
+			}
+		}
+	}
+
+	// Check for common projects
+	for _, project := range tag1.Projects {
+		for _, relatedProject := range tag2.Projects {
+			if project.ID == relatedProject.ID {
+				return true
+			}
+		}
+	}
+
+	return false
 }
