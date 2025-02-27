@@ -47,7 +47,7 @@ func Dist(
 	}, nil
 }
 
-// Favicon returns the favicon.
+// Favicon is the favicon handler.
 func Favicon(
 	_ context.Context,
 	_ *data.Database[master.Queries],
@@ -59,8 +59,8 @@ func Favicon(
 	_ *map[string]master.FullTag,
 ) (routing.APIFn, error) {
 	return func(w http.ResponseWriter, r *http.Request) error {
-		// write the dist.Favicon to the writer
-		_, err := w.Write([]byte(static.Favicon))
+		w.Header().Set("Content-Type", "image/x-icon")
+		_, err := w.Write(static.Favicon)
 		if err != nil {
 			return err
 		}

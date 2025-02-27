@@ -10,4 +10,4 @@ import (
 var Dist embed.FS
 
 //go:embed dist/favicon.ico
-var Favicon string
+var Favicon []byte
