@@ -9,8 +9,8 @@ import (
 //go:generate sqlc generate
 //go:generate rm -f db.go
 //go:generate gomarkdoc -o README.md -e .
-//go:generate rm -f static.db
 //go:generate sh -c "cat combined/schema.sql | sqlite3 -batch static.db"
+//go:generate rm -f static.db
 
 // Schema is the schema for the database.
 //
