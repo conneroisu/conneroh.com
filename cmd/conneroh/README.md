@@ -14,6 +14,7 @@ Package conneroh provides implementations for conneroh.
 
 ## Index
 
+- [Variables](<#variables>)
 - [func AddRoutes\(ctx context.Context, h \*http.ServeMux, db \*data.Database\[master.Queries\]\) error](<#AddRoutes>)
 - [func Dist\(\_ context.Context, \_ \*data.Database\[master.Queries\], \_ \*\[\]master.FullPost, \_ \*\[\]master.FullProject, \_ \*\[\]master.FullTag, \_ \*map\[string\]master.FullPost, \_ \*map\[string\]master.FullProject, \_ \*map\[string\]master.FullTag\) \(routing.APIFn, error\)](<#Dist>)
 - [func Favicon\(\_ context.Context, \_ \*data.Database\[master.Queries\], \_ \*\[\]master.FullPost, \_ \*\[\]master.FullProject, \_ \*\[\]master.FullTag, \_ \*map\[string\]master.FullPost, \_ \*map\[string\]master.FullProject, \_ \*map\[string\]master.FullTag\) \(routing.APIFn, error\)](<#Favicon>)
@@ -30,8 +31,28 @@ Package conneroh provides implementations for conneroh.
 - [func Tags\(\_ context.Context, \_ \*data.Database\[master.Queries\], fullPosts \*\[\]master.FullPost, fullProjects \*\[\]master.FullProject, fullTags \*\[\]master.FullTag, fullPostSlugMap \*map\[string\]master.FullPost, fullProjectSlugMap \*map\[string\]master.FullProject, fullTagSlugMap \*map\[string\]master.FullTag\) \(routing.APIFn, error\)](<#Tags>)
 
 
+## Variables
+
+<a name="RouteMap"></a>RouteMap is a map of all routes.
+
+```go
+var RouteMap = routing.APIMap{
+    "GET /dist/":                      Dist,
+    "GET /favicon.ico":                Favicon,
+    "GET /{$}":                        Home,
+    "GET /projects":                   Projects,
+    "GET /posts":                      Posts,
+    "GET /tags":                       Tags,
+    "GET /project/{id}":               Project,
+    "GET /post/{id}":                  Post,
+    "GET /tag/{id}":                   Tag,
+    "GET /hateoas/morph/{view}":       Morph,
+    "GET /hateoas/morphs/{view}/{id}": Morphs,
+}
+```
+
 <a name="AddRoutes"></a>
-## func [AddRoutes](<https://github.com/conneroisu/conneroh/blob/main/cmd/conneroh/routes.go#L27-L31>)
+## func [AddRoutes](<https://github.com/conneroisu/conneroh/blob/main/cmd/conneroh/routes.go#L28-L32>)
 
 ```go
 func AddRoutes(ctx context.Context, h *http.ServeMux, db *data.Database[master.Queries]) error
@@ -40,7 +61,7 @@ func AddRoutes(ctx context.Context, h *http.ServeMux, db *data.Database[master.Q
 AddRoutes adds all routes to the router.
 
 <a name="Dist"></a>
-## func [Dist](<https://github.com/conneroisu/conneroh/blob/main/cmd/conneroh/handlers.go#L34-L43>)
+## func [Dist](<https://github.com/conneroisu/conneroh/blob/main/cmd/conneroh/handlers.go#L36-L45>)
 
 ```go
 func Dist(_ context.Context, _ *data.Database[master.Queries], _ *[]master.FullPost, _ *[]master.FullProject, _ *[]master.FullTag, _ *map[string]master.FullPost, _ *map[string]master.FullProject, _ *map[string]master.FullTag) (routing.APIFn, error)
@@ -49,7 +70,7 @@ func Dist(_ context.Context, _ *data.Database[master.Queries], _ *[]master.FullP
 Dist is the dist handler for serving/distributing static files.
 
 <a name="Favicon"></a>
-## func [Favicon](<https://github.com/conneroisu/conneroh/blob/main/cmd/conneroh/handlers.go#L51-L60>)
+## func [Favicon](<https://github.com/conneroisu/conneroh/blob/main/cmd/conneroh/handlers.go#L53-L62>)
 
 ```go
 func Favicon(_ context.Context, _ *data.Database[master.Queries], _ *[]master.FullPost, _ *[]master.FullProject, _ *[]master.FullTag, _ *map[string]master.FullPost, _ *map[string]master.FullProject, _ *map[string]master.FullTag) (routing.APIFn, error)
@@ -58,7 +79,7 @@ func Favicon(_ context.Context, _ *data.Database[master.Queries], _ *[]master.Fu
 Favicon is the favicon handler.
 
 <a name="Home"></a>
-## func [Home](<https://github.com/conneroisu/conneroh/blob/main/cmd/conneroh/handlers.go#L72-L81>)
+## func [Home](<https://github.com/conneroisu/conneroh/blob/main/cmd/conneroh/handlers.go#L74-L83>)
 
 ```go
 func Home(ctx context.Context, db *data.Database[master.Queries], fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, fullTags *[]master.FullTag, fullPostsSlugMap *map[string]master.FullPost, fullProjectsSlugMap *map[string]master.FullProject, fullTagsSlugMap *map[string]master.FullTag) (routing.APIFn, error)
@@ -67,7 +88,7 @@ func Home(ctx context.Context, db *data.Database[master.Queries], fullPosts *[]m
 Home is the home page handler.
 
 <a name="Morph"></a>
-## func [Morph](<https://github.com/conneroisu/conneroh/blob/main/cmd/conneroh/handlers.go#L97-L106>)
+## func [Morph](<https://github.com/conneroisu/conneroh/blob/main/cmd/conneroh/handlers.go#L99-L108>)
 
 ```go
 func Morph(ctx context.Context, db *data.Database[master.Queries], fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, fullTags *[]master.FullTag, fullPostSlugMap *map[string]master.FullPost, fullProjectSlugMap *map[string]master.FullProject, fullTagSlugMap *map[string]master.FullTag) (routing.APIFn, error)
@@ -76,7 +97,7 @@ func Morph(ctx context.Context, db *data.Database[master.Queries], fullPosts *[]
 Morph renders a morphed view.
 
 <a name="Morphs"></a>
-## func [Morphs](<https://github.com/conneroisu/conneroh/blob/main/cmd/conneroh/handlers.go#L136-L145>)
+## func [Morphs](<https://github.com/conneroisu/conneroh/blob/main/cmd/conneroh/handlers.go#L138-L147>)
 
 ```go
 func Morphs(_ context.Context, _ *data.Database[master.Queries], fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, fullTags *[]master.FullTag, fullPostSlugMap *map[string]master.FullPost, fullProjectSlugMap *map[string]master.FullProject, fullTagSlugMap *map[string]master.FullTag) (routing.APIFn, error)
@@ -94,7 +115,7 @@ func NewServer(ctx context.Context, db *data.Database[master.Queries]) http.Hand
 NewServer creates a new web\-ui server
 
 <a name="Post"></a>
-## func [Post](<https://github.com/conneroisu/conneroh/blob/main/cmd/conneroh/handlers.posts.go#L53-L62>)
+## func [Post](<https://github.com/conneroisu/conneroh/blob/main/cmd/conneroh/handlers.go#L289-L298>)
 
 ```go
 func Post(_ context.Context, _ *data.Database[master.Queries], fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, fullTags *[]master.FullTag, fullPostSlugMap *map[string]master.FullPost, fullProjectSlugMap *map[string]master.FullProject, fullTagSlugMap *map[string]master.FullTag) (routing.APIFn, error)
@@ -103,7 +124,7 @@ func Post(_ context.Context, _ *data.Database[master.Queries], fullPosts *[]mast
 Post is the post handler.
 
 <a name="Posts"></a>
-## func [Posts](<https://github.com/conneroisu/conneroh/blob/main/cmd/conneroh/handlers.posts.go#L17-L26>)
+## func [Posts](<https://github.com/conneroisu/conneroh/blob/main/cmd/conneroh/handlers.go#L253-L262>)
 
 ```go
 func Posts(_ context.Context, _ *data.Database[master.Queries], fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, fullTags *[]master.FullTag, fullPostSlugMap *map[string]master.FullPost, fullProjectSlugMap *map[string]master.FullProject, fullTagSlugMap *map[string]master.FullTag) (routing.APIFn, error)
@@ -112,7 +133,7 @@ func Posts(_ context.Context, _ *data.Database[master.Queries], fullPosts *[]mas
 Posts is the posts handler.
 
 <a name="Project"></a>
-## func [Project](<https://github.com/conneroisu/conneroh/blob/main/cmd/conneroh/handlers.projects.go#L41-L50>)
+## func [Project](<https://github.com/conneroisu/conneroh/blob/main/cmd/conneroh/handlers.go#L424-L433>)
 
 ```go
 func Project(ctx context.Context, db *data.Database[master.Queries], fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, fullTags *[]master.FullTag, fullPostSlugMap *map[string]master.FullPost, fullProjectSlugMap *map[string]master.FullProject, fullTagSlugMap *map[string]master.FullTag) (routing.APIFn, error)
@@ -121,7 +142,7 @@ func Project(ctx context.Context, db *data.Database[master.Queries], fullPosts *
 Project is the project handler.
 
 <a name="Projects"></a>
-## func [Projects](<https://github.com/conneroisu/conneroh/blob/main/cmd/conneroh/handlers.projects.go#L15-L24>)
+## func [Projects](<https://github.com/conneroisu/conneroh/blob/main/cmd/conneroh/handlers.go#L398-L407>)
 
 ```go
 func Projects(ctx context.Context, db *data.Database[master.Queries], fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, fullTags *[]master.FullTag, fullPostSlugMap *map[string]master.FullPost, fullProjectSlugMap *map[string]master.FullProject, fullTagSlugMap *map[string]master.FullTag) (routing.APIFn, error)
@@ -139,7 +160,7 @@ func Run(ctx context.Context, _ func(string) string) error
 Run is the entry point for the application.
 
 <a name="Tag"></a>
-## func [Tag](<https://github.com/conneroisu/conneroh/blob/main/cmd/conneroh/handlers.tags.go#L42-L51>)
+## func [Tag](<https://github.com/conneroisu/conneroh/blob/main/cmd/conneroh/handlers.go#L485-L494>)
 
 ```go
 func Tag(_ context.Context, _ *data.Database[master.Queries], fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, fullTags *[]master.FullTag, fullPostSlugMap *map[string]master.FullPost, fullProjectSlugMap *map[string]master.FullProject, fullTagSlugMap *map[string]master.FullTag) (routing.APIFn, error)
@@ -148,7 +169,7 @@ func Tag(_ context.Context, _ *data.Database[master.Queries], fullPosts *[]maste
 Tag is the tag handler.
 
 <a name="Tags"></a>
-## func [Tags](<https://github.com/conneroisu/conneroh/blob/main/cmd/conneroh/handlers.tags.go#L15-L24>)
+## func [Tags](<https://github.com/conneroisu/conneroh/blob/main/cmd/conneroh/handlers.go#L458-L467>)
 
 ```go
 func Tags(_ context.Context, _ *data.Database[master.Queries], fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, fullTags *[]master.FullTag, fullPostSlugMap *map[string]master.FullPost, fullProjectSlugMap *map[string]master.FullProject, fullTagSlugMap *map[string]master.FullTag) (routing.APIFn, error)

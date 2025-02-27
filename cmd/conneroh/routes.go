@@ -9,7 +9,8 @@ import (
 	"github.com/conneroisu/conneroh.com/internal/routing"
 )
 
-var routeMap = routing.APIMap{
+// RouteMap is a map of all routes.
+var RouteMap = routing.APIMap{
 	"GET /dist/":                      Dist,
 	"GET /favicon.ico":                Favicon,
 	"GET /{$}":                        Home,
@@ -53,7 +54,7 @@ func AddRoutes(
 	if err != nil {
 		return err
 	}
-	return routeMap.AddRoutes(
+	return RouteMap.AddRoutes(
 		ctx,
 		h,
 		db,
