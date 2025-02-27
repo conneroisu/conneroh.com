@@ -46,6 +46,9 @@ in
       tailwindcss
       tailwindcss-language-server
       bun
+      nodePackages.typescript-language-server
+      python311
+      python311Packages.fontforge
 
       # SQL Related
       sqlc
@@ -53,7 +56,6 @@ in
       sqldiff
       inputs.sqlcquash.packages."${pkgs.system}".default
       sleek
-      nodePackages.typescript-language-server
 
       # Infra
       flyctl
