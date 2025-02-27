@@ -16,17 +16,5 @@ inputs.pre-commit-hooks.lib.${pkgs.system}.run {
   hooks = {
     alejandra.enable = true;
     gofmt.enable = true;
-    prettier = {
-      enable = true;
-      excludes = [
-        "flake.lock"
-        ".*_dist/"
-        ".*node_modules/"
-      ];
-      args = [
-        "--ignore-path=.gitignore"
-        "--log-level=debug"
-      ];
-    };
   };
 }

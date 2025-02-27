@@ -106,3 +106,45 @@ func Parse(
 	}
 	return buf.String(), nil
 }
+
+// ParseWithFrontMatter parses markdown to html and decodes the frontmatter into the provided target struct.
+func ParseWithFrontMatter(
+	name string,
+	source []byte,
+	frontMatterTarget interface{},
+) (string, error) {
+	var (
+		buf bytes.Buffer
+		ctx = parser.NewContext()
+	)
+
+	err := md.Convert(source, &buf, parser.WithContext(ctx))
+	if err != nil {
+		return "", err
+	}
+
+	d := frontmatter.Get(ctx)
+	if d == nil {
+		return "", &FrontMatterMissingError{
+			fileName: name,
+		}
+	}
+
+	err = d.Decode(frontMatterTarget)
+	if err != nil {
+		return "", err
+	}
+
+	// Validate the frontmatter struct if it's not nil
+	if frontMatterTarget != nil {
+		v := validator.New(validator.WithRequiredStructEnabled())
+		if err := v.Struct(frontMatterTarget); err != nil {
+			if _, ok := err.(*validator.InvalidValidationError); ok {
+				return "", err
+			}
+			return "", err
+		}
+	}
+
+	return buf.String(), nil
+}

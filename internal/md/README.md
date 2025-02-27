@@ -17,6 +17,7 @@ Package md contains the implementation of a markdown parser/renderer.
 ## Index
 
 - [func Parse\(name string, source \[\]byte\) \(string, error\)](#Parse)
+- [func ParseWithFrontMatter\(name string, source \[\]byte, frontMatterTarget interface\{\}\) \(string, error\)](#ParseWithFrontMatter)
 - [type FrontMatter](#FrontMatter)
 - [type FrontMatterMissingError](#FrontMatterMissingError)
   - [func \(e FrontMatterMissingError\) Error\(\) string](#FrontMatterMissingError.Error)
@@ -33,6 +34,16 @@ func Parse(name string, source []byte) (string, error)
 ```
 
 Parse parses markdown to html.
+
+<a name="ParseWithFrontMatter"></a>
+
+## func [ParseWithFrontMatter](https://github.com/conneroisu/conneroh/blob/main/internal/md/parse.go#L111-L115)
+
+```go
+func ParseWithFrontMatter(name string, source []byte, frontMatterTarget interface{}) (string, error)
+```
+
+ParseWithFrontMatter parses markdown to html and decodes the frontmatter into the provided target struct.
 
 <a name="FrontMatter"></a>
 
@@ -72,7 +83,7 @@ Error implements the error interface on FrontMatterMissingError.
 
 <a name="PostFrontMatter"></a>
 
-## type [PostFrontMatter](https://github.com/conneroisu/conneroh/blob/main/internal/md/posts.go#L4-L8)
+## type [PostFrontMatter](https://github.com/conneroisu/conneroh/blob/main/internal/md/posts.go#L4-L10)
 
 PostFrontMatter is the frontmatter of a post markdown document.
 
@@ -81,12 +92,14 @@ type PostFrontMatter struct {
     Title       string   `yaml:"title" validate:"required"`
     Description string   `yaml:"description" validate:"required"`
     Tags        []string `yaml:"tags" validate:"required"`
+    Slug        string   `yaml:"slug" validate:"required"`
+    BannerUrl   string   `yaml:"banner_url" validate:"required"`
 }
 ```
 
 <a name="ProjectFrontMatter"></a>
 
-## type [ProjectFrontMatter](https://github.com/conneroisu/conneroh/blob/main/internal/md/projects.go#L4-L8)
+## type [ProjectFrontMatter](https://github.com/conneroisu/conneroh/blob/main/internal/md/projects.go#L4-L9)
 
 ProjectFrontMatter is the frontmatter of a project markdown document.
 
@@ -95,12 +108,13 @@ type ProjectFrontMatter struct {
     Title       string   `yaml:"title" validate:"required"`
     Description string   `yaml:"description" validate:"required"`
     Tags        []string `yaml:"tags" validate:"required"`
+    Slug        string   `yaml:"slug" validate:"required"`
 }
 ```
 
 <a name="TagFrontMatter"></a>
 
-## type [TagFrontMatter](https://github.com/conneroisu/conneroh/blob/main/internal/md/tags.go#L4-L8)
+## type [TagFrontMatter](https://github.com/conneroisu/conneroh/blob/main/internal/md/tags.go#L4-L9)
 
 TagFrontMatter is the frontmatter of a tag markdown document.
 
@@ -109,6 +123,7 @@ type TagFrontMatter struct {
     Title       string   `yaml:"title" validate:"required"`
     Description string   `yaml:"description" validate:"required"`
     Tags        []string `yaml:"tags" validate:"required"`
+    Slug        string   `yaml:"slug" validate:"required"`
 }
 ```
 

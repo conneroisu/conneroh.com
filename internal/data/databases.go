@@ -4,6 +4,7 @@
 package data
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"io"
@@ -34,10 +35,11 @@ type Database[
 
 // Config is a struct that holds the configuration for a database.
 type Config struct {
-	Schema   string
-	URI      string
-	FileName string
-	Seed     string
+	Schema           string
+	URI              string
+	FileName         string
+	Seed             string
+	SeedMarkdownDocs bool // Flag to seed from markdown docs
 }
 
 // NewDb sets up the database using the URI and optional options.
@@ -63,13 +65,19 @@ func NewDb[
 			}
 		}
 	}
+
+	var db *sql.DB
+	var queries *Q
+
 	switch u.Scheme {
 	case "file":
-		db, err := sql.Open("sqlite", config.FileName)
+		db, err = sql.Open("sqlite", config.FileName)
 		if err != nil {
 			return nil,
 				fmt.Errorf("failed to open db: %v", err)
 		}
+
+		// Apply schema
 		if len(config.Schema) > 0 {
 			for _, schem := range strings.Split(config.Schema, ";") {
 				if len(strings.TrimSpace(schem)) == 0 {
@@ -82,6 +90,8 @@ func NewDb[
 				}
 			}
 		}
+
+		// Apply seed data
 		if len(config.Seed) > 0 {
 			for _, seed := range strings.Split(config.Seed, ";") {
 				if len(strings.TrimSpace(seed)) == 0 {
@@ -94,16 +104,33 @@ func NewDb[
 				}
 			}
 		}
+
+		// Create queries
+		queries = newFunc(db)
+
+		// Seed from markdown docs if enabled
+		if config.SeedMarkdownDocs {
+			qptr, ok := any(queries).(*master.Queries)
+			if ok {
+				if err := qptr.SeedFromEmbedded(context.Background()); err != nil {
+					return nil, fmt.Errorf("error seeding from markdown docs: %v", err)
+				}
+			}
+		}
+
 		return &Database[Q]{
-			Queries: newFunc(db),
+			Queries: queries,
 			DB:      db,
 		}, nil
+
 	case "libsql":
-		db, err := sql.Open("libsql", u.String())
+		db, err = sql.Open("libsql", u.String())
 		if err != nil {
 			return nil,
 				fmt.Errorf("failed to open db: %v", err)
 		}
+
+		// Apply schema
 		if len(config.Schema) > 0 {
 			for _, schem := range strings.Split(config.Schema, ";") {
 				if len(strings.TrimSpace(schem)) == 0 {
@@ -116,6 +143,8 @@ func NewDb[
 				}
 			}
 		}
+
+		// Apply seed data
 		if len(config.Seed) > 0 {
 			for _, seed := range strings.Split(config.Seed, ";") {
 				if len(strings.TrimSpace(seed)) == 0 {
@@ -131,10 +160,25 @@ func NewDb[
 				}
 			}
 		}
+
+		// Create queries
+		queries = newFunc(db)
+
+		// Seed from markdown docs if enabled
+		if config.SeedMarkdownDocs {
+			qptr, ok := any(queries).(*master.Queries)
+			if ok {
+				if err := qptr.SeedFromEmbedded(context.Background()); err != nil {
+					return nil, fmt.Errorf("error seeding from markdown docs: %v", err)
+				}
+			}
+		}
+
 		return &Database[Q]{
-			Queries: newFunc(db),
+			Queries: queries,
 			DB:      db,
 		}, nil
+
 	default:
 		return nil, fmt.Errorf("unsupported scheme: %s", u.Scheme)
 	}
