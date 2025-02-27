@@ -35,7 +35,7 @@ templ: version: v0.3.833
 
 
 <a name="Home"></a>
-## func [Home](<https://github.com/conneroisu/conneroh/blob/main/cmd/conneroh/views/home_templ.go#L16-L23>)
+## func [Home](<https://github.com/conneroisu/conneroh/blob/main/cmd/conneroh/views/home_templ.go#L13-L20>)
 
 ```go
 func Home(fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, fullTags *[]master.FullTag, fullPostsSlugMap *map[string]master.FullPost, fullProjectsSlugMap *map[string]master.FullProject, fullTagsSlugMap *map[string]master.FullTag) templ.Component
