@@ -28,9 +28,9 @@ ORDER BY
 
 -- name: TagCreate :one
 INSERT INTO
-    tags (name, description, slug)
+    tags (name, description, slug, embedding_id)
 VALUES
-    (?, ?, ?) RETURNING *;
+    (?, ?, ?, ?) RETURNING *;
 
 -- name: TagsListByProject :many
 SELECT

@@ -10,9 +10,16 @@ LIMIT
 
 -- name: PostCreate :one
 INSERT INTO
-    posts (title, description, slug, content, banner_url)
+    posts (
+        title,
+        description,
+        slug,
+        content,
+        banner_url,
+        embedding_id
+    )
 VALUES
-    (?, ?, ?, ?, ?) RETURNING *;
+    (?, ?, ?, ?, ?, ?) RETURNING *;
 
 -- name: PostDeleteBySlug :exec
 DELETE FROM

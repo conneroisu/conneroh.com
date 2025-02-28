@@ -285,7 +285,7 @@ func seedProjects(
 		for _, tagName := range frontMatter.Tags {
 			tag, err := db.Queries.TagGetByName(ctx, tagName)
 			if err != nil {
-				return fmt.Errorf("failed to get tag by name: %w", err)
+				return nil
 			}
 			if err := db.Queries.ProjectTagCreate(
 				ctx,

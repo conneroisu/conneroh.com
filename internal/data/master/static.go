@@ -4,6 +4,8 @@ package master
 import (
 	"context"
 	_ "embed"
+
+	"github.com/ollama/ollama/api"
 )
 
 //go:generate sqlcquash combine
@@ -23,11 +25,164 @@ var Schema string
 //go:embed combined/seeds.sql
 var Seed string
 
-// FullPost is a post with all its projects and tags.
-type FullPost struct {
-	Post
-	Projects []Project
-	Tags     []Tag
+func createEmbed(ctx context.Context, q *Queries, input string) (int64, error) {
+	client, err := api.ClientFromEnvironment()
+	if err != nil {
+		return 0, err
+	}
+	res, err := client.Embed(ctx, &api.EmbedRequest{
+		Model: "text-embedding-ada-002",
+		Input: input,
+	})
+	if err != nil {
+		return 0, err
+	}
+	return q.EmbeddingsCreate(ctx, res.Embeddings)
+}
+
+type (
+	// FullPost is a post with all its projects and tags.
+	FullPost struct {
+		Post
+		Projects []Project
+		Tags     []Tag
+	}
+	// FullProject is a project with all its posts and tags.
+	FullProject struct {
+		Project
+		Posts []Post
+		Tags  []Tag
+	}
+	// FullTag is a tag with all its posts and projects.
+	FullTag struct {
+		Tag
+		Posts    []Post
+		Projects []Project
+	}
+)
+
+// FullProjectCreate creates a project with all its posts and tags.
+func (q *Queries) FullProjectCreate(
+	ctx context.Context,
+	project Project,
+	projectPosts []Post,
+	projectTags []Tag,
+) (*FullProject, error) {
+	id, err := createEmbed(ctx, q, project.Name)
+	if err != nil {
+		return nil, err
+	}
+	fullProject, err := q.ProjectCreate(ctx, ProjectCreateParams{
+		Name:        project.Name,
+		Slug:        project.Slug,
+		Description: project.Description,
+		EmbeddingID: id,
+	})
+	if err != nil {
+		return nil, err
+	}
+	for _, post := range projectPosts {
+		err := q.PostProjectCreate(ctx, post.ID, fullProject.ID)
+		if err != nil {
+			return nil, err
+		}
+	}
+	for _, tag := range projectTags {
+		err := q.ProjectTagCreate(ctx, fullProject.ID, tag.ID)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return &FullProject{
+		Project: fullProject,
+		Posts:   projectPosts,
+		Tags:    projectTags,
+	}, nil
+}
+
+// FullPostsCreate creates a new post with all the associated projects and tags.
+func (q *Queries) FullPostsCreate(
+	ctx context.Context,
+	posts Post,
+	postProjects []Project,
+	postTags []Tag,
+) (*FullPost, error) {
+	var (
+		fullPost Post
+		project  Project
+		tag      Tag
+		err      error
+	)
+	id, err := createEmbed(ctx, q, posts.Content)
+	if err != nil {
+		return nil, err
+	}
+	fullPost, err = q.PostCreate(ctx, PostCreateParams{
+		Title:       posts.Title,
+		Slug:        posts.Slug,
+		Content:     posts.Content,
+		Description: posts.Description,
+		EmbeddingID: id,
+	})
+	if err != nil {
+		return nil, err
+	}
+	for _, project = range postProjects {
+		err := q.ProjectPostCreate(ctx, fullPost.ID, project.ID)
+		if err != nil {
+			return nil, err
+		}
+	}
+	for _, tag = range postTags {
+		err := q.PostTagCreate(ctx, fullPost.ID, tag.ID)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return &FullPost{
+		Post:     fullPost,
+		Projects: postProjects,
+		Tags:     postTags,
+	}, nil
+}
+
+// FullTagCreate creates a tag with all its posts and projects.
+func (q *Queries) FullTagCreate(
+	ctx context.Context,
+	tag Tag,
+	tagProjects []Project,
+	tagPosts []Post,
+) (*FullTag, error) {
+	id, err := createEmbed(ctx, q, tag.Name)
+	if err != nil {
+		return nil, err
+	}
+	fullTag, err := q.TagCreate(ctx, TagCreateParams{
+		Name:        tag.Name,
+		Slug:        tag.Slug,
+		Description: tag.Description,
+		EmbeddingID: id,
+	})
+	if err != nil {
+		return nil, err
+	}
+	for _, project := range tagProjects {
+		err := q.ProjectTagCreate(ctx, project.ID, fullTag.ID)
+		if err != nil {
+			return nil, err
+		}
+	}
+	for _, post := range tagPosts {
+		err := q.PostTagCreate(ctx, post.ID, fullTag.ID)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return &FullTag{
+		Tag:      fullTag,
+		Posts:    tagPosts,
+		Projects: tagProjects,
+	}, nil
 }
 
 // FullPostsList returns all posts with all their projects and tags.
@@ -99,54 +254,6 @@ func (q *Queries) FullPostsSlugMapGet(
 	return &postsMap, nil
 }
 
-// FullPostsCreate creates a new post with all the associated projects and tags.
-func (q *Queries) FullPostsCreate(
-	ctx context.Context,
-	posts Post,
-	postProjects []Project,
-	postTags []Tag,
-) (*FullPost, error) {
-	var (
-		fullPost Post
-		project  Project
-		tag      Tag
-		err      error
-	)
-	fullPost, err = q.PostCreate(ctx, PostCreateParams{
-		Title:       posts.Title,
-		Slug:        posts.Slug,
-		Content:     posts.Content,
-		Description: posts.Description,
-	})
-	if err != nil {
-		return nil, err
-	}
-	for _, project = range postProjects {
-		err := q.ProjectPostCreate(ctx, fullPost.ID, project.ID)
-		if err != nil {
-			return nil, err
-		}
-	}
-	for _, tag = range postTags {
-		err := q.PostTagCreate(ctx, fullPost.ID, tag.ID)
-		if err != nil {
-			return nil, err
-		}
-	}
-	return &FullPost{
-		Post:     fullPost,
-		Projects: postProjects,
-		Tags:     postTags,
-	}, nil
-}
-
-// FullProject is a project with all its posts and tags.
-type FullProject struct {
-	Project
-	Posts []Post
-	Tags  []Tag
-}
-
 // FullProjectsList returns all projects with all their posts and tags.
 func (q *Queries) FullProjectsList(
 	ctx context.Context,
@@ -208,47 +315,6 @@ func (q *Queries) FullProjectsSlugMapGet(
 	return &fullProjects, nil
 }
 
-// FullProjectCreate creates a project with all its posts and tags.
-func (q *Queries) FullProjectCreate(
-	ctx context.Context,
-	project Project,
-	projectPosts []Post,
-	projectTags []Tag,
-) (*FullProject, error) {
-	fullProject, err := q.ProjectCreate(ctx, ProjectCreateParams{
-		Name:        project.Name,
-		Slug:        project.Slug,
-		Description: project.Description,
-	})
-	if err != nil {
-		return nil, err
-	}
-	for _, post := range projectPosts {
-		err := q.PostProjectCreate(ctx, post.ID, fullProject.ID)
-		if err != nil {
-			return nil, err
-		}
-	}
-	for _, tag := range projectTags {
-		err := q.ProjectTagCreate(ctx, fullProject.ID, tag.ID)
-		if err != nil {
-			return nil, err
-		}
-	}
-	return &FullProject{
-		Project: fullProject,
-		Posts:   projectPosts,
-		Tags:    projectTags,
-	}, nil
-}
-
-// FullTag is a tag with all its posts and projects.
-type FullTag struct {
-	Tag
-	Posts    []Post
-	Projects []Project
-}
-
 // FullTagsList returns all tags with all their posts and projects.
 func (q *Queries) FullTagsList(
 	ctx context.Context,
@@ -308,38 +374,4 @@ func (q *Queries) FullTagsSlugMapGet(
 		}
 	}
 	return &fullTags, nil
-}
-
-// FullTagCreate creates a tag with all its posts and projects.
-func (q *Queries) FullTagCreate(
-	ctx context.Context,
-	tag Tag,
-	tagProjects []Project,
-	tagPosts []Post,
-) (*FullTag, error) {
-	fullTag, err := q.TagCreate(ctx, TagCreateParams{
-		Name:        tag.Name,
-		Slug:        tag.Slug,
-		Description: tag.Description,
-	})
-	if err != nil {
-		return nil, err
-	}
-	for _, project := range tagProjects {
-		err := q.ProjectTagCreate(ctx, project.ID, fullTag.ID)
-		if err != nil {
-			return nil, err
-		}
-	}
-	for _, post := range tagPosts {
-		err := q.PostTagCreate(ctx, post.ID, fullTag.ID)
-		if err != nil {
-			return nil, err
-		}
-	}
-	return &FullTag{
-		Tag:      fullTag,
-		Posts:    tagPosts,
-		Projects: tagProjects,
-	}, nil
 }

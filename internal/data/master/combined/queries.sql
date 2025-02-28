@@ -32,9 +32,16 @@ LIMIT
 
 -- name: PostCreate :one
 INSERT INTO
-    posts (title, description, slug, content, banner_url)
+    posts (
+        title,
+        description,
+        slug,
+        content,
+        banner_url,
+        embedding_id
+    )
 VALUES
-    (?, ?, ?, ?, ?) RETURNING *;
+    (?, ?, ?, ?, ?, ?) RETURNING *;
 
 -- name: PostDeleteBySlug :exec
 DELETE FROM
@@ -199,9 +206,16 @@ ORDER BY
 
 -- name: ProjectCreate :one
 INSERT INTO
-    projects (name, slug, description, content, banner_url)
+    projects (
+        name,
+        slug,
+        description,
+        content,
+        banner_url,
+        embedding_id
+    )
 VALUES
-    (?, ?, ?, ?, ?) RETURNING *;
+    (?, ?, ?, ?, ?, ?) RETURNING *;
 
 -- name: ProjectsListByTag :many
 SELECT
@@ -325,9 +339,9 @@ ORDER BY
 
 -- name: TagCreate :one
 INSERT INTO
-    tags (name, description, slug)
+    tags (name, description, slug, embedding_id)
 VALUES
-    (?, ?, ?) RETURNING *;
+    (?, ?, ?, ?) RETURNING *;
 
 -- name: TagsListByProject :many
 SELECT

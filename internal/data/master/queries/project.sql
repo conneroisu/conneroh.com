@@ -28,9 +28,16 @@ ORDER BY
 
 -- name: ProjectCreate :one
 INSERT INTO
-    projects (name, slug, description, content, banner_url)
+    projects (
+        name,
+        slug,
+        description,
+        content,
+        banner_url,
+        embedding_id
+    )
 VALUES
-    (?, ?, ?, ?, ?) RETURNING *;
+    (?, ?, ?, ?, ?, ?) RETURNING *;
 
 -- name: ProjectsListByTag :many
 SELECT

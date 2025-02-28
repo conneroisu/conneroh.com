@@ -68,9 +68,16 @@ func (q *Queries) EmbeddingsGetByID(ctx context.Context, id int64) (Embedding, e
 
 const postCreate = `-- name: PostCreate :one
 INSERT INTO
-    posts (title, description, slug, content, banner_url)
+    posts (
+        title,
+        description,
+        slug,
+        content,
+        banner_url,
+        embedding_id
+    )
 VALUES
-    (?, ?, ?, ?, ?) RETURNING id, title, description, slug, content, banner_url, created_at, updated_at, embedding_id
+    (?, ?, ?, ?, ?, ?) RETURNING id, title, description, slug, content, banner_url, created_at, updated_at, embedding_id
 `
 
 type PostCreateParams struct {
@@ -79,14 +86,22 @@ type PostCreateParams struct {
 	Slug        string `db:"slug" json:"slug"`
 	Content     string `db:"content" json:"content"`
 	BannerUrl   string `db:"banner_url" json:"banner_url"`
+	EmbeddingID int64  `db:"embedding_id" json:"embedding_id"`
 }
 
 // PostCreate
 //
 //	INSERT INTO
-//	    posts (title, description, slug, content, banner_url)
+//	    posts (
+//	        title,
+//	        description,
+//	        slug,
+//	        content,
+//	        banner_url,
+//	        embedding_id
+//	    )
 //	VALUES
-//	    (?, ?, ?, ?, ?) RETURNING id, title, description, slug, content, banner_url, created_at, updated_at, embedding_id
+//	    (?, ?, ?, ?, ?, ?) RETURNING id, title, description, slug, content, banner_url, created_at, updated_at, embedding_id
 func (q *Queries) PostCreate(ctx context.Context, arg PostCreateParams) (Post, error) {
 	row := q.db.QueryRowContext(ctx, postCreate,
 		arg.Title,
@@ -94,6 +109,7 @@ func (q *Queries) PostCreate(ctx context.Context, arg PostCreateParams) (Post, e
 		arg.Slug,
 		arg.Content,
 		arg.BannerUrl,
+		arg.EmbeddingID,
 	)
 	var i Post
 	err := row.Scan(
@@ -736,9 +752,16 @@ func (q *Queries) PostsListByTag(ctx context.Context, tagID int64) ([]Post, erro
 
 const projectCreate = `-- name: ProjectCreate :one
 INSERT INTO
-    projects (name, slug, description, content, banner_url)
+    projects (
+        name,
+        slug,
+        description,
+        content,
+        banner_url,
+        embedding_id
+    )
 VALUES
-    (?, ?, ?, ?, ?) RETURNING id, name, slug, description, content, banner_url, created_at, updated_at, embedding_id
+    (?, ?, ?, ?, ?, ?) RETURNING id, name, slug, description, content, banner_url, created_at, updated_at, embedding_id
 `
 
 type ProjectCreateParams struct {
@@ -747,14 +770,22 @@ type ProjectCreateParams struct {
 	Description string `db:"description" json:"description"`
 	Content     string `db:"content" json:"content"`
 	BannerUrl   string `db:"banner_url" json:"banner_url"`
+	EmbeddingID int64  `db:"embedding_id" json:"embedding_id"`
 }
 
 // ProjectCreate
 //
 //	INSERT INTO
-//	    projects (name, slug, description, content, banner_url)
+//	    projects (
+//	        name,
+//	        slug,
+//	        description,
+//	        content,
+//	        banner_url,
+//	        embedding_id
+//	    )
 //	VALUES
-//	    (?, ?, ?, ?, ?) RETURNING id, name, slug, description, content, banner_url, created_at, updated_at, embedding_id
+//	    (?, ?, ?, ?, ?, ?) RETURNING id, name, slug, description, content, banner_url, created_at, updated_at, embedding_id
 func (q *Queries) ProjectCreate(ctx context.Context, arg ProjectCreateParams) (Project, error) {
 	row := q.db.QueryRowContext(ctx, projectCreate,
 		arg.Name,
@@ -762,6 +793,7 @@ func (q *Queries) ProjectCreate(ctx context.Context, arg ProjectCreateParams) (P
 		arg.Description,
 		arg.Content,
 		arg.BannerUrl,
+		arg.EmbeddingID,
 	)
 	var i Project
 	err := row.Scan(
@@ -1312,25 +1344,31 @@ func (q *Queries) ProjectsListByTag(ctx context.Context, tagID int64) ([]Project
 
 const tagCreate = `-- name: TagCreate :one
 INSERT INTO
-    tags (name, description, slug)
+    tags (name, description, slug, embedding_id)
 VALUES
-    (?, ?, ?) RETURNING id, name, description, slug, icon, created_at, updated_at, embedding_id
+    (?, ?, ?, ?) RETURNING id, name, description, slug, icon, created_at, updated_at, embedding_id
 `
 
 type TagCreateParams struct {
 	Name        string `db:"name" json:"name"`
 	Description string `db:"description" json:"description"`
 	Slug        string `db:"slug" json:"slug"`
+	EmbeddingID int64  `db:"embedding_id" json:"embedding_id"`
 }
 
 // TagCreate
 //
 //	INSERT INTO
-//	    tags (name, description, slug)
+//	    tags (name, description, slug, embedding_id)
 //	VALUES
-//	    (?, ?, ?) RETURNING id, name, description, slug, icon, created_at, updated_at, embedding_id
+//	    (?, ?, ?, ?) RETURNING id, name, description, slug, icon, created_at, updated_at, embedding_id
 func (q *Queries) TagCreate(ctx context.Context, arg TagCreateParams) (Tag, error) {
-	row := q.db.QueryRowContext(ctx, tagCreate, arg.Name, arg.Description, arg.Slug)
+	row := q.db.QueryRowContext(ctx, tagCreate,
+		arg.Name,
+		arg.Description,
+		arg.Slug,
+		arg.EmbeddingID,
+	)
 	var i Tag
 	err := row.Scan(
 		&i.ID,
