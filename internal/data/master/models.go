@@ -4,6 +4,11 @@
 
 package master
 
+type Embedding struct {
+	ID        int64       `db:"id" json:"id"`
+	Embedding interface{} `db:"embedding" json:"embedding"`
+}
+
 type Post struct {
 	ID          int64  `db:"id" json:"id"`
 	Title       string `db:"title" json:"title"`

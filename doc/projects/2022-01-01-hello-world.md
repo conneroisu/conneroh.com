@@ -5,11 +5,11 @@ tags: ["programming-languages/go", "microservices", "framework", "backend"]
 slug: gomicro
 ---
 
-# Go Microservices Framework {#id .className attrName=attrValue class="p-20"}
+# Go Microservices Framework {#id .className attrName=attrValue class="py-14 text-2xl"}
 
 A lightweight, extensible framework for building production-ready microservices using Go.
 
-## Features {#id .className attrName=attrValue class="p-20"}
+## Features {#id .className attrName=attrValue class="py-14"}
 
 - **Service Discovery**: 
 
@@ -31,7 +31,7 @@ Easily add authentication, rate limiting, etc.
 
 Dynamic configuration with environment variables and files
 
-## Getting Started {#id .className attrName=attrValue class="p-20"}
+## Getting Started {#id .className attrName=attrValue class="py-14"}
 
 ```go
 package main

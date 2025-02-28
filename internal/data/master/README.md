@@ -15,6 +15,7 @@ Package master contains the master schema for the database.
 ## Index
 
 - [Variables](<#variables>)
+- [type Embedding](<#Embedding>)
 - [type FullPost](<#FullPost>)
 - [type FullProject](<#FullProject>)
 - [type FullTag](<#FullTag>)
@@ -103,6 +104,18 @@ var Schema string
 var Seed string
 ```
 
+<a name="Embedding"></a>
+## type [Embedding](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/models.go#L7-L10>)
+
+
+
+```go
+type Embedding struct {
+    ID        int64       `db:"id" json:"id"`
+    Embedding interface{} `db:"embedding" json:"embedding"`
+}
+```
+
 <a name="FullPost"></a>
 ## type [FullPost](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/static.posts.go#L6-L10>)
 
@@ -143,7 +156,7 @@ type FullTag struct {
 ```
 
 <a name="Post"></a>
-## type [Post](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/models.go#L7-L16>)
+## type [Post](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/models.go#L12-L21>)
 
 
 
@@ -176,7 +189,7 @@ type PostCreateParams struct {
 ```
 
 <a name="PostProject"></a>
-## type [PostProject](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/models.go#L18-L21>)
+## type [PostProject](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/models.go#L23-L26>)
 
 
 
@@ -188,7 +201,7 @@ type PostProject struct {
 ```
 
 <a name="PostTag"></a>
-## type [PostTag](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/models.go#L23-L26>)
+## type [PostTag](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/models.go#L28-L31>)
 
 
 
@@ -216,7 +229,7 @@ type PostUpdateParams struct {
 ```
 
 <a name="Project"></a>
-## type [Project](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/models.go#L28-L36>)
+## type [Project](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/models.go#L33-L41>)
 
 
 
@@ -247,7 +260,7 @@ type ProjectCreateParams struct {
 ```
 
 <a name="ProjectPost"></a>
-## type [ProjectPost](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/models.go#L38-L41>)
+## type [ProjectPost](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/models.go#L43-L46>)
 
 
 
@@ -259,7 +272,7 @@ type ProjectPost struct {
 ```
 
 <a name="ProjectTag"></a>
-## type [ProjectTag](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/models.go#L43-L46>)
+## type [ProjectTag](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/models.go#L48-L51>)
 
 
 
@@ -1187,7 +1200,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries
 WithTx returns a new Queries instance with the given transaction.
 
 <a name="Tag"></a>
-## type [Tag](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/models.go#L48-L56>)
+## type [Tag](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/models.go#L53-L61>)
 
 
 
@@ -1217,7 +1230,7 @@ type TagCreateParams struct {
 ```
 
 <a name="TagPost"></a>
-## type [TagPost](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/models.go#L58-L61>)
+## type [TagPost](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/models.go#L63-L66>)
 
 
 
@@ -1229,7 +1242,7 @@ type TagPost struct {
 ```
 
 <a name="TagProject"></a>
-## type [TagProject](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/models.go#L63-L66>)
+## type [TagProject](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/models.go#L68-L71>)
 
 
 

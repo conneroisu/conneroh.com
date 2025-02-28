@@ -3,6 +3,11 @@
 --	sqlcquash: v0.0.2
 
 
+CREATE TABLE IF NOT EXISTS embeddings (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    embedding F32_BLOB(768) NOT NULL
+);
+
 -- dialect: sqlite
 CREATE TABLE IF NOT EXISTS posts (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
