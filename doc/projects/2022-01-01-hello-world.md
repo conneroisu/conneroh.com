@@ -11,12 +11,25 @@ A lightweight, extensible framework for building production-ready microservices 
 
 ## Features {#id .className attrName=attrValue class="p-20"}
 
-- **Service Discovery**: Automatic registration and discovery of services
-- **Circuit Breaking**: Built-in circuit breakers to prevent cascading failures
-- **Metrics & Monitoring**: Prometheus integration for real-time metrics
-- **Structured Logging**: Context-aware logging with tracing IDs
-- **Middleware Support**: Easily add authentication, rate limiting, etc.
-- **Configuration**: Dynamic configuration with environment variables and files
+- **Service Discovery**: 
+
+Automatic registration and discovery of services
+
+- **Circuit Breaking**: 
+
+Built-in circuit breakers to prevent cascading failures
+- **Metrics & Monitoring**: 
+
+Prometheus integration for real-time metrics
+- **Structured Logging**: 
+
+Context-aware logging with tracing IDs
+- **Middleware Support**: 
+
+Easily add authentication, rate limiting, etc.
+- **Configuration**: 
+
+Dynamic configuration with environment variables and files
 
 ## Getting Started {#id .className attrName=attrValue class="p-20"}
 
