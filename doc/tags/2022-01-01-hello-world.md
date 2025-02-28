@@ -6,6 +6,6 @@ slug: programming-languages/go
 banner_url: /assets/img/posts/default.jpg
 ---
 
-# Getting Started with Go
+# Getting Started with Go 
 
 Go is a statically typed, compiled programming language designed at Google.

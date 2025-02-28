@@ -3,6 +3,7 @@ title: Go Microservices Framework
 description: A lightweight, opinionated framework for building microservices in Go
 tags: ["programming-languages/go", "microservices", "framework", "backend"]
 slug: gomicro
+banner_url: /images/banners/gomicro.png
 ---
 
 # Go Microservices Framework {#id .className attrName=attrValue class="py-14 text-2xl"}

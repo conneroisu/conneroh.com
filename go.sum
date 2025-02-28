@@ -1,7 +1,5 @@
 github.com/BurntSushi/toml v1.2.1 h1:9F2/+DoOYIOksmaJFPw1tGFy1eDnIJXg+UHjuD8lTak=
 github.com/BurntSushi/toml v1.2.1/go.mod h1:CxXYINrC8qIiEnFrOxCa7Jy5BFHlXnUU2pbicEuybxQ=
-github.com/Oudwins/tailwind-merge-go v0.2.0 h1:rtVHgYmLwwae4P+K6//ceRuUdyz3Bny6fo4664fOEmo=
-github.com/Oudwins/tailwind-merge-go v0.2.0/go.mod h1:kkZodgOPvZQ8f7SIrlWkG/w1g9JTbtnptnePIh3V72U=
 github.com/a-h/templ v0.3.833 h1:L/KOk/0VvVTBegtE0fp2RJQiBm7/52Zxv5fqlEHiQUU=
 github.com/a-h/templ v0.3.833/go.mod h1:cAu4AiZhtJfBjMY0HASlyzvkrtjnHWPeEsyGK2YYmfk=
 github.com/alecthomas/chroma/v2 v2.2.0 h1:Aten8jfQwUqEdadVFFjNyjx7HTexhKP0XuqBG67mRDY=
@@ -10,8 +8,6 @@ github.com/alecthomas/repr v0.0.0-20220113201626-b1b626ac65ae h1:zzGwJfFlFGD94Cy
 github.com/alecthomas/repr v0.0.0-20220113201626-b1b626ac65ae/go.mod h1:2kn6fqh/zIyPLmm3ugklbEi5hg5wS435eygvNfaDQL8=
 github.com/antlr4-go/antlr/v4 v4.13.0 h1:lxCg3LAv+EUK6t1i0y1V6/SLeUi0eKEKdhQAlS8TVTI=
 github.com/antlr4-go/antlr/v4 v4.13.0/go.mod h1:pfChB/xh/Unjila75QW7+VU4TSnWnnk9UTnmpPaOR2g=
-github.com/axzilla/templui v0.31.0 h1:33goypx8xwDddRH/u4mqb4ghn1kHxSLDHhZHw4Lexg0=
-github.com/axzilla/templui v0.31.0/go.mod h1:H7MpmIDQ/g2kg8nc1fCehZ10ykvw47AWI+kTurLgZgg=
 github.com/chromedp/cdproto v0.0.0-20230220211738-2b1ec77315c9 h1:wMSvdj3BswqfQOXp2R1bJOAE7xIQLt2dlMQDMf836VY=
 github.com/chromedp/cdproto v0.0.0-20230220211738-2b1ec77315c9/go.mod h1:GKljq0VrfU4D5yc+2qA6OVr8pmO/MBbPEWqWQ/oqGEs=
 github.com/chromedp/chromedp v0.9.1 h1:CC7cC5p1BeLiiS2gfNNPwp3OaUxtRMBjfiw3E3k6dFA=
@@ -24,8 +20,9 @@ github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSs
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/dlclark/regexp2 v1.4.0/go.mod h1:2pZnwuY/m+8K6iRw6wQdMtk+rH5tNGR1i55kozfMjCc=
-github.com/dlclark/regexp2 v1.7.0 h1:7lJfhqlPssTb1WQx4yvTHN0uElPEv52sbaECrAQxjAo=
 github.com/dlclark/regexp2 v1.7.0/go.mod h1:DHkYz0B9wPfa6wondMfaivmHpzrQ3v9q8cnmRbL6yW8=
+github.com/dlclark/regexp2 v1.11.4 h1:rPYF9/LECdNymJufQKmri9gV604RvvABwgOA8un7yAo=
+github.com/dlclark/regexp2 v1.11.4/go.mod h1:DHkYz0B9wPfa6wondMfaivmHpzrQ3v9q8cnmRbL6yW8=
 github.com/dustin/go-humanize v1.0.1 h1:GzkhY7T5VNhEkwH0PVJgjz+fX1rhBrR7pRT3mDkpeCY=
 github.com/dustin/go-humanize v1.0.1/go.mod h1:Mu1zIs6XwVuF/gI1OepvI0qD18qycQx+mFykh5fBlto=
 github.com/forPelevin/gomoji v1.1.3 h1:7c3dYzVmYhpOL3bS4riXqSWJBX3BhSvH68yoNNf3FH0=
@@ -64,6 +61,8 @@ github.com/mattn/go-isatty v0.0.20 h1:xfD0iDuEKnDkl03q4limB+vH+GxLEtL/jb4xVJSWWE
 github.com/mattn/go-isatty v0.0.20/go.mod h1:W+V8PltTTMOvKvAeJH7IuucS94S2C6jfK/D7dTCTo3Y=
 github.com/ncruces/go-strftime v0.1.9 h1:bY0MQC28UADQmHmaF5dgpLmImcShSi2kHU9XLdhx/f4=
 github.com/ncruces/go-strftime v0.1.9/go.mod h1:Fwc5htZGVVkseilnfgOVb9mKy6w1naJmn9CehxcKcls=
+github.com/ollama/ollama v0.5.12 h1:qM+k/ozyHLJzEQoAEPrUQ0qXqsgDEEdpIVwuwScrd2U=
+github.com/ollama/ollama v0.5.12/go.mod h1:ibdmDvb/TjKY1OArBWIazL3pd1DHTk8eG2MMjEkWhiI=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/quail-ink/goldmark-enclave v0.1.5 h1:tLwSiF/7lQyKjTsPVMMjDL2q+XBSIkpe6NbFd2VcFk4=

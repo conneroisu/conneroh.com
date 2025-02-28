@@ -3,6 +3,23 @@
 --	sqlcquash: v0.0.2
 
 
+-- name: EmbeddingsCreate :one
+INSERT INTO
+    embeddings (embedding)
+VALUES
+    (?) RETURNING id;
+
+-- name: EmbeddingsGetByID :one
+SELECT
+    id,
+    embedding
+FROM
+    embeddings
+WHERE
+    id = ?
+LIMIT
+    1;
+
 -- name: PostGet :one
 SELECT
     *
@@ -182,9 +199,9 @@ ORDER BY
 
 -- name: ProjectCreate :one
 INSERT INTO
-    projects (name, slug, description, content)
+    projects (name, slug, description, content, banner_url)
 VALUES
-    (?, ?, ?, ?) RETURNING *;
+    (?, ?, ?, ?, ?) RETURNING *;
 
 -- name: ProjectsListByTag :many
 SELECT
@@ -204,7 +221,8 @@ SET
     name = ?,
     slug = ?,
     description = ?,
-    content = ?
+    content = ?,
+    banner_url = ?
 WHERE
     id = ? RETURNING *;
 

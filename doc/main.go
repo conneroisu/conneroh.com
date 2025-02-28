@@ -1,4 +1,4 @@
-// Package main contains documentation updater.
+// Package main contains documentation and updater.
 package main
 
 import (
@@ -45,6 +45,15 @@ var Projects embed.FS
 //
 //go:embed tags/*.md
 var Tags embed.FS
+
+// Frontmatter is the frontmatter of a tag markdown document.
+type Frontmatter struct {
+	Title       string   `yaml:"title" validate:"required"`
+	Description string   `yaml:"description" validate:"required"`
+	Tags        []string `yaml:"tags" validate:"required"`
+	Slug        string   `yaml:"slug" validate:"required"`
+	BannerURL   string   `yaml:"banner_url" validate:"required"`
+}
 
 // FrontMatterMissingError is returned when the front matter is missing from the markdown file.
 type FrontMatterMissingError struct {
@@ -111,70 +120,41 @@ var (
 )
 
 // ParseWithFrontMatter parses markdown to html and decodes the frontmatter into the provided target struct.
-func ParseWithFrontMatter[
-	T *PostFrontMatter | *ProjectFrontMatter | *TagFrontMatter,
-](
+func ParseWithFrontMatter(
 	name string,
 	source []byte,
-	frontMatterTarget T,
-) (string, error) {
+) (content string, fm Frontmatter, err error) {
 	var (
 		buf bytes.Buffer
 		ctx = parser.NewContext()
 	)
-
-	err := md.Convert(source, &buf, parser.WithContext(ctx))
+	err = md.Convert(source, &buf, parser.WithContext(ctx))
 	if err != nil {
-		return "", err
+		return
 	}
-
 	d := frontmatter.Get(ctx)
 	if d == nil {
-		return "", &FrontMatterMissingError{
+		err = &FrontMatterMissingError{
 			fileName: name,
 		}
+		return
 	}
-
-	err = d.Decode(frontMatterTarget)
+	err = d.Decode(&fm)
 	if err != nil {
-		return "", err
+		return
 	}
-
 	// Validate the frontmatter struct if it's not nil
 	v := validator.New(validator.WithRequiredStructEnabled())
-	if err := v.Struct(frontMatterTarget); err != nil {
-		if _, ok := err.(*validator.InvalidValidationError); ok {
-			return "", err
+	if err = v.Struct(fm); err != nil {
+		var ok bool
+		err, ok = err.(*validator.InvalidValidationError)
+		if ok {
+			return
 		}
-		return "", err
+		return
 	}
-
-	return buf.String(), nil
-}
-
-// ProjectFrontMatter is the frontmatter of a project markdown document.
-type ProjectFrontMatter struct {
-	Title       string   `yaml:"title" validate:"required"`
-	Description string   `yaml:"description" validate:"required"`
-	Tags        []string `yaml:"tags" validate:"required"`
-	Slug        string   `yaml:"slug" validate:"required"`
-}
-
-// PostFrontMatter is the frontmatter of a post markdown document.
-type PostFrontMatter struct {
-	Title       string   `yaml:"title" validate:"required"`
-	Description string   `yaml:"description" validate:"required"`
-	Tags        []string `yaml:"tags" validate:"required"`
-	Slug        string   `yaml:"slug" validate:"required"`
-	BannerURL   string   `yaml:"banner_url" validate:"required"`
-}
-
-// TagFrontMatter is the frontmatter of a tag markdown document.
-type TagFrontMatter struct {
-	Title       string   `yaml:"title" validate:"required"`
-	Description string   `yaml:"description" validate:"required"`
-	Tags        []string `yaml:"tags" validate:"required"`
-	Slug        string   `yaml:"slug" validate:"required"`
+	content = buf.String()
+	return
 }
 
 // SeedFromEmbedded reads the embedded doc files and seeds the database with them.
@@ -184,6 +164,11 @@ func SeedFromEmbedded(
 ) error {
 	slog.Info("Seeding database from embedded markdown files")
 
+	// Seed tags
+	if err := seedTags(ctx, db, Tags); err != nil {
+		return fmt.Errorf("error seeding tags: %w", err)
+	}
+
 	// Seed posts
 	if err := seedPosts(ctx, db, Posts); err != nil {
 		return fmt.Errorf("error seeding posts: %w", err)
@@ -192,11 +177,6 @@ func SeedFromEmbedded(
 	// Seed projects
 	if err := seedProjects(ctx, db, Projects); err != nil {
 		return fmt.Errorf("error seeding projects: %w", err)
-	}
-
-	// Seed tags
-	if err := seedTags(ctx, db, Tags); err != nil {
-		return fmt.Errorf("error seeding tags: %w", err)
 	}
 
 	return nil
@@ -222,8 +202,7 @@ func seedPosts(
 			return fmt.Errorf("error reading file %s: %w", path, err)
 		}
 		// Parse frontmatter
-		var frontMatter PostFrontMatter
-		htmlContent, err := ParseWithFrontMatter(path, content, &frontMatter)
+		htmlContent, frontMatter, err := ParseWithFrontMatter(path, content)
 		if err != nil {
 			return fmt.Errorf("error parsing frontmatter for %s: %w", path, err)
 		}
@@ -232,7 +211,7 @@ func seedPosts(
 			Description: frontMatter.Description,
 			Slug:        frontMatter.Slug,
 			Content:     string(htmlContent),
-			BannerUrl:   "/assets/img/posts/default.jpg",
+			BannerUrl:   frontMatter.BannerURL,
 		})
 		if err != nil {
 			// If post already exists (e.g., unique constraint violation), just log and continue
@@ -284,16 +263,11 @@ func seedProjects(
 		if d.IsDir() || !strings.HasSuffix(path, ".md") {
 			return nil
 		}
-
-		// Read file content
 		content, err := fs.ReadFile(projectsFS, path)
 		if err != nil {
 			return fmt.Errorf("error reading file %s: %w", path, err)
 		}
-
-		// Parse frontmatter
-		var frontMatter ProjectFrontMatter
-		parsedContent, err := ParseWithFrontMatter(path, content, &frontMatter)
+		htmlContent, frontMatter, err := ParseWithFrontMatter(path, content)
 		if err != nil {
 			return fmt.Errorf("error parsing frontmatter for %s: %w", path, err)
 		}
@@ -301,41 +275,34 @@ func seedProjects(
 			Name:        frontMatter.Title,
 			Slug:        frontMatter.Slug,
 			Description: frontMatter.Description,
-			Content:     string(parsedContent),
+			Content:     string(htmlContent),
 		})
 		if err != nil {
 			// If project already exists, just log and continue
 			slog.Warn("Failed to create project", "name", frontMatter.Title, "error", err)
 			return nil
 		}
-
-		// Associate tags with project
 		for _, tagName := range frontMatter.Tags {
-			// Try to find the tag by name
 			tag, err := db.Queries.TagGetByName(ctx, tagName)
 			if err != nil {
-				// Create the tag if it doesn't exist
-				tag, err = db.Queries.TagCreate(ctx, master.TagCreateParams{
-					Name:        tagName,
-					Description: "Auto-generated tag from project",
-					Slug:        tagName,
-				})
-				if err != nil {
-					slog.Warn("Failed to create tag", "name", tagName, "error", err)
-					continue
-				}
+				return fmt.Errorf("failed to get tag by name: %w", err)
 			}
-
-			// Associate tag with project
 			if err := db.Queries.ProjectTagCreate(
 				ctx,
 				project.ID,
 				tag.ID,
 			); err != nil {
-				slog.Warn("Failed to associate tag with project", "projectID", project.ID, "tagID", tag.ID, "error", err)
+				slog.Warn(
+					`Failed to associate tag with project`,
+					`projectID`,
+					project.ID,
+					`tagID`,
+					tag.ID,
+					`error`,
+					err,
+				)
 			}
 		}
-
 		slog.Info("Created project", "name", frontMatter.Title, "id", project.ID)
 		return nil
 	})
@@ -357,24 +324,17 @@ func seedTags(
 			if d.IsDir() || !strings.HasSuffix(path, ".md") {
 				return nil
 			}
-
-			// Read file content
 			content, err := fs.ReadFile(tagsFS, path)
 			if err != nil {
 				return fmt.Errorf("error reading file %s: %w", path, err)
 			}
-
-			// Parse frontmatter
-			var frontMatter TagFrontMatter
-			_, err = ParseWithFrontMatter(path, content, &frontMatter)
+			htmlContent, frontMatter, err := ParseWithFrontMatter(path, content)
 			if err != nil {
 				return fmt.Errorf("error parsing frontmatter for %s: %w", path, err)
 			}
-
-			// Create tag
 			tag, err := db.Queries.TagCreate(ctx, master.TagCreateParams{
 				Name:        frontMatter.Title,
-				Description: frontMatter.Description,
+				Description: htmlContent,
 				Slug:        frontMatter.Slug,
 			})
 			if err != nil {

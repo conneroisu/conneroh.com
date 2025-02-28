@@ -18,6 +18,7 @@ type Post struct {
 	BannerUrl   string `db:"banner_url" json:"banner_url"`
 	CreatedAt   int64  `db:"created_at" json:"created_at"`
 	UpdatedAt   string `db:"updated_at" json:"updated_at"`
+	EmbeddingID int64  `db:"embedding_id" json:"embedding_id"`
 }
 
 type PostProject struct {
@@ -36,8 +37,10 @@ type Project struct {
 	Slug        string `db:"slug" json:"slug"`
 	Description string `db:"description" json:"description"`
 	Content     string `db:"content" json:"content"`
+	BannerUrl   string `db:"banner_url" json:"banner_url"`
 	CreatedAt   *int64 `db:"created_at" json:"created_at"`
 	UpdatedAt   *int64 `db:"updated_at" json:"updated_at"`
+	EmbeddingID int64  `db:"embedding_id" json:"embedding_id"`
 }
 
 type ProjectPost struct {
@@ -58,6 +61,7 @@ type Tag struct {
 	Icon        string `db:"icon" json:"icon"`
 	CreatedAt   int64  `db:"created_at" json:"created_at"`
 	UpdatedAt   int64  `db:"updated_at" json:"updated_at"`
+	EmbeddingID int64  `db:"embedding_id" json:"embedding_id"`
 }
 
 type TagPost struct {

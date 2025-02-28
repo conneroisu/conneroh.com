@@ -3,13 +3,11 @@ module github.com/conneroisu/conneroh.com
 go 1.24.0
 
 require (
-	github.com/Oudwins/tailwind-merge-go v0.2.0
 	github.com/a-h/templ v0.3.833
-	github.com/axzilla/templui v0.31.0
 	github.com/go-playground/validator/v10 v10.25.0
 	github.com/litao91/goldmark-mathjax v0.0.0-20210217064022-a43cf739a50f
+	github.com/ollama/ollama v0.5.12
 	github.com/quail-ink/goldmark-enclave v0.1.5
-	github.com/stretchr/testify v1.10.0
 	github.com/tursodatabase/libsql-client-go v0.0.0-20240902231107-85af5b9d094d
 	github.com/yuin/goldmark v1.7.8
 	github.com/yuin/goldmark-highlighting/v2 v2.0.0-20230729083705-37449abec8cc
@@ -26,8 +24,7 @@ require (
 	github.com/alecthomas/chroma/v2 v2.2.0 // indirect
 	github.com/antlr4-go/antlr/v4 v4.13.0 // indirect
 	github.com/coder/websocket v1.8.12 // indirect
-	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/dlclark/regexp2 v1.7.0 // indirect
+	github.com/dlclark/regexp2 v1.11.4 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/forPelevin/gomoji v1.1.3 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.8 // indirect
@@ -37,9 +34,9 @@ require (
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/ncruces/go-strftime v0.1.9 // indirect
-	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
+	github.com/stretchr/testify v1.10.0 // indirect
 	golang.org/x/crypto v0.32.0 // indirect
 	golang.org/x/exp v0.0.0-20240325151524-a685a6edb6d8 // indirect
 	golang.org/x/net v0.34.0 // indirect

@@ -28,9 +28,9 @@ ORDER BY
 
 -- name: ProjectCreate :one
 INSERT INTO
-    projects (name, slug, description, content)
+    projects (name, slug, description, content, banner_url)
 VALUES
-    (?, ?, ?, ?) RETURNING *;
+    (?, ?, ?, ?, ?) RETURNING *;
 
 -- name: ProjectsListByTag :many
 SELECT
@@ -50,7 +50,8 @@ SET
     name = ?,
     slug = ?,
     description = ?,
-    content = ?
+    content = ?,
+    banner_url = ?
 WHERE
     id = ? RETURNING *;
 

@@ -17,7 +17,9 @@ CREATE TABLE IF NOT EXISTS posts (
     content TEXT NOT NULL,
     banner_url TEXT NOT NULL,
     created_at INTEGER NOT NULL DEFAULT (unixepoch('now')),
-    updated_at TEXT NOT NULL DEFAULT (unixepoch('now'))
+    updated_at TEXT NOT NULL DEFAULT (unixepoch('now')),
+    embedding_id INTEGER NOT NULL,
+    FOREIGN KEY(embedding_id) REFERENCES embeddings(id)
 );
 
 -- dialect: sqlite
@@ -43,8 +45,11 @@ CREATE TABLE IF NOT EXISTS projects (
     slug TEXT NOT NULL,
     description TEXT NOT NULL,
     content TEXT NOT NULL,
+    banner_url TEXT NOT NULL,
     created_at INTEGER DEFAULT (unixepoch('now')),
-    updated_at INTEGER DEFAULT (unixepoch('now'))
+    updated_at INTEGER DEFAULT (unixepoch('now')),
+    embedding_id INTEGER NOT NULL,
+    FOREIGN KEY(embedding_id) REFERENCES embeddings(id)
 );
 
 -- dialect: sqlite
@@ -71,7 +76,9 @@ CREATE TABLE IF NOT EXISTS tags (
     slug TEXT NOT NULL UNIQUE,
     icon TEXT NOT NULL DEFAULT 'nf-fa-tag',
     created_at INTEGER NOT NULL DEFAULT (unixepoch('now')),
-    updated_at INTEGER NOT NULL DEFAULT (unixepoch('now'))
+    updated_at INTEGER NOT NULL DEFAULT (unixepoch('now')),
+    embedding_id INTEGER NOT NULL,
+    FOREIGN KEY(embedding_id) REFERENCES embeddings(id)
 );
 
 CREATE INDEX IF NOT EXISTS idx_tags_name ON tags (name);

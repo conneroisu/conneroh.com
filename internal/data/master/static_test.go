@@ -22,5 +22,4 @@ func TestSchema(t *testing.T) {
 		return
 	}
 	defer db.Close()
-
 }
