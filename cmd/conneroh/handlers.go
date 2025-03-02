@@ -356,7 +356,7 @@ func filterPostsByTags(posts []master.FullPost, includeTags, excludeTags []strin
 		// Convert post tags to lowercase for case-insensitive matching
 		postTags := make([]string, 0, len(post.Tags))
 		for _, tag := range post.Tags {
-			postTags = append(postTags, strings.ToLower(tag.Name))
+			postTags = append(postTags, strings.ToLower(tag.Slug))
 		}
 
 		// Check if post should be excluded

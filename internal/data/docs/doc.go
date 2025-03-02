@@ -1,19 +1,21 @@
 // Package docs contains documentation and updater.
 package docs
 
-import "embed"
+import (
+	"embed"
+)
 
 // Posts contains all posts.
 //
-//go:embed posts/*.md
+//go:embed posts/*
 var Posts embed.FS
 
 // Projects contains all projects.
 //
-//go:embed projects/*.md
+//go:embed projects/*
 var Projects embed.FS
 
 // Tags contains all tags.
 //
-//go:embed tags/*.md
+//go:embed tags/*
 var Tags embed.FS

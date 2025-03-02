@@ -71,6 +71,7 @@ Package master contains the master schema for the database.
   - [func \(q \*Queries\) TagGetByID\(ctx context.Context, id int64\) \(Tag, error\)](<#Queries.TagGetByID>)
   - [func \(q \*Queries\) TagGetBySlug\(ctx context.Context, slug string\) \(Tag, error\)](<#Queries.TagGetBySlug>)
   - [func \(q \*Queries\) TagUpdate\(ctx context.Context, arg TagUpdateParams\) error](<#Queries.TagUpdate>)
+  - [func \(q \*Queries\) TagsListAlphabetical\(ctx context.Context\) \(\[\]Tag, error\)](<#Queries.TagsListAlphabetical>)
   - [func \(q \*Queries\) TagsListByPost\(ctx context.Context, postID int64\) \(\[\]Tag, error\)](<#Queries.TagsListByPost>)
   - [func \(q \*Queries\) TagsListByProject\(ctx context.Context, projectID int64\) \(\[\]Tag, error\)](<#Queries.TagsListByProject>)
   - [func \(q \*Queries\) WithTx\(tx \*sql.Tx\) \*Queries](<#Queries.WithTx>)
@@ -1035,8 +1036,26 @@ WHERE
     id = ?
 ```
 
+<a name="Queries.TagsListAlphabetical"></a>
+### func \(\*Queries\) [TagsListAlphabetical](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1368>)
+
+```go
+func (q *Queries) TagsListAlphabetical(ctx context.Context) ([]Tag, error)
+```
+
+TagsListAlphabetical
+
+```
+SELECT
+    t.id, t.title, t.slug, t.description, t.icon, t.created_at, t.updated_at, t.embedding_id
+FROM
+    tags t
+ORDER BY
+    t.title ASC
+```
+
 <a name="Queries.TagsListByPost"></a>
-### func \(\*Queries\) [TagsListByPost](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1374>)
+### func \(\*Queries\) [TagsListByPost](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1423>)
 
 ```go
 func (q *Queries) TagsListByPost(ctx context.Context, postID int64) ([]Tag, error)
@@ -1057,7 +1076,7 @@ ORDER BY
 ```
 
 <a name="Queries.TagsListByProject"></a>
-### func \(\*Queries\) [TagsListByProject](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1429>)
+### func \(\*Queries\) [TagsListByProject](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1478>)
 
 ```go
 func (q *Queries) TagsListByProject(ctx context.Context, projectID int64) ([]Tag, error)

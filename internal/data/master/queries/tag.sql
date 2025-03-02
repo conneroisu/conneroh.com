@@ -35,6 +35,14 @@ SET
 WHERE
     id = ?;
 
+-- name: TagsListAlphabetical :many
+SELECT
+    t.*
+FROM
+    tags t
+ORDER BY
+    t.title ASC;
+
 -- name: TagsListByProject :many
 SELECT
     t.*

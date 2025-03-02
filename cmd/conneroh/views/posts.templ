@@ -148,7 +148,7 @@ templ Post(
 						href={ templ.SafeURL(fmt.Sprintf("/tag/%s", tag.Slug)) }
 						class="inline-block px-3 py-1 text-sm font-medium rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors"
 					>
-						{ tag.Name }
+						{ tag.Slug }
 					</a>
 				}
 			</div>
@@ -176,7 +176,7 @@ templ Post(
 							class="flex items-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
 						>
 							<div>
-								<h3 class="font-medium text-gray-900 dark:text-white">{ project.Name }</h3>
+								<h3 class="font-medium text-gray-900 dark:text-white">{ project.Slug }</h3>
 								<p class="text-gray-500 dark:text-gray-400 text-sm line-clamp-2">{ project.Description }</p>
 							</div>
 						</a>

@@ -1348,6 +1348,55 @@ func (q *Queries) TagUpdate(ctx context.Context, arg TagUpdateParams) error {
 	return err
 }
 
+const tagsListAlphabetical = `-- name: TagsListAlphabetical :many
+SELECT
+    t.id, t.title, t.slug, t.description, t.icon, t.created_at, t.updated_at, t.embedding_id
+FROM
+    tags t
+ORDER BY
+    t.title ASC
+`
+
+// TagsListAlphabetical
+//
+//	SELECT
+//	    t.id, t.title, t.slug, t.description, t.icon, t.created_at, t.updated_at, t.embedding_id
+//	FROM
+//	    tags t
+//	ORDER BY
+//	    t.title ASC
+func (q *Queries) TagsListAlphabetical(ctx context.Context) ([]Tag, error) {
+	rows, err := q.db.QueryContext(ctx, tagsListAlphabetical)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Tag
+	for rows.Next() {
+		var i Tag
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.Slug,
+			&i.Description,
+			&i.Icon,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.EmbeddingID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const tagsListByPost = `-- name: TagsListByPost :many
 SELECT
     t.id, t.title, t.slug, t.description, t.icon, t.created_at, t.updated_at, t.embedding_id

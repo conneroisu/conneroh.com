@@ -89,10 +89,10 @@ templ Tags(
 				<div
 					class="hidden"
 					data-tag-id={ fmt.Sprintf("%d", tag.ID) }
-					data-tag-name={ tag.Name }
+					data-tag-name={ tag.Title }
 					data-tag-description={ tag.Description }
 					data-tag-slug={ tag.Slug }
-					data-tag-section={ templ.EscapeString(getTagSection(tag.Name)) }
+					data-tag-section={ templ.EscapeString(getTagSection(tag.Slug)) }
 					data-tag-posts-count={ fmt.Sprintf("%d", len(tag.Posts)) }
 					data-tag-icon={ "nf " + tag.Icon + " text-white" }
 					data-tag-projects-count={ fmt.Sprintf("%d", len(tag.Projects)) }
@@ -139,7 +139,7 @@ templ Tag(
 			<div class="inline-block mb-4 bg-blue-100 dark:bg-blue-900 p-4 rounded-full w-14">
 				<i class={ "nf " + tag.Icon + " text-white" }></i>
 			</div>
-			<h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-4">{ tag.Name }</h1>
+			<h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-4">{ tag.Title }</h1>
 			<p class="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">{ tag.Description }</p>
 		</header>
 		<div x-data="{ activeTab: 'posts' }" class="mb-8">
@@ -210,7 +210,7 @@ templ Tag(
 					<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 						for _, project := range tag.Projects {
 							<a href={ templ.SafeURL(fmt.Sprintf("/project/%s", project.Slug)) } class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-300">
-								<h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">{ project.Name }</h2>
+								<h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">{ project.Title }</h2>
 								<p class="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">{ project.Description }</p>
 								<div class="flex justify-between items-center">
 									<span class="text-blue-600 dark:text-blue-400 hover:underline text-sm font-medium">View project</span>
@@ -247,7 +247,7 @@ templ Tag(
 										</svg>
 									</div>
 									<div>
-										<h3 class="font-medium text-gray-900 dark:text-white">{ relatedTag.Name }</h3>
+										<h3 class="font-medium text-gray-900 dark:text-white">{ relatedTag.Title }</h3>
 										<p class="text-xs text-gray-500 dark:text-gray-400 line-clamp-1">{ fmt.Sprintf("%d posts, %d projects", len(relatedTag.Posts), len(relatedTag.Projects)) }</p>
 									</div>
 								</a>

@@ -36,7 +36,7 @@ func formatTags(tags []master.Tag) string {
 		if i > 0 {
 			result += ","
 		}
-		result += fmt.Sprintf(`{"id":%d,"name":"%s","slug":"%s"}`, tag.ID, tag.Name, tag.Slug)
+		result += fmt.Sprintf(`{"id":%d,"name":"%s","slug":"%s"}`, tag.ID, tag.Title, tag.Slug)
 	}
 	result += "]"
 	return result
