@@ -85,18 +85,3 @@ CREATE TABLE IF NOT EXISTS tags (
 );
 
 CREATE INDEX IF NOT EXISTS idx_tags_name ON tags (name);
-
--- dialect: sqlite
-CREATE TABLE IF NOT EXISTS tag_posts (
-    tag_id INTEGER NOT NULL,
-    post_id INTEGER NOT NULL,
-    FOREIGN KEY (tag_id) REFERENCES tags(id),
-    FOREIGN KEY (post_id) REFERENCES posts(id)
-);
-
-CREATE TABLE IF NOT EXISTS tag_projects (
-    tag_id INTEGER NOT NULL,
-    project_id INTEGER NOT NULL,
-    FOREIGN KEY (tag_id) REFERENCES tags(id),
-    FOREIGN KEY (project_id) REFERENCES projects(id)
-);

@@ -66,13 +66,3 @@ type Tag struct {
 	UpdatedAt   int64  `db:"updated_at" json:"updated_at"`
 	EmbeddingID int64  `db:"embedding_id" json:"embedding_id"`
 }
-
-type TagPost struct {
-	TagID  int64 `db:"tag_id" json:"tag_id"`
-	PostID int64 `db:"post_id" json:"post_id"`
-}
-
-type TagProject struct {
-	TagID     int64 `db:"tag_id" json:"tag_id"`
-	ProjectID int64 `db:"project_id" json:"project_id"`
-}
