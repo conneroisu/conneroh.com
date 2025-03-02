@@ -2,6 +2,7 @@ package data
 
 import (
 	"bytes"
+	"os"
 
 	mathjax "github.com/litao91/goldmark-mathjax"
 	enclave "github.com/quail-ink/goldmark-enclave"
@@ -67,7 +68,7 @@ var (
 
 // Markdown is the frontmatter and content of a markdown document.
 type Markdown struct {
-	// Title is the title of the document.
+	// Title is the title/display name of the document.
 	Title string `yaml:"title"`
 	// Slug is the slug of the document.
 	//
@@ -82,15 +83,26 @@ type Markdown struct {
 	// BannerURL is the URL of the banner image.
 	BannerURL string `yaml:"banner_url"`
 
-	// Content is the content of the document.
-	Content []byte `yaml:"-"`
+	// Posts are related posts of the document. (Never used on tags)
+	Posts []string `yaml:"posts,omitempty"`
+	// Projects are related projects of the document. (Never used on tags)
+	Projects []string `yaml:"projects,omitempty"`
+
+	// RawContent is the content of the document.
+	RawContent []byte `yaml:"-"`
+	// RenderContent is the content of the document to be rendered as HTML.
+	RenderContent []byte `yaml:"-"`
 }
 
-func parse(b []byte) (*Markdown, error) {
+func parse(path string) (*Markdown, error) {
+	b, err := os.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
 	var fm Markdown
 	buf := bytes.NewBufferString("")
 	ctx := parser.NewContext()
-	err := md.Convert(b, buf, parser.WithContext(ctx))
+	err = md.Convert(b, buf, parser.WithContext(ctx))
 	if err != nil {
 		return nil, err
 	}
@@ -102,10 +114,11 @@ func parse(b []byte) (*Markdown, error) {
 	if err != nil {
 		return nil, err
 	}
-
+	fm.RenderContent = buf.Bytes()
 	if fm.Description == "" {
 		// It is a tag page.
-		fm.Description = buf.String()
+		fm.Description = string(fm.RenderContent)
 	}
+	fm.RawContent = b
 	return &fm, nil
 }
