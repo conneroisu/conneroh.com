@@ -53,8 +53,18 @@ func NewServer(
 // Run is the entry point for the application.
 func Run(
 	ctx context.Context,
-	_ func(string) string,
+	getenv func(string) string,
 ) error {
+
+	tursoURI := getenv("TURSO_URI")
+	if tursoURI == "" {
+		return fmt.Errorf("TURSO_URI is not set")
+	}
+	tursoToken := getenv("TURSO_TOKEN")
+	if tursoToken == "" {
+		return fmt.Errorf("TURSO_TOKEN is not set")
+	}
+	dbURI := tursoURI + "?authToken=" + tursoToken
 
 	innerCtx, stop := signal.NotifyContext(ctx, os.Interrupt, syscall.SIGTERM)
 	defer stop()
@@ -64,12 +74,7 @@ func Run(
 		wg         sync.WaitGroup
 	)
 
-	db, err := data.NewDb(master.New, &data.Config{
-		Schema:   master.Schema,
-		URI:      "file://dummy",
-		Seed:     master.Seed,
-		FileName: "test.db",
-	})
+	db, err := data.NewDb(master.New, dbURI)
 	if err != nil {
 		return err
 	}

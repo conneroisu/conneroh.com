@@ -1,4 +1,5 @@
 CREATE TABLE IF NOT EXISTS embeddings (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    embedding TEXT NOT NULL
+    embedding F32_BLOB(768) NOT NULL,
+    created_at INTEGER NOT NULL DEFAULT (unixepoch('now'))
 );

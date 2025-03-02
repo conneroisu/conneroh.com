@@ -26,7 +26,7 @@ Package conneroh provides implementations for conneroh.
 - [func Posts\(\_ context.Context, \_ \*data.Database\[master.Queries\], fullPosts \*\[\]master.FullPost, fullProjects \*\[\]master.FullProject, fullTags \*\[\]master.FullTag, fullPostSlugMap \*map\[string\]master.FullPost, fullProjectSlugMap \*map\[string\]master.FullProject, fullTagSlugMap \*map\[string\]master.FullTag\) \(routing.APIFn, error\)](<#Posts>)
 - [func Project\(ctx context.Context, db \*data.Database\[master.Queries\], fullPosts \*\[\]master.FullPost, fullProjects \*\[\]master.FullProject, fullTags \*\[\]master.FullTag, fullPostSlugMap \*map\[string\]master.FullPost, fullProjectSlugMap \*map\[string\]master.FullProject, fullTagSlugMap \*map\[string\]master.FullTag\) \(routing.APIFn, error\)](<#Project>)
 - [func Projects\(ctx context.Context, db \*data.Database\[master.Queries\], fullPosts \*\[\]master.FullPost, fullProjects \*\[\]master.FullProject, fullTags \*\[\]master.FullTag, fullPostSlugMap \*map\[string\]master.FullPost, fullProjectSlugMap \*map\[string\]master.FullProject, fullTagSlugMap \*map\[string\]master.FullTag\) \(routing.APIFn, error\)](<#Projects>)
-- [func Run\(ctx context.Context, \_ func\(string\) string\) error](<#Run>)
+- [func Run\(ctx context.Context, getenv func\(string\) string\) error](<#Run>)
 - [func Tag\(\_ context.Context, \_ \*data.Database\[master.Queries\], fullPosts \*\[\]master.FullPost, fullProjects \*\[\]master.FullProject, fullTags \*\[\]master.FullTag, fullPostSlugMap \*map\[string\]master.FullPost, fullProjectSlugMap \*map\[string\]master.FullProject, fullTagSlugMap \*map\[string\]master.FullTag\) \(routing.APIFn, error\)](<#Tag>)
 - [func Tags\(\_ context.Context, \_ \*data.Database\[master.Queries\], fullPosts \*\[\]master.FullPost, fullProjects \*\[\]master.FullProject, fullTags \*\[\]master.FullTag, fullPostSlugMap \*map\[string\]master.FullPost, fullProjectSlugMap \*map\[string\]master.FullProject, fullTagSlugMap \*map\[string\]master.FullTag\) \(routing.APIFn, error\)](<#Tags>)
 
@@ -154,7 +154,7 @@ Projects is the projects handler.
 ## func [Run](<https://github.com/conneroisu/conneroh/blob/main/cmd/conneroh/root.go#L54-L57>)
 
 ```go
-func Run(ctx context.Context, _ func(string) string) error
+func Run(ctx context.Context, getenv func(string) string) error
 ```
 
 Run is the entry point for the application.

@@ -33,11 +33,12 @@ INSERT INTO
         slug,
         description,
         content,
+        raw_content,
         banner_url,
         embedding_id
     )
 VALUES
-    (?, ?, ?, ?, ?, ?) RETURNING *;
+    (?, ?, ?, ?, ?, ?, ?) RETURNING *;
 
 -- name: ProjectsListByTag :many
 SELECT
@@ -58,6 +59,7 @@ SET
     slug = ?,
     description = ?,
     content = ?,
+    raw_content = ?,
     banner_url = ?
 WHERE
     id = ? RETURNING *;

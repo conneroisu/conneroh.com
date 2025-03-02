@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS projects (
     slug TEXT NOT NULL,
     description TEXT NOT NULL,
     content TEXT NOT NULL,
+    raw_content TEXT NOT NULL,
     banner_url TEXT NOT NULL,
     created_at INTEGER DEFAULT (unixepoch('now')),
     updated_at INTEGER DEFAULT (unixepoch('now')),

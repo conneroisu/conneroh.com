@@ -15,11 +15,12 @@ INSERT INTO
         description,
         slug,
         content,
+        raw_content,
         banner_url,
         embedding_id
     )
 VALUES
-    (?, ?, ?, ?, ?, ?) RETURNING *;
+    (?, ?, ?, ?, ?, ?, ?) RETURNING *;
 
 -- name: PostDeleteBySlug :exec
 DELETE FROM
@@ -64,6 +65,7 @@ SET
     description = ?,
     slug = ?,
     content = ?,
+    raw_content = ?,
     banner_url = ?
 WHERE
     id = ? RETURNING *;

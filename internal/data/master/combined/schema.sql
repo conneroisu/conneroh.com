@@ -5,7 +5,8 @@
 
 CREATE TABLE IF NOT EXISTS embeddings (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    embedding F32_BLOB(768) NOT NULL
+    embedding F32_BLOB(768) NOT NULL,
+    created_at INTEGER NOT NULL DEFAULT (unixepoch('now'))
 );
 
 -- dialect: sqlite
@@ -15,6 +16,7 @@ CREATE TABLE IF NOT EXISTS posts (
     description TEXT NOT NULL,
     slug TEXT NOT NULL UNIQUE,
     content TEXT NOT NULL,
+    raw_content TEXT NOT NULL,
     banner_url TEXT NOT NULL,
     created_at INTEGER NOT NULL DEFAULT (unixepoch('now')),
     updated_at TEXT NOT NULL DEFAULT (unixepoch('now')),
@@ -45,6 +47,7 @@ CREATE TABLE IF NOT EXISTS projects (
     slug TEXT NOT NULL,
     description TEXT NOT NULL,
     content TEXT NOT NULL,
+    raw_content TEXT NOT NULL,
     banner_url TEXT NOT NULL,
     created_at INTEGER DEFAULT (unixepoch('now')),
     updated_at INTEGER DEFAULT (unixepoch('now')),

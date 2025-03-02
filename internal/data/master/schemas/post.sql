@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS posts (
     description TEXT NOT NULL,
     slug TEXT NOT NULL UNIQUE,
     content TEXT NOT NULL,
+    raw_content TEXT NOT NULL,
     banner_url TEXT NOT NULL,
     created_at INTEGER NOT NULL DEFAULT (unixepoch('now')),
     updated_at TEXT NOT NULL DEFAULT (unixepoch('now')),

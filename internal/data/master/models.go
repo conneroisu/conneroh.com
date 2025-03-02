@@ -7,6 +7,7 @@ package master
 type Embedding struct {
 	ID        int64       `db:"id" json:"id"`
 	Embedding interface{} `db:"embedding" json:"embedding"`
+	CreatedAt int64       `db:"created_at" json:"created_at"`
 }
 
 type Post struct {
@@ -15,6 +16,7 @@ type Post struct {
 	Description string `db:"description" json:"description"`
 	Slug        string `db:"slug" json:"slug"`
 	Content     string `db:"content" json:"content"`
+	RawContent  string `db:"raw_content" json:"raw_content"`
 	BannerUrl   string `db:"banner_url" json:"banner_url"`
 	CreatedAt   int64  `db:"created_at" json:"created_at"`
 	UpdatedAt   string `db:"updated_at" json:"updated_at"`
@@ -37,6 +39,7 @@ type Project struct {
 	Slug        string `db:"slug" json:"slug"`
 	Description string `db:"description" json:"description"`
 	Content     string `db:"content" json:"content"`
+	RawContent  string `db:"raw_content" json:"raw_content"`
 	BannerUrl   string `db:"banner_url" json:"banner_url"`
 	CreatedAt   *int64 `db:"created_at" json:"created_at"`
 	UpdatedAt   *int64 `db:"updated_at" json:"updated_at"`

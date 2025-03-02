@@ -19,6 +19,7 @@ in
     shellHook = ''
       export REPO_ROOT=$(git rev-parse --show-toplevel)
       ${inputs.self.checks.${pkgs.system}.pre-commit.shellHook}
+      export CGO_CFLAGS="-O2"
     '';
     buildInputs = inputs.self.checks.${pkgs.system}.pre-commit.enabledPackages;
     packages = with pkgs; [
@@ -47,8 +48,7 @@ in
       tailwindcss-language-server
       bun
       nodePackages.typescript-language-server
-      python311
-      python311Packages.fontforge
+      sqlite-web
 
       # SQL Related
       sqlc

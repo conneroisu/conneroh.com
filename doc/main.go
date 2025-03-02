@@ -6,7 +6,6 @@ import (
 	"embed"
 	"fmt"
 	"io/fs"
-	"log"
 	"log/slog"
 	"strings"
 
@@ -76,7 +75,7 @@ var (
 			extension.DefinitionList,
 			extension.NewTypographer(
 				extension.WithTypographicSubstitutions(extension.TypographicSubstitutions{
-					extension.Apostrophe: []byte("’"),
+					extension.Apostrophe: []byte("'"),
 				}),
 			),
 			enclave.New(&core.Config{
@@ -206,23 +205,22 @@ func seedPosts(
 		if err != nil {
 			return fmt.Errorf("error parsing frontmatter for %s: %w", path, err)
 		}
-		post, err := db.Queries.PostCreate(ctx, master.PostCreateParams{
+
+		// Prepare the post struct
+		post := master.Post{
 			Title:       frontMatter.Title,
 			Description: frontMatter.Description,
 			Slug:        frontMatter.Slug,
 			Content:     string(htmlContent),
 			BannerUrl:   frontMatter.BannerURL,
-		})
-		if err != nil {
-			// If post already exists (e.g., unique constraint violation), just log and continue
-			slog.Warn("Failed to create post", "title", frontMatter.Title, "error", err)
-			return nil
 		}
 
-		// Associate tags with post
+		// Collect all tags that will be associated with this post
+		var postTags []master.Tag
+		var tag master.Tag
 		for _, tagName := range frontMatter.Tags {
 			// Try to find the tag by name
-			tag, err := db.Queries.TagGetByName(ctx, tagName)
+			tag, err = db.Queries.TagGetByName(ctx, tagName)
 			if err != nil {
 				// Create the tag if it doesn't exist
 				tag, err = db.Queries.TagCreate(ctx, master.TagCreateParams{
@@ -235,17 +233,17 @@ func seedPosts(
 					continue
 				}
 			}
-			// Associate tag with post
-			if err := db.Queries.PostTagCreate(
-				ctx,
-				post.ID,
-				tag.ID,
-			); err != nil {
-				slog.Warn("Failed to associate tag with post", "postID", post.ID, "tagID", tag.ID, "error", err)
-			}
+			postTags = append(postTags, tag)
 		}
 
-		slog.Info("Created post", "title", frontMatter.Title, "id", post.ID)
+		// Create post with all related tags and projects (empty projects for now)
+		fullPost, err := db.Queries.FullPostsCreate(ctx, post, []master.Project{}, postTags)
+		if err != nil {
+			slog.Warn("failed to create post", "title", frontMatter.Title, "error", err)
+			return err
+		}
+
+		slog.Info("created post", "title", frontMatter.Title, "id", fullPost.Post.ID)
 		return nil
 	})
 }
@@ -271,39 +269,45 @@ func seedProjects(
 		if err != nil {
 			return fmt.Errorf("error parsing frontmatter for %s: %w", path, err)
 		}
-		project, err := db.Queries.ProjectCreate(ctx, master.ProjectCreateParams{
+
+		// Prepare the project struct
+		project := master.Project{
 			Name:        frontMatter.Title,
 			Slug:        frontMatter.Slug,
 			Description: frontMatter.Description,
 			Content:     string(htmlContent),
-		})
+			BannerUrl:   frontMatter.BannerURL,
+		}
+
+		// Collect all tags that will be associated with this project
+		var projectTags []master.Tag
+		var tag master.Tag
+		for _, tagName := range frontMatter.Tags {
+			tag, err = db.Queries.TagGetByName(ctx, tagName)
+			if err != nil {
+				// Create the tag if it doesn't exist
+				tag, err = db.Queries.TagCreate(ctx, master.TagCreateParams{
+					Name:        tagName,
+					Description: "Auto-generated tag from project " + frontMatter.Title,
+					Slug:        tagName,
+				})
+				if err != nil {
+					slog.Warn("Failed to create tag", "name", tagName, "error", err)
+					continue
+				}
+			}
+			projectTags = append(projectTags, tag)
+		}
+
+		// Create project with all related tags and posts (empty posts for now)
+		fullProject, err := db.Queries.FullProjectCreate(ctx, project, []master.Post{}, projectTags)
 		if err != nil {
 			// If project already exists, just log and continue
 			slog.Warn("Failed to create project", "name", frontMatter.Title, "error", err)
 			return nil
 		}
-		for _, tagName := range frontMatter.Tags {
-			tag, err := db.Queries.TagGetByName(ctx, tagName)
-			if err != nil {
-				return nil
-			}
-			if err := db.Queries.ProjectTagCreate(
-				ctx,
-				project.ID,
-				tag.ID,
-			); err != nil {
-				slog.Warn(
-					`Failed to associate tag with project`,
-					`projectID`,
-					project.ID,
-					`tagID`,
-					tag.ID,
-					`error`,
-					err,
-				)
-			}
-		}
-		slog.Info("Created project", "name", frontMatter.Title, "id", project.ID)
+
+		slog.Info("Created project", "name", frontMatter.Title, "id", fullProject.Project.ID)
 		return nil
 	})
 }
@@ -332,37 +336,21 @@ func seedTags(
 			if err != nil {
 				return fmt.Errorf("error parsing frontmatter for %s: %w", path, err)
 			}
-			tag, err := db.Queries.TagCreate(ctx, master.TagCreateParams{
+			// Prepare tag struct
+			tag := master.Tag{
 				Name:        frontMatter.Title,
 				Description: htmlContent,
 				Slug:        frontMatter.Slug,
-			})
+			}
+			// Create the tag with empty posts and projects arrays (will be populated later)
+			fullTag, err := db.Queries.FullTagCreate(ctx, tag, []master.Project{}, []master.Post{})
 			if err != nil {
 				// If tag already exists, just log and continue
 				slog.Warn("Failed to create tag", "name", frontMatter.Title, "error", err)
 				return nil
 			}
 
-			slog.Info("Created tag", "name", frontMatter.Title, "id", tag.ID)
+			slog.Info("Created tag", "name", frontMatter.Title, "id", fullTag.Tag.ID)
 			return nil
 		})
-}
-
-func main() {
-	db, err := data.NewDb(master.New, &data.Config{
-		// test.db
-		Schema:   master.Schema,
-		Seed:     master.Seed,
-		URI:      "file:data/test.db?mode=memory&cache=shared",
-		FileName: "test.db",
-	})
-	if err != nil {
-		log.Fatal("Failed to connect to database", "error", err)
-	}
-	if err := SeedFromEmbedded(context.Background(), db); err != nil {
-		log.Fatal("Failed to seed database", "error", err)
-	}
-	if err := db.Close(); err != nil {
-		log.Fatal("Failed to close database", "error", err)
-	}
 }
