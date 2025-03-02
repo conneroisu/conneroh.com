@@ -6,13 +6,14 @@ FROM
 WHERE
     project_id = ?;
 
--- name: ProjectTagsGetByTagID :many
+-- name: ProjectTagsGet :many
 SELECT
     *
 FROM
     project_tags
 WHERE
-    tag_id = ?;
+    project_id = ?
+    AND tag_id = ?;
 
 -- name: ProjectTagCreate :exec
 INSERT INTO

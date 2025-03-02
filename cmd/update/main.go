@@ -12,6 +12,7 @@ import (
 	"github.com/conneroisu/conneroh.com/cmd/conneroh"
 	"github.com/conneroisu/conneroh.com/internal/data"
 	"github.com/conneroisu/conneroh.com/internal/data/docs"
+	"github.com/conneroisu/conneroh.com/internal/data/master"
 	"github.com/ollama/ollama/api"
 )
 
@@ -49,17 +50,25 @@ func Run(
 				return nil
 			}
 			slog.Info("parsing tag", "path", path)
-			parsed, err := data.Parse(path, true)
+			parsed, err := data.Parse(path, docs.Tags)
+			if err != nil {
+				slog.Error("failed to parse tag", "path", path, "err", err)
+				return err
+			}
+			slog.Info("upserting tag", "tag", parsed.Title)
+			tag, err := parsed.UpsertTag(ctx, db, client)
 			if err != nil {
 				return err
 			}
-			return parsed.UpsertTag(ctx, db, client)
+			slog.Info("upserted tag", "tag", tag, "tag", tag.Title)
+			return nil
 		},
 	)
 	if err != nil {
 		return err
 	}
 
+	var post master.Post
 	err = fs.WalkDir(
 		docs.Posts,
 		"posts",
@@ -71,11 +80,16 @@ func Run(
 				return nil
 			}
 			slog.Info("parsing post", "path", path)
-			parsed, err := data.Parse(path, false)
+			parsed, err := data.Parse(path, docs.Posts)
 			if err != nil {
 				return err
 			}
-			return parsed.UpsertPost(ctx, db, client)
+			slog.Info("upserting post", "post", parsed.Title)
+			post, err = parsed.UpsertPost(ctx, db, client)
+			if err != nil {
+				return err
+			}
+			return db.Queries.UpsertPostTags(ctx, parsed.Tags, post.ID)
 		},
 	)
 	if err != nil {
@@ -93,11 +107,17 @@ func Run(
 				return nil
 			}
 			slog.Info("parsing project", "path", path)
-			parsed, err := data.Parse(path, false)
+			parsed, err := data.Parse(path, docs.Projects)
 			if err != nil {
 				return err
 			}
-			return parsed.UpsertProject(ctx, db, client)
+			slog.Info("upserting project", "project", parsed.Title)
+			project, err := parsed.UpsertProject(ctx, db, client)
+			if err != nil {
+				return err
+			}
+			slog.Info("upserted project", "project", project, "project", project.Title)
+			return db.Queries.UpsertProjectTags(ctx, parsed.Tags, project.ID)
 		},
 	)
 	if err != nil {

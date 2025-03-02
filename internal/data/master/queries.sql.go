@@ -93,7 +93,7 @@ func (q *Queries) EmeddingUpdate(ctx context.Context, embedding string, iD int64
 	return err
 }
 
-const postCreate = `-- name: PostCreate :exec
+const postCreate = `-- name: PostCreate :one
 INSERT INTO
     posts (
         title,
@@ -105,7 +105,7 @@ INSERT INTO
         embedding_id
     )
 VALUES
-    (?, ?, ?, ?, ?, ?, ?)
+    (?, ?, ?, ?, ?, ?, ?) RETURNING id, title, slug, description, content, raw_content, banner_url, created_at, updated_at, embedding_id
 `
 
 type PostCreateParams struct {
@@ -131,9 +131,9 @@ type PostCreateParams struct {
 //	        embedding_id
 //	    )
 //	VALUES
-//	    (?, ?, ?, ?, ?, ?, ?)
-func (q *Queries) PostCreate(ctx context.Context, arg PostCreateParams) error {
-	_, err := q.db.ExecContext(ctx, postCreate,
+//	    (?, ?, ?, ?, ?, ?, ?) RETURNING id, title, slug, description, content, raw_content, banner_url, created_at, updated_at, embedding_id
+func (q *Queries) PostCreate(ctx context.Context, arg PostCreateParams) (Post, error) {
+	row := q.db.QueryRowContext(ctx, postCreate,
 		arg.Title,
 		arg.Description,
 		arg.Slug,
@@ -142,7 +142,20 @@ func (q *Queries) PostCreate(ctx context.Context, arg PostCreateParams) error {
 		arg.BannerUrl,
 		arg.EmbeddingID,
 	)
-	return err
+	var i Post
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.Slug,
+		&i.Description,
+		&i.Content,
+		&i.RawContent,
+		&i.BannerUrl,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.EmbeddingID,
+	)
+	return i, err
 }
 
 const postGet = `-- name: PostGet :one
@@ -436,6 +449,32 @@ func (q *Queries) PostTagDelete(ctx context.Context, postID int64, tagID int64) 
 	return err
 }
 
+const postTagGet = `-- name: PostTagGet :one
+SELECT
+    post_id, tag_id
+FROM
+    post_tags
+WHERE
+    post_id = ?
+    AND tag_id = ?
+`
+
+// PostTagGet
+//
+//	SELECT
+//	    post_id, tag_id
+//	FROM
+//	    post_tags
+//	WHERE
+//	    post_id = ?
+//	    AND tag_id = ?
+func (q *Queries) PostTagGet(ctx context.Context, postID int64, tagID int64) (PostTag, error) {
+	row := q.db.QueryRowContext(ctx, postTagGet, postID, tagID)
+	var i PostTag
+	err := row.Scan(&i.PostID, &i.TagID)
+	return i, err
+}
+
 const postTagsGetByPostID = `-- name: PostTagsGetByPostID :many
 SELECT
     post_id, tag_id
@@ -516,7 +555,7 @@ func (q *Queries) PostTagsGetByTagID(ctx context.Context, tagID int64) ([]PostTa
 	return items, nil
 }
 
-const postUpdate = `-- name: PostUpdate :exec
+const postUpdate = `-- name: PostUpdate :one
 UPDATE
     posts
 SET
@@ -528,7 +567,7 @@ SET
     banner_url = ?,
     embedding_id = ?
 WHERE
-    id = ?
+    id = ? RETURNING id, title, slug, description, content, raw_content, banner_url, created_at, updated_at, embedding_id
 `
 
 type PostUpdateParams struct {
@@ -555,9 +594,9 @@ type PostUpdateParams struct {
 //	    banner_url = ?,
 //	    embedding_id = ?
 //	WHERE
-//	    id = ?
-func (q *Queries) PostUpdate(ctx context.Context, arg PostUpdateParams) error {
-	_, err := q.db.ExecContext(ctx, postUpdate,
+//	    id = ? RETURNING id, title, slug, description, content, raw_content, banner_url, created_at, updated_at, embedding_id
+func (q *Queries) PostUpdate(ctx context.Context, arg PostUpdateParams) (Post, error) {
+	row := q.db.QueryRowContext(ctx, postUpdate,
 		arg.Title,
 		arg.Description,
 		arg.Slug,
@@ -567,7 +606,20 @@ func (q *Queries) PostUpdate(ctx context.Context, arg PostUpdateParams) error {
 		arg.EmbeddingID,
 		arg.ID,
 	)
-	return err
+	var i Post
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.Slug,
+		&i.Description,
+		&i.Content,
+		&i.RawContent,
+		&i.BannerUrl,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.EmbeddingID,
+	)
+	return i, err
 }
 
 const postsList = `-- name: PostsList :many
@@ -735,7 +787,7 @@ func (q *Queries) PostsListByTag(ctx context.Context, tagID int64) ([]Post, erro
 	return items, nil
 }
 
-const projectCreate = `-- name: ProjectCreate :exec
+const projectCreate = `-- name: ProjectCreate :one
 INSERT INTO
     projects (
         title,
@@ -747,7 +799,7 @@ INSERT INTO
         embedding_id
     )
 VALUES
-    (?, ?, ?, ?, ?, ?, ?)
+    (?, ?, ?, ?, ?, ?, ?) RETURNING id, title, slug, description, content, raw_content, banner_url, created_at, updated_at, embedding_id
 `
 
 type ProjectCreateParams struct {
@@ -773,9 +825,9 @@ type ProjectCreateParams struct {
 //	        embedding_id
 //	    )
 //	VALUES
-//	    (?, ?, ?, ?, ?, ?, ?)
-func (q *Queries) ProjectCreate(ctx context.Context, arg ProjectCreateParams) error {
-	_, err := q.db.ExecContext(ctx, projectCreate,
+//	    (?, ?, ?, ?, ?, ?, ?) RETURNING id, title, slug, description, content, raw_content, banner_url, created_at, updated_at, embedding_id
+func (q *Queries) ProjectCreate(ctx context.Context, arg ProjectCreateParams) (Project, error) {
+	row := q.db.QueryRowContext(ctx, projectCreate,
 		arg.Title,
 		arg.Slug,
 		arg.Description,
@@ -784,7 +836,20 @@ func (q *Queries) ProjectCreate(ctx context.Context, arg ProjectCreateParams) er
 		arg.BannerUrl,
 		arg.EmbeddingID,
 	)
-	return err
+	var i Project
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.Slug,
+		&i.Description,
+		&i.Content,
+		&i.RawContent,
+		&i.BannerUrl,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.EmbeddingID,
+	)
+	return i, err
 }
 
 const projectGetByID = `-- name: ProjectGetByID :one
@@ -903,6 +968,48 @@ func (q *Queries) ProjectTagDelete(ctx context.Context, projectID int64, tagID i
 	return err
 }
 
+const projectTagsGet = `-- name: ProjectTagsGet :many
+SELECT
+    project_id, tag_id
+FROM
+    project_tags
+WHERE
+    project_id = ?
+    AND tag_id = ?
+`
+
+// ProjectTagsGet
+//
+//	SELECT
+//	    project_id, tag_id
+//	FROM
+//	    project_tags
+//	WHERE
+//	    project_id = ?
+//	    AND tag_id = ?
+func (q *Queries) ProjectTagsGet(ctx context.Context, projectID int64, tagID int64) ([]ProjectTag, error) {
+	rows, err := q.db.QueryContext(ctx, projectTagsGet, projectID, tagID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ProjectTag
+	for rows.Next() {
+		var i ProjectTag
+		if err := rows.Scan(&i.ProjectID, &i.TagID); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const projectTagsGetByProjectID = `-- name: ProjectTagsGetByProjectID :many
 SELECT
     project_id, tag_id
@@ -943,47 +1050,7 @@ func (q *Queries) ProjectTagsGetByProjectID(ctx context.Context, projectID int64
 	return items, nil
 }
 
-const projectTagsGetByTagID = `-- name: ProjectTagsGetByTagID :many
-SELECT
-    project_id, tag_id
-FROM
-    project_tags
-WHERE
-    tag_id = ?
-`
-
-// ProjectTagsGetByTagID
-//
-//	SELECT
-//	    project_id, tag_id
-//	FROM
-//	    project_tags
-//	WHERE
-//	    tag_id = ?
-func (q *Queries) ProjectTagsGetByTagID(ctx context.Context, tagID int64) ([]ProjectTag, error) {
-	rows, err := q.db.QueryContext(ctx, projectTagsGetByTagID, tagID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []ProjectTag
-	for rows.Next() {
-		var i ProjectTag
-		if err := rows.Scan(&i.ProjectID, &i.TagID); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const projectUpdate = `-- name: ProjectUpdate :exec
+const projectUpdate = `-- name: ProjectUpdate :one
 UPDATE
     projects
 SET
@@ -995,7 +1062,7 @@ SET
     banner_url = ?,
     embedding_id = ?
 WHERE
-    id = ?
+    id = ? RETURNING id, title, slug, description, content, raw_content, banner_url, created_at, updated_at, embedding_id
 `
 
 type ProjectUpdateParams struct {
@@ -1022,9 +1089,9 @@ type ProjectUpdateParams struct {
 //	    banner_url = ?,
 //	    embedding_id = ?
 //	WHERE
-//	    id = ?
-func (q *Queries) ProjectUpdate(ctx context.Context, arg ProjectUpdateParams) error {
-	_, err := q.db.ExecContext(ctx, projectUpdate,
+//	    id = ? RETURNING id, title, slug, description, content, raw_content, banner_url, created_at, updated_at, embedding_id
+func (q *Queries) ProjectUpdate(ctx context.Context, arg ProjectUpdateParams) (Project, error) {
+	row := q.db.QueryRowContext(ctx, projectUpdate,
 		arg.Title,
 		arg.Slug,
 		arg.Description,
@@ -1034,7 +1101,20 @@ func (q *Queries) ProjectUpdate(ctx context.Context, arg ProjectUpdateParams) er
 		arg.EmbeddingID,
 		arg.ID,
 	)
-	return err
+	var i Project
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.Slug,
+		&i.Description,
+		&i.Content,
+		&i.RawContent,
+		&i.BannerUrl,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.EmbeddingID,
+	)
+	return i, err
 }
 
 const projectsList = `-- name: ProjectsList :many
@@ -1202,11 +1282,11 @@ func (q *Queries) ProjectsListByTag(ctx context.Context, tagID int64) ([]Project
 	return items, nil
 }
 
-const tagCreate = `-- name: TagCreate :exec
+const tagCreate = `-- name: TagCreate :one
 INSERT INTO
     tags (title, description, slug, embedding_id)
 VALUES
-    (?, ?, ?, ?)
+    (?, ?, ?, ?) RETURNING id, title, slug, description, icon, created_at, updated_at, embedding_id
 `
 
 type TagCreateParams struct {
@@ -1221,15 +1301,26 @@ type TagCreateParams struct {
 //	INSERT INTO
 //	    tags (title, description, slug, embedding_id)
 //	VALUES
-//	    (?, ?, ?, ?)
-func (q *Queries) TagCreate(ctx context.Context, arg TagCreateParams) error {
-	_, err := q.db.ExecContext(ctx, tagCreate,
+//	    (?, ?, ?, ?) RETURNING id, title, slug, description, icon, created_at, updated_at, embedding_id
+func (q *Queries) TagCreate(ctx context.Context, arg TagCreateParams) (Tag, error) {
+	row := q.db.QueryRowContext(ctx, tagCreate,
 		arg.Title,
 		arg.Description,
 		arg.Slug,
 		arg.EmbeddingID,
 	)
-	return err
+	var i Tag
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.Slug,
+		&i.Description,
+		&i.Icon,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.EmbeddingID,
+	)
+	return i, err
 }
 
 const tagGetByID = `-- name: TagGetByID :one
@@ -1306,7 +1397,7 @@ func (q *Queries) TagGetBySlug(ctx context.Context, slug string) (Tag, error) {
 	return i, err
 }
 
-const tagUpdate = `-- name: TagUpdate :exec
+const tagUpdate = `-- name: TagUpdate :one
 UPDATE
     tags
 SET
@@ -1315,7 +1406,7 @@ SET
     slug = ?,
     embedding_id = ?
 WHERE
-    id = ?
+    id = ? RETURNING id, title, slug, description, icon, created_at, updated_at, embedding_id
 `
 
 type TagUpdateParams struct {
@@ -1336,16 +1427,27 @@ type TagUpdateParams struct {
 //	    slug = ?,
 //	    embedding_id = ?
 //	WHERE
-//	    id = ?
-func (q *Queries) TagUpdate(ctx context.Context, arg TagUpdateParams) error {
-	_, err := q.db.ExecContext(ctx, tagUpdate,
+//	    id = ? RETURNING id, title, slug, description, icon, created_at, updated_at, embedding_id
+func (q *Queries) TagUpdate(ctx context.Context, arg TagUpdateParams) (Tag, error) {
+	row := q.db.QueryRowContext(ctx, tagUpdate,
 		arg.Title,
 		arg.Description,
 		arg.Slug,
 		arg.EmbeddingID,
 		arg.ID,
 	)
-	return err
+	var i Tag
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.Slug,
+		&i.Description,
+		&i.Icon,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.EmbeddingID,
+	)
+	return i, err
 }
 
 const tagsListAlphabetical = `-- name: TagsListAlphabetical :many

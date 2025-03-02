@@ -67,6 +67,7 @@ in
       (pkgs.writeShellScriptBin "unit-tests" ''go test -v ./...'')
       (pkgs.writeShellScriptBin "lint" ''golangci-lint run'')
       (pkgs.writeShellScriptBin "build" ''nix build .#packages.x86_64-linux.conneroh'')
+      (pkgs.writeShellScriptBin "update" ''doppler run -- go run ./cmd/update'')
       (pkgs.writeShellScriptBin "generate-all" ''
         go generate $REPO_ROOT/... &
         templ generate $REPO_ROOT &

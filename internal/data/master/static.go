@@ -3,7 +3,9 @@ package master
 
 import (
 	"context"
+	"database/sql"
 	_ "embed"
+	"errors"
 )
 
 //go:generate sqlcquash combine
@@ -233,4 +235,56 @@ func (q *Queries) FullTagsSlugMapGet(
 		}
 	}
 	return &fullTags, nil
+}
+
+// UpsertProjectTags upserts the project tags for a project.
+func (q *Queries) UpsertProjectTags(
+	ctx context.Context,
+	tags []string, // slugs
+	id int64,
+) error {
+	for _, tag := range tags {
+		t, err := q.TagGetBySlug(ctx, tag)
+		if err != nil {
+			return err
+		}
+		_, err = q.ProjectTagsGet(ctx, id, t.ID)
+		if err == nil {
+			return nil
+		}
+		if !errors.Is(err, sql.ErrNoRows) {
+			return err
+		}
+		err = q.ProjectTagCreate(ctx, id, t.ID)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// UpsertPostTags upserts the post tags for a post.
+func (q *Queries) UpsertPostTags(
+	ctx context.Context,
+	tags []string, // slugs
+	id int64,
+) error {
+	for _, tag := range tags {
+		t, err := q.TagGetBySlug(ctx, tag)
+		if err != nil {
+			return err
+		}
+		_, err = q.PostTagGet(ctx, id, t.ID)
+		if err == nil {
+			return nil
+		}
+		if !errors.Is(err, sql.ErrNoRows) {
+			return err
+		}
+		err = q.PostTagCreate(ctx, id, t.ID)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

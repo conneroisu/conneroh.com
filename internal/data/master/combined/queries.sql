@@ -38,7 +38,7 @@ WHERE
 LIMIT
     1;
 
--- name: PostCreate :exec
+-- name: PostCreate :one
 INSERT INTO
     posts (
         title,
@@ -50,9 +50,9 @@ INSERT INTO
         embedding_id
     )
 VALUES
-    (?, ?, ?, ?, ?, ?, ?);
+    (?, ?, ?, ?, ?, ?, ?) RETURNING *;
 
--- name: PostUpdate :exec
+-- name: PostUpdate :one
 UPDATE
     posts
 SET
@@ -64,7 +64,7 @@ SET
     banner_url = ?,
     embedding_id = ?
 WHERE
-    id = ?;
+    id = ? RETURNING *;
 
 -- name: PostGetBySlug :one
 SELECT
@@ -175,6 +175,15 @@ WHERE
     post_id = ?
     AND tag_id = ?;
 
+-- name: PostTagGet :one
+SELECT
+    *
+FROM
+    post_tags
+WHERE
+    post_id = ?
+    AND tag_id = ?;
+
 -- name: ProjectGetByID :one
 SELECT
     *
@@ -203,7 +212,7 @@ FROM
 ORDER BY
     created_at DESC;
 
--- name: ProjectCreate :exec
+-- name: ProjectCreate :one
 INSERT INTO
     projects (
         title,
@@ -215,9 +224,9 @@ INSERT INTO
         embedding_id
     )
 VALUES
-    (?, ?, ?, ?, ?, ?, ?);
+    (?, ?, ?, ?, ?, ?, ?) RETURNING *;
 
--- name: ProjectUpdate :exec
+-- name: ProjectUpdate :one
 UPDATE
     projects
 SET
@@ -229,7 +238,7 @@ SET
     banner_url = ?,
     embedding_id = ?
 WHERE
-    id = ?;
+    id = ? RETURNING *;
 
 -- name: ProjectsListByTag :many
 SELECT
@@ -261,13 +270,14 @@ FROM
 WHERE
     project_id = ?;
 
--- name: ProjectTagsGetByTagID :many
+-- name: ProjectTagsGet :many
 SELECT
     *
 FROM
     project_tags
 WHERE
-    tag_id = ?;
+    project_id = ?
+    AND tag_id = ?;
 
 -- name: ProjectTagCreate :exec
 INSERT INTO
@@ -302,13 +312,13 @@ WHERE
 LIMIT
     1;
 
--- name: TagCreate :exec
+-- name: TagCreate :one
 INSERT INTO
     tags (title, description, slug, embedding_id)
 VALUES
-    (?, ?, ?, ?);
+    (?, ?, ?, ?) RETURNING *;
 
--- name: TagUpdate :exec
+-- name: TagUpdate :one
 UPDATE
     tags
 SET
@@ -317,7 +327,7 @@ SET
     slug = ?,
     embedding_id = ?
 WHERE
-    id = ?;
+    id = ? RETURNING *;
 
 -- name: TagsListAlphabetical :many
 SELECT

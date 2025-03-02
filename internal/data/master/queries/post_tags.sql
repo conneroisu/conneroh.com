@@ -26,3 +26,12 @@ DELETE FROM
 WHERE
     post_id = ?
     AND tag_id = ?;
+
+-- name: PostTagGet :one
+SELECT
+    *
+FROM
+    post_tags
+WHERE
+    post_id = ?
+    AND tag_id = ?;

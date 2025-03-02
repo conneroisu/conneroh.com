@@ -8,7 +8,7 @@ WHERE
 LIMIT
     1;
 
--- name: PostCreate :exec
+-- name: PostCreate :one
 INSERT INTO
     posts (
         title,
@@ -20,9 +20,9 @@ INSERT INTO
         embedding_id
     )
 VALUES
-    (?, ?, ?, ?, ?, ?, ?);
+    (?, ?, ?, ?, ?, ?, ?) RETURNING *;
 
--- name: PostUpdate :exec
+-- name: PostUpdate :one
 UPDATE
     posts
 SET
@@ -34,7 +34,7 @@ SET
     banner_url = ?,
     embedding_id = ?
 WHERE
-    id = ?;
+    id = ? RETURNING *;
 
 -- name: PostGetBySlug :one
 SELECT

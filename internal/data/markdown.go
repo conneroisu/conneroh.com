@@ -4,11 +4,15 @@ import (
 	"bytes"
 	"context"
 	"database/sql"
+	"embed"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"os"
+	"log/slog"
+	"path/filepath"
+	"strings"
 
+	"github.com/conneroisu/conneroh.com/internal/data/docs"
 	"github.com/conneroisu/conneroh.com/internal/data/master"
 	mathjax "github.com/litao91/goldmark-mathjax"
 	"github.com/ollama/ollama/api"
@@ -102,8 +106,8 @@ type Markdown struct {
 }
 
 // Parse parses the markdown file at the given path.
-func Parse(path string, tag bool) (*Markdown, error) {
-	b, err := os.ReadFile(path)
+func Parse(fsPath string, embedFs embed.FS) (*Markdown, error) {
+	b, err := embedFs.ReadFile(fsPath)
 	if err != nil {
 		return nil, err
 	}
@@ -122,10 +126,20 @@ func Parse(path string, tag bool) (*Markdown, error) {
 	if err != nil {
 		return nil, err
 	}
+	switch embedFs {
+	case docs.Posts:
+		fsPath = strings.Replace(fsPath, "posts/", "", 1)
+	case docs.Tags:
+		fsPath = strings.Replace(fsPath, "tags/", "", 1)
+	case docs.Projects:
+		fsPath = strings.Replace(fsPath, "projects/", "", 1)
+	}
+	fsPath = strings.TrimSuffix(fsPath, filepath.Ext(fsPath))
+	fm.Slug = fsPath
 	fm.RenderContent = buf.String()
 	if fm.Description == "" {
-		if !tag {
-			return nil, fmt.Errorf("description is empty for %s", path)
+		if embedFs != docs.Tags {
+			return nil, fmt.Errorf("description is empty for %s", fsPath)
 		}
 		// It is a tag page.
 		fm.Description = fm.RawContent
@@ -133,23 +147,6 @@ func Parse(path string, tag bool) (*Markdown, error) {
 	fm.RawContent = string(b)
 
 	return &fm, nil
-}
-
-func (md *Markdown) assertTags(
-	ctx context.Context,
-	db *Database[master.Queries],
-) error {
-	for _, tag := range md.Tags {
-		_, err := db.Queries.TagGetBySlug(ctx, tag)
-		if err == nil || errors.Is(err, sql.ErrNoRows) {
-			return fmt.Errorf(
-				"failed to find referenced tag %s: %w",
-				tag,
-				err,
-			)
-		}
-	}
-	return nil
 }
 
 // UpsertEmbedding inserts or updates the embedding document in the database.
@@ -160,6 +157,8 @@ func UpsertEmbedding(
 	content string,
 	existingID int64,
 ) (int64, error) {
+	slog.Info("Upserting embedding", "existingID", existingID)
+	defer slog.Info("Upserted embedding", "existingID", existingID)
 	embed, err := client.Embeddings(ctx, &api.EmbeddingRequest{
 		Model:  "granite-embedding:278m",
 		Prompt: content,
@@ -192,10 +191,12 @@ func (md *Markdown) UpsertTag(
 	ctx context.Context,
 	db *Database[master.Queries],
 	client *api.Client,
-) error {
+) (tag master.Tag, err error) {
+	slog.Info("upserting tag", "slug", md.Slug)
 	var id int64
-	tag, err := db.Queries.TagGetBySlug(ctx, md.Slug)
+	tag, err = db.Queries.TagGetBySlug(ctx, md.Slug)
 	if err == nil {
+		slog.Debug("tag already exists - updating", "slug", md.Slug)
 		if tag.Description == md.RawContent {
 			return db.Queries.TagUpdate(
 				ctx,
@@ -216,7 +217,7 @@ func (md *Markdown) UpsertTag(
 			tag.EmbeddingID,
 		)
 		if err != nil {
-			return err
+			return
 		}
 		// updated embedding
 		return db.Queries.TagUpdate(
@@ -232,9 +233,10 @@ func (md *Markdown) UpsertTag(
 	}
 	// err is not nil (new tag)
 	if errors.Is(err, sql.ErrNoRows) {
+		slog.Debug("tag does not exist - creating", "slug", md.Slug)
 		id, err = UpsertEmbedding(ctx, db, client, md.RawContent, 0)
 		if err != nil {
-			return err
+			return master.Tag{}, err
 		}
 		return db.Queries.TagCreate(ctx, master.TagCreateParams{
 			Slug:        md.Slug,
@@ -243,7 +245,7 @@ func (md *Markdown) UpsertTag(
 			EmbeddingID: id,
 		})
 	}
-	return err
+	return
 }
 
 // UpsertPost inserts or updates the post document in the database.
@@ -251,14 +253,11 @@ func (md *Markdown) UpsertPost(
 	ctx context.Context,
 	db *Database[master.Queries],
 	client *api.Client,
-) error {
+) (post master.Post, err error) {
+	slog.Info("upserting post", "slug", md.Slug)
 	var id int64
-	err := md.assertTags(ctx, db)
-	if err != nil {
-		return err
-	}
 	// check if the post already exists
-	post, err := db.Queries.PostGetBySlug(ctx, md.Slug)
+	post, err = db.Queries.PostGetBySlug(ctx, md.Slug)
 	if err == nil {
 		// same content
 		if post.RawContent == string(md.RawContent) {
@@ -284,7 +283,7 @@ func (md *Markdown) UpsertPost(
 			post.EmbeddingID,
 		)
 		if err != nil {
-			return err
+			return
 		}
 		return db.Queries.PostUpdate(
 			ctx,
@@ -304,7 +303,7 @@ func (md *Markdown) UpsertPost(
 	if errors.Is(err, sql.ErrNoRows) {
 		id, err = UpsertEmbedding(ctx, db, client, md.RawContent, 0)
 		if err != nil {
-			return err
+			return
 		}
 		return db.Queries.PostCreate(ctx, master.PostCreateParams{
 			Slug:        md.Slug,
@@ -316,7 +315,7 @@ func (md *Markdown) UpsertPost(
 			EmbeddingID: id,
 		})
 	}
-	return err
+	return
 }
 
 // UpsertProject inserts or updates a project in the database.
@@ -324,13 +323,13 @@ func (md *Markdown) UpsertProject(
 	ctx context.Context,
 	db *Database[master.Queries],
 	client *api.Client,
-) error {
+) (project master.Project, err error) {
+	slog.Info("upserting project", "slug", md.Slug)
 	var id int64
-	err := md.assertTags(ctx, db)
-	if err != nil {
-		return err
+	if md.Title == "" {
+		return master.Project{}, errors.New("title is empty")
 	}
-	project, err := db.Queries.ProjectGetBySlug(ctx, md.Slug)
+	project, err = db.Queries.ProjectGetBySlug(ctx, md.Slug)
 	if err == nil {
 		// project already exists with the same content, update metadata
 		if project.Content == md.RawContent {
@@ -357,7 +356,7 @@ func (md *Markdown) UpsertProject(
 			project.EmbeddingID,
 		)
 		if err != nil {
-			return err
+			return
 		}
 		return db.Queries.ProjectUpdate(ctx, master.ProjectUpdateParams{
 			ID:          project.ID,
@@ -379,10 +378,9 @@ func (md *Markdown) UpsertProject(
 			0,
 		)
 		if err != nil {
-			return err
+			return
 		}
-		return db.Queries.ProjectUpdate(ctx, master.ProjectUpdateParams{
-			ID:          project.ID,
+		return db.Queries.ProjectCreate(ctx, master.ProjectCreateParams{
 			Slug:        md.Slug,
 			Title:       md.Title,
 			BannerUrl:   md.BannerURL,
@@ -391,5 +389,6 @@ func (md *Markdown) UpsertProject(
 			EmbeddingID: id,
 		})
 	}
-	return nil
+	slog.Error("project update failed", "err", err)
+	return
 }

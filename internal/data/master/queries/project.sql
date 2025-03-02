@@ -26,7 +26,7 @@ FROM
 ORDER BY
     created_at DESC;
 
--- name: ProjectCreate :exec
+-- name: ProjectCreate :one
 INSERT INTO
     projects (
         title,
@@ -38,9 +38,9 @@ INSERT INTO
         embedding_id
     )
 VALUES
-    (?, ?, ?, ?, ?, ?, ?);
+    (?, ?, ?, ?, ?, ?, ?) RETURNING *;
 
--- name: ProjectUpdate :exec
+-- name: ProjectUpdate :one
 UPDATE
     projects
 SET
@@ -52,7 +52,7 @@ SET
     banner_url = ?,
     embedding_id = ?
 WHERE
-    id = ?;
+    id = ? RETURNING *;
 
 -- name: ProjectsListByTag :many
 SELECT
