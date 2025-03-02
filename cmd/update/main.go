@@ -1,7 +1,9 @@
+// Package main updates the database with new vault content.
 package main
 
 import (
 	"context"
+	"fmt"
 	"io/fs"
 	"log/slog"
 	"os"
@@ -17,14 +19,17 @@ func main() {
 	ctx := context.Background()
 	err := Run(ctx, os.Getenv)
 	if err != nil {
-		slog.Error("failed to run update", "err", err)
+		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 }
 
 // Run parses all markdown files in the database.
-func Run(ctx context.Context, getenv func(string) string) error {
-	db, err := conneroh.NewDb(os.Getenv)
+func Run(
+	ctx context.Context,
+	getenv func(string) string,
+) error {
+	db, err := conneroh.NewDb(getenv)
 	if err != nil {
 		return err
 	}
