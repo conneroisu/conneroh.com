@@ -157,8 +157,8 @@ func UpsertEmbedding(
 	content string,
 	existingID int64,
 ) (int64, error) {
-	slog.Info("Upserting embedding", "existingID", existingID)
-	defer slog.Info("Upserted embedding", "existingID", existingID)
+	slog.Info("upserting embedding", "existingID", existingID)
+	defer slog.Info("upserted embedding", "existingID", existingID)
 	embed, err := client.Embeddings(ctx, &api.EmbeddingRequest{
 		Model:  "granite-embedding:278m",
 		Prompt: content,
@@ -193,6 +193,7 @@ func (md *Markdown) UpsertTag(
 	client *api.Client,
 ) (tag master.Tag, err error) {
 	slog.Info("upserting tag", "slug", md.Slug)
+	defer slog.Info("upserted tag", "slug", md.Slug)
 	var id int64
 	tag, err = db.Queries.TagGetBySlug(ctx, md.Slug)
 	if err == nil {
@@ -255,6 +256,7 @@ func (md *Markdown) UpsertPost(
 	client *api.Client,
 ) (post master.Post, err error) {
 	slog.Info("upserting post", "slug", md.Slug)
+	defer slog.Info("upserted post", "slug", md.Slug)
 	var id int64
 	// check if the post already exists
 	post, err = db.Queries.PostGetBySlug(ctx, md.Slug)
@@ -325,6 +327,7 @@ func (md *Markdown) UpsertProject(
 	client *api.Client,
 ) (project master.Project, err error) {
 	slog.Info("upserting project", "slug", md.Slug)
+	defer slog.Info("upserted project", "slug", md.Slug)
 	var id int64
 	if md.Title == "" {
 		return master.Project{}, errors.New("title is empty")

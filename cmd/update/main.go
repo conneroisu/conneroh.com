@@ -49,18 +49,16 @@ func Run(
 			if d.IsDir() || !strings.HasSuffix(path, ".md") {
 				return nil
 			}
-			slog.Info("parsing tag", "path", path)
 			parsed, err := data.Parse(path, docs.Tags)
 			if err != nil {
 				slog.Error("failed to parse tag", "path", path, "err", err)
 				return err
 			}
-			slog.Info("upserting tag", "tag", parsed.Title)
 			tag, err := parsed.UpsertTag(ctx, db, client)
 			if err != nil {
 				return err
 			}
-			slog.Info("upserted tag", "tag", tag, "tag", tag.Title)
+			slog.Info("upserted tag", "tag", tag.Title)
 			return nil
 		},
 	)
@@ -79,12 +77,10 @@ func Run(
 			if d.IsDir() || !strings.HasSuffix(path, ".md") {
 				return nil
 			}
-			slog.Info("parsing post", "path", path)
 			parsed, err := data.Parse(path, docs.Posts)
 			if err != nil {
 				return err
 			}
-			slog.Info("upserting post", "post", parsed.Title)
 			post, err = parsed.UpsertPost(ctx, db, client)
 			if err != nil {
 				return err
@@ -106,17 +102,14 @@ func Run(
 			if d.IsDir() || !strings.HasSuffix(path, ".md") {
 				return nil
 			}
-			slog.Info("parsing project", "path", path)
 			parsed, err := data.Parse(path, docs.Projects)
 			if err != nil {
 				return err
 			}
-			slog.Info("upserting project", "project", parsed.Title)
 			project, err := parsed.UpsertProject(ctx, db, client)
 			if err != nil {
 				return err
 			}
-			slog.Info("upserted project", "project", project, "project", project.Title)
 			return db.Queries.UpsertProjectTags(ctx, parsed.Tags, project.ID)
 		},
 	)
