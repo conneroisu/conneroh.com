@@ -50,22 +50,31 @@ func NewServer(
 	return handler
 }
 
+// NewDb creates a new database connection.
+func NewDb(getenv func(string) string) (*data.Database[master.Queries], error) {
+	tursoURI := getenv("TURSO_URI")
+	if tursoURI == "" {
+		return nil, fmt.Errorf("TURSO_URI is not set")
+	}
+	tursoToken := getenv("TURSO_TOKEN")
+	if tursoToken == "" {
+		return nil, fmt.Errorf("TURSO_TOKEN is not set")
+	}
+	dbURI := tursoURI + "?authToken=" + tursoToken
+
+	return data.NewDb(master.New, dbURI)
+}
+
 // Run is the entry point for the application.
 func Run(
 	ctx context.Context,
 	getenv func(string) string,
 ) error {
 
-	tursoURI := getenv("TURSO_URI")
-	if tursoURI == "" {
-		return fmt.Errorf("TURSO_URI is not set")
+	db, err := NewDb(getenv)
+	if err != nil {
+		return err
 	}
-	tursoToken := getenv("TURSO_TOKEN")
-	if tursoToken == "" {
-		return fmt.Errorf("TURSO_TOKEN is not set")
-	}
-	dbURI := tursoURI + "?authToken=" + tursoToken
-
 	innerCtx, stop := signal.NotifyContext(ctx, os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
@@ -73,11 +82,6 @@ func Run(
 		httpServer *http.Server
 		wg         sync.WaitGroup
 	)
-
-	db, err := data.NewDb(master.New, dbURI)
-	if err != nil {
-		return err
-	}
 
 	// Configure server with timeouts
 	httpServer = &http.Server{

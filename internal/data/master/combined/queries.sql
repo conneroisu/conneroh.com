@@ -44,11 +44,19 @@ INSERT INTO
 VALUES
     (?, ?, ?, ?, ?, ?, ?) RETURNING *;
 
--- name: PostDeleteBySlug :exec
-DELETE FROM
+-- name: PostUpdate :exec
+UPDATE
     posts
+SET
+    title = ?,
+    description = ?,
+    slug = ?,
+    content = ?,
+    raw_content = ?,
+    banner_url = ?,
+    embedding_id = ?
 WHERE
-    slug = ?;
+    id = ?;
 
 -- name: PostGetBySlug :one
 SELECT
@@ -78,25 +86,6 @@ WHERE
     pt.tag_id = ?
 ORDER BY
     p.created_at DESC;
-
--- name: PostUpdate :one
-UPDATE
-    posts
-SET
-    title = ?,
-    description = ?,
-    slug = ?,
-    content = ?,
-    raw_content = ?,
-    banner_url = ?
-WHERE
-    id = ? RETURNING *;
-
--- name: PostDeleteByID :exec
-DELETE FROM
-    posts
-WHERE
-    id = ?;
 
 -- name: PostProjectListByPost :many
 SELECT
@@ -220,17 +209,6 @@ INSERT INTO
 VALUES
     (?, ?, ?, ?, ?, ?, ?) RETURNING *;
 
--- name: ProjectsListByTag :many
-SELECT
-    p.*
-FROM
-    projects p
-    JOIN project_tags pt ON p.id = pt.project_id
-WHERE
-    pt.tag_id = ?
-ORDER BY
-    p.created_at DESC;
-
 -- name: ProjectUpdate :one
 UPDATE
     projects
@@ -243,6 +221,17 @@ SET
     banner_url = ?
 WHERE
     id = ? RETURNING *;
+
+-- name: ProjectsListByTag :many
+SELECT
+    p.*
+FROM
+    projects p
+    JOIN project_tags pt ON p.id = pt.project_id
+WHERE
+    pt.tag_id = ?
+ORDER BY
+    p.created_at DESC;
 
 -- name: ProjectsListByPost :many
 SELECT

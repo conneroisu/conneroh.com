@@ -22,11 +22,19 @@ INSERT INTO
 VALUES
     (?, ?, ?, ?, ?, ?, ?) RETURNING *;
 
--- name: PostDeleteBySlug :exec
-DELETE FROM
+-- name: PostUpdate :exec
+UPDATE
     posts
+SET
+    title = ?,
+    description = ?,
+    slug = ?,
+    content = ?,
+    raw_content = ?,
+    banner_url = ?,
+    embedding_id = ?
 WHERE
-    slug = ?;
+    id = ?;
 
 -- name: PostGetBySlug :one
 SELECT
@@ -56,25 +64,6 @@ WHERE
     pt.tag_id = ?
 ORDER BY
     p.created_at DESC;
-
--- name: PostUpdate :one
-UPDATE
-    posts
-SET
-    title = ?,
-    description = ?,
-    slug = ?,
-    content = ?,
-    raw_content = ?,
-    banner_url = ?
-WHERE
-    id = ? RETURNING *;
-
--- name: PostDeleteByID :exec
-DELETE FROM
-    posts
-WHERE
-    id = ?;
 
 -- name: PostProjectListByPost :many
 SELECT

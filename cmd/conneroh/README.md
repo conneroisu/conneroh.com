@@ -21,6 +21,7 @@ Package conneroh provides implementations for conneroh.
 - [func Home\(ctx context.Context, db \*data.Database\[master.Queries\], fullPosts \*\[\]master.FullPost, fullProjects \*\[\]master.FullProject, fullTags \*\[\]master.FullTag, fullPostsSlugMap \*map\[string\]master.FullPost, fullProjectsSlugMap \*map\[string\]master.FullProject, fullTagsSlugMap \*map\[string\]master.FullTag\) \(routing.APIFn, error\)](<#Home>)
 - [func Morph\(ctx context.Context, db \*data.Database\[master.Queries\], fullPosts \*\[\]master.FullPost, fullProjects \*\[\]master.FullProject, fullTags \*\[\]master.FullTag, fullPostSlugMap \*map\[string\]master.FullPost, fullProjectSlugMap \*map\[string\]master.FullProject, fullTagSlugMap \*map\[string\]master.FullTag\) \(routing.APIFn, error\)](<#Morph>)
 - [func Morphs\(\_ context.Context, \_ \*data.Database\[master.Queries\], fullPosts \*\[\]master.FullPost, fullProjects \*\[\]master.FullProject, fullTags \*\[\]master.FullTag, fullPostSlugMap \*map\[string\]master.FullPost, fullProjectSlugMap \*map\[string\]master.FullProject, fullTagSlugMap \*map\[string\]master.FullTag\) \(routing.APIFn, error\)](<#Morphs>)
+- [func NewDb\(getenv func\(string\) string\) \(\*data.Database\[master.Queries\], error\)](<#NewDb>)
 - [func NewServer\(ctx context.Context, db \*data.Database\[master.Queries\]\) http.Handler](<#NewServer>)
 - [func Post\(\_ context.Context, \_ \*data.Database\[master.Queries\], fullPosts \*\[\]master.FullPost, fullProjects \*\[\]master.FullProject, fullTags \*\[\]master.FullTag, fullPostSlugMap \*map\[string\]master.FullPost, fullProjectSlugMap \*map\[string\]master.FullProject, fullTagSlugMap \*map\[string\]master.FullTag\) \(routing.APIFn, error\)](<#Post>)
 - [func Posts\(\_ context.Context, \_ \*data.Database\[master.Queries\], fullPosts \*\[\]master.FullPost, fullProjects \*\[\]master.FullProject, fullTags \*\[\]master.FullTag, fullPostSlugMap \*map\[string\]master.FullPost, fullProjectSlugMap \*map\[string\]master.FullProject, fullTagSlugMap \*map\[string\]master.FullTag\) \(routing.APIFn, error\)](<#Posts>)
@@ -105,6 +106,15 @@ func Morphs(_ context.Context, _ *data.Database[master.Queries], fullPosts *[]ma
 
 Morphs renders a morphed view.
 
+<a name="NewDb"></a>
+## func [NewDb](<https://github.com/conneroisu/conneroh/blob/main/cmd/conneroh/root.go#L54>)
+
+```go
+func NewDb(getenv func(string) string) (*data.Database[master.Queries], error)
+```
+
+NewDb creates a new database connection.
+
 <a name="NewServer"></a>
 ## func [NewServer](<https://github.com/conneroisu/conneroh/blob/main/cmd/conneroh/root.go#L31-L34>)
 
@@ -151,7 +161,7 @@ func Projects(ctx context.Context, db *data.Database[master.Queries], fullPosts 
 Projects is the projects handler.
 
 <a name="Run"></a>
-## func [Run](<https://github.com/conneroisu/conneroh/blob/main/cmd/conneroh/root.go#L54-L57>)
+## func [Run](<https://github.com/conneroisu/conneroh/blob/main/cmd/conneroh/root.go#L69-L72>)
 
 ```go
 func Run(ctx context.Context, getenv func(string) string) error

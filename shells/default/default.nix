@@ -67,20 +67,6 @@ in
       (pkgs.writeShellScriptBin "unit-tests" ''go test -v ./...'')
       (pkgs.writeShellScriptBin "lint" ''golangci-lint run'')
       (pkgs.writeShellScriptBin "build" ''nix build .#packages.x86_64-linux.conneroh'')
-      (pkgs.writeShellScriptBin "generate-reload" ''
-        bun build \
-         $REPO_ROOT/index.js \
-         --minify \
-         --minify-syntax \
-         --minify-whitespace  \
-         --minify-identifiers \
-         --outdir $REPO_ROOT/cmd/conneroh/_static/dist/
-        tailwindcss \
-         --minify \
-         -i $REPO_ROOT/input.css \
-         -o $REPO_ROOT/cmd/conneroh/_static/dist/style.css \
-         --cwd $REPO_ROOT
-      '')
       (pkgs.writeShellScriptBin "generate-all" ''
         go generate $REPO_ROOT/... &
         templ generate $REPO_ROOT &

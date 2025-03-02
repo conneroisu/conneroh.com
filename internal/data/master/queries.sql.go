@@ -136,42 +136,6 @@ func (q *Queries) PostCreate(ctx context.Context, arg PostCreateParams) (Post, e
 	return i, err
 }
 
-const postDeleteByID = `-- name: PostDeleteByID :exec
-DELETE FROM
-    posts
-WHERE
-    id = ?
-`
-
-// PostDeleteByID
-//
-//	DELETE FROM
-//	    posts
-//	WHERE
-//	    id = ?
-func (q *Queries) PostDeleteByID(ctx context.Context, id int64) error {
-	_, err := q.db.ExecContext(ctx, postDeleteByID, id)
-	return err
-}
-
-const postDeleteBySlug = `-- name: PostDeleteBySlug :exec
-DELETE FROM
-    posts
-WHERE
-    slug = ?
-`
-
-// PostDeleteBySlug
-//
-//	DELETE FROM
-//	    posts
-//	WHERE
-//	    slug = ?
-func (q *Queries) PostDeleteBySlug(ctx context.Context, slug string) error {
-	_, err := q.db.ExecContext(ctx, postDeleteBySlug, slug)
-	return err
-}
-
 const postGet = `-- name: PostGet :one
 SELECT
     id, title, description, slug, content, raw_content, banner_url, created_at, updated_at, embedding_id
@@ -543,7 +507,7 @@ func (q *Queries) PostTagsGetByTagID(ctx context.Context, tagID int64) ([]PostTa
 	return items, nil
 }
 
-const postUpdate = `-- name: PostUpdate :one
+const postUpdate = `-- name: PostUpdate :exec
 UPDATE
     posts
 SET
@@ -552,9 +516,10 @@ SET
     slug = ?,
     content = ?,
     raw_content = ?,
-    banner_url = ?
+    banner_url = ?,
+    embedding_id = ?
 WHERE
-    id = ? RETURNING id, title, description, slug, content, raw_content, banner_url, created_at, updated_at, embedding_id
+    id = ?
 `
 
 type PostUpdateParams struct {
@@ -564,6 +529,7 @@ type PostUpdateParams struct {
 	Content     string `db:"content" json:"content"`
 	RawContent  string `db:"raw_content" json:"raw_content"`
 	BannerUrl   string `db:"banner_url" json:"banner_url"`
+	EmbeddingID int64  `db:"embedding_id" json:"embedding_id"`
 	ID          int64  `db:"id" json:"id"`
 }
 
@@ -577,33 +543,22 @@ type PostUpdateParams struct {
 //	    slug = ?,
 //	    content = ?,
 //	    raw_content = ?,
-//	    banner_url = ?
+//	    banner_url = ?,
+//	    embedding_id = ?
 //	WHERE
-//	    id = ? RETURNING id, title, description, slug, content, raw_content, banner_url, created_at, updated_at, embedding_id
-func (q *Queries) PostUpdate(ctx context.Context, arg PostUpdateParams) (Post, error) {
-	row := q.db.QueryRowContext(ctx, postUpdate,
+//	    id = ?
+func (q *Queries) PostUpdate(ctx context.Context, arg PostUpdateParams) error {
+	_, err := q.db.ExecContext(ctx, postUpdate,
 		arg.Title,
 		arg.Description,
 		arg.Slug,
 		arg.Content,
 		arg.RawContent,
 		arg.BannerUrl,
+		arg.EmbeddingID,
 		arg.ID,
 	)
-	var i Post
-	err := row.Scan(
-		&i.ID,
-		&i.Title,
-		&i.Description,
-		&i.Slug,
-		&i.Content,
-		&i.RawContent,
-		&i.BannerUrl,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-		&i.EmbeddingID,
-	)
-	return i, err
+	return err
 }
 
 const postsList = `-- name: PostsList :many

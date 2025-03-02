@@ -40,17 +40,6 @@ INSERT INTO
 VALUES
     (?, ?, ?, ?, ?, ?, ?) RETURNING *;
 
--- name: ProjectsListByTag :many
-SELECT
-    p.*
-FROM
-    projects p
-    JOIN project_tags pt ON p.id = pt.project_id
-WHERE
-    pt.tag_id = ?
-ORDER BY
-    p.created_at DESC;
-
 -- name: ProjectUpdate :one
 UPDATE
     projects
@@ -63,6 +52,17 @@ SET
     banner_url = ?
 WHERE
     id = ? RETURNING *;
+
+-- name: ProjectsListByTag :many
+SELECT
+    p.*
+FROM
+    projects p
+    JOIN project_tags pt ON p.id = pt.project_id
+WHERE
+    pt.tag_id = ?
+ORDER BY
+    p.created_at DESC;
 
 -- name: ProjectsListByPost :many
 SELECT

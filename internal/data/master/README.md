@@ -44,8 +44,6 @@ Package master contains the master schema for the database.
   - [func \(q \*Queries\) FullTagsList\(ctx context.Context\) \(\*\[\]FullTag, error\)](<#Queries.FullTagsList>)
   - [func \(q \*Queries\) FullTagsSlugMapGet\(ctx context.Context\) \(\*map\[string\]FullTag, error\)](<#Queries.FullTagsSlugMapGet>)
   - [func \(q \*Queries\) PostCreate\(ctx context.Context, arg PostCreateParams\) \(Post, error\)](<#Queries.PostCreate>)
-  - [func \(q \*Queries\) PostDeleteByID\(ctx context.Context, id int64\) error](<#Queries.PostDeleteByID>)
-  - [func \(q \*Queries\) PostDeleteBySlug\(ctx context.Context, slug string\) error](<#Queries.PostDeleteBySlug>)
   - [func \(q \*Queries\) PostGet\(ctx context.Context, id int64\) \(Post, error\)](<#Queries.PostGet>)
   - [func \(q \*Queries\) PostGetBySlug\(ctx context.Context, slug string\) \(Post, error\)](<#Queries.PostGetBySlug>)
   - [func \(q \*Queries\) PostProjectCreate\(ctx context.Context, postID int64, projectID int64\) error](<#Queries.PostProjectCreate>)
@@ -57,7 +55,7 @@ Package master contains the master schema for the database.
   - [func \(q \*Queries\) PostTagDelete\(ctx context.Context, postID int64, tagID int64\) error](<#Queries.PostTagDelete>)
   - [func \(q \*Queries\) PostTagsGetByPostID\(ctx context.Context, postID int64\) \(\[\]PostTag, error\)](<#Queries.PostTagsGetByPostID>)
   - [func \(q \*Queries\) PostTagsGetByTagID\(ctx context.Context, tagID int64\) \(\[\]PostTag, error\)](<#Queries.PostTagsGetByTagID>)
-  - [func \(q \*Queries\) PostUpdate\(ctx context.Context, arg PostUpdateParams\) \(Post, error\)](<#Queries.PostUpdate>)
+  - [func \(q \*Queries\) PostUpdate\(ctx context.Context, arg PostUpdateParams\) error](<#Queries.PostUpdate>)
   - [func \(q \*Queries\) PostsList\(ctx context.Context\) \(\[\]Post, error\)](<#Queries.PostsList>)
   - [func \(q \*Queries\) PostsListByProject\(ctx context.Context, projectID int64\) \(\[\]Post, error\)](<#Queries.PostsListByProject>)
   - [func \(q \*Queries\) PostsListByTag\(ctx context.Context, tagID int64\) \(\[\]Post, error\)](<#Queries.PostsListByTag>)
@@ -227,7 +225,7 @@ type PostTag struct {
 ```
 
 <a name="PostUpdateParams"></a>
-## type [PostUpdateParams](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L560-L568>)
+## type [PostUpdateParams](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L525-L534>)
 
 
 
@@ -239,6 +237,7 @@ type PostUpdateParams struct {
     Content     string `db:"content" json:"content"`
     RawContent  string `db:"raw_content" json:"raw_content"`
     BannerUrl   string `db:"banner_url" json:"banner_url"`
+    EmbeddingID int64  `db:"embedding_id" json:"embedding_id"`
     ID          int64  `db:"id" json:"id"`
 }
 ```
@@ -264,7 +263,7 @@ type Project struct {
 ```
 
 <a name="ProjectCreateParams"></a>
-## type [ProjectCreateParams](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L789-L797>)
+## type [ProjectCreateParams](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L744-L752>)
 
 
 
@@ -305,7 +304,7 @@ type ProjectTag struct {
 ```
 
 <a name="ProjectUpdateParams"></a>
-## type [ProjectUpdateParams](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1167-L1175>)
+## type [ProjectUpdateParams](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1122-L1130>)
 
 
 
@@ -485,40 +484,8 @@ VALUES
     (?, ?, ?, ?, ?, ?, ?) RETURNING id, title, description, slug, content, raw_content, banner_url, created_at, updated_at, embedding_id
 ```
 
-<a name="Queries.PostDeleteByID"></a>
-### func \(\*Queries\) [PostDeleteByID](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L152>)
-
-```go
-func (q *Queries) PostDeleteByID(ctx context.Context, id int64) error
-```
-
-PostDeleteByID
-
-```
-DELETE FROM
-    posts
-WHERE
-    id = ?
-```
-
-<a name="Queries.PostDeleteBySlug"></a>
-### func \(\*Queries\) [PostDeleteBySlug](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L170>)
-
-```go
-func (q *Queries) PostDeleteBySlug(ctx context.Context, slug string) error
-```
-
-PostDeleteBySlug
-
-```
-DELETE FROM
-    posts
-WHERE
-    slug = ?
-```
-
 <a name="Queries.PostGet"></a>
-### func \(\*Queries\) [PostGet](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L196>)
+### func \(\*Queries\) [PostGet](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L160>)
 
 ```go
 func (q *Queries) PostGet(ctx context.Context, id int64) (Post, error)
@@ -538,7 +505,7 @@ LIMIT
 ```
 
 <a name="Queries.PostGetBySlug"></a>
-### func \(\*Queries\) [PostGetBySlug](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L235>)
+### func \(\*Queries\) [PostGetBySlug](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L199>)
 
 ```go
 func (q *Queries) PostGetBySlug(ctx context.Context, slug string) (Post, error)
@@ -558,7 +525,7 @@ LIMIT
 ```
 
 <a name="Queries.PostProjectCreate"></a>
-### func \(\*Queries\) [PostProjectCreate](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L266>)
+### func \(\*Queries\) [PostProjectCreate](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L230>)
 
 ```go
 func (q *Queries) PostProjectCreate(ctx context.Context, postID int64, projectID int64) error
@@ -574,7 +541,7 @@ VALUES
 ```
 
 <a name="Queries.PostProjectDelete"></a>
-### func \(\*Queries\) [PostProjectDelete](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L286>)
+### func \(\*Queries\) [PostProjectDelete](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L250>)
 
 ```go
 func (q *Queries) PostProjectDelete(ctx context.Context, postID int64, projectID int64) error
@@ -591,7 +558,7 @@ WHERE
 ```
 
 <a name="Queries.PostProjectListByPost"></a>
-### func \(\*Queries\) [PostProjectListByPost](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L314>)
+### func \(\*Queries\) [PostProjectListByPost](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L278>)
 
 ```go
 func (q *Queries) PostProjectListByPost(ctx context.Context, postID int64) ([]Project, error)
@@ -612,7 +579,7 @@ ORDER BY
 ```
 
 <a name="Queries.PostProjectsGetByPostID"></a>
-### func \(\*Queries\) [PostProjectsGetByPostID](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L365>)
+### func \(\*Queries\) [PostProjectsGetByPostID](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L329>)
 
 ```go
 func (q *Queries) PostProjectsGetByPostID(ctx context.Context, postID int64) ([]PostProject, error)
@@ -630,7 +597,7 @@ WHERE
 ```
 
 <a name="Queries.PostProjectsGetByProjectID"></a>
-### func \(\*Queries\) [PostProjectsGetByProjectID](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L405>)
+### func \(\*Queries\) [PostProjectsGetByProjectID](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L369>)
 
 ```go
 func (q *Queries) PostProjectsGetByProjectID(ctx context.Context, projectID int64) ([]PostProject, error)
@@ -648,7 +615,7 @@ WHERE
 ```
 
 <a name="Queries.PostTagCreate"></a>
-### func \(\*Queries\) [PostTagCreate](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L441>)
+### func \(\*Queries\) [PostTagCreate](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L405>)
 
 ```go
 func (q *Queries) PostTagCreate(ctx context.Context, postID int64, tagID int64) error
@@ -664,7 +631,7 @@ VALUES
 ```
 
 <a name="Queries.PostTagDelete"></a>
-### func \(\*Queries\) [PostTagDelete](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L461>)
+### func \(\*Queries\) [PostTagDelete](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L425>)
 
 ```go
 func (q *Queries) PostTagDelete(ctx context.Context, postID int64, tagID int64) error
@@ -681,7 +648,7 @@ WHERE
 ```
 
 <a name="Queries.PostTagsGetByPostID"></a>
-### func \(\*Queries\) [PostTagsGetByPostID](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L483>)
+### func \(\*Queries\) [PostTagsGetByPostID](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L447>)
 
 ```go
 func (q *Queries) PostTagsGetByPostID(ctx context.Context, postID int64) ([]PostTag, error)
@@ -699,7 +666,7 @@ WHERE
 ```
 
 <a name="Queries.PostTagsGetByTagID"></a>
-### func \(\*Queries\) [PostTagsGetByTagID](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L523>)
+### func \(\*Queries\) [PostTagsGetByTagID](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L487>)
 
 ```go
 func (q *Queries) PostTagsGetByTagID(ctx context.Context, tagID int64) ([]PostTag, error)
@@ -717,10 +684,10 @@ WHERE
 ```
 
 <a name="Queries.PostUpdate"></a>
-### func \(\*Queries\) [PostUpdate](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L583>)
+### func \(\*Queries\) [PostUpdate](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L550>)
 
 ```go
-func (q *Queries) PostUpdate(ctx context.Context, arg PostUpdateParams) (Post, error)
+func (q *Queries) PostUpdate(ctx context.Context, arg PostUpdateParams) error
 ```
 
 PostUpdate
@@ -734,13 +701,14 @@ SET
     slug = ?,
     content = ?,
     raw_content = ?,
-    banner_url = ?
+    banner_url = ?,
+    embedding_id = ?
 WHERE
-    id = ? RETURNING id, title, description, slug, content, raw_content, banner_url, created_at, updated_at, embedding_id
+    id = ?
 ```
 
 <a name="Queries.PostsList"></a>
-### func \(\*Queries\) [PostsList](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L626>)
+### func \(\*Queries\) [PostsList](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L581>)
 
 ```go
 func (q *Queries) PostsList(ctx context.Context) ([]Post, error)
@@ -758,7 +726,7 @@ ORDER BY
 ```
 
 <a name="Queries.PostsListByProject"></a>
-### func \(\*Queries\) [PostsListByProject](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L683>)
+### func \(\*Queries\) [PostsListByProject](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L638>)
 
 ```go
 func (q *Queries) PostsListByProject(ctx context.Context, projectID int64) ([]Post, error)
@@ -779,7 +747,7 @@ ORDER BY
 ```
 
 <a name="Queries.PostsListByTag"></a>
-### func \(\*Queries\) [PostsListByTag](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L740>)
+### func \(\*Queries\) [PostsListByTag](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L695>)
 
 ```go
 func (q *Queries) PostsListByTag(ctx context.Context, tagID int64) ([]Post, error)
@@ -800,7 +768,7 @@ ORDER BY
 ```
 
 <a name="Queries.ProjectCreate"></a>
-### func \(\*Queries\) [ProjectCreate](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L813>)
+### func \(\*Queries\) [ProjectCreate](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L768>)
 
 ```go
 func (q *Queries) ProjectCreate(ctx context.Context, arg ProjectCreateParams) (Project, error)
@@ -824,7 +792,7 @@ VALUES
 ```
 
 <a name="Queries.ProjectGetByID"></a>
-### func \(\*Queries\) [ProjectGetByID](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L860>)
+### func \(\*Queries\) [ProjectGetByID](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L815>)
 
 ```go
 func (q *Queries) ProjectGetByID(ctx context.Context, id int64) (Project, error)
@@ -844,7 +812,7 @@ LIMIT
 ```
 
 <a name="Queries.ProjectGetBySlug"></a>
-### func \(\*Queries\) [ProjectGetBySlug](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L899>)
+### func \(\*Queries\) [ProjectGetBySlug](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L854>)
 
 ```go
 func (q *Queries) ProjectGetBySlug(ctx context.Context, slug string) (Project, error)
@@ -864,7 +832,7 @@ LIMIT
 ```
 
 <a name="Queries.ProjectPostCreate"></a>
-### func \(\*Queries\) [ProjectPostCreate](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L930>)
+### func \(\*Queries\) [ProjectPostCreate](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L885>)
 
 ```go
 func (q *Queries) ProjectPostCreate(ctx context.Context, postID int64, projectID int64) error
@@ -880,7 +848,7 @@ VALUES
 ```
 
 <a name="Queries.ProjectPostDelete"></a>
-### func \(\*Queries\) [ProjectPostDelete](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L950>)
+### func \(\*Queries\) [ProjectPostDelete](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L905>)
 
 ```go
 func (q *Queries) ProjectPostDelete(ctx context.Context, projectID int64, postID int64) error
@@ -897,7 +865,7 @@ WHERE
 ```
 
 <a name="Queries.ProjectPostsGetByPostID"></a>
-### func \(\*Queries\) [ProjectPostsGetByPostID](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L972>)
+### func \(\*Queries\) [ProjectPostsGetByPostID](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L927>)
 
 ```go
 func (q *Queries) ProjectPostsGetByPostID(ctx context.Context, postID int64) ([]ProjectPost, error)
@@ -915,7 +883,7 @@ WHERE
 ```
 
 <a name="Queries.ProjectPostsGetByProjectID"></a>
-### func \(\*Queries\) [ProjectPostsGetByProjectID](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1012>)
+### func \(\*Queries\) [ProjectPostsGetByProjectID](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L967>)
 
 ```go
 func (q *Queries) ProjectPostsGetByProjectID(ctx context.Context, projectID int64) ([]ProjectPost, error)
@@ -933,7 +901,7 @@ WHERE
 ```
 
 <a name="Queries.ProjectTagCreate"></a>
-### func \(\*Queries\) [ProjectTagCreate](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1048>)
+### func \(\*Queries\) [ProjectTagCreate](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1003>)
 
 ```go
 func (q *Queries) ProjectTagCreate(ctx context.Context, projectID int64, tagID int64) error
@@ -949,7 +917,7 @@ VALUES
 ```
 
 <a name="Queries.ProjectTagDelete"></a>
-### func \(\*Queries\) [ProjectTagDelete](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1068>)
+### func \(\*Queries\) [ProjectTagDelete](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1023>)
 
 ```go
 func (q *Queries) ProjectTagDelete(ctx context.Context, projectID int64, tagID int64) error
@@ -966,7 +934,7 @@ WHERE
 ```
 
 <a name="Queries.ProjectTagsGetByProjectID"></a>
-### func \(\*Queries\) [ProjectTagsGetByProjectID](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1090>)
+### func \(\*Queries\) [ProjectTagsGetByProjectID](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1045>)
 
 ```go
 func (q *Queries) ProjectTagsGetByProjectID(ctx context.Context, projectID int64) ([]ProjectTag, error)
@@ -984,7 +952,7 @@ WHERE
 ```
 
 <a name="Queries.ProjectTagsGetByTagID"></a>
-### func \(\*Queries\) [ProjectTagsGetByTagID](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1130>)
+### func \(\*Queries\) [ProjectTagsGetByTagID](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1085>)
 
 ```go
 func (q *Queries) ProjectTagsGetByTagID(ctx context.Context, tagID int64) ([]ProjectTag, error)
@@ -1002,7 +970,7 @@ WHERE
 ```
 
 <a name="Queries.ProjectUpdate"></a>
-### func \(\*Queries\) [ProjectUpdate](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1190>)
+### func \(\*Queries\) [ProjectUpdate](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1145>)
 
 ```go
 func (q *Queries) ProjectUpdate(ctx context.Context, arg ProjectUpdateParams) (Project, error)
@@ -1025,7 +993,7 @@ WHERE
 ```
 
 <a name="Queries.ProjectsList"></a>
-### func \(\*Queries\) [ProjectsList](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1233>)
+### func \(\*Queries\) [ProjectsList](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1188>)
 
 ```go
 func (q *Queries) ProjectsList(ctx context.Context) ([]Project, error)
@@ -1043,7 +1011,7 @@ ORDER BY
 ```
 
 <a name="Queries.ProjectsListByPost"></a>
-### func \(\*Queries\) [ProjectsListByPost](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1290>)
+### func \(\*Queries\) [ProjectsListByPost](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1245>)
 
 ```go
 func (q *Queries) ProjectsListByPost(ctx context.Context, postID int64) ([]Project, error)
@@ -1064,7 +1032,7 @@ ORDER BY
 ```
 
 <a name="Queries.ProjectsListByTag"></a>
-### func \(\*Queries\) [ProjectsListByTag](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1347>)
+### func \(\*Queries\) [ProjectsListByTag](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1302>)
 
 ```go
 func (q *Queries) ProjectsListByTag(ctx context.Context, tagID int64) ([]Project, error)
@@ -1085,7 +1053,7 @@ ORDER BY
 ```
 
 <a name="Queries.TagCreate"></a>
-### func \(\*Queries\) [TagCreate](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1401>)
+### func \(\*Queries\) [TagCreate](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1356>)
 
 ```go
 func (q *Queries) TagCreate(ctx context.Context, arg TagCreateParams) (Tag, error)
@@ -1101,7 +1069,7 @@ VALUES
 ```
 
 <a name="Queries.TagGetByID"></a>
-### func \(\*Queries\) [TagGetByID](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1443>)
+### func \(\*Queries\) [TagGetByID](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1398>)
 
 ```go
 func (q *Queries) TagGetByID(ctx context.Context, id int64) (Tag, error)
@@ -1121,7 +1089,7 @@ LIMIT
 ```
 
 <a name="Queries.TagGetByName"></a>
-### func \(\*Queries\) [TagGetByName](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1480>)
+### func \(\*Queries\) [TagGetByName](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1435>)
 
 ```go
 func (q *Queries) TagGetByName(ctx context.Context, name string) (Tag, error)
@@ -1141,7 +1109,7 @@ LIMIT
 ```
 
 <a name="Queries.TagsListAlphabetical"></a>
-### func \(\*Queries\) [TagsListAlphabetical](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1513>)
+### func \(\*Queries\) [TagsListAlphabetical](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1468>)
 
 ```go
 func (q *Queries) TagsListAlphabetical(ctx context.Context) ([]Tag, error)
@@ -1159,7 +1127,7 @@ ORDER BY
 ```
 
 <a name="Queries.TagsListByPost"></a>
-### func \(\*Queries\) [TagsListByPost](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1568>)
+### func \(\*Queries\) [TagsListByPost](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1523>)
 
 ```go
 func (q *Queries) TagsListByPost(ctx context.Context, postID int64) ([]Tag, error)
@@ -1180,7 +1148,7 @@ ORDER BY
 ```
 
 <a name="Queries.TagsListByProject"></a>
-### func \(\*Queries\) [TagsListByProject](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1623>)
+### func \(\*Queries\) [TagsListByProject](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1578>)
 
 ```go
 func (q *Queries) TagsListByProject(ctx context.Context, projectID int64) ([]Tag, error)
@@ -1228,7 +1196,7 @@ type Tag struct {
 ```
 
 <a name="TagCreateParams"></a>
-## type [TagCreateParams](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1388-L1393>)
+## type [TagCreateParams](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1343-L1348>)
 
 
 

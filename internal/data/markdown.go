@@ -2,8 +2,12 @@ package data
 
 import (
 	"bytes"
+	"context"
+	"database/sql"
+	"errors"
 	"os"
 
+	"github.com/conneroisu/conneroh.com/internal/data/master"
 	mathjax "github.com/litao91/goldmark-mathjax"
 	enclave "github.com/quail-ink/goldmark-enclave"
 	"github.com/quail-ink/goldmark-enclave/core"
@@ -123,5 +127,34 @@ func parse(path string) (*Markdown, error) {
 	return &fm, nil
 }
 
-func (fm *Markdown) Upsert() {
+// UpsertPost inserts or updates the post document in the database.
+func (md *Markdown) UpsertPost(
+	ctx context.Context,
+	db Database[master.Queries],
+) error {
+	// check if the post already exists
+	post, err := db.Queries.PostGetBySlug(ctx, md.Slug)
+	if err == nil {
+		return db.Queries.PostUpdate(ctx, master.PostUpdateParams{
+			ID:          post.ID,
+			Slug:        md.Slug,
+			Title:       md.Title,
+			BannerUrl:   md.BannerURL,
+			Description: md.Description,
+			RawContent:  string(md.RawContent),
+			Content:     string(md.RenderContent),
+		})
+	}
+	// err is not nil
+	if errors.Is(err, sql.ErrNoRows) {
+		return md.insertPost(ctx, db)
+	}
+	return err
+}
+
+func (md *Markdown) insertPost(
+	ctx context.Context,
+	db Database[master.Queries],
+) error {
+	return nil
 }
