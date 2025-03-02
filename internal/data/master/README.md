@@ -68,10 +68,10 @@ Package master contains the master schema for the database.
   - [func \(q \*Queries\) ProjectsList\(ctx context.Context\) \(\[\]Project, error\)](<#Queries.ProjectsList>)
   - [func \(q \*Queries\) ProjectsListByPost\(ctx context.Context, postID int64\) \(\[\]Project, error\)](<#Queries.ProjectsListByPost>)
   - [func \(q \*Queries\) ProjectsListByTag\(ctx context.Context, tagID int64\) \(\[\]Project, error\)](<#Queries.ProjectsListByTag>)
-  - [func \(q \*Queries\) TagCreate\(ctx context.Context, arg TagCreateParams\) \(Tag, error\)](<#Queries.TagCreate>)
+  - [func \(q \*Queries\) TagCreate\(ctx context.Context, arg TagCreateParams\) error](<#Queries.TagCreate>)
   - [func \(q \*Queries\) TagGetByID\(ctx context.Context, id int64\) \(Tag, error\)](<#Queries.TagGetByID>)
   - [func \(q \*Queries\) TagGetBySlug\(ctx context.Context, slug string\) \(Tag, error\)](<#Queries.TagGetBySlug>)
-  - [func \(q \*Queries\) TagUpdate\(ctx context.Context, arg TagUpdateParams\) \(Tag, error\)](<#Queries.TagUpdate>)
+  - [func \(q \*Queries\) TagUpdate\(ctx context.Context, arg TagUpdateParams\) error](<#Queries.TagUpdate>)
   - [func \(q \*Queries\) TagsListAlphabetical\(ctx context.Context\) \(\[\]Tag, error\)](<#Queries.TagsListAlphabetical>)
   - [func \(q \*Queries\) TagsListByPost\(ctx context.Context, postID int64\) \(\[\]Tag, error\)](<#Queries.TagsListByPost>)
   - [func \(q \*Queries\) TagsListByProject\(ctx context.Context, projectID int64\) \(\[\]Tag, error\)](<#Queries.TagsListByProject>)
@@ -254,8 +254,8 @@ type Project struct {
     Content     string `db:"content" json:"content"`
     RawContent  string `db:"raw_content" json:"raw_content"`
     BannerUrl   string `db:"banner_url" json:"banner_url"`
-    CreatedAt   *int64 `db:"created_at" json:"created_at"`
-    UpdatedAt   *int64 `db:"updated_at" json:"updated_at"`
+    CreatedAt   int64  `db:"created_at" json:"created_at"`
+    UpdatedAt   int64  `db:"updated_at" json:"updated_at"`
     EmbeddingID int64  `db:"embedding_id" json:"embedding_id"`
 }
 ```
@@ -983,23 +983,23 @@ ORDER BY
 ```
 
 <a name="Queries.TagCreate"></a>
-### func \(\*Queries\) [TagCreate](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1305>)
+### func \(\*Queries\) [TagCreate](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1306>)
 
 ```go
-func (q *Queries) TagCreate(ctx context.Context, arg TagCreateParams) (Tag, error)
+func (q *Queries) TagCreate(ctx context.Context, arg TagCreateParams) error
 ```
 
 TagCreate
 
 ```
 INSERT INTO
-    tags (title, description, slug, embedding_id)
+    tags (title, content, raw_content, slug, embedding_id)
 VALUES
-    (?, ?, ?, ?) RETURNING id, title, slug, description, icon, created_at, updated_at, embedding_id
+    (?, ?, ?, ?, ?)
 ```
 
 <a name="Queries.TagGetByID"></a>
-### func \(\*Queries\) [TagGetByID](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1347>)
+### func \(\*Queries\) [TagGetByID](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1338>)
 
 ```go
 func (q *Queries) TagGetByID(ctx context.Context, id int64) (Tag, error)
@@ -1009,7 +1009,7 @@ TagGetByID
 
 ```
 SELECT
-    id, title, slug, description, icon, created_at, updated_at, embedding_id
+    id, title, slug, content, raw_content, icon, created_at, updated_at, embedding_id
 FROM
     tags
 WHERE
@@ -1019,7 +1019,7 @@ LIMIT
 ```
 
 <a name="Queries.TagGetBySlug"></a>
-### func \(\*Queries\) [TagGetBySlug](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1384>)
+### func \(\*Queries\) [TagGetBySlug](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1376>)
 
 ```go
 func (q *Queries) TagGetBySlug(ctx context.Context, slug string) (Tag, error)
@@ -1029,7 +1029,7 @@ TagGetBySlug
 
 ```
 SELECT
-    id, title, slug, description, icon, created_at, updated_at, embedding_id
+    id, title, slug, content, raw_content, icon, created_at, updated_at, embedding_id
 FROM
     tags
 WHERE
@@ -1039,10 +1039,10 @@ LIMIT
 ```
 
 <a name="Queries.TagUpdate"></a>
-### func \(\*Queries\) [TagUpdate](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1431>)
+### func \(\*Queries\) [TagUpdate](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1427>)
 
 ```go
-func (q *Queries) TagUpdate(ctx context.Context, arg TagUpdateParams) (Tag, error)
+func (q *Queries) TagUpdate(ctx context.Context, arg TagUpdateParams) error
 ```
 
 TagUpdate
@@ -1052,15 +1052,16 @@ UPDATE
     tags
 SET
     title = ?,
-    description = ?,
     slug = ?,
+    content = ?,
+    raw_content = ?,
     embedding_id = ?
 WHERE
-    id = ? RETURNING id, title, slug, description, icon, created_at, updated_at, embedding_id
+    id = ?
 ```
 
 <a name="Queries.TagsListAlphabetical"></a>
-### func \(\*Queries\) [TagsListAlphabetical](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1470>)
+### func \(\*Queries\) [TagsListAlphabetical](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1456>)
 
 ```go
 func (q *Queries) TagsListAlphabetical(ctx context.Context) ([]Tag, error)
@@ -1070,7 +1071,7 @@ TagsListAlphabetical
 
 ```
 SELECT
-    t.id, t.title, t.slug, t.description, t.icon, t.created_at, t.updated_at, t.embedding_id
+    t.id, t.title, t.slug, t.content, t.raw_content, t.icon, t.created_at, t.updated_at, t.embedding_id
 FROM
     tags t
 ORDER BY
@@ -1078,7 +1079,7 @@ ORDER BY
 ```
 
 <a name="Queries.TagsListByPost"></a>
-### func \(\*Queries\) [TagsListByPost](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1525>)
+### func \(\*Queries\) [TagsListByPost](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1512>)
 
 ```go
 func (q *Queries) TagsListByPost(ctx context.Context, postID int64) ([]Tag, error)
@@ -1088,7 +1089,7 @@ TagsListByPost
 
 ```
 SELECT
-    t.id, t.title, t.slug, t.description, t.icon, t.created_at, t.updated_at, t.embedding_id
+    t.id, t.title, t.slug, t.content, t.raw_content, t.icon, t.created_at, t.updated_at, t.embedding_id
 FROM
     tags t
     JOIN post_tags pt ON t.id = pt.tag_id
@@ -1099,7 +1100,7 @@ ORDER BY
 ```
 
 <a name="Queries.TagsListByProject"></a>
-### func \(\*Queries\) [TagsListByProject](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1580>)
+### func \(\*Queries\) [TagsListByProject](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1568>)
 
 ```go
 func (q *Queries) TagsListByProject(ctx context.Context, projectID int64) ([]Tag, error)
@@ -1109,7 +1110,7 @@ TagsListByProject
 
 ```
 SELECT
-    t.id, t.title, t.slug, t.description, t.icon, t.created_at, t.updated_at, t.embedding_id
+    t.id, t.title, t.slug, t.content, t.raw_content, t.icon, t.created_at, t.updated_at, t.embedding_id
 FROM
     tags t
     JOIN project_tags pt ON t.id = pt.tag_id
@@ -1147,7 +1148,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries
 WithTx returns a new Queries instance with the given transaction.
 
 <a name="Tag"></a>
-## type [Tag](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/models.go#L54-L63>)
+## type [Tag](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/models.go#L54-L64>)
 
 
 
@@ -1156,7 +1157,8 @@ type Tag struct {
     ID          int64  `db:"id" json:"id"`
     Title       string `db:"title" json:"title"`
     Slug        string `db:"slug" json:"slug"`
-    Description string `db:"description" json:"description"`
+    Content     string `db:"content" json:"content"`
+    RawContent  string `db:"raw_content" json:"raw_content"`
     Icon        string `db:"icon" json:"icon"`
     CreatedAt   int64  `db:"created_at" json:"created_at"`
     UpdatedAt   int64  `db:"updated_at" json:"updated_at"`
@@ -1165,29 +1167,31 @@ type Tag struct {
 ```
 
 <a name="TagCreateParams"></a>
-## type [TagCreateParams](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1292-L1297>)
+## type [TagCreateParams](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1292-L1298>)
 
 
 
 ```go
 type TagCreateParams struct {
     Title       string `db:"title" json:"title"`
-    Description string `db:"description" json:"description"`
+    Content     string `db:"content" json:"content"`
+    RawContent  string `db:"raw_content" json:"raw_content"`
     Slug        string `db:"slug" json:"slug"`
     EmbeddingID int64  `db:"embedding_id" json:"embedding_id"`
 }
 ```
 
 <a name="TagUpdateParams"></a>
-## type [TagUpdateParams](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1412-L1418>)
+## type [TagUpdateParams](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1406-L1413>)
 
 
 
 ```go
 type TagUpdateParams struct {
     Title       string `db:"title" json:"title"`
-    Description string `db:"description" json:"description"`
     Slug        string `db:"slug" json:"slug"`
+    Content     string `db:"content" json:"content"`
+    RawContent  string `db:"raw_content" json:"raw_content"`
     EmbeddingID int64  `db:"embedding_id" json:"embedding_id"`
     ID          int64  `db:"id" json:"id"`
 }

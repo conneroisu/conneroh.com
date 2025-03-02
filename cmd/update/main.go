@@ -54,12 +54,7 @@ func Run(
 				slog.Error("failed to parse tag", "path", path, "err", err)
 				return err
 			}
-			tag, err := parsed.UpsertTag(ctx, db, client)
-			if err != nil {
-				return err
-			}
-			slog.Info("upserted tag", "tag", tag.Title)
-			return nil
+			return parsed.UpsertTag(ctx, db, client)
 		},
 	)
 	if err != nil {

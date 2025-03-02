@@ -35,14 +35,12 @@ templ Project(
 			</div>
 			<div class="prose prose-xl dark:prose-invert max-w-none">
 				<p class="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line">{ project.Description }</p>
-				if project.CreatedAt != nil {
-					<div class="mt-6 flex items-center text-sm text-gray-500 dark:text-gray-400">
-						<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-						</svg>
-						<span>Created: { formatDate(*project.CreatedAt) }</span>
-					</div>
-				}
+				<div class="mt-6 flex items-center text-sm text-gray-500 dark:text-gray-400">
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+					</svg>
+					<span>Created: { formatDate(project.CreatedAt) }</span>
+				</div>
 			</div>
 		</div>
 		<div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden p-6 mb-8">

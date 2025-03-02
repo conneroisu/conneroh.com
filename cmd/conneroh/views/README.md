@@ -89,7 +89,7 @@ func Project(project *master.FullProject, fullPosts *[]master.FullPost, fullProj
 
 
 <a name="Projects"></a>
-## func [Projects](<https://github.com/conneroisu/conneroh/blob/main/cmd/conneroh/views/projects_templ.go#L199-L206>)
+## func [Projects](<https://github.com/conneroisu/conneroh/blob/main/cmd/conneroh/views/projects_templ.go#L189-L196>)
 
 ```go
 func Projects(fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, fullTags *[]master.FullTag, fullPostsSlugMap *map[string]master.FullPost, fullProjectsSlugMap *map[string]master.FullProject, fullTagsSlugMap *map[string]master.FullTag) templ.Component

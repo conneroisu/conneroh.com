@@ -46,14 +46,14 @@ var RouteMap = routing.APIMap{
     "GET /tags":                       Tags,
     "GET /project/{id}":               Project,
     "GET /post/{id}":                  Post,
-    "GET /tag/{id}":                   Tag,
-    "GET /hateoas/morph/{view}":       Morph,
+    "GET /tag/{id...}":                Tag,
+    "GET /hateoas/morph/{view...}":    Morph,
     "GET /hateoas/morphs/{view}/{id}": Morphs,
 }
 ```
 
 <a name="AddRoutes"></a>
-## func [AddRoutes](<https://github.com/conneroisu/conneroh/blob/main/cmd/conneroh/routes.go#L28-L32>)
+## func [AddRoutes](<https://github.com/conneroisu/conneroh/blob/main/cmd/conneroh/routes.go#L30-L34>)
 
 ```go
 func AddRoutes(ctx context.Context, h *http.ServeMux, db *data.Database[master.Queries]) error

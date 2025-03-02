@@ -18,22 +18,23 @@ WHERE
 LIMIT
     1;
 
--- name: TagCreate :one
+-- name: TagCreate :exec
 INSERT INTO
-    tags (title, description, slug, embedding_id)
+    tags (title, content, raw_content, slug, embedding_id)
 VALUES
-    (?, ?, ?, ?) RETURNING *;
+    (?, ?, ?, ?, ?);
 
--- name: TagUpdate :one
+-- name: TagUpdate :exec
 UPDATE
     tags
 SET
     title = ?,
-    description = ?,
     slug = ?,
+    content = ?,
+    raw_content = ?,
     embedding_id = ?
 WHERE
-    id = ? RETURNING *;
+    id = ?;
 
 -- name: TagsListAlphabetical :many
 SELECT

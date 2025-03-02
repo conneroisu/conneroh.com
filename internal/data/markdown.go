@@ -131,6 +131,8 @@ func Parse(fsPath string, embedFs embed.FS) (*Markdown, error) {
 		fsPath = strings.Replace(fsPath, "posts/", "", 1)
 	case docs.Tags:
 		fsPath = strings.Replace(fsPath, "tags/", "", 1)
+		// It is a tag page.
+		fm.Description = buf.String()
 	case docs.Projects:
 		fsPath = strings.Replace(fsPath, "projects/", "", 1)
 	}
@@ -138,11 +140,7 @@ func Parse(fsPath string, embedFs embed.FS) (*Markdown, error) {
 	fm.Slug = fsPath
 	fm.RenderContent = buf.String()
 	if fm.Description == "" {
-		if embedFs != docs.Tags {
-			return nil, fmt.Errorf("description is empty for %s", fsPath)
-		}
-		// It is a tag page.
-		fm.Description = fm.RawContent
+		return nil, fmt.Errorf("description is empty for %s", fsPath)
 	}
 	fm.RawContent = string(b)
 
@@ -191,21 +189,23 @@ func (md *Markdown) UpsertTag(
 	ctx context.Context,
 	db *Database[master.Queries],
 	client *api.Client,
-) (tag master.Tag, err error) {
+) (err error) {
 	slog.Info("upserting tag", "slug", md.Slug)
 	defer slog.Info("upserted tag", "slug", md.Slug)
 	var id int64
+	var tag master.Tag
 	tag, err = db.Queries.TagGetBySlug(ctx, md.Slug)
 	if err == nil {
 		slog.Debug("tag already exists - updating", "slug", md.Slug)
-		if tag.Description == md.RawContent {
+		if tag.RawContent == md.RawContent {
 			return db.Queries.TagUpdate(
 				ctx,
 				master.TagUpdateParams{
 					ID:          tag.ID,
 					Slug:        md.Slug,
 					Title:       md.Title,
-					Description: md.Description,
+					RawContent:  md.RawContent,
+					Content:     md.RenderContent,
 					EmbeddingID: tag.EmbeddingID,
 				},
 			)
@@ -227,7 +227,8 @@ func (md *Markdown) UpsertTag(
 				ID:          tag.ID,
 				Slug:        md.Slug,
 				Title:       md.Title,
-				Description: md.Description,
+				RawContent:  md.RawContent,
+				Content:     md.RenderContent,
 				EmbeddingID: id,
 			},
 		)
@@ -237,12 +238,13 @@ func (md *Markdown) UpsertTag(
 		slog.Debug("tag does not exist - creating", "slug", md.Slug)
 		id, err = UpsertEmbedding(ctx, db, client, md.RawContent, 0)
 		if err != nil {
-			return master.Tag{}, err
+			return
 		}
 		return db.Queries.TagCreate(ctx, master.TagCreateParams{
 			Slug:        md.Slug,
 			Title:       md.Title,
-			Description: md.Description,
+			RawContent:  md.RawContent,
+			Content:     md.RenderContent,
 			EmbeddingID: id,
 		})
 	}
@@ -262,7 +264,7 @@ func (md *Markdown) UpsertPost(
 	post, err = db.Queries.PostGetBySlug(ctx, md.Slug)
 	if err == nil {
 		// same content
-		if post.RawContent == string(md.RawContent) {
+		if post.RawContent == md.RawContent {
 			return db.Queries.PostUpdate(
 				ctx,
 				master.PostUpdateParams{
