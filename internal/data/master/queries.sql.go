@@ -29,7 +29,7 @@ VALUES
 //	     embeddings (embedding)
 //	 VALUES
 //	     (?) RETURNING id
-func (q *Queries) EmbeddingsCreate(ctx context.Context, embedding interface{}) (int64, error) {
+func (q *Queries) EmbeddingsCreate(ctx context.Context, embedding string) (int64, error) {
 	row := q.db.QueryRowContext(ctx, embeddingsCreate, embedding)
 	var id int64
 	err := row.Scan(&id)
@@ -49,8 +49,8 @@ LIMIT
 `
 
 type EmbeddingsGetByIDRow struct {
-	ID        int64       `db:"id" json:"id"`
-	Embedding interface{} `db:"embedding" json:"embedding"`
+	ID        int64  `db:"id" json:"id"`
+	Embedding string `db:"embedding" json:"embedding"`
 }
 
 // EmbeddingsGetByID
@@ -869,124 +869,6 @@ func (q *Queries) ProjectGetBySlug(ctx context.Context, slug string) (Project, e
 	return i, err
 }
 
-const projectPostCreate = `-- name: ProjectPostCreate :exec
-INSERT INTO
-    project_posts (post_id, project_id)
-VALUES
-    (?, ?)
-`
-
-// ProjectPostCreate
-//
-//	INSERT INTO
-//	    project_posts (post_id, project_id)
-//	VALUES
-//	    (?, ?)
-func (q *Queries) ProjectPostCreate(ctx context.Context, postID int64, projectID int64) error {
-	_, err := q.db.ExecContext(ctx, projectPostCreate, postID, projectID)
-	return err
-}
-
-const projectPostDelete = `-- name: ProjectPostDelete :exec
-DELETE FROM
-    project_posts
-WHERE
-    project_id = ?
-    AND post_id = ?
-`
-
-// ProjectPostDelete
-//
-//	DELETE FROM
-//	    project_posts
-//	WHERE
-//	    project_id = ?
-//	    AND post_id = ?
-func (q *Queries) ProjectPostDelete(ctx context.Context, projectID int64, postID int64) error {
-	_, err := q.db.ExecContext(ctx, projectPostDelete, projectID, postID)
-	return err
-}
-
-const projectPostsGetByPostID = `-- name: ProjectPostsGetByPostID :many
-SELECT
-    project_id, post_id
-FROM
-    project_posts
-WHERE
-    post_id = ?
-`
-
-// ProjectPostsGetByPostID
-//
-//	SELECT
-//	    project_id, post_id
-//	FROM
-//	    project_posts
-//	WHERE
-//	    post_id = ?
-func (q *Queries) ProjectPostsGetByPostID(ctx context.Context, postID int64) ([]ProjectPost, error) {
-	rows, err := q.db.QueryContext(ctx, projectPostsGetByPostID, postID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []ProjectPost
-	for rows.Next() {
-		var i ProjectPost
-		if err := rows.Scan(&i.ProjectID, &i.PostID); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const projectPostsGetByProjectID = `-- name: ProjectPostsGetByProjectID :many
-SELECT
-    project_id, post_id
-FROM
-    project_posts
-WHERE
-    project_id = ?
-`
-
-// ProjectPostsGetByProjectID
-//
-//	SELECT
-//	    project_id, post_id
-//	FROM
-//	    project_posts
-//	WHERE
-//	    project_id = ?
-func (q *Queries) ProjectPostsGetByProjectID(ctx context.Context, projectID int64) ([]ProjectPost, error) {
-	rows, err := q.db.QueryContext(ctx, projectPostsGetByProjectID, projectID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []ProjectPost
-	for rows.Next() {
-		var i ProjectPost
-		if err := rows.Scan(&i.ProjectID, &i.PostID); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
 const projectTagCreate = `-- name: ProjectTagCreate :exec
 INSERT INTO
     project_tags (project_id, tag_id)
@@ -1224,7 +1106,7 @@ SELECT
     p.id, p.name, p.slug, p.description, p.content, p.raw_content, p.banner_url, p.created_at, p.updated_at, p.embedding_id
 FROM
     projects p
-    JOIN project_posts pp ON p.id = pp.project_id
+    JOIN post_projects pp ON p.id = pp.project_id
 WHERE
     pp.post_id = ?
 ORDER BY
@@ -1237,7 +1119,7 @@ ORDER BY
 //	    p.id, p.name, p.slug, p.description, p.content, p.raw_content, p.banner_url, p.created_at, p.updated_at, p.embedding_id
 //	FROM
 //	    projects p
-//	    JOIN project_posts pp ON p.id = pp.project_id
+//	    JOIN post_projects pp ON p.id = pp.project_id
 //	WHERE
 //	    pp.post_id = ?
 //	ORDER BY

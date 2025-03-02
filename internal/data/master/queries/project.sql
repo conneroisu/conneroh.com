@@ -69,7 +69,7 @@ SELECT
     p.*
 FROM
     projects p
-    JOIN project_posts pp ON p.id = pp.project_id
+    JOIN post_projects pp ON p.id = pp.project_id
 WHERE
     pp.post_id = ?
 ORDER BY

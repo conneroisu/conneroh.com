@@ -4,11 +4,13 @@ import (
 	"bytes"
 	"context"
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"os"
 
 	"github.com/conneroisu/conneroh.com/internal/data/master"
 	mathjax "github.com/litao91/goldmark-mathjax"
+	"github.com/ollama/ollama/api"
 	enclave "github.com/quail-ink/goldmark-enclave"
 	"github.com/quail-ink/goldmark-enclave/core"
 	"github.com/yuin/goldmark"
@@ -96,9 +98,12 @@ type Markdown struct {
 	RawContent []byte `yaml:"-"`
 	// RenderContent is the content of the document to be rendered as HTML.
 	RenderContent []byte `yaml:"-"`
+	// Emebbedding is the content of the document to be embedded in the page.
+	EmbeddingContent [][]float64 `yaml:"-"`
 }
 
-func parse(path string) (*Markdown, error) {
+// Parse parses the markdown file at the given path.
+func Parse(path string) (*Markdown, error) {
 	b, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
@@ -124,26 +129,49 @@ func parse(path string) (*Markdown, error) {
 		fm.Description = string(fm.RenderContent)
 	}
 	fm.RawContent = b
+
 	return &fm, nil
 }
 
 // UpsertPost inserts or updates the post document in the database.
 func (md *Markdown) UpsertPost(
 	ctx context.Context,
-	db Database[master.Queries],
+	db *Database[master.Queries],
+	client *api.Client,
 ) error {
 	// check if the post already exists
 	post, err := db.Queries.PostGetBySlug(ctx, md.Slug)
 	if err == nil {
-		return db.Queries.PostUpdate(ctx, master.PostUpdateParams{
-			ID:          post.ID,
-			Slug:        md.Slug,
-			Title:       md.Title,
-			BannerUrl:   md.BannerURL,
-			Description: md.Description,
-			RawContent:  string(md.RawContent),
-			Content:     string(md.RenderContent),
-		})
+		// same content
+		if post.RawContent == string(md.RawContent) {
+			return db.Queries.PostUpdate(ctx, master.PostUpdateParams{
+				ID:          post.ID,
+				Slug:        md.Slug,
+				Title:       md.Title,
+				BannerUrl:   md.BannerURL,
+				Description: md.Description,
+				RawContent:  string(md.RawContent),
+				Content:     string(md.RenderContent),
+				EmbeddingID: post.EmbeddingID,
+			})
+		}
+		id, err := UpsertEmbedding(ctx, db, client, string(md.RawContent))
+		if err != nil {
+			return err
+		}
+		// same embedding
+		if id == post.EmbeddingID {
+			return db.Queries.PostUpdate(ctx, master.PostUpdateParams{
+				ID:          post.ID,
+				Slug:        md.Slug,
+				Title:       md.Title,
+				BannerUrl:   md.BannerURL,
+				Description: md.Description,
+				RawContent:  string(md.RawContent),
+				Content:     string(md.RenderContent),
+				EmbeddingID: id,
+			})
+		}
 	}
 	// err is not nil
 	if errors.Is(err, sql.ErrNoRows) {
@@ -152,9 +180,35 @@ func (md *Markdown) UpsertPost(
 	return err
 }
 
+// UpsertEmbedding inserts or updates the embedding document in the database.
+func UpsertEmbedding(
+	ctx context.Context,
+	db *Database[master.Queries],
+	client *api.Client,
+	content string,
+) (int64, error) {
+	embed, err := client.Embeddings(ctx, &api.EmbeddingRequest{
+		Model:  "granite-embedding:278m",
+		Prompt: content,
+	})
+	if err != nil {
+		return int64(0), err
+	}
+	jsVal, err := json.Marshal(embed)
+	if err != nil {
+		return 0, err
+	}
+	id, err := db.Queries.EmbeddingsCreate(ctx, string(jsVal))
+	if err != nil {
+		return 0, err
+	}
+
+	return id, nil
+}
+
 func (md *Markdown) insertPost(
 	ctx context.Context,
-	db Database[master.Queries],
+	db *Database[master.Queries],
 ) error {
 	return nil
 }

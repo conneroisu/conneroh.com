@@ -238,40 +238,11 @@ SELECT
     p.*
 FROM
     projects p
-    JOIN project_posts pp ON p.id = pp.project_id
+    JOIN post_projects pp ON p.id = pp.project_id
 WHERE
     pp.post_id = ?
 ORDER BY
     p.created_at DESC;
-
--- name: ProjectPostsGetByProjectID :many
-SELECT
-    *
-FROM
-    project_posts
-WHERE
-    project_id = ?;
-
--- name: ProjectPostsGetByPostID :many
-SELECT
-    *
-FROM
-    project_posts
-WHERE
-    post_id = ?;
-
--- name: ProjectPostCreate :exec
-INSERT INTO
-    project_posts (post_id, project_id)
-VALUES
-    (?, ?);
-
--- name: ProjectPostDelete :exec
-DELETE FROM
-    project_posts
-WHERE
-    project_id = ?
-    AND post_id = ?;
 
 -- name: ProjectTagsGetByProjectID :many
 SELECT

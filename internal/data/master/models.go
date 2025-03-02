@@ -5,9 +5,9 @@
 package master
 
 type Embedding struct {
-	ID        int64       `db:"id" json:"id"`
-	Embedding interface{} `db:"embedding" json:"embedding"`
-	CreatedAt int64       `db:"created_at" json:"created_at"`
+	ID        int64  `db:"id" json:"id"`
+	Embedding string `db:"embedding" json:"embedding"`
+	CreatedAt int64  `db:"created_at" json:"created_at"`
 }
 
 type Post struct {
@@ -44,11 +44,6 @@ type Project struct {
 	CreatedAt   *int64 `db:"created_at" json:"created_at"`
 	UpdatedAt   *int64 `db:"updated_at" json:"updated_at"`
 	EmbeddingID int64  `db:"embedding_id" json:"embedding_id"`
-}
-
-type ProjectPost struct {
-	ProjectID int64 `db:"project_id" json:"project_id"`
-	PostID    int64 `db:"post_id" json:"post_id"`
 }
 
 type ProjectTag struct {
