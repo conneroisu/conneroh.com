@@ -8,29 +8,32 @@ WHERE
 LIMIT
     1;
 
--- name: TagGetByName :one
+-- name: TagGetBySlug :one
 SELECT
     *
 FROM
     tags
 WHERE
-    name = ?
+    slug = ?
 LIMIT
     1;
 
--- name: TagsListAlphabetical :many
-SELECT
-    *
-FROM
-    tags
-ORDER BY
-    name;
-
--- name: TagCreate :one
+-- name: TagCreate :exec
 INSERT INTO
-    tags (name, description, slug, embedding_id)
+    tags (title, description, slug, embedding_id)
 VALUES
-    (?, ?, ?, ?) RETURNING *;
+    (?, ?, ?, ?);
+
+-- name: TagUpdate :exec
+UPDATE
+    tags
+SET
+    title = ?,
+    description = ?,
+    slug = ?,
+    embedding_id = ?
+WHERE
+    id = ?;
 
 -- name: TagsListByProject :many
 SELECT
@@ -41,7 +44,7 @@ FROM
 WHERE
     pt.project_id = ?
 ORDER BY
-    t.name ASC;
+    t.title ASC;
 
 -- name: TagsListByPost :many
 SELECT
@@ -52,4 +55,4 @@ FROM
 WHERE
     pt.post_id = ?
 ORDER BY
-    t.name ASC;
+    t.title ASC;

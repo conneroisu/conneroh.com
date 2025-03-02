@@ -71,7 +71,29 @@ func (q *Queries) EmbeddingsGetByID(ctx context.Context, id int64) (EmbeddingsGe
 	return i, err
 }
 
-const postCreate = `-- name: PostCreate :one
+const emeddingUpdate = `-- name: EmeddingUpdate :exec
+UPDATE
+    embeddings
+SET
+    embedding = ?
+WHERE
+    id = ?
+`
+
+// EmeddingUpdate
+//
+//	UPDATE
+//	    embeddings
+//	SET
+//	    embedding = ?
+//	WHERE
+//	    id = ?
+func (q *Queries) EmeddingUpdate(ctx context.Context, embedding string, iD int64) error {
+	_, err := q.db.ExecContext(ctx, emeddingUpdate, embedding, iD)
+	return err
+}
+
+const postCreate = `-- name: PostCreate :exec
 INSERT INTO
     posts (
         title,
@@ -83,7 +105,7 @@ INSERT INTO
         embedding_id
     )
 VALUES
-    (?, ?, ?, ?, ?, ?, ?) RETURNING id, title, description, slug, content, raw_content, banner_url, created_at, updated_at, embedding_id
+    (?, ?, ?, ?, ?, ?, ?)
 `
 
 type PostCreateParams struct {
@@ -109,9 +131,9 @@ type PostCreateParams struct {
 //	        embedding_id
 //	    )
 //	VALUES
-//	    (?, ?, ?, ?, ?, ?, ?) RETURNING id, title, description, slug, content, raw_content, banner_url, created_at, updated_at, embedding_id
-func (q *Queries) PostCreate(ctx context.Context, arg PostCreateParams) (Post, error) {
-	row := q.db.QueryRowContext(ctx, postCreate,
+//	    (?, ?, ?, ?, ?, ?, ?)
+func (q *Queries) PostCreate(ctx context.Context, arg PostCreateParams) error {
+	_, err := q.db.ExecContext(ctx, postCreate,
 		arg.Title,
 		arg.Description,
 		arg.Slug,
@@ -120,25 +142,12 @@ func (q *Queries) PostCreate(ctx context.Context, arg PostCreateParams) (Post, e
 		arg.BannerUrl,
 		arg.EmbeddingID,
 	)
-	var i Post
-	err := row.Scan(
-		&i.ID,
-		&i.Title,
-		&i.Description,
-		&i.Slug,
-		&i.Content,
-		&i.RawContent,
-		&i.BannerUrl,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-		&i.EmbeddingID,
-	)
-	return i, err
+	return err
 }
 
 const postGet = `-- name: PostGet :one
 SELECT
-    id, title, description, slug, content, raw_content, banner_url, created_at, updated_at, embedding_id
+    id, title, slug, description, content, raw_content, banner_url, created_at, updated_at, embedding_id
 FROM
     posts
 WHERE
@@ -150,7 +159,7 @@ LIMIT
 // PostGet
 //
 //	SELECT
-//	    id, title, description, slug, content, raw_content, banner_url, created_at, updated_at, embedding_id
+//	    id, title, slug, description, content, raw_content, banner_url, created_at, updated_at, embedding_id
 //	FROM
 //	    posts
 //	WHERE
@@ -163,8 +172,8 @@ func (q *Queries) PostGet(ctx context.Context, id int64) (Post, error) {
 	err := row.Scan(
 		&i.ID,
 		&i.Title,
-		&i.Description,
 		&i.Slug,
+		&i.Description,
 		&i.Content,
 		&i.RawContent,
 		&i.BannerUrl,
@@ -177,7 +186,7 @@ func (q *Queries) PostGet(ctx context.Context, id int64) (Post, error) {
 
 const postGetBySlug = `-- name: PostGetBySlug :one
 SELECT
-    id, title, description, slug, content, raw_content, banner_url, created_at, updated_at, embedding_id
+    id, title, slug, description, content, raw_content, banner_url, created_at, updated_at, embedding_id
 FROM
     posts
 WHERE
@@ -189,7 +198,7 @@ LIMIT
 // PostGetBySlug
 //
 //	SELECT
-//	    id, title, description, slug, content, raw_content, banner_url, created_at, updated_at, embedding_id
+//	    id, title, slug, description, content, raw_content, banner_url, created_at, updated_at, embedding_id
 //	FROM
 //	    posts
 //	WHERE
@@ -202,8 +211,8 @@ func (q *Queries) PostGetBySlug(ctx context.Context, slug string) (Post, error) 
 	err := row.Scan(
 		&i.ID,
 		&i.Title,
-		&i.Description,
 		&i.Slug,
+		&i.Description,
 		&i.Content,
 		&i.RawContent,
 		&i.BannerUrl,
@@ -254,7 +263,7 @@ func (q *Queries) PostProjectDelete(ctx context.Context, postID int64, projectID
 
 const postProjectListByPost = `-- name: PostProjectListByPost :many
 SELECT
-    p.id, p.name, p.slug, p.description, p.content, p.raw_content, p.banner_url, p.created_at, p.updated_at, p.embedding_id
+    p.id, p.title, p.slug, p.description, p.content, p.raw_content, p.banner_url, p.created_at, p.updated_at, p.embedding_id
 FROM
     post_projects pp
     JOIN projects p ON pp.project_id = p.id
@@ -267,7 +276,7 @@ ORDER BY
 // PostProjectListByPost
 //
 //	SELECT
-//	    p.id, p.name, p.slug, p.description, p.content, p.raw_content, p.banner_url, p.created_at, p.updated_at, p.embedding_id
+//	    p.id, p.title, p.slug, p.description, p.content, p.raw_content, p.banner_url, p.created_at, p.updated_at, p.embedding_id
 //	FROM
 //	    post_projects pp
 //	    JOIN projects p ON pp.project_id = p.id
@@ -286,7 +295,7 @@ func (q *Queries) PostProjectListByPost(ctx context.Context, postID int64) ([]Pr
 		var i Project
 		if err := rows.Scan(
 			&i.ID,
-			&i.Name,
+			&i.Title,
 			&i.Slug,
 			&i.Description,
 			&i.Content,
@@ -563,7 +572,7 @@ func (q *Queries) PostUpdate(ctx context.Context, arg PostUpdateParams) error {
 
 const postsList = `-- name: PostsList :many
 SELECT
-    id, title, description, slug, content, raw_content, banner_url, created_at, updated_at, embedding_id
+    id, title, slug, description, content, raw_content, banner_url, created_at, updated_at, embedding_id
 FROM
     posts
 ORDER BY
@@ -573,7 +582,7 @@ ORDER BY
 // PostsList
 //
 //	SELECT
-//	    id, title, description, slug, content, raw_content, banner_url, created_at, updated_at, embedding_id
+//	    id, title, slug, description, content, raw_content, banner_url, created_at, updated_at, embedding_id
 //	FROM
 //	    posts
 //	ORDER BY
@@ -590,8 +599,8 @@ func (q *Queries) PostsList(ctx context.Context) ([]Post, error) {
 		if err := rows.Scan(
 			&i.ID,
 			&i.Title,
-			&i.Description,
 			&i.Slug,
+			&i.Description,
 			&i.Content,
 			&i.RawContent,
 			&i.BannerUrl,
@@ -614,7 +623,7 @@ func (q *Queries) PostsList(ctx context.Context) ([]Post, error) {
 
 const postsListByProject = `-- name: PostsListByProject :many
 SELECT
-    p.id, p.title, p.description, p.slug, p.content, p.raw_content, p.banner_url, p.created_at, p.updated_at, p.embedding_id
+    p.id, p.title, p.slug, p.description, p.content, p.raw_content, p.banner_url, p.created_at, p.updated_at, p.embedding_id
 FROM
     posts p
     JOIN post_projects pp ON p.id = pp.post_id
@@ -627,7 +636,7 @@ ORDER BY
 // PostsListByProject
 //
 //	SELECT
-//	    p.id, p.title, p.description, p.slug, p.content, p.raw_content, p.banner_url, p.created_at, p.updated_at, p.embedding_id
+//	    p.id, p.title, p.slug, p.description, p.content, p.raw_content, p.banner_url, p.created_at, p.updated_at, p.embedding_id
 //	FROM
 //	    posts p
 //	    JOIN post_projects pp ON p.id = pp.post_id
@@ -647,8 +656,8 @@ func (q *Queries) PostsListByProject(ctx context.Context, projectID int64) ([]Po
 		if err := rows.Scan(
 			&i.ID,
 			&i.Title,
-			&i.Description,
 			&i.Slug,
+			&i.Description,
 			&i.Content,
 			&i.RawContent,
 			&i.BannerUrl,
@@ -671,7 +680,7 @@ func (q *Queries) PostsListByProject(ctx context.Context, projectID int64) ([]Po
 
 const postsListByTag = `-- name: PostsListByTag :many
 SELECT
-    p.id, p.title, p.description, p.slug, p.content, p.raw_content, p.banner_url, p.created_at, p.updated_at, p.embedding_id
+    p.id, p.title, p.slug, p.description, p.content, p.raw_content, p.banner_url, p.created_at, p.updated_at, p.embedding_id
 FROM
     posts p
     JOIN post_tags pt ON p.id = pt.post_id
@@ -684,7 +693,7 @@ ORDER BY
 // PostsListByTag
 //
 //	SELECT
-//	    p.id, p.title, p.description, p.slug, p.content, p.raw_content, p.banner_url, p.created_at, p.updated_at, p.embedding_id
+//	    p.id, p.title, p.slug, p.description, p.content, p.raw_content, p.banner_url, p.created_at, p.updated_at, p.embedding_id
 //	FROM
 //	    posts p
 //	    JOIN post_tags pt ON p.id = pt.post_id
@@ -704,8 +713,8 @@ func (q *Queries) PostsListByTag(ctx context.Context, tagID int64) ([]Post, erro
 		if err := rows.Scan(
 			&i.ID,
 			&i.Title,
-			&i.Description,
 			&i.Slug,
+			&i.Description,
 			&i.Content,
 			&i.RawContent,
 			&i.BannerUrl,
@@ -726,10 +735,10 @@ func (q *Queries) PostsListByTag(ctx context.Context, tagID int64) ([]Post, erro
 	return items, nil
 }
 
-const projectCreate = `-- name: ProjectCreate :one
+const projectCreate = `-- name: ProjectCreate :exec
 INSERT INTO
     projects (
-        name,
+        title,
         slug,
         description,
         content,
@@ -738,11 +747,11 @@ INSERT INTO
         embedding_id
     )
 VALUES
-    (?, ?, ?, ?, ?, ?, ?) RETURNING id, name, slug, description, content, raw_content, banner_url, created_at, updated_at, embedding_id
+    (?, ?, ?, ?, ?, ?, ?)
 `
 
 type ProjectCreateParams struct {
-	Name        string `db:"name" json:"name"`
+	Title       string `db:"title" json:"title"`
 	Slug        string `db:"slug" json:"slug"`
 	Description string `db:"description" json:"description"`
 	Content     string `db:"content" json:"content"`
@@ -755,7 +764,7 @@ type ProjectCreateParams struct {
 //
 //	INSERT INTO
 //	    projects (
-//	        name,
+//	        title,
 //	        slug,
 //	        description,
 //	        content,
@@ -764,10 +773,10 @@ type ProjectCreateParams struct {
 //	        embedding_id
 //	    )
 //	VALUES
-//	    (?, ?, ?, ?, ?, ?, ?) RETURNING id, name, slug, description, content, raw_content, banner_url, created_at, updated_at, embedding_id
-func (q *Queries) ProjectCreate(ctx context.Context, arg ProjectCreateParams) (Project, error) {
-	row := q.db.QueryRowContext(ctx, projectCreate,
-		arg.Name,
+//	    (?, ?, ?, ?, ?, ?, ?)
+func (q *Queries) ProjectCreate(ctx context.Context, arg ProjectCreateParams) error {
+	_, err := q.db.ExecContext(ctx, projectCreate,
+		arg.Title,
 		arg.Slug,
 		arg.Description,
 		arg.Content,
@@ -775,25 +784,12 @@ func (q *Queries) ProjectCreate(ctx context.Context, arg ProjectCreateParams) (P
 		arg.BannerUrl,
 		arg.EmbeddingID,
 	)
-	var i Project
-	err := row.Scan(
-		&i.ID,
-		&i.Name,
-		&i.Slug,
-		&i.Description,
-		&i.Content,
-		&i.RawContent,
-		&i.BannerUrl,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-		&i.EmbeddingID,
-	)
-	return i, err
+	return err
 }
 
 const projectGetByID = `-- name: ProjectGetByID :one
 SELECT
-    id, name, slug, description, content, raw_content, banner_url, created_at, updated_at, embedding_id
+    id, title, slug, description, content, raw_content, banner_url, created_at, updated_at, embedding_id
 FROM
     projects
 WHERE
@@ -805,7 +801,7 @@ LIMIT
 // ProjectGetByID
 //
 //	SELECT
-//	    id, name, slug, description, content, raw_content, banner_url, created_at, updated_at, embedding_id
+//	    id, title, slug, description, content, raw_content, banner_url, created_at, updated_at, embedding_id
 //	FROM
 //	    projects
 //	WHERE
@@ -817,7 +813,7 @@ func (q *Queries) ProjectGetByID(ctx context.Context, id int64) (Project, error)
 	var i Project
 	err := row.Scan(
 		&i.ID,
-		&i.Name,
+		&i.Title,
 		&i.Slug,
 		&i.Description,
 		&i.Content,
@@ -832,7 +828,7 @@ func (q *Queries) ProjectGetByID(ctx context.Context, id int64) (Project, error)
 
 const projectGetBySlug = `-- name: ProjectGetBySlug :one
 SELECT
-    id, name, slug, description, content, raw_content, banner_url, created_at, updated_at, embedding_id
+    id, title, slug, description, content, raw_content, banner_url, created_at, updated_at, embedding_id
 FROM
     projects
 WHERE
@@ -844,7 +840,7 @@ LIMIT
 // ProjectGetBySlug
 //
 //	SELECT
-//	    id, name, slug, description, content, raw_content, banner_url, created_at, updated_at, embedding_id
+//	    id, title, slug, description, content, raw_content, banner_url, created_at, updated_at, embedding_id
 //	FROM
 //	    projects
 //	WHERE
@@ -856,7 +852,7 @@ func (q *Queries) ProjectGetBySlug(ctx context.Context, slug string) (Project, e
 	var i Project
 	err := row.Scan(
 		&i.ID,
-		&i.Name,
+		&i.Title,
 		&i.Slug,
 		&i.Description,
 		&i.Content,
@@ -987,27 +983,29 @@ func (q *Queries) ProjectTagsGetByTagID(ctx context.Context, tagID int64) ([]Pro
 	return items, nil
 }
 
-const projectUpdate = `-- name: ProjectUpdate :one
+const projectUpdate = `-- name: ProjectUpdate :exec
 UPDATE
     projects
 SET
-    name = ?,
+    title = ?,
     slug = ?,
     description = ?,
     content = ?,
     raw_content = ?,
-    banner_url = ?
+    banner_url = ?,
+    embedding_id = ?
 WHERE
-    id = ? RETURNING id, name, slug, description, content, raw_content, banner_url, created_at, updated_at, embedding_id
+    id = ?
 `
 
 type ProjectUpdateParams struct {
-	Name        string `db:"name" json:"name"`
+	Title       string `db:"title" json:"title"`
 	Slug        string `db:"slug" json:"slug"`
 	Description string `db:"description" json:"description"`
 	Content     string `db:"content" json:"content"`
 	RawContent  string `db:"raw_content" json:"raw_content"`
 	BannerUrl   string `db:"banner_url" json:"banner_url"`
+	EmbeddingID int64  `db:"embedding_id" json:"embedding_id"`
 	ID          int64  `db:"id" json:"id"`
 }
 
@@ -1016,43 +1014,32 @@ type ProjectUpdateParams struct {
 //	UPDATE
 //	    projects
 //	SET
-//	    name = ?,
+//	    title = ?,
 //	    slug = ?,
 //	    description = ?,
 //	    content = ?,
 //	    raw_content = ?,
-//	    banner_url = ?
+//	    banner_url = ?,
+//	    embedding_id = ?
 //	WHERE
-//	    id = ? RETURNING id, name, slug, description, content, raw_content, banner_url, created_at, updated_at, embedding_id
-func (q *Queries) ProjectUpdate(ctx context.Context, arg ProjectUpdateParams) (Project, error) {
-	row := q.db.QueryRowContext(ctx, projectUpdate,
-		arg.Name,
+//	    id = ?
+func (q *Queries) ProjectUpdate(ctx context.Context, arg ProjectUpdateParams) error {
+	_, err := q.db.ExecContext(ctx, projectUpdate,
+		arg.Title,
 		arg.Slug,
 		arg.Description,
 		arg.Content,
 		arg.RawContent,
 		arg.BannerUrl,
+		arg.EmbeddingID,
 		arg.ID,
 	)
-	var i Project
-	err := row.Scan(
-		&i.ID,
-		&i.Name,
-		&i.Slug,
-		&i.Description,
-		&i.Content,
-		&i.RawContent,
-		&i.BannerUrl,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-		&i.EmbeddingID,
-	)
-	return i, err
+	return err
 }
 
 const projectsList = `-- name: ProjectsList :many
 SELECT
-    id, name, slug, description, content, raw_content, banner_url, created_at, updated_at, embedding_id
+    id, title, slug, description, content, raw_content, banner_url, created_at, updated_at, embedding_id
 FROM
     projects
 ORDER BY
@@ -1062,7 +1049,7 @@ ORDER BY
 // ProjectsList
 //
 //	SELECT
-//	    id, name, slug, description, content, raw_content, banner_url, created_at, updated_at, embedding_id
+//	    id, title, slug, description, content, raw_content, banner_url, created_at, updated_at, embedding_id
 //	FROM
 //	    projects
 //	ORDER BY
@@ -1078,7 +1065,7 @@ func (q *Queries) ProjectsList(ctx context.Context) ([]Project, error) {
 		var i Project
 		if err := rows.Scan(
 			&i.ID,
-			&i.Name,
+			&i.Title,
 			&i.Slug,
 			&i.Description,
 			&i.Content,
@@ -1103,7 +1090,7 @@ func (q *Queries) ProjectsList(ctx context.Context) ([]Project, error) {
 
 const projectsListByPost = `-- name: ProjectsListByPost :many
 SELECT
-    p.id, p.name, p.slug, p.description, p.content, p.raw_content, p.banner_url, p.created_at, p.updated_at, p.embedding_id
+    p.id, p.title, p.slug, p.description, p.content, p.raw_content, p.banner_url, p.created_at, p.updated_at, p.embedding_id
 FROM
     projects p
     JOIN post_projects pp ON p.id = pp.project_id
@@ -1116,7 +1103,7 @@ ORDER BY
 // ProjectsListByPost
 //
 //	SELECT
-//	    p.id, p.name, p.slug, p.description, p.content, p.raw_content, p.banner_url, p.created_at, p.updated_at, p.embedding_id
+//	    p.id, p.title, p.slug, p.description, p.content, p.raw_content, p.banner_url, p.created_at, p.updated_at, p.embedding_id
 //	FROM
 //	    projects p
 //	    JOIN post_projects pp ON p.id = pp.project_id
@@ -1135,7 +1122,7 @@ func (q *Queries) ProjectsListByPost(ctx context.Context, postID int64) ([]Proje
 		var i Project
 		if err := rows.Scan(
 			&i.ID,
-			&i.Name,
+			&i.Title,
 			&i.Slug,
 			&i.Description,
 			&i.Content,
@@ -1160,7 +1147,7 @@ func (q *Queries) ProjectsListByPost(ctx context.Context, postID int64) ([]Proje
 
 const projectsListByTag = `-- name: ProjectsListByTag :many
 SELECT
-    p.id, p.name, p.slug, p.description, p.content, p.raw_content, p.banner_url, p.created_at, p.updated_at, p.embedding_id
+    p.id, p.title, p.slug, p.description, p.content, p.raw_content, p.banner_url, p.created_at, p.updated_at, p.embedding_id
 FROM
     projects p
     JOIN project_tags pt ON p.id = pt.project_id
@@ -1173,7 +1160,7 @@ ORDER BY
 // ProjectsListByTag
 //
 //	SELECT
-//	    p.id, p.name, p.slug, p.description, p.content, p.raw_content, p.banner_url, p.created_at, p.updated_at, p.embedding_id
+//	    p.id, p.title, p.slug, p.description, p.content, p.raw_content, p.banner_url, p.created_at, p.updated_at, p.embedding_id
 //	FROM
 //	    projects p
 //	    JOIN project_tags pt ON p.id = pt.project_id
@@ -1192,7 +1179,7 @@ func (q *Queries) ProjectsListByTag(ctx context.Context, tagID int64) ([]Project
 		var i Project
 		if err := rows.Scan(
 			&i.ID,
-			&i.Name,
+			&i.Title,
 			&i.Slug,
 			&i.Description,
 			&i.Content,
@@ -1215,15 +1202,15 @@ func (q *Queries) ProjectsListByTag(ctx context.Context, tagID int64) ([]Project
 	return items, nil
 }
 
-const tagCreate = `-- name: TagCreate :one
+const tagCreate = `-- name: TagCreate :exec
 INSERT INTO
-    tags (name, description, slug, embedding_id)
+    tags (title, description, slug, embedding_id)
 VALUES
-    (?, ?, ?, ?) RETURNING id, name, description, slug, icon, created_at, updated_at, embedding_id
+    (?, ?, ?, ?)
 `
 
 type TagCreateParams struct {
-	Name        string `db:"name" json:"name"`
+	Title       string `db:"title" json:"title"`
 	Description string `db:"description" json:"description"`
 	Slug        string `db:"slug" json:"slug"`
 	EmbeddingID int64  `db:"embedding_id" json:"embedding_id"`
@@ -1232,33 +1219,22 @@ type TagCreateParams struct {
 // TagCreate
 //
 //	INSERT INTO
-//	    tags (name, description, slug, embedding_id)
+//	    tags (title, description, slug, embedding_id)
 //	VALUES
-//	    (?, ?, ?, ?) RETURNING id, name, description, slug, icon, created_at, updated_at, embedding_id
-func (q *Queries) TagCreate(ctx context.Context, arg TagCreateParams) (Tag, error) {
-	row := q.db.QueryRowContext(ctx, tagCreate,
-		arg.Name,
+//	    (?, ?, ?, ?)
+func (q *Queries) TagCreate(ctx context.Context, arg TagCreateParams) error {
+	_, err := q.db.ExecContext(ctx, tagCreate,
+		arg.Title,
 		arg.Description,
 		arg.Slug,
 		arg.EmbeddingID,
 	)
-	var i Tag
-	err := row.Scan(
-		&i.ID,
-		&i.Name,
-		&i.Description,
-		&i.Slug,
-		&i.Icon,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-		&i.EmbeddingID,
-	)
-	return i, err
+	return err
 }
 
 const tagGetByID = `-- name: TagGetByID :one
 SELECT
-    id, name, description, slug, icon, created_at, updated_at, embedding_id
+    id, title, slug, description, icon, created_at, updated_at, embedding_id
 FROM
     tags
 WHERE
@@ -1270,7 +1246,7 @@ LIMIT
 // TagGetByID
 //
 //	SELECT
-//	    id, name, description, slug, icon, created_at, updated_at, embedding_id
+//	    id, title, slug, description, icon, created_at, updated_at, embedding_id
 //	FROM
 //	    tags
 //	WHERE
@@ -1282,9 +1258,9 @@ func (q *Queries) TagGetByID(ctx context.Context, id int64) (Tag, error) {
 	var i Tag
 	err := row.Scan(
 		&i.ID,
-		&i.Name,
-		&i.Description,
+		&i.Title,
 		&i.Slug,
+		&i.Description,
 		&i.Icon,
 		&i.CreatedAt,
 		&i.UpdatedAt,
@@ -1293,35 +1269,35 @@ func (q *Queries) TagGetByID(ctx context.Context, id int64) (Tag, error) {
 	return i, err
 }
 
-const tagGetByName = `-- name: TagGetByName :one
+const tagGetBySlug = `-- name: TagGetBySlug :one
 SELECT
-    id, name, description, slug, icon, created_at, updated_at, embedding_id
+    id, title, slug, description, icon, created_at, updated_at, embedding_id
 FROM
     tags
 WHERE
-    name = ?
+    slug = ?
 LIMIT
     1
 `
 
-// TagGetByName
+// TagGetBySlug
 //
 //	SELECT
-//	    id, name, description, slug, icon, created_at, updated_at, embedding_id
+//	    id, title, slug, description, icon, created_at, updated_at, embedding_id
 //	FROM
 //	    tags
 //	WHERE
-//	    name = ?
+//	    slug = ?
 //	LIMIT
 //	    1
-func (q *Queries) TagGetByName(ctx context.Context, name string) (Tag, error) {
-	row := q.db.QueryRowContext(ctx, tagGetByName, name)
+func (q *Queries) TagGetBySlug(ctx context.Context, slug string) (Tag, error) {
+	row := q.db.QueryRowContext(ctx, tagGetBySlug, slug)
 	var i Tag
 	err := row.Scan(
 		&i.ID,
-		&i.Name,
-		&i.Description,
+		&i.Title,
 		&i.Slug,
+		&i.Description,
 		&i.Icon,
 		&i.CreatedAt,
 		&i.UpdatedAt,
@@ -1330,78 +1306,71 @@ func (q *Queries) TagGetByName(ctx context.Context, name string) (Tag, error) {
 	return i, err
 }
 
-const tagsListAlphabetical = `-- name: TagsListAlphabetical :many
-SELECT
-    id, name, description, slug, icon, created_at, updated_at, embedding_id
-FROM
+const tagUpdate = `-- name: TagUpdate :exec
+UPDATE
     tags
-ORDER BY
-    name
+SET
+    title = ?,
+    description = ?,
+    slug = ?,
+    embedding_id = ?
+WHERE
+    id = ?
 `
 
-// TagsListAlphabetical
+type TagUpdateParams struct {
+	Title       string `db:"title" json:"title"`
+	Description string `db:"description" json:"description"`
+	Slug        string `db:"slug" json:"slug"`
+	EmbeddingID int64  `db:"embedding_id" json:"embedding_id"`
+	ID          int64  `db:"id" json:"id"`
+}
+
+// TagUpdate
 //
-//	SELECT
-//	    id, name, description, slug, icon, created_at, updated_at, embedding_id
-//	FROM
+//	UPDATE
 //	    tags
-//	ORDER BY
-//	    name
-func (q *Queries) TagsListAlphabetical(ctx context.Context) ([]Tag, error) {
-	rows, err := q.db.QueryContext(ctx, tagsListAlphabetical)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []Tag
-	for rows.Next() {
-		var i Tag
-		if err := rows.Scan(
-			&i.ID,
-			&i.Name,
-			&i.Description,
-			&i.Slug,
-			&i.Icon,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-			&i.EmbeddingID,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
+//	SET
+//	    title = ?,
+//	    description = ?,
+//	    slug = ?,
+//	    embedding_id = ?
+//	WHERE
+//	    id = ?
+func (q *Queries) TagUpdate(ctx context.Context, arg TagUpdateParams) error {
+	_, err := q.db.ExecContext(ctx, tagUpdate,
+		arg.Title,
+		arg.Description,
+		arg.Slug,
+		arg.EmbeddingID,
+		arg.ID,
+	)
+	return err
 }
 
 const tagsListByPost = `-- name: TagsListByPost :many
 SELECT
-    t.id, t.name, t.description, t.slug, t.icon, t.created_at, t.updated_at, t.embedding_id
+    t.id, t.title, t.slug, t.description, t.icon, t.created_at, t.updated_at, t.embedding_id
 FROM
     tags t
     JOIN post_tags pt ON t.id = pt.tag_id
 WHERE
     pt.post_id = ?
 ORDER BY
-    t.name ASC
+    t.title ASC
 `
 
 // TagsListByPost
 //
 //	SELECT
-//	    t.id, t.name, t.description, t.slug, t.icon, t.created_at, t.updated_at, t.embedding_id
+//	    t.id, t.title, t.slug, t.description, t.icon, t.created_at, t.updated_at, t.embedding_id
 //	FROM
 //	    tags t
 //	    JOIN post_tags pt ON t.id = pt.tag_id
 //	WHERE
 //	    pt.post_id = ?
 //	ORDER BY
-//	    t.name ASC
+//	    t.title ASC
 func (q *Queries) TagsListByPost(ctx context.Context, postID int64) ([]Tag, error) {
 	rows, err := q.db.QueryContext(ctx, tagsListByPost, postID)
 	if err != nil {
@@ -1413,9 +1382,9 @@ func (q *Queries) TagsListByPost(ctx context.Context, postID int64) ([]Tag, erro
 		var i Tag
 		if err := rows.Scan(
 			&i.ID,
-			&i.Name,
-			&i.Description,
+			&i.Title,
 			&i.Slug,
+			&i.Description,
 			&i.Icon,
 			&i.CreatedAt,
 			&i.UpdatedAt,
@@ -1436,27 +1405,27 @@ func (q *Queries) TagsListByPost(ctx context.Context, postID int64) ([]Tag, erro
 
 const tagsListByProject = `-- name: TagsListByProject :many
 SELECT
-    t.id, t.name, t.description, t.slug, t.icon, t.created_at, t.updated_at, t.embedding_id
+    t.id, t.title, t.slug, t.description, t.icon, t.created_at, t.updated_at, t.embedding_id
 FROM
     tags t
     JOIN project_tags pt ON t.id = pt.tag_id
 WHERE
     pt.project_id = ?
 ORDER BY
-    t.name ASC
+    t.title ASC
 `
 
 // TagsListByProject
 //
 //	SELECT
-//	    t.id, t.name, t.description, t.slug, t.icon, t.created_at, t.updated_at, t.embedding_id
+//	    t.id, t.title, t.slug, t.description, t.icon, t.created_at, t.updated_at, t.embedding_id
 //	FROM
 //	    tags t
 //	    JOIN project_tags pt ON t.id = pt.tag_id
 //	WHERE
 //	    pt.project_id = ?
 //	ORDER BY
-//	    t.name ASC
+//	    t.title ASC
 func (q *Queries) TagsListByProject(ctx context.Context, projectID int64) ([]Tag, error) {
 	rows, err := q.db.QueryContext(ctx, tagsListByProject, projectID)
 	if err != nil {
@@ -1468,9 +1437,9 @@ func (q *Queries) TagsListByProject(ctx context.Context, projectID int64) ([]Tag
 		var i Tag
 		if err := rows.Scan(
 			&i.ID,
-			&i.Name,
-			&i.Description,
+			&i.Title,
 			&i.Slug,
+			&i.Description,
 			&i.Icon,
 			&i.CreatedAt,
 			&i.UpdatedAt,

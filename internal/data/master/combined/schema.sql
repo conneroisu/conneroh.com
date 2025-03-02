@@ -11,10 +11,10 @@ CREATE TABLE IF NOT EXISTS embeddings (
 
 -- dialect: sqlite
 CREATE TABLE IF NOT EXISTS posts (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    title TEXT NOT NULL,
-    description TEXT NOT NULL,
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    title TEXT NOT NULL UNIQUE,
     slug TEXT NOT NULL UNIQUE,
+    description TEXT NOT NULL,
     content TEXT NOT NULL,
     raw_content TEXT NOT NULL,
     banner_url TEXT NOT NULL,
@@ -42,9 +42,9 @@ CREATE TABLE IF NOT EXISTS post_tags (
 
 -- dialect: sqlite
 CREATE TABLE IF NOT EXISTS projects (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL UNIQUE,
-    slug TEXT NOT NULL,
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    title TEXT NOT NULL UNIQUE,
+    slug TEXT NOT NULL UNIQUE,
     description TEXT NOT NULL,
     content TEXT NOT NULL,
     raw_content TEXT NOT NULL,
@@ -65,15 +65,13 @@ CREATE TABLE IF NOT EXISTS project_tags (
 
 -- dialect: sqlite
 CREATE TABLE IF NOT EXISTS tags (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL UNIQUE,
-    description TEXT NOT NULL,
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    title TEXT NOT NULL UNIQUE,
     slug TEXT NOT NULL UNIQUE,
+    description TEXT NOT NULL,
     icon TEXT NOT NULL DEFAULT 'nf-fa-tag',
     created_at INTEGER NOT NULL DEFAULT (unixepoch('now')),
     updated_at INTEGER NOT NULL DEFAULT (unixepoch('now')),
     embedding_id INTEGER NOT NULL,
-    FOREIGN KEY(embedding_id) REFERENCES embeddings(id)
+    FOREIGN KEY (embedding_id) REFERENCES embeddings(id)
 );
-
-CREATE INDEX IF NOT EXISTS idx_tags_name ON tags (name);

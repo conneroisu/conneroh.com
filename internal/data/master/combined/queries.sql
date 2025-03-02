@@ -20,6 +20,14 @@ WHERE
 LIMIT
     1;
 
+-- name: EmeddingUpdate :exec
+UPDATE
+    embeddings
+SET
+    embedding = ?
+WHERE
+    id = ?;
+
 -- name: PostGet :one
 SELECT
     *
@@ -30,7 +38,7 @@ WHERE
 LIMIT
     1;
 
--- name: PostCreate :one
+-- name: PostCreate :exec
 INSERT INTO
     posts (
         title,
@@ -42,7 +50,7 @@ INSERT INTO
         embedding_id
     )
 VALUES
-    (?, ?, ?, ?, ?, ?, ?) RETURNING *;
+    (?, ?, ?, ?, ?, ?, ?);
 
 -- name: PostUpdate :exec
 UPDATE
@@ -195,10 +203,10 @@ FROM
 ORDER BY
     created_at DESC;
 
--- name: ProjectCreate :one
+-- name: ProjectCreate :exec
 INSERT INTO
     projects (
-        name,
+        title,
         slug,
         description,
         content,
@@ -207,20 +215,21 @@ INSERT INTO
         embedding_id
     )
 VALUES
-    (?, ?, ?, ?, ?, ?, ?) RETURNING *;
+    (?, ?, ?, ?, ?, ?, ?);
 
--- name: ProjectUpdate :one
+-- name: ProjectUpdate :exec
 UPDATE
     projects
 SET
-    name = ?,
+    title = ?,
     slug = ?,
     description = ?,
     content = ?,
     raw_content = ?,
-    banner_url = ?
+    banner_url = ?,
+    embedding_id = ?
 WHERE
-    id = ? RETURNING *;
+    id = ?;
 
 -- name: ProjectsListByTag :many
 SELECT
@@ -283,29 +292,32 @@ WHERE
 LIMIT
     1;
 
--- name: TagGetByName :one
+-- name: TagGetBySlug :one
 SELECT
     *
 FROM
     tags
 WHERE
-    name = ?
+    slug = ?
 LIMIT
     1;
 
--- name: TagsListAlphabetical :many
-SELECT
-    *
-FROM
-    tags
-ORDER BY
-    name;
-
--- name: TagCreate :one
+-- name: TagCreate :exec
 INSERT INTO
-    tags (name, description, slug, embedding_id)
+    tags (title, description, slug, embedding_id)
 VALUES
-    (?, ?, ?, ?) RETURNING *;
+    (?, ?, ?, ?);
+
+-- name: TagUpdate :exec
+UPDATE
+    tags
+SET
+    title = ?,
+    description = ?,
+    slug = ?,
+    embedding_id = ?
+WHERE
+    id = ?;
 
 -- name: TagsListByProject :many
 SELECT
@@ -316,7 +328,7 @@ FROM
 WHERE
     pt.project_id = ?
 ORDER BY
-    t.name ASC;
+    t.title ASC;
 
 -- name: TagsListByPost :many
 SELECT
@@ -327,4 +339,4 @@ FROM
 WHERE
     pt.post_id = ?
 ORDER BY
-    t.name ASC;
+    t.title ASC;

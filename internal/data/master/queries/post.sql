@@ -8,7 +8,7 @@ WHERE
 LIMIT
     1;
 
--- name: PostCreate :one
+-- name: PostCreate :exec
 INSERT INTO
     posts (
         title,
@@ -20,7 +20,7 @@ INSERT INTO
         embedding_id
     )
 VALUES
-    (?, ?, ?, ?, ?, ?, ?) RETURNING *;
+    (?, ?, ?, ?, ?, ?, ?);
 
 -- name: PostUpdate :exec
 UPDATE

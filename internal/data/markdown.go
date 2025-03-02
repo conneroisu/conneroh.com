@@ -6,6 +6,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"os"
 
 	"github.com/conneroisu/conneroh.com/internal/data/master"
@@ -95,15 +96,13 @@ type Markdown struct {
 	Projects []string `yaml:"projects,omitempty"`
 
 	// RawContent is the content of the document.
-	RawContent []byte `yaml:"-"`
+	RawContent string `yaml:"-"`
 	// RenderContent is the content of the document to be rendered as HTML.
-	RenderContent []byte `yaml:"-"`
-	// Emebbedding is the content of the document to be embedded in the page.
-	EmbeddingContent [][]float64 `yaml:"-"`
+	RenderContent string `yaml:"-"`
 }
 
 // Parse parses the markdown file at the given path.
-func Parse(path string) (*Markdown, error) {
+func Parse(path string, tag bool) (*Markdown, error) {
 	b, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
@@ -123,61 +122,34 @@ func Parse(path string) (*Markdown, error) {
 	if err != nil {
 		return nil, err
 	}
-	fm.RenderContent = buf.Bytes()
+	fm.RenderContent = buf.String()
 	if fm.Description == "" {
+		if !tag {
+			return nil, fmt.Errorf("description is empty for %s", path)
+		}
 		// It is a tag page.
-		fm.Description = string(fm.RenderContent)
+		fm.Description = fm.RawContent
 	}
-	fm.RawContent = b
+	fm.RawContent = string(b)
 
 	return &fm, nil
 }
 
-// UpsertPost inserts or updates the post document in the database.
-func (md *Markdown) UpsertPost(
+func (md *Markdown) assertTags(
 	ctx context.Context,
 	db *Database[master.Queries],
-	client *api.Client,
 ) error {
-	// check if the post already exists
-	post, err := db.Queries.PostGetBySlug(ctx, md.Slug)
-	if err == nil {
-		// same content
-		if post.RawContent == string(md.RawContent) {
-			return db.Queries.PostUpdate(ctx, master.PostUpdateParams{
-				ID:          post.ID,
-				Slug:        md.Slug,
-				Title:       md.Title,
-				BannerUrl:   md.BannerURL,
-				Description: md.Description,
-				RawContent:  string(md.RawContent),
-				Content:     string(md.RenderContent),
-				EmbeddingID: post.EmbeddingID,
-			})
-		}
-		id, err := UpsertEmbedding(ctx, db, client, string(md.RawContent))
-		if err != nil {
-			return err
-		}
-		// same embedding
-		if id == post.EmbeddingID {
-			return db.Queries.PostUpdate(ctx, master.PostUpdateParams{
-				ID:          post.ID,
-				Slug:        md.Slug,
-				Title:       md.Title,
-				BannerUrl:   md.BannerURL,
-				Description: md.Description,
-				RawContent:  string(md.RawContent),
-				Content:     string(md.RenderContent),
-				EmbeddingID: id,
-			})
+	for _, tag := range md.Tags {
+		_, err := db.Queries.TagGetBySlug(ctx, tag)
+		if err == nil || errors.Is(err, sql.ErrNoRows) {
+			return fmt.Errorf(
+				"failed to find referenced tag %s: %w",
+				tag,
+				err,
+			)
 		}
 	}
-	// err is not nil
-	if errors.Is(err, sql.ErrNoRows) {
-		return md.insertPost(ctx, db)
-	}
-	return err
+	return nil
 }
 
 // UpsertEmbedding inserts or updates the embedding document in the database.
@@ -186,29 +158,230 @@ func UpsertEmbedding(
 	db *Database[master.Queries],
 	client *api.Client,
 	content string,
+	existingID int64,
 ) (int64, error) {
 	embed, err := client.Embeddings(ctx, &api.EmbeddingRequest{
 		Model:  "granite-embedding:278m",
 		Prompt: content,
 	})
 	if err != nil {
-		return int64(0), err
+		return 0, err
 	}
 	jsVal, err := json.Marshal(embed)
 	if err != nil {
 		return 0, err
 	}
+	// embedding already exists, update it
+	if existingID != 0 {
+		err = db.Queries.EmeddingUpdate(ctx, string(jsVal), existingID)
+		if err != nil {
+			return 0, err
+		}
+		return existingID, nil
+	}
+	// embedding does not exist, create it
 	id, err := db.Queries.EmbeddingsCreate(ctx, string(jsVal))
 	if err != nil {
 		return 0, err
 	}
-
 	return id, nil
 }
 
-func (md *Markdown) insertPost(
+// UpsertTag inserts or updates the tag document in the database.
+func (md *Markdown) UpsertTag(
 	ctx context.Context,
 	db *Database[master.Queries],
+	client *api.Client,
 ) error {
+	var id int64
+	tag, err := db.Queries.TagGetBySlug(ctx, md.Slug)
+	if err == nil {
+		if tag.Description == md.RawContent {
+			return db.Queries.TagUpdate(
+				ctx,
+				master.TagUpdateParams{
+					ID:          tag.ID,
+					Slug:        md.Slug,
+					Title:       md.Title,
+					Description: md.Description,
+					EmbeddingID: tag.EmbeddingID,
+				},
+			)
+		}
+		id, err = UpsertEmbedding(
+			ctx,
+			db,
+			client,
+			md.RawContent,
+			tag.EmbeddingID,
+		)
+		if err != nil {
+			return err
+		}
+		// updated embedding
+		return db.Queries.TagUpdate(
+			ctx,
+			master.TagUpdateParams{
+				ID:          tag.ID,
+				Slug:        md.Slug,
+				Title:       md.Title,
+				Description: md.Description,
+				EmbeddingID: id,
+			},
+		)
+	}
+	// err is not nil (new tag)
+	if errors.Is(err, sql.ErrNoRows) {
+		id, err = UpsertEmbedding(ctx, db, client, md.RawContent, 0)
+		if err != nil {
+			return err
+		}
+		return db.Queries.TagCreate(ctx, master.TagCreateParams{
+			Slug:        md.Slug,
+			Title:       md.Title,
+			Description: md.Description,
+			EmbeddingID: id,
+		})
+	}
+	return err
+}
+
+// UpsertPost inserts or updates the post document in the database.
+func (md *Markdown) UpsertPost(
+	ctx context.Context,
+	db *Database[master.Queries],
+	client *api.Client,
+) error {
+	var id int64
+	err := md.assertTags(ctx, db)
+	if err != nil {
+		return err
+	}
+	// check if the post already exists
+	post, err := db.Queries.PostGetBySlug(ctx, md.Slug)
+	if err == nil {
+		// same content
+		if post.RawContent == string(md.RawContent) {
+			return db.Queries.PostUpdate(
+				ctx,
+				master.PostUpdateParams{
+					ID:          post.ID,
+					Slug:        md.Slug,
+					Title:       md.Title,
+					BannerUrl:   md.BannerURL,
+					Description: md.Description,
+					RawContent:  md.RawContent,
+					Content:     md.RenderContent,
+					EmbeddingID: post.EmbeddingID,
+				},
+			)
+		}
+		id, err = UpsertEmbedding(
+			ctx,
+			db,
+			client,
+			md.RawContent,
+			post.EmbeddingID,
+		)
+		if err != nil {
+			return err
+		}
+		return db.Queries.PostUpdate(
+			ctx,
+			master.PostUpdateParams{
+				ID:          post.ID,
+				Slug:        md.Slug,
+				Title:       md.Title,
+				BannerUrl:   md.BannerURL,
+				Description: md.Description,
+				RawContent:  md.RawContent,
+				Content:     md.RenderContent,
+				EmbeddingID: id,
+			},
+		)
+	}
+	// err is not nil (new post)
+	if errors.Is(err, sql.ErrNoRows) {
+		id, err = UpsertEmbedding(ctx, db, client, md.RawContent, 0)
+		if err != nil {
+			return err
+		}
+		return db.Queries.PostCreate(ctx, master.PostCreateParams{
+			Slug:        md.Slug,
+			Title:       md.Title,
+			BannerUrl:   md.BannerURL,
+			Description: md.Description,
+			RawContent:  md.RawContent,
+			Content:     md.RenderContent,
+			EmbeddingID: id,
+		})
+	}
+	return err
+}
+
+// UpsertProject inserts or updates a project in the database.
+func (md *Markdown) UpsertProject(
+	ctx context.Context,
+	db *Database[master.Queries],
+	client *api.Client,
+) error {
+	var id int64
+	err := md.assertTags(ctx, db)
+	if err != nil {
+		return err
+	}
+	project, err := db.Queries.ProjectGetBySlug(ctx, md.Slug)
+	if err == nil {
+		// project already exists with the same content, update metadata
+		if project.Content == md.RawContent {
+			return db.Queries.ProjectUpdate(
+				ctx,
+				master.ProjectUpdateParams{
+					ID:          project.ID,
+					Slug:        md.Slug,
+					Title:       md.Title,
+					BannerUrl:   md.BannerURL,
+					Description: md.Description,
+					Content:     md.RenderContent,
+					RawContent:  md.RawContent,
+					EmbeddingID: project.EmbeddingID,
+				},
+			)
+		}
+		// project already exists with a different content, update embedding
+		id, err = UpsertEmbedding(
+			ctx,
+			db,
+			client,
+			string(md.RawContent),
+			project.EmbeddingID,
+		)
+		if err != nil {
+			return err
+		}
+
+	}
+	// err is not nil (new project)
+	if errors.Is(err, sql.ErrNoRows) {
+		id, err = UpsertEmbedding(
+			ctx,
+			db,
+			client,
+			md.RawContent,
+			0,
+		)
+		if err != nil {
+			return err
+		}
+		return db.Queries.ProjectUpdate(ctx, master.ProjectUpdateParams{
+			ID:          project.ID,
+			Slug:        md.Slug,
+			Title:       md.Title,
+			BannerUrl:   md.BannerURL,
+			Description: md.Description,
+			Content:     md.RenderContent,
+			EmbeddingID: id,
+		})
+	}
 	return nil
 }

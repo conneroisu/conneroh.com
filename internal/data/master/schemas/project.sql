@@ -1,8 +1,8 @@
 -- dialect: sqlite
 CREATE TABLE IF NOT EXISTS projects (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL UNIQUE,
-    slug TEXT NOT NULL,
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    title TEXT NOT NULL UNIQUE,
+    slug TEXT NOT NULL UNIQUE,
     description TEXT NOT NULL,
     content TEXT NOT NULL,
     raw_content TEXT NOT NULL,

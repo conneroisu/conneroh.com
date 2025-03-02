@@ -14,3 +14,11 @@ WHERE
     id = ?
 LIMIT
     1;
+
+-- name: EmeddingUpdate :exec
+UPDATE
+    embeddings
+SET
+    embedding = ?
+WHERE
+    id = ?;

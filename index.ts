@@ -1,5 +1,4 @@
 import "htmx.org";
-import htmx from "htmx.org";
 import Alpine from "alpinejs";
 
 declare global {

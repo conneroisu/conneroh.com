@@ -13,8 +13,8 @@ type Embedding struct {
 type Post struct {
 	ID          int64  `db:"id" json:"id"`
 	Title       string `db:"title" json:"title"`
-	Description string `db:"description" json:"description"`
 	Slug        string `db:"slug" json:"slug"`
+	Description string `db:"description" json:"description"`
 	Content     string `db:"content" json:"content"`
 	RawContent  string `db:"raw_content" json:"raw_content"`
 	BannerUrl   string `db:"banner_url" json:"banner_url"`
@@ -35,7 +35,7 @@ type PostTag struct {
 
 type Project struct {
 	ID          int64  `db:"id" json:"id"`
-	Name        string `db:"name" json:"name"`
+	Title       string `db:"title" json:"title"`
 	Slug        string `db:"slug" json:"slug"`
 	Description string `db:"description" json:"description"`
 	Content     string `db:"content" json:"content"`
@@ -53,9 +53,9 @@ type ProjectTag struct {
 
 type Tag struct {
 	ID          int64  `db:"id" json:"id"`
-	Name        string `db:"name" json:"name"`
-	Description string `db:"description" json:"description"`
+	Title       string `db:"title" json:"title"`
 	Slug        string `db:"slug" json:"slug"`
+	Description string `db:"description" json:"description"`
 	Icon        string `db:"icon" json:"icon"`
 	CreatedAt   int64  `db:"created_at" json:"created_at"`
 	UpdatedAt   int64  `db:"updated_at" json:"updated_at"`
