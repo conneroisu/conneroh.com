@@ -7,12 +7,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/fs"
-	"log/slog"
 	"os"
-	"strings"
 
-	"github.com/conneroisu/conneroh.com/internal/data/docs"
 	"github.com/conneroisu/conneroh.com/internal/data/master"
 	mathjax "github.com/litao91/goldmark-mathjax"
 	"github.com/ollama/ollama/api"
@@ -76,81 +72,6 @@ var (
 		),
 	)
 )
-
-// ParseAll parses all markdown files in the database.
-func ParseAll(ctx context.Context, db *Database[master.Queries]) error {
-	client, err := api.ClientFromEnvironment()
-	if err != nil {
-		return err
-	}
-
-	err = fs.WalkDir(
-		docs.Tags,
-		"tags",
-		func(path string, d fs.DirEntry, err error) error {
-			if err != nil {
-				return err
-			}
-			if d.IsDir() || !strings.HasSuffix(path, ".md") {
-				return nil
-			}
-			slog.Info("parsing tag", "path", path)
-			parsed, err := Parse(path, true)
-			if err != nil {
-				return err
-			}
-			return parsed.UpsertTag(ctx, db, client)
-		},
-	)
-	if err != nil {
-		return err
-	}
-
-	err = fs.WalkDir(
-		docs.Posts,
-		"posts",
-		func(path string, d fs.DirEntry, err error) error {
-			if err != nil {
-				return err
-			}
-			if d.IsDir() || !strings.HasSuffix(path, ".md") {
-				return nil
-			}
-			slog.Info("parsing post", "path", path)
-			parsed, err := Parse(path, false)
-			if err != nil {
-				return err
-			}
-			return parsed.UpsertPost(ctx, db, client)
-		},
-	)
-	if err != nil {
-		return err
-	}
-
-	err = fs.WalkDir(
-		docs.Projects,
-		"projects",
-		func(path string, d fs.DirEntry, err error) error {
-			if err != nil {
-				return err
-			}
-			if d.IsDir() || !strings.HasSuffix(path, ".md") {
-				return nil
-			}
-			slog.Info("parsing project", "path", path)
-			parsed, err := Parse(path, false)
-			if err != nil {
-				return err
-			}
-			return parsed.UpsertProject(ctx, db, client)
-		},
-	)
-	if err != nil {
-		return err
-	}
-	return nil
-}
 
 // Markdown is the frontmatter and content of a markdown document.
 type Markdown struct {
@@ -438,7 +359,15 @@ func (md *Markdown) UpsertProject(
 		if err != nil {
 			return err
 		}
-
+		return db.Queries.ProjectUpdate(ctx, master.ProjectUpdateParams{
+			ID:          project.ID,
+			Slug:        md.Slug,
+			Title:       md.Title,
+			BannerUrl:   md.BannerURL,
+			Description: md.Description,
+			Content:     md.RenderContent,
+			EmbeddingID: id,
+		})
 	}
 	// err is not nil (new project)
 	if errors.Is(err, sql.ErrNoRows) {
