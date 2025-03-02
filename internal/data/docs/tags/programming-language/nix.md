@@ -1,4 +1,6 @@
 ---
+id: nix
+aliases: []
 tags: []
 title: Nix
 ---

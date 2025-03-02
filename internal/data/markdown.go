@@ -122,3 +122,6 @@ func parse(path string) (*Markdown, error) {
 	fm.RawContent = b
 	return &fm, nil
 }
+
+func (fm *Markdown) Upsert() {
+}

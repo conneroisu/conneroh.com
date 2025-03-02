@@ -1,0 +1,7 @@
+---
+id: dotfiles
+aliases: []
+tags: []
+---
+
+
