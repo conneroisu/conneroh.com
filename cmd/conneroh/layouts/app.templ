@@ -34,11 +34,19 @@ templ Layout(title string) {
 
 templ header() {
 	<header>
-		<nav class="border-b border-gray-200 dark:border-gray-800">
-			<div class="container mx-auto px-4 sm:px-6 lg:px-8">
-				<!-- Desktop Navigation -->
-				<div class="hidden sm:flex items-center justify-between h-16">
-					<div class="flex items-center space-x-8">
+		<nav
+			class="border-b border-gray-200 dark:border-gray-800"
+		>
+			<div
+				class="container mx-auto px-4 sm:px-6 lg:px-8"
+			>
+				// Desktop Navigation
+				<div
+					class="hidden sm:flex items-center justify-between h-16"
+				>
+					<div
+						class="flex items-center space-x-8"
+					>
 						<a
 							class="text-xl font-bold text-gray-900 dark:text-white cursor-pointer"
 							hx-get="/hateoas/morph/home"
@@ -81,13 +89,12 @@ templ header() {
 							Tags
 						</a>
 					</div>
-					<!-- The improved search component -->
 					@headerSearch()
 				</div>
-				<!-- Mobile Navigation -->
+				// Mobile Navigation
 				<div class="sm:hidden" x-data="{ isMenuOpen: false }">
 					<div class="flex items-center justify-between h-16">
-						<!-- Mobile menu toggle on the left -->
+						// Mobile menu toggle on the left
 						<button
 							@click="isMenuOpen = !isMenuOpen"
 							class="p-2 rounded-md text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none"
@@ -96,7 +103,6 @@ templ header() {
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
 							</svg>
 						</button>
-						<!-- Site name in the middle -->
 						<a
 							class="text-xl font-bold text-gray-900 dark:text-white cursor-pointer"
 							hx-get="/hateoas/morph/home"
@@ -107,12 +113,12 @@ templ header() {
 						>
 							Conner Ohnesorge
 						</a>
-						<!-- Mobile search on the right -->
+						// Mobile search on the right
 						<div class="flex items-center">
 							@headerSearch()
 						</div>
 					</div>
-					<!-- Mobile Menu -->
+					// Mobile Menu
 					<div
 						x-show="isMenuOpen"
 						class="pt-2 pb-4 space-y-1"
