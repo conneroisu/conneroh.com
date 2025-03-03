@@ -53,7 +53,7 @@ templ headerSearch() {
 			}
 		}"
 	>
-		<!-- Desktop search -->
+		// Desktop search
 		<div class="hidden md:flex items-center">
 			<button
 				@click="isSearchOpen = !isSearchOpen"
@@ -75,7 +75,7 @@ templ headerSearch() {
 					></path>
 				</svg>
 			</button>
-			<!-- Search dropdown -->
+			// Search dropdown
 			<div
 				x-show="isSearchOpen"
 				@click.away="isSearchOpen = false"
@@ -87,7 +87,7 @@ templ headerSearch() {
 				x-transition:leave-start="opacity-100 scale-100"
 				x-transition:leave-end="opacity-0 scale-95"
 			>
-				<!-- Search input -->
+				// Search input
 				<div class="p-3 border-b border-gray-200 dark:border-gray-700">
 					<div class="relative">
 						<input
@@ -107,24 +107,33 @@ templ headerSearch() {
 						</div>
 					</div>
 				</div>
-				<!-- Results container -->
+				// Results container
 				<div class="max-h-64 overflow-y-auto" x-show="showResults">
-					<!-- Loading indicator -->
+					// Loading indicator
 					<div x-show="isLoading" class="p-4 text-center text-gray-500 dark:text-gray-400">
 						<svg class="animate-spin h-5 w-5 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
 							<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
 							<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
 						</svg>
 					</div>
-					<!-- No results message -->
+					// No results message
 					<div x-show="!isLoading && searchQuery.length >= 2 && searchResults.length === 0" class="p-4 text-center text-gray-500 dark:text-gray-400">
 						No results found for "<span x-text="searchQuery"></span>"
 					</div>
-					<!-- Results list -->
-					<div x-show="!isLoading && searchResults.length > 0">
-						<h3 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-4 pt-3 pb-2">Search Results</h3>
+					// Results list
+					<div
+						x-show="!isLoading && searchResults.length > 0"
+					>
+						<h3
+							class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-4 pt-3 pb-2"
+						>
+							Search Results
+						</h3>
 						<ul>
-							<template x-for="(result, index) in searchResults" :key="index">
+							<template
+								x-for="(result, index) in searchResults"
+								:key="index"
+							>
 								<li>
 									<a
 										:href="result.url"
@@ -145,16 +154,24 @@ templ headerSearch() {
 												</svg>
 											</div>
 											<div>
-												<p class="text-sm font-medium text-gray-900 dark:text-white" x-text="result.title"></p>
-												<p class="text-xs text-gray-500 dark:text-gray-400" x-text="result.type.charAt(0).toUpperCase() + result.type.slice(1)"></p>
+												<p
+													class="text-sm font-medium text-gray-900 dark:text-white"
+													x-text="result.title"
+												></p>
+												<p
+													class="text-xs text-gray-500 dark:text-gray-400"
+													x-text="result.type.charAt(0).toUpperCase() + result.type.slice(1)"
+												></p>
 											</div>
 										</div>
 									</a>
 								</li>
 							</template>
 						</ul>
-						<!-- View all results link -->
-						<div class="px-4 py-3 border-t border-gray-200 dark:border-gray-700">
+						// View all results link
+						<div
+							class="px-4 py-3 border-t border-gray-200 dark:border-gray-700"
+						>
 							<a
 								:href="'/search?q=' + encodeURIComponent(searchQuery)"
 								class="block text-center text-sm text-blue-600 dark:text-blue-400 hover:underline"
@@ -167,7 +184,7 @@ templ headerSearch() {
 				</div>
 			</div>
 		</div>
-		<!-- Mobile search toggle button -->
+		// Mobile search toggle button
 		<button
 			@click="isSearchOpen = !isSearchOpen"
 			class="md:hidden text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white focus:outline-none"
@@ -198,7 +215,7 @@ templ headerSearch() {
 				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
 			</svg>
 		</button>
-		<!-- Mobile search panel -->
+		// Mobile search panel
 		<div
 			x-show="isSearchOpen"
 			class="md:hidden fixed inset-0 z-50 bg-white dark:bg-gray-900 pt-16 px-4 pb-4"
@@ -209,7 +226,7 @@ templ headerSearch() {
 			x-transition:leave-start="opacity-100"
 			x-transition:leave-end="opacity-0"
 		>
-			<!-- Close button for mobile -->
+			// Close button for mobile
 			<button
 				@click="isSearchOpen = false"
 				class="absolute top-4 right-4 text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
@@ -219,7 +236,7 @@ templ headerSearch() {
 				</svg>
 			</button>
 			<h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Search</h2>
-			<!-- Mobile search input -->
+			// Mobile search input
 			<div class="relative mb-4">
 				<input
 					x-ref="mobileSearchInput"
@@ -236,9 +253,9 @@ templ headerSearch() {
 					</svg>
 				</div>
 			</div>
-			<!-- Mobile results container -->
+			// Mobile results container
 			<div class="overflow-y-auto mt-4 max-h-[calc(100vh-180px)]">
-				<!-- Loading indicator -->
+				// Loading indicator
 				<div x-show="isLoading" class="py-8 text-center text-gray-500 dark:text-gray-400">
 					<svg class="animate-spin h-8 w-8 mx-auto mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
 						<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -246,7 +263,7 @@ templ headerSearch() {
 					</svg>
 					<p>Searching...</p>
 				</div>
-				<!-- No results message -->
+				// No results message
 				<div x-show="!isLoading && searchQuery.length >= 2 && searchResults.length === 0" class="py-8 text-center text-gray-500 dark:text-gray-400">
 					<svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto mb-4 text-gray-300 dark:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -254,9 +271,15 @@ templ headerSearch() {
 					<p class="text-lg">No results found for "<span x-text="searchQuery"></span>"</p>
 					<p class="mt-2">Try different keywords or check spelling</p>
 				</div>
-				<!-- Results list -->
-				<div x-show="!isLoading && searchResults.length > 0">
-					<h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">Search Results</h3>
+				// Results list
+				<div
+					x-show="!isLoading && searchResults.length > 0"
+				>
+					<h3
+						class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3"
+					>
+						Search Results
+					</h3>
 					<ul class="space-y-2">
 						<template x-for="(result, index) in searchResults" :key="index">
 							<li class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
@@ -266,12 +289,28 @@ templ headerSearch() {
 									@click="isSearchOpen = false"
 								>
 									<div class="flex items-center">
-										<!-- Icon based on result type -->
-										<div class="mr-4 flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-blue-600 dark:text-blue-300">
-											<svg x-show="result.type === 'post'" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+										// Icon based on result type
+										<div
+											class="mr-4 flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-blue-600 dark:text-blue-300"
+										>
+											<svg
+												x-show="result.type === 'post'"
+												xmlns="http://www.w3.org/2000/svg"
+												class="h-5 w-5"
+												fill="none"
+												viewBox="0 0 24 24"
+												stroke="currentColor"
+											>
 												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1M19 20a2 2 0 002-2V8a2 2 0 00-2-2h-5a2 2 0 00-2 2v12a2 2 0 002 2h5z"></path>
 											</svg>
-											<svg x-show="result.type === 'project'" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+											<svg
+												x-show="result.type === 'project'"
+												xmlns="http://www.w3.org/2000/svg"
+												class="h-5 w-5"
+												fill="none"
+												viewBox="0 0 24 24"
+												stroke="currentColor"
+											>
 												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
 											</svg>
 											<svg x-show="result.type === 'tag'" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -287,7 +326,7 @@ templ headerSearch() {
 							</li>
 						</template>
 					</ul>
-					<!-- View all results link -->
+					// View all results link
 					<div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
 						<a
 							:href="'/search?q=' + encodeURIComponent(searchQuery)"
