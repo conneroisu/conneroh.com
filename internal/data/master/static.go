@@ -49,19 +49,15 @@ type (
 // FullPostsList returns all posts with all their projects and tags.
 func (q *Queries) FullPostsList(
 	ctx context.Context,
+	posts []Post,
 ) (*[]FullPost, error) {
 	var (
 		fullPosts    []FullPost
-		posts        []Post
 		postProjects []Project
 		postTags     []Tag
 		post         Post
 		err          error
 	)
-	posts, err = q.PostsList(ctx)
-	if err != nil {
-		return nil, err
-	}
 	for _, post = range posts {
 		postProjects, err = q.ProjectsListByPost(ctx, post.ID)
 		if err != nil {
@@ -84,20 +80,16 @@ func (q *Queries) FullPostsList(
 // as a map of slugs to FullPosts.
 func (q *Queries) FullPostsSlugMapGet(
 	ctx context.Context,
+	posts []Post,
 ) (*map[string]FullPost, error) {
 	var (
 		postsMap     = make(map[string]FullPost)
 		postProjects []Project
 		postTags     []Tag
-		postsList    []Post
 		post         Post
 		err          error
 	)
-	postsList, err = q.PostsList(ctx)
-	if err != nil {
-		return nil, err
-	}
-	for _, post = range postsList {
+	for _, post = range posts {
 		postProjects, err = q.ProjectsListByPost(ctx, post.ID)
 		if err != nil {
 			return nil, err
@@ -118,12 +110,9 @@ func (q *Queries) FullPostsSlugMapGet(
 // FullProjectsList returns all projects with all their posts and tags.
 func (q *Queries) FullProjectsList(
 	ctx context.Context,
+	projects []Project,
 ) (*[]FullProject, error) {
 	var fullProjects []FullProject
-	projects, err := q.ProjectsList(ctx)
-	if err != nil {
-		return nil, err
-	}
 	for _, project := range projects {
 		projectPosts, err := q.PostsListByProject(ctx, project.ID)
 		if err != nil {
@@ -145,20 +134,16 @@ func (q *Queries) FullProjectsList(
 // FullProjectsSlugMapGet returns a map of projects by their slugs.
 func (q *Queries) FullProjectsSlugMapGet(
 	ctx context.Context,
+	projects []Project,
 ) (*map[string]FullProject, error) {
 	var (
 		fullProjects = make(map[string]FullProject)
 		projectTags  []Tag
 		projectPosts []Post
 		project      Project
-		projectList  []Project
 		err          error
 	)
-	projectList, err = q.ProjectsList(ctx)
-	if err != nil {
-		return nil, err
-	}
-	for _, project = range projectList {
+	for _, project = range projects {
 		projectPosts, err = q.PostsListByProject(ctx, project.ID)
 		if err != nil {
 			return nil, err
@@ -179,12 +164,9 @@ func (q *Queries) FullProjectsSlugMapGet(
 // FullTagsList returns all tags with all their posts and projects.
 func (q *Queries) FullTagsList(
 	ctx context.Context,
+	tags []Tag,
 ) (*[]FullTag, error) {
 	var fullTags []FullTag
-	tags, err := q.TagsListAlphabetical(ctx)
-	if err != nil {
-		return nil, err
-	}
 	for _, tag := range tags {
 		tagProjects, err := q.ProjectsListByTag(ctx, tag.ID)
 		if err != nil {
@@ -206,20 +188,16 @@ func (q *Queries) FullTagsList(
 // FullTagsSlugMapGet returns a map of tags by their slugs.
 func (q *Queries) FullTagsSlugMapGet(
 	ctx context.Context,
+	tags []Tag,
 ) (*map[string]FullTag, error) {
 	var (
 		fullTags    = make(map[string]FullTag)
 		tagProjects []Project
 		tagPosts    []Post
-		tagsList    []Tag
 		tag         Tag
 		err         error
 	)
-	tagsList, err = q.TagsListAlphabetical(ctx)
-	if err != nil {
-		return nil, err
-	}
-	for _, tag = range tagsList {
+	for _, tag = range tags {
 		tagProjects, err = q.ProjectsListByTag(ctx, tag.ID)
 		if err != nil {
 			return nil, err

@@ -34,6 +34,9 @@ func AddRoutes(
 ) error {
 	slog.Info("getting full data")
 	var (
+		posts          []master.Post
+		projects       []master.Project
+		tags           []master.Tag
 		fullPosts      *[]master.FullPost
 		fullProjects   *[]master.FullProject
 		fullTags       *[]master.FullTag
@@ -42,28 +45,47 @@ func AddRoutes(
 		postSlugMap    *map[string]master.FullPost
 	)
 	eg := errgroup.Group{}
+
+	// get shared data
 	eg.Go(func() (err error) {
-		fullPosts, err = db.Queries.FullPostsList(ctx)
+		posts, err = db.Queries.PostsList(ctx)
 		return err
 	})
 	eg.Go(func() (err error) {
-		fullTags, err = db.Queries.FullTagsList(ctx)
+		projects, err = db.Queries.ProjectsList(ctx)
 		return err
 	})
 	eg.Go(func() (err error) {
-		fullProjects, err = db.Queries.FullProjectsList(ctx)
+		tags, err = db.Queries.TagsListAlphabetical(ctx)
+		return err
+	})
+
+	if err := eg.Wait(); err != nil {
+		return err
+	}
+
+	eg.Go(func() (err error) {
+		fullPosts, err = db.Queries.FullPostsList(ctx, posts)
 		return err
 	})
 	eg.Go(func() (err error) {
-		projectSlugMap, err = db.Queries.FullProjectsSlugMapGet(ctx)
+		fullTags, err = db.Queries.FullTagsList(ctx, tags)
 		return err
 	})
 	eg.Go(func() (err error) {
-		tagSlugMap, err = db.Queries.FullTagsSlugMapGet(ctx)
+		fullProjects, err = db.Queries.FullProjectsList(ctx, projects)
 		return err
 	})
 	eg.Go(func() (err error) {
-		postSlugMap, err = db.Queries.FullPostsSlugMapGet(ctx)
+		projectSlugMap, err = db.Queries.FullProjectsSlugMapGet(ctx, projects)
+		return err
+	})
+	eg.Go(func() (err error) {
+		tagSlugMap, err = db.Queries.FullTagsSlugMapGet(ctx, tags)
+		return err
+	})
+	eg.Go(func() (err error) {
+		postSlugMap, err = db.Queries.FullPostsSlugMapGet(ctx, posts)
 		return err
 	})
 
@@ -71,6 +93,7 @@ func AddRoutes(
 		return err
 	}
 	slog.Info("got full data")
+
 	slog.Info("adding routes")
 	defer slog.Info("added routes")
 	return RouteMap.AddRoutes(

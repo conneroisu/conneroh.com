@@ -34,12 +34,12 @@ Package master contains the master schema for the database.
   - [func \(q \*Queries\) EmbeddingsCreate\(ctx context.Context, embedding string\) \(int64, error\)](<#Queries.EmbeddingsCreate>)
   - [func \(q \*Queries\) EmbeddingsGetByID\(ctx context.Context, id int64\) \(EmbeddingsGetByIDRow, error\)](<#Queries.EmbeddingsGetByID>)
   - [func \(q \*Queries\) EmeddingUpdate\(ctx context.Context, embedding string, iD int64\) error](<#Queries.EmeddingUpdate>)
-  - [func \(q \*Queries\) FullPostsList\(ctx context.Context\) \(\*\[\]FullPost, error\)](<#Queries.FullPostsList>)
-  - [func \(q \*Queries\) FullPostsSlugMapGet\(ctx context.Context\) \(\*map\[string\]FullPost, error\)](<#Queries.FullPostsSlugMapGet>)
-  - [func \(q \*Queries\) FullProjectsList\(ctx context.Context\) \(\*\[\]FullProject, error\)](<#Queries.FullProjectsList>)
-  - [func \(q \*Queries\) FullProjectsSlugMapGet\(ctx context.Context\) \(\*map\[string\]FullProject, error\)](<#Queries.FullProjectsSlugMapGet>)
-  - [func \(q \*Queries\) FullTagsList\(ctx context.Context\) \(\*\[\]FullTag, error\)](<#Queries.FullTagsList>)
-  - [func \(q \*Queries\) FullTagsSlugMapGet\(ctx context.Context\) \(\*map\[string\]FullTag, error\)](<#Queries.FullTagsSlugMapGet>)
+  - [func \(q \*Queries\) FullPostsList\(ctx context.Context, posts \[\]Post\) \(\*\[\]FullPost, error\)](<#Queries.FullPostsList>)
+  - [func \(q \*Queries\) FullPostsSlugMapGet\(ctx context.Context, posts \[\]Post\) \(\*map\[string\]FullPost, error\)](<#Queries.FullPostsSlugMapGet>)
+  - [func \(q \*Queries\) FullProjectsList\(ctx context.Context, projects \[\]Project\) \(\*\[\]FullProject, error\)](<#Queries.FullProjectsList>)
+  - [func \(q \*Queries\) FullProjectsSlugMapGet\(ctx context.Context, projects \[\]Project\) \(\*map\[string\]FullProject, error\)](<#Queries.FullProjectsSlugMapGet>)
+  - [func \(q \*Queries\) FullTagsList\(ctx context.Context, tags \[\]Tag\) \(\*\[\]FullTag, error\)](<#Queries.FullTagsList>)
+  - [func \(q \*Queries\) FullTagsSlugMapGet\(ctx context.Context, tags \[\]Tag\) \(\*map\[string\]FullTag, error\)](<#Queries.FullTagsSlugMapGet>)
   - [func \(q \*Queries\) PostCreate\(ctx context.Context, arg PostCreateParams\) \(Post, error\)](<#Queries.PostCreate>)
   - [func \(q \*Queries\) PostGet\(ctx context.Context, id int64\) \(Post, error\)](<#Queries.PostGet>)
   - [func \(q \*Queries\) PostGetBySlug\(ctx context.Context, slug string\) \(Post, error\)](<#Queries.PostGetBySlug>)
@@ -385,55 +385,55 @@ WHERE
 ```
 
 <a name="Queries.FullPostsList"></a>
-### func \(\*Queries\) [FullPostsList](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/static.go#L50-L52>)
+### func \(\*Queries\) [FullPostsList](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/static.go#L50-L53>)
 
 ```go
-func (q *Queries) FullPostsList(ctx context.Context) (*[]FullPost, error)
+func (q *Queries) FullPostsList(ctx context.Context, posts []Post) (*[]FullPost, error)
 ```
 
 FullPostsList returns all posts with all their projects and tags.
 
 <a name="Queries.FullPostsSlugMapGet"></a>
-### func \(\*Queries\) [FullPostsSlugMapGet](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/static.go#L85-L87>)
+### func \(\*Queries\) [FullPostsSlugMapGet](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/static.go#L81-L84>)
 
 ```go
-func (q *Queries) FullPostsSlugMapGet(ctx context.Context) (*map[string]FullPost, error)
+func (q *Queries) FullPostsSlugMapGet(ctx context.Context, posts []Post) (*map[string]FullPost, error)
 ```
 
 FullPostsSlugMapGet returns all posts with all their projects and tags as a map of slugs to FullPosts.
 
 <a name="Queries.FullProjectsList"></a>
-### func \(\*Queries\) [FullProjectsList](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/static.go#L119-L121>)
+### func \(\*Queries\) [FullProjectsList](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/static.go#L111-L114>)
 
 ```go
-func (q *Queries) FullProjectsList(ctx context.Context) (*[]FullProject, error)
+func (q *Queries) FullProjectsList(ctx context.Context, projects []Project) (*[]FullProject, error)
 ```
 
 FullProjectsList returns all projects with all their posts and tags.
 
 <a name="Queries.FullProjectsSlugMapGet"></a>
-### func \(\*Queries\) [FullProjectsSlugMapGet](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/static.go#L146-L148>)
+### func \(\*Queries\) [FullProjectsSlugMapGet](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/static.go#L135-L138>)
 
 ```go
-func (q *Queries) FullProjectsSlugMapGet(ctx context.Context) (*map[string]FullProject, error)
+func (q *Queries) FullProjectsSlugMapGet(ctx context.Context, projects []Project) (*map[string]FullProject, error)
 ```
 
 FullProjectsSlugMapGet returns a map of projects by their slugs.
 
 <a name="Queries.FullTagsList"></a>
-### func \(\*Queries\) [FullTagsList](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/static.go#L180-L182>)
+### func \(\*Queries\) [FullTagsList](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/static.go#L165-L168>)
 
 ```go
-func (q *Queries) FullTagsList(ctx context.Context) (*[]FullTag, error)
+func (q *Queries) FullTagsList(ctx context.Context, tags []Tag) (*[]FullTag, error)
 ```
 
 FullTagsList returns all tags with all their posts and projects.
 
 <a name="Queries.FullTagsSlugMapGet"></a>
-### func \(\*Queries\) [FullTagsSlugMapGet](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/static.go#L207-L209>)
+### func \(\*Queries\) [FullTagsSlugMapGet](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/static.go#L189-L192>)
 
 ```go
-func (q *Queries) FullTagsSlugMapGet(ctx context.Context) (*map[string]FullTag, error)
+func (q *Queries) FullTagsSlugMapGet(ctx context.Context, tags []Tag) (*map[string]FullTag, error)
 ```
 
 FullTagsSlugMapGet returns a map of tags by their slugs.
@@ -1121,7 +1121,7 @@ ORDER BY
 ```
 
 <a name="Queries.UpsertPostTags"></a>
-### func \(\*Queries\) [UpsertPostTags](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/static.go#L267-L271>)
+### func \(\*Queries\) [UpsertPostTags](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/static.go#L245-L249>)
 
 ```go
 func (q *Queries) UpsertPostTags(ctx context.Context, tags []string, id int64) error
@@ -1130,7 +1130,7 @@ func (q *Queries) UpsertPostTags(ctx context.Context, tags []string, id int64) e
 UpsertPostTags upserts the post tags for a post.
 
 <a name="Queries.UpsertProjectTags"></a>
-### func \(\*Queries\) [UpsertProjectTags](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/static.go#L241-L245>)
+### func \(\*Queries\) [UpsertProjectTags](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/static.go#L219-L223>)
 
 ```go
 func (q *Queries) UpsertProjectTags(ctx context.Context, tags []string, id int64) error
