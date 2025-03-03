@@ -65,7 +65,11 @@ templ Tags(
 			}
 		}"
 	>
-		<h1 class="text-3xl font-bold mb-6 text-gray-900 dark:text-white">Tags</h1>
+		<h1
+			class="text-3xl font-bold mb-6 text-gray-900 dark:text-white"
+		>
+			Tags
+		</h1>
 		<!-- Search and Filter Controls using the Searcher component -->
 		@layouts.Searcher(
 			"searchQuery",
@@ -76,13 +80,13 @@ templ Tags(
 			"",
 			"",
 		)
-		<!-- Results info -->
+		// Results Info
 		@layouts.SearchResult("tags", "filteredTags()")
-		<!-- Loading state -->
+		// Loading state
 		<div x-show="isLoading">
 			@layouts.LoadingState()
 		</div>
-		<!-- Hidden tag data for Alpine -->
+		// Hidden tag data for Alpine
 		if fullTags != nil {
 			// Create a nested map for sections
 			for _, tag := range *fullTags {
@@ -99,27 +103,54 @@ templ Tags(
 				></div>
 			}
 		}
-		<!-- Tags Grid -->
-		<div x-show="!isLoading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-			<template x-for="tag in filteredTags()" :key="tag.id">
-				<a :href="`/tag/${tag.slug}`" class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
-					<div class="p-6">
-						<div class="flex items-center justify-between mb-3">
-							<h2 class="text-xl font-semibold text-gray-900 dark:text-white" x-text="tag.name"></h2>
+		// Tags Grid
+		<div
+			x-show="!isLoading"
+			class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+		>
+			<template
+				x-for="tag in filteredTags()"
+				:key="tag.id"
+			>
+				<a
+					:href="`/tag/${tag.slug}`"
+					class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1"
+				>
+					<div
+						class="p-6"
+					>
+						<div
+							class="flex items-center justify-between mb-3"
+						>
+							<h2
+								class="text-xl font-semibold text-gray-900 dark:text-white"
+								x-text="tag.name"
+							></h2>
 							<div class="bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center h-8 w-8">
 								<i :class="tag.icon"></i>
 							</div>
 						</div>
-						<div class="text-gray-600 dark:text-gray-300 mb-4 line-clamp-2" x-text="tag.description"></div>
-						<div class="flex items-center justify-between text-sm">
-							<span class="text-gray-500 dark:text-gray-400" x-text="`${tag.postsCount} posts`"></span>
-							<span class="text-gray-500 dark:text-gray-400" x-text="`${tag.projectsCount} projects`"></span>
+						<div
+							class="text-gray-600 dark:text-gray-300 mb-4 line-clamp-2"
+							x-text="tag.description"
+						></div>
+						<div
+							class="flex items-center justify-between text-sm"
+						>
+							<span
+								class="text-gray-500 dark:text-gray-400"
+								x-text="`${tag.postsCount} posts`"
+							></span>
+							<span
+								class="text-gray-500 dark:text-gray-400"
+								x-text="`${tag.projectsCount} projects`"
+							></span>
 						</div>
 					</div>
 				</a>
 			</template>
 		</div>
-		<!-- Empty state -->
+		// Empty state
 		@layouts.EmptySearchResults("filteredTags()", "clearFilters()")
 	</div>
 }
@@ -135,21 +166,36 @@ templ Tag(
 	fullTagsSlugMap *map[string]master.FullTag,
 ) {
 	<div class="container mx-auto px-4 py-8 max-w-4xl">
-		<header class="text-center mb-12">
-			<div class="inline-block mb-4 bg-blue-100 dark:bg-blue-900 p-4 rounded-full w-14">
+		<header
+			class="text-center mb-12"
+		>
+			<div
+				class="inline-block mb-4 bg-blue-100 dark:bg-blue-900 p-4 rounded-full w-14"
+			>
 				<i class={ "nf " + tag.Icon + " text-white" }></i>
 			</div>
-			<h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+			<h1
+				class="text-4xl font-bold text-gray-900 dark:text-white mb-4"
+			>
 				{ tag.Title }
 			</h1>
-			<div class="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+			<div
+				class="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto"
+			>
 				@templ.Raw(tag.Content)
 			</div>
 		</header>
-		<div x-data="{ activeTab: 'posts' }" class="mb-8">
-			<!-- Tabs -->
-			<div class="border-b border-gray-200 dark:border-gray-700 mb-6">
-				<nav class="flex space-x-8">
+		<div
+			x-data="{ activeTab: 'posts' }"
+			class="mb-8"
+		>
+			// Tabs
+			<div
+				class="border-b border-gray-200 dark:border-gray-700 mb-6"
+			>
+				<nav
+					class="flex space-x-8"
+				>
 					<button
 						@click="activeTab = 'posts'"
 						:class="{ 'border-blue-500 text-blue-600 dark:text-blue-500': activeTab === 'posts', 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300': activeTab !== 'posts' }"
@@ -173,14 +219,23 @@ templ Tag(
 					</button>
 				</nav>
 			</div>
-			<!-- Posts Tab -->
+			// Posts Tab
 			<div x-show="activeTab === 'posts'">
 				if len(tag.Posts) > 0 {
-					<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+					<div
+						class="grid grid-cols-1 md:grid-cols-2 gap-6"
+					>
 						for _, post := range tag.Posts {
-							<a href={ templ.SafeURL(fmt.Sprintf("/post/%s", post.Slug)) } class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+							<a
+								href={ templ.SafeURL(fmt.Sprintf("/post/%s", post.Slug)) }
+								class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
+							>
 								if post.BannerUrl != "" {
-									<img src={ post.BannerUrl } alt={ post.Title } class="w-full h-40 object-cover"/>
+									<img
+										src={ post.BannerUrl }
+										alt={ post.Title }
+										class="w-full h-40 object-cover"
+									/>
 								} else {
 									<div
 										class="w-full h-40 bg-gray-200 dark:bg-gray-700 flex items-center justify-center"
@@ -204,10 +259,14 @@ templ Tag(
 									<div
 										class="flex justify-between items-center"
 									>
-										<span class="text-blue-600 dark:text-blue-400 hover:underline text-sm font-medium">
+										<span
+											class="text-blue-600 dark:text-blue-400 hover:underline text-sm font-medium"
+										>
 											Read more
 										</span>
-										<span class="text-sm text-gray-500 dark:text-gray-400">
+										<span
+											class="text-sm text-gray-500 dark:text-gray-400"
+										>
 											{ formatDate(post.CreatedAt) }
 										</span>
 									</div>
@@ -224,7 +283,7 @@ templ Tag(
 					</div>
 				}
 			</div>
-			<!-- Projects Tab -->
+			// Projects Tab
 			<div x-show="activeTab === 'projects'" x-cloak>
 				if len(tag.Projects) > 0 {
 					<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -253,7 +312,9 @@ templ Tag(
 						}
 					</div>
 				} else {
-					<div class="text-center py-12 text-gray-500 dark:text-gray-400">
+					<div
+						class="text-center py-12 text-gray-500 dark:text-gray-400"
+					>
 						<svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
 						</svg>
@@ -261,8 +322,11 @@ templ Tag(
 					</div>
 				}
 			</div>
-			<!-- Related Tags Tab -->
-			<div x-show="activeTab === 'related'" x-cloak>
+			// Related Tags Tab
+			<div
+				x-show="activeTab === 'related'"
+				x-cloak
+			>
 				if fullTags != nil {
 					<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
 						for _, relatedTag := range *fullTags {
@@ -271,15 +335,28 @@ templ Tag(
 								continue
 							}
 							if haveCommonItems(tag, &relatedTag) {
-								<a href={ templ.SafeURL(fmt.Sprintf("/tag/%s", relatedTag.Slug)) } class="bg-white dark:bg-gray-800 rounded-lg p-4 hover:shadow-md transition-shadow duration-300 flex items-center">
-									<div class="text-gray-400 dark:text-gray-500 mr-3">
+								<a
+									href={ templ.SafeURL(fmt.Sprintf("/tag/%s", relatedTag.Slug)) }
+									class="bg-white dark:bg-gray-800 rounded-lg p-4 hover:shadow-md transition-shadow duration-300 flex items-center"
+								>
+									<div
+										class="text-gray-400 dark:text-gray-500 mr-3"
+									>
 										<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
 										</svg>
 									</div>
 									<div>
-										<h3 class="font-medium text-gray-900 dark:text-white">{ relatedTag.Title }</h3>
-										<p class="text-xs text-gray-500 dark:text-gray-400 line-clamp-1">{ fmt.Sprintf("%d posts, %d projects", len(relatedTag.Posts), len(relatedTag.Projects)) }</p>
+										<h3
+											class="font-medium text-gray-900 dark:text-white"
+										>
+											{ relatedTag.Title }
+										</h3>
+										<p
+											class="text-xs text-gray-500 dark:text-gray-400 line-clamp-1"
+										>
+											{ fmt.Sprintf("%d posts, %d projects", len(relatedTag.Posts), len(relatedTag.Projects)) }
+										</p>
 									</div>
 								</a>
 							}
