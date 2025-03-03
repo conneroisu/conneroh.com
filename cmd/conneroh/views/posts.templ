@@ -62,7 +62,7 @@ templ Posts(
 	}"
 	>
 		<h1 class="text-3xl font-bold mb-6 text-gray-900 dark:text-white">Blog Posts</h1>
-		<!-- Search and Filter Controls using the Searcher component -->
+		// Search and Filter Controls using the Searcher component
 		@layouts.Searcher(
 			"searchQuery",
 			"selectedTag",
@@ -72,11 +72,11 @@ templ Posts(
 			"",
 			"",
 		)
-		<!-- Results info -->
+		// Results info
 		@layouts.SearchResult("posts", "filteredPosts()")
-		<!-- Posts Grid -->
+		// Posts Grid
 		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-			<!-- Hidden data elements for Alpine to process -->
+			// Hidden data elements for Alpine to process
 			if posts != nil {
 				for _, post := range *posts {
 					// Format tags data for JSON storage
@@ -92,7 +92,7 @@ templ Posts(
 					></div>
 				}
 			}
-			<!-- Template for displaying posts -->
+			// Template for displaying posts
 			<template x-for="post in filteredPosts()" :key="post.id">
 				<div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
 					<a :href="`/post/${post.slug}`" class="block">
@@ -117,7 +117,7 @@ templ Posts(
 				</div>
 			</template>
 		</div>
-		<!-- Empty state -->
+		// Empty state
 		@layouts.EmptySearchResults("filteredPosts()", "clearFilters()")
 	</div>
 }

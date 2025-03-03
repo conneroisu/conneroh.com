@@ -62,7 +62,7 @@ func Page(comp templ.Component) templ.Component
 
 
 <a name="Post"></a>
-## func [Post](<https://github.com/conneroisu/conneroh/blob/main/cmd/conneroh/views/posts_templ.go#L190-L198>)
+## func [Post](<https://github.com/conneroisu/conneroh/blob/main/cmd/conneroh/views/posts_templ.go#L186-L194>)
 
 ```go
 func Post(post *master.FullPost, fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, fullTags *[]master.FullTag, fullPostSlugMap *map[string]master.FullPost, fullProjectSlugMap *map[string]master.FullProject, fullTagSlugMap *map[string]master.FullTag) templ.Component
