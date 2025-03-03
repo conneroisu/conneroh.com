@@ -132,9 +132,16 @@ in
 
         echo "Build process finished!"
       '')
+      (pkgs.writeShellScriptBin "generate-reload" ''
+          templ generate $REPO_ROOT &
+        wait
+      '')
       (pkgs.writeShellScriptBin "generate-all" ''
+
         go generate $REPO_ROOT/... &
+
         templ generate $REPO_ROOT &
+
         bun build \
             $REPO_ROOT/index.js \
             --minify \
@@ -142,6 +149,7 @@ in
             --minify-whitespace  \
             --minify-identifiers \
             --outdir $REPO_ROOT/cmd/conneroh/_static/dist/ &
+
         tailwindcss \
             --minify \
             -i $REPO_ROOT/input.css \

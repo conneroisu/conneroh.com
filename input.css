@@ -4,6 +4,13 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+@font-face {
+  font-family: "NerdFontsSymbols";
+  src: url("/dist/NF.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+}
+
 @theme inline {
   --color-border: var(--border);
   --color-input: var(--input);
