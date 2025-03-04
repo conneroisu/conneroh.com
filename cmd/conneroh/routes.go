@@ -34,9 +34,10 @@ func AddRoutes(
 ) error {
 	slog.Info("getting full data")
 	var (
-		posts          []master.Post
-		projects       []master.Project
-		tags           []master.Tag
+		posts    []master.Post
+		projects []master.Project
+		tags     []master.Tag
+
 		fullPosts      *[]master.FullPost
 		fullProjects   *[]master.FullProject
 		fullTags       *[]master.FullTag
