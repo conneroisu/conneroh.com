@@ -1397,6 +1397,7 @@ SET
     title = ?,
     slug = ?,
     content = ?,
+    icon = ?,
     raw_content = ?,
     embedding_id = ?
 WHERE
@@ -1407,6 +1408,7 @@ type TagUpdateParams struct {
 	Title       string `db:"title" json:"title"`
 	Slug        string `db:"slug" json:"slug"`
 	Content     string `db:"content" json:"content"`
+	Icon        string `db:"icon" json:"icon"`
 	RawContent  string `db:"raw_content" json:"raw_content"`
 	EmbeddingID int64  `db:"embedding_id" json:"embedding_id"`
 	ID          int64  `db:"id" json:"id"`
@@ -1420,6 +1422,7 @@ type TagUpdateParams struct {
 //	    title = ?,
 //	    slug = ?,
 //	    content = ?,
+//	    icon = ?,
 //	    raw_content = ?,
 //	    embedding_id = ?
 //	WHERE
@@ -1429,6 +1432,7 @@ func (q *Queries) TagUpdate(ctx context.Context, arg TagUpdateParams) error {
 		arg.Title,
 		arg.Slug,
 		arg.Content,
+		arg.Icon,
 		arg.RawContent,
 		arg.EmbeddingID,
 		arg.ID,

@@ -325,6 +325,7 @@ SET
     title = ?,
     slug = ?,
     content = ?,
+    icon = ?,
     raw_content = ?,
     embedding_id = ?
 WHERE

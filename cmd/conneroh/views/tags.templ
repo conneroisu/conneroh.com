@@ -98,7 +98,7 @@ templ Tags(
 					data-tag-slug={ tag.Slug }
 					data-tag-section={ templ.EscapeString(getTagSection(tag.Slug)) }
 					data-tag-posts-count={ fmt.Sprintf("%d", len(tag.Posts)) }
-					data-tag-icon={ "nf " + tag.Icon + " text-white" }
+					data-tag-icon={ "nf " + tag.Icon + " text-white text-lg" }
 					data-tag-projects-count={ fmt.Sprintf("%d", len(tag.Projects)) }
 				></div>
 			}
@@ -127,7 +127,9 @@ templ Tags(
 								x-text="tag.name"
 							></h2>
 							<div class="bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center h-8 w-8">
-								<i :class="tag.icon"></i>
+								<i
+									:class="tag.icon"
+								></i>
 							</div>
 						</div>
 						<div
@@ -172,7 +174,7 @@ templ Tag(
 			<div
 				class="inline-block mb-4 bg-blue-100 dark:bg-blue-900 p-4 rounded-full w-14"
 			>
-				<i class={ "nf " + tag.Icon + " text-white" }></i>
+				<i class={ "nf " + tag.Icon + " text-white text-2xl" }></i>
 			</div>
 			<h1
 				class="text-4xl font-bold text-gray-900 dark:text-white mb-4"

@@ -1039,7 +1039,7 @@ LIMIT
 ```
 
 <a name="Queries.TagUpdate"></a>
-### func \(\*Queries\) [TagUpdate](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1427>)
+### func \(\*Queries\) [TagUpdate](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1430>)
 
 ```go
 func (q *Queries) TagUpdate(ctx context.Context, arg TagUpdateParams) error
@@ -1054,6 +1054,7 @@ SET
     title = ?,
     slug = ?,
     content = ?,
+    icon = ?,
     raw_content = ?,
     embedding_id = ?
 WHERE
@@ -1061,7 +1062,7 @@ WHERE
 ```
 
 <a name="Queries.TagsListAlphabetical"></a>
-### func \(\*Queries\) [TagsListAlphabetical](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1456>)
+### func \(\*Queries\) [TagsListAlphabetical](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1460>)
 
 ```go
 func (q *Queries) TagsListAlphabetical(ctx context.Context) ([]Tag, error)
@@ -1079,7 +1080,7 @@ ORDER BY
 ```
 
 <a name="Queries.TagsListByPost"></a>
-### func \(\*Queries\) [TagsListByPost](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1512>)
+### func \(\*Queries\) [TagsListByPost](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1516>)
 
 ```go
 func (q *Queries) TagsListByPost(ctx context.Context, postID int64) ([]Tag, error)
@@ -1100,7 +1101,7 @@ ORDER BY
 ```
 
 <a name="Queries.TagsListByProject"></a>
-### func \(\*Queries\) [TagsListByProject](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1568>)
+### func \(\*Queries\) [TagsListByProject](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1572>)
 
 ```go
 func (q *Queries) TagsListByProject(ctx context.Context, projectID int64) ([]Tag, error)
@@ -1182,7 +1183,7 @@ type TagCreateParams struct {
 ```
 
 <a name="TagUpdateParams"></a>
-## type [TagUpdateParams](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1406-L1413>)
+## type [TagUpdateParams](<https://github.com/conneroisu/conneroh/blob/main/internal/data/master/queries.sql.go#L1407-L1415>)
 
 
 
@@ -1191,6 +1192,7 @@ type TagUpdateParams struct {
     Title       string `db:"title" json:"title"`
     Slug        string `db:"slug" json:"slug"`
     Content     string `db:"content" json:"content"`
+    Icon        string `db:"icon" json:"icon"`
     RawContent  string `db:"raw_content" json:"raw_content"`
     EmbeddingID int64  `db:"embedding_id" json:"embedding_id"`
     ID          int64  `db:"id" json:"id"`

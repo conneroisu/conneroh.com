@@ -6,6 +6,7 @@ import (
 	"database/sql"
 	_ "embed"
 	"errors"
+	"fmt"
 )
 
 //go:generate sqlcquash combine
@@ -224,14 +225,14 @@ func (q *Queries) UpsertProjectTags(
 	for _, tag := range tags {
 		t, err := q.TagGetBySlug(ctx, tag)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to get tag with slug %s: %w", tag, err)
 		}
 		_, err = q.ProjectTagsGet(ctx, id, t.ID)
 		if err == nil {
 			return nil
 		}
 		if !errors.Is(err, sql.ErrNoRows) {
-			return err
+			return fmt.Errorf("fucckkkks to get project tags: %w", err)
 		}
 		err = q.ProjectTagCreate(ctx, id, t.ID)
 		if err != nil {

@@ -98,6 +98,8 @@ type Markdown struct {
 	Tags []string `yaml:"tags"`
 	// BannerURL is the URL of the banner image.
 	BannerURL string `yaml:"banner_url"`
+	// Icon is the URL of the icon image.
+	Icon string `yaml:"icon,omitempty"`
 
 	// Posts are related posts of the document. (Never used on tags)
 	Posts []string `yaml:"posts,omitempty"`
@@ -148,6 +150,10 @@ func Parse(fsPath string, embedFs embed.FS) (*Markdown, error) {
 		return nil, fmt.Errorf("description is empty for %s", fsPath)
 	}
 	fm.RawContent = string(b)
+
+	if fm.Icon == "" {
+		fm.Icon = "nf-fa-tag"
+	}
 
 	return &fm, nil
 }
@@ -211,6 +217,7 @@ func (md *Markdown) UpsertTag(
 					Title:       md.Title,
 					RawContent:  md.RawContent,
 					Content:     md.RenderContent,
+					Icon:        md.Icon,
 					EmbeddingID: tag.EmbeddingID,
 				},
 			)
@@ -445,7 +452,7 @@ func Run(
 		},
 	)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to update tags: %v", err)
 	}
 
 	var post master.Post
@@ -471,7 +478,7 @@ func Run(
 		},
 	)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to update posts: %v", err)
 	}
 
 	err = fs.WalkDir(
@@ -492,11 +499,15 @@ func Run(
 			if err != nil {
 				return err
 			}
-			return db.Queries.UpsertProjectTags(ctx, parsed.Tags, project.ID)
+			err = db.Queries.UpsertProjectTags(ctx, parsed.Tags, project.ID)
+			if err != nil {
+				return fmt.Errorf("failed to upsert project tags: %v", err)
+			}
+			return nil
 		},
 	)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to update projects: %v", err)
 	}
 	return nil
 }

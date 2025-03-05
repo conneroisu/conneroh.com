@@ -8,12 +8,14 @@ import (
 	"fmt"
 	"io"
 	"net/url"
+	"strings"
 
 	"github.com/conneroisu/conneroh.com/internal/data/generic"
 	"github.com/conneroisu/conneroh.com/internal/data/master"
 
-	// Register the libsql driver
-	_ "github.com/tursodatabase/libsql-client-go/libsql"
+	// Register the sqlite driver
+	_ "modernc.org/sqlite"
+	// _ "github.com/tursodatabase/libsql-client-go/libsql"
 )
 
 var _ io.Closer = (*Database[master.Queries])(nil)
@@ -42,10 +44,35 @@ func NewDb[
 	if err != nil {
 		return nil, fmt.Errorf("error parsing url: %v", err)
 	}
-	db, err := sql.Open("libsql", u.String())
+	db, err := sql.Open("sqlite", u.String())
 	if err != nil {
 		return nil,
 			fmt.Errorf("failed to open db: %v", err)
+	}
+
+	for _, schem := range strings.Split(master.Schema, ";") {
+		if len(strings.TrimSpace(schem)) == 0 {
+			continue
+		}
+		_, err := db.Exec(schem)
+		if err != nil {
+			return nil,
+				fmt.Errorf(
+					"error executing schema: %v, '%s'",
+					err,
+					schem,
+				)
+		}
+	}
+	for _, seed := range strings.Split(master.Seed, ";") {
+		if len(strings.TrimSpace(seed)) == 0 {
+			continue
+		}
+		_, err := db.Exec(seed)
+		if err != nil {
+			return nil,
+				fmt.Errorf("error seeding db: %v", err)
+		}
 	}
 	return &Database[Q]{
 		Queries: newFunc(db),

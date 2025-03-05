@@ -60,7 +60,7 @@ func Favicon(
 	_ *map[string]master.FullProject,
 	_ *map[string]master.FullTag,
 ) (routing.APIFn, error) {
-	return func(w http.ResponseWriter, r *http.Request) error {
+	return func(w http.ResponseWriter, _ *http.Request) error {
 		w.Header().Set("Content-Type", "image/x-icon")
 		_, err := w.Write(static.Favicon)
 		if err != nil {
