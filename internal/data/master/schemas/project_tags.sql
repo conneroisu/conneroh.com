@@ -4,4 +4,4 @@ CREATE TABLE IF NOT EXISTS project_tags (
     tag_id INTEGER NOT NULL,
     FOREIGN KEY (project_id) REFERENCES projects(id),
     FOREIGN KEY (tag_id) REFERENCES tags(id)
-);
+) STRICT;

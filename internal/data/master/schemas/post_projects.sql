@@ -4,4 +4,4 @@ CREATE TABLE IF NOT EXISTS post_projects (
     project_id INTEGER NOT NULL,
     FOREIGN KEY (post_id) REFERENCES posts(id),
     FOREIGN KEY (project_id) REFERENCES projects(id)
-);
+) STRICT;

@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS embeddings (
     id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
     embedding TEXT NOT NULL,
     created_at INTEGER NOT NULL DEFAULT (unixepoch('now'))
-);
+) STRICT;
 
 -- dialect: sqlite
 CREATE TABLE IF NOT EXISTS posts (
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS posts (
     updated_at TEXT NOT NULL DEFAULT (unixepoch('now')),
     embedding_id INTEGER NOT NULL,
     FOREIGN KEY(embedding_id) REFERENCES embeddings(id)
-);
+) STRICT;
 
 -- dialect: sqlite
 CREATE TABLE IF NOT EXISTS post_projects (
@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS post_projects (
     project_id INTEGER NOT NULL,
     FOREIGN KEY (post_id) REFERENCES posts(id),
     FOREIGN KEY (project_id) REFERENCES projects(id)
-);
+) STRICT;
 
 -- dialect: sqlite
 CREATE TABLE IF NOT EXISTS post_tags (
@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS post_tags (
     tag_id INTEGER NOT NULL,
     FOREIGN KEY (post_id) REFERENCES posts(id),
     FOREIGN KEY (tag_id) REFERENCES tags(id)
-);
+) STRICT;
 
 -- dialect: sqlite
 CREATE TABLE IF NOT EXISTS projects (
@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS projects (
     updated_at INTEGER NOT NULL DEFAULT (unixepoch('now')),
     embedding_id INTEGER NOT NULL,
     FOREIGN KEY(embedding_id) REFERENCES embeddings(id)
-);
+) STRICT;
 
 -- dialect: sqlite
 CREATE TABLE IF NOT EXISTS project_tags (
@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS project_tags (
     tag_id INTEGER NOT NULL,
     FOREIGN KEY (project_id) REFERENCES projects(id),
     FOREIGN KEY (tag_id) REFERENCES tags(id)
-);
+) STRICT;
 
 -- dialect: sqlite
 CREATE TABLE IF NOT EXISTS tags (
@@ -75,4 +75,4 @@ CREATE TABLE IF NOT EXISTS tags (
     updated_at INTEGER NOT NULL DEFAULT (unixepoch('now')),
     embedding_id INTEGER NOT NULL,
     FOREIGN KEY (embedding_id) REFERENCES embeddings(id)
-);
+) STRICT;

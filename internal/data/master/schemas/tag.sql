@@ -10,4 +10,4 @@ CREATE TABLE IF NOT EXISTS tags (
     updated_at INTEGER NOT NULL DEFAULT (unixepoch('now')),
     embedding_id INTEGER NOT NULL,
     FOREIGN KEY (embedding_id) REFERENCES embeddings(id)
-);
+) STRICT;
