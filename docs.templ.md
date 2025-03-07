@@ -5094,7 +5094,3 @@ templ Tags(
 ```
 
 Here, the function `getTagSection` is defined inside the loop, which not only reduces readability but also introduces unnecessary function redefinition on each iteration.
-
-### **Conclusion**
-
-While templ does not enforce placing function definitions at the end of a file, doing so enhances readability and usability. By keeping template logic upfront and separating utility functions, the structure remains clean and maintainable, making templ a more efficient and reliable tool for Go-based HTML templating.
