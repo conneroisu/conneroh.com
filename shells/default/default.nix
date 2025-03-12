@@ -72,8 +72,5 @@ in
         openssl.dev
       ]
       # Add the generated script packages
-      ++ scriptPackages
-      ++ [
-        pkgs."${namespace}"._copygen
-      ];
+      ++ scriptPackages;
   }
