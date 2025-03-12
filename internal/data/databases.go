@@ -50,7 +50,7 @@ func NewDb[
 			fmt.Errorf("failed to open db: %v", err)
 	}
 
-	for _, schem := range strings.Split(master.Schema, ";") {
+	for schem := range strings.SplitSeq(master.Schema, ";") {
 		if len(strings.TrimSpace(schem)) == 0 {
 			continue
 		}
@@ -64,7 +64,7 @@ func NewDb[
 				)
 		}
 	}
-	for _, seed := range strings.Split(master.Seed, ";") {
+	for seed := range strings.SplitSeq(master.Seed, ";") {
 		if len(strings.TrimSpace(seed)) == 0 {
 			continue
 		}

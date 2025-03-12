@@ -51,17 +51,7 @@ func NewServer(
 }
 
 // NewDb creates a new database connection.
-func NewDb(getenv func(string) string) (*data.Database[master.Queries], error) {
-	// tursoURI := getenv("TURSO_URI")
-	// if tursoURI == "" {
-	// 	return nil, fmt.Errorf("TURSO_URI is not set")
-	// }
-	// tursoToken := getenv("TURSO_TOKEN")
-	// if tursoToken == "" {
-	// 	return nil, fmt.Errorf("TURSO_TOKEN is not set")
-	// }
-	// dbURI := tursoURI + "?authToken=" + tursoToken
-	//
+func NewDb(_ func(string) string) (*data.Database[master.Queries], error) {
 	return data.NewDb(master.New, "master.db")
 }
 
