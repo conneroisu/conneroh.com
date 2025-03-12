@@ -7,6 +7,8 @@ import (
 	_ "embed"
 	"errors"
 	"fmt"
+
+	"golang.org/x/exp/slog"
 )
 
 //go:generate sqlcquash combine
@@ -221,13 +223,15 @@ func (q *Queries) UpsertProjectTags(
 	ctx context.Context,
 	tags []string, // slugs
 	id int64,
-) error {
-	for _, tag := range tags {
-		t, err := q.TagGetBySlug(ctx, tag)
+) (err error) {
+	var tag string
+	var t Tag
+	for _, tag = range tags {
+		t, err = q.TagGetBySlug(ctx, tag)
 		if err != nil {
 			return fmt.Errorf("failed to get tag with slug %s: %w", tag, err)
 		}
-		_, err = q.ProjectTagsGet(ctx, id, t.ID)
+		_, err = q.ProjectTagsGetByIDs(ctx, id, t.ID)
 		if err == nil {
 			return nil
 		}
@@ -238,6 +242,7 @@ func (q *Queries) UpsertProjectTags(
 		if err != nil {
 			return err
 		}
+		slog.DebugCtx(ctx, "created project tag", "project", id, "tag", t.ID)
 	}
 	return nil
 }

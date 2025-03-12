@@ -270,7 +270,7 @@ FROM
 WHERE
     project_id = ?;
 
--- name: ProjectTagsGet :many
+-- name: ProjectTagsGetByIDs :one
 SELECT
     *
 FROM

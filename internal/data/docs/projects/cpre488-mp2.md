@@ -3,7 +3,7 @@ id: cpre488-mp2
 aliases: []
 tags:
   - programming-language/c
-  - programming-language/c++
+  - programming-language/cpp
   - programming-language/matlab
   - ide/vivado
   - hdl/vhdl

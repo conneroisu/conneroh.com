@@ -35,7 +35,7 @@ templ: version: v0.3.833
 
 
 <a name="Home"></a>
-## func [Home](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/home_templ.go#L13-L20>)
+## func [Home](<https://github.com/conneroisu/conneroh/blob/main/cmd/conneroh/views/home_templ.go#L13-L20>)
 
 ```go
 func Home(fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, fullTags *[]master.FullTag, fullPostsSlugMap *map[string]master.FullPost, fullProjectsSlugMap *map[string]master.FullProject, fullTagsSlugMap *map[string]master.FullTag) templ.Component
@@ -44,7 +44,7 @@ func Home(fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, full
 
 
 <a name="Morpher"></a>
-## func [Morpher](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/types_templ.go#L60>)
+## func [Morpher](<https://github.com/conneroisu/conneroh/blob/main/cmd/conneroh/views/types_templ.go#L60>)
 
 ```go
 func Morpher(comp templ.Component) templ.Component
@@ -53,7 +53,7 @@ func Morpher(comp templ.Component) templ.Component
 
 
 <a name="Page"></a>
-## func [Page](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/types_templ.go#L13>)
+## func [Page](<https://github.com/conneroisu/conneroh/blob/main/cmd/conneroh/views/types_templ.go#L13>)
 
 ```go
 func Page(comp templ.Component) templ.Component
@@ -62,7 +62,7 @@ func Page(comp templ.Component) templ.Component
 
 
 <a name="Post"></a>
-## func [Post](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/posts_templ.go#L186-L194>)
+## func [Post](<https://github.com/conneroisu/conneroh/blob/main/cmd/conneroh/views/posts_templ.go#L186-L194>)
 
 ```go
 func Post(post *master.FullPost, fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, fullTags *[]master.FullTag, fullPostSlugMap *map[string]master.FullPost, fullProjectSlugMap *map[string]master.FullProject, fullTagSlugMap *map[string]master.FullTag) templ.Component
@@ -71,7 +71,7 @@ func Post(post *master.FullPost, fullPosts *[]master.FullPost, fullProjects *[]m
 Individual Post component
 
 <a name="Posts"></a>
-## func [Posts](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/posts_templ.go#L18-L25>)
+## func [Posts](<https://github.com/conneroisu/conneroh/blob/main/cmd/conneroh/views/posts_templ.go#L18-L25>)
 
 ```go
 func Posts(posts *[]master.FullPost, fullProjects *[]master.FullProject, fullTags *[]master.FullTag, fullPostsSlugMap *map[string]master.FullPost, fullProjectsSlugMap *map[string]master.FullProject, fullTagsSlugMap *map[string]master.FullTag) templ.Component
@@ -80,7 +80,7 @@ func Posts(posts *[]master.FullPost, fullProjects *[]master.FullProject, fullTag
 
 
 <a name="Project"></a>
-## func [Project](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/projects_templ.go#L17-L25>)
+## func [Project](<https://github.com/conneroisu/conneroh/blob/main/cmd/conneroh/views/projects_templ.go#L17-L25>)
 
 ```go
 func Project(project *master.FullProject, fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, fullTags *[]master.FullTag, fullPostsSlugMap *map[string]master.FullPost, fullProjectsSlugMap *map[string]master.FullProject, fullTagsSlugMap *map[string]master.FullTag) templ.Component
@@ -89,7 +89,7 @@ func Project(project *master.FullProject, fullPosts *[]master.FullPost, fullProj
 
 
 <a name="Projects"></a>
-## func [Projects](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/projects_templ.go#L189-L196>)
+## func [Projects](<https://github.com/conneroisu/conneroh/blob/main/cmd/conneroh/views/projects_templ.go#L189-L196>)
 
 ```go
 func Projects(fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, fullTags *[]master.FullTag, fullPostsSlugMap *map[string]master.FullPost, fullProjectsSlugMap *map[string]master.FullProject, fullTagsSlugMap *map[string]master.FullTag) templ.Component
@@ -98,7 +98,7 @@ func Projects(fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, 
 
 
 <a name="Tag"></a>
-## func [Tag](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/tags_templ.go#L207-L215>)
+## func [Tag](<https://github.com/conneroisu/conneroh/blob/main/cmd/conneroh/views/tags_templ.go#L207-L215>)
 
 ```go
 func Tag(tag *master.FullTag, fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, fullTags *[]master.FullTag, fullPostsSlugMap *map[string]master.FullPost, fullProjectsSlugMap *map[string]master.FullProject, fullTagsSlugMap *map[string]master.FullTag) templ.Component
@@ -107,7 +107,7 @@ func Tag(tag *master.FullTag, fullPosts *[]master.FullPost, fullProjects *[]mast
 Tag component for displaying a single tag and its associated content
 
 <a name="Tags"></a>
-## func [Tags](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/tags_templ.go#L18-L25>)
+## func [Tags](<https://github.com/conneroisu/conneroh/blob/main/cmd/conneroh/views/tags_templ.go#L18-L25>)
 
 ```go
 func Tags(fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, fullTags *[]master.FullTag, fullPostsSlugMap *map[string]master.FullPost, fullProjectsSlugMap *map[string]master.FullProject, fullTagsSlugMap *map[string]master.FullTag) templ.Component

@@ -968,7 +968,7 @@ func (q *Queries) ProjectTagDelete(ctx context.Context, projectID int64, tagID i
 	return err
 }
 
-const projectTagsGet = `-- name: ProjectTagsGet :many
+const projectTagsGetByIDs = `-- name: ProjectTagsGetByIDs :one
 SELECT
     project_id, tag_id
 FROM
@@ -978,7 +978,7 @@ WHERE
     AND tag_id = ?
 `
 
-// ProjectTagsGet
+// ProjectTagsGetByIDs
 //
 //	SELECT
 //	    project_id, tag_id
@@ -987,27 +987,11 @@ WHERE
 //	WHERE
 //	    project_id = ?
 //	    AND tag_id = ?
-func (q *Queries) ProjectTagsGet(ctx context.Context, projectID int64, tagID int64) ([]ProjectTag, error) {
-	rows, err := q.db.QueryContext(ctx, projectTagsGet, projectID, tagID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []ProjectTag
-	for rows.Next() {
-		var i ProjectTag
-		if err := rows.Scan(&i.ProjectID, &i.TagID); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
+func (q *Queries) ProjectTagsGetByIDs(ctx context.Context, projectID int64, tagID int64) (ProjectTag, error) {
+	row := q.db.QueryRowContext(ctx, projectTagsGetByIDs, projectID, tagID)
+	var i ProjectTag
+	err := row.Scan(&i.ProjectID, &i.TagID)
+	return i, err
 }
 
 const projectTagsGetByProjectID = `-- name: ProjectTagsGetByProjectID :many

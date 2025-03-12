@@ -4,7 +4,7 @@ aliases: []
 tags:
   - ide/vivado
   - vcs/git
-  - cpre488
+  - academics/cpre488
 description: Post on how I made Vivado not suck at Git
 projects:
   - cpre488-mp2
