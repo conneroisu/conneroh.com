@@ -61,20 +61,7 @@ templ Project(
 				<div
 					class="mt-6 flex items-center text-sm text-gray-500 dark:text-gray-400"
 				>
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						class="h-5 w-5 mr-2"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke="currentColor"
-					>
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-						></path>
-					</svg>
+					<i class="nf nf-cod-calendar mr-2 text-lg"></i>
 					<span>Created: { formatDate(project.CreatedAt) }</span>
 				</div>
 			</div>
@@ -213,7 +200,11 @@ templ Projects(
 			}
 		}"
 	>
-		<h1 class="text-3xl font-bold mb-6 text-gray-900 dark:text-white">Projects</h1>
+		<h1
+			class="text-3xl font-bold mb-6 text-gray-900 dark:text-white"
+		>
+			Projects
+		</h1>
 		// Search and Filter Controls using the Searcher component
 		@layouts.Searcher(
 			"searchQuery",
@@ -286,9 +277,7 @@ templ Projects(
 							class="text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center group"
 						>
 							View Project
-							<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1 transition-transform duration-200 transform group-hover:translate-x-1" viewBox="0 0 20 20" fill="currentColor">
-								<path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-							</svg>
+							<i class="nf nf-cod-arrow_right h-4 w-4 ml-1 transition-transform duration-200 transform group-hover:translate-x-1"></i>
 						</a>
 					</div>
 				</div>
