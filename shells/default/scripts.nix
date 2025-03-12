@@ -21,7 +21,7 @@
     description = "Build the package";
   };
   update = {
-    exec = ''doppler run -- go run ./cmd/update'';
+    exec = ''doppler run -- go run $REPO_ROOT/cmd/update'';
     description = "Run update command with doppler";
   };
   "generate-all-profile" = {

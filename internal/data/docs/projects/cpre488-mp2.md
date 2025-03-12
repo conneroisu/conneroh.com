@@ -5,6 +5,9 @@ tags:
   - programming-language/c
   - programming-language/c++
   - programming-language/matlab
+  - ide/vivado
+  - hdl/vhdl
+  - hdl/verilog
 description: The third Project from CPRE488 at Iowa State University
 title: CPRE488 MP2
 ---

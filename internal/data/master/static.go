@@ -232,7 +232,7 @@ func (q *Queries) UpsertProjectTags(
 			return nil
 		}
 		if !errors.Is(err, sql.ErrNoRows) {
-			return fmt.Errorf("fucckkkks to get project tags: %w", err)
+			return fmt.Errorf("failed to get project tag: %w", err)
 		}
 		err = q.ProjectTagCreate(ctx, id, t.ID)
 		if err != nil {
@@ -247,22 +247,24 @@ func (q *Queries) UpsertPostTags(
 	ctx context.Context,
 	tags []string, // slugs
 	id int64,
-) error {
-	for _, tag := range tags {
-		t, err := q.TagGetBySlug(ctx, tag)
+) (err error) {
+	var tag string
+	var t Tag
+	for _, tag = range tags {
+		t, err = q.TagGetBySlug(ctx, tag)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to get by slug post tags: %s:	%w", tag, err)
 		}
 		_, err = q.PostTagGet(ctx, id, t.ID)
 		if err == nil {
 			return nil
 		}
 		if !errors.Is(err, sql.ErrNoRows) {
-			return err
+			return fmt.Errorf("failed to upsert post tags (not no rows): %w", err)
 		}
 		err = q.PostTagCreate(ctx, id, t.ID)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to create post tags: %w", err)
 		}
 	}
 	return nil
