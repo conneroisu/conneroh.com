@@ -9,4 +9,3 @@ title: Neovim
 # Neovim
 
 My favorite editor, Neovim
-

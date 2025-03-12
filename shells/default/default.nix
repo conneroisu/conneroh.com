@@ -56,6 +56,7 @@ in
         tailwindcss-language-server
         bun
         nodePackages.typescript-language-server
+        nodePackages.prettier
         sqlite-web
 
         # SQL Related
@@ -65,6 +66,9 @@ in
         inputs.sqlcquash.packages."${pkgs.system}".default
         sleek
         bc
+
+        # C/C++
+        clang-tools
 
         # Infra
         flyctl

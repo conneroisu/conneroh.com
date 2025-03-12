@@ -5,6 +5,7 @@ tags:
   - programming-language
 title: Go
 ---
+
 Golang, also known as Go, is an open-source programming language designed by Google and first released in 2009.
 
 Created by Robert Griesemer, Rob Pike, and Ken Thompson, Go is known for its simplicity, efficiency, and strong concurrency model, making it well-suited for cloud computing, microservices, and distributed systems.

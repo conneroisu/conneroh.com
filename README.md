@@ -56,6 +56,7 @@ The site organizes content into projects, posts, and tags, all backed by a SQLit
 ## Database Schema
 
 The application uses a SQLite database with the following main tables:
+
 - `posts` - Blog articles
 - `projects` - Portfolio projects
 - `tags` - Skills and categories
@@ -74,6 +75,7 @@ The application uses a SQLite database with the following main tables:
 ### Environment Variables
 
 The application requires the following environment variables:
+
 - `TURSO_URI` - Turso database URI
 - `TURSO_TOKEN` - Turso authentication token
 

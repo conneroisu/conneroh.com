@@ -10,5 +10,5 @@ projects:
   - cpre488-mp2
 title: Making Vivado not suck at Git
 ---
-# Making Vivado not suck at Git
 
+# Making Vivado not suck at Git

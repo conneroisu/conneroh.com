@@ -6,7 +6,8 @@
 
 @font-face {
   font-family: "NerdFontsSymbols";
-  src: local("NerdFontsSymbols"),
+  src:
+    local("NerdFontsSymbols"),
     url("/dist/NF.woff2") format("woff2"),
     url("/dist/NF.woff") format("woff");
   font-weight: normal;

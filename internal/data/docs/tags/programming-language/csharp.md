@@ -5,6 +5,7 @@ tags:
   - programming-language
 title: C#
 ---
+
 C# is a modern, object-oriented programming language developed by Microsoft in the early 2000s as part of the .NET framework, designed to be simple, type-safe, and scalable.
 
 It integrates elements from C++ and Java, providing automatic memory management via garbage collection and a strong type system to reduce common programming errors.
