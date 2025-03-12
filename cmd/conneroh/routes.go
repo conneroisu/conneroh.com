@@ -22,7 +22,7 @@ var RouteMap = routing.APIMap{
 	"GET /project/{id}":               Project,
 	"GET /post/{id}":                  Post,
 	"GET /tag/{id...}":                Tag,
-	"GET /hateoas/morph/{view...}":    Morph,
+	"GET /hateoas/morph/{view...}":    MorphView,
 	"GET /hateoas/morphs/{view}/{id}": Morphs,
 }
 

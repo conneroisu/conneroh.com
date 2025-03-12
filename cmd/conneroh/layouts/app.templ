@@ -15,11 +15,15 @@ templ Layout(title string) {
 
 @font-face {
   font-family: "NerdFontsSymbols";
-  src: url("/dist/NF.woff2") format("woff2");
+  src: local("NerdFontsSymbols"),
+       url("/dist/NF.woff2") format("woff2");
   font-weight: normal;
   font-style: normal;
+  font-display: swap;
 }
-
+#icon {
+  font-family: "NerdFontsSymbols", sans-serif;
+}
 			</style>
 			<script type="module" src="/dist/index.js"></script>
 		</head>

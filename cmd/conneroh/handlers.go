@@ -95,8 +95,8 @@ func Home(
 
 }
 
-// Morph renders a morphed view.
-func Morph(
+// MorphView renders a morphed view.
+func MorphView(
 	ctx context.Context,
 	db *data.Database[master.Queries],
 	fullPosts *[]master.FullPost,
