@@ -2,6 +2,7 @@
 id: git
 aliases: []
 tags: []
+icon: nf-dev-git
 title: Git
 ---
 

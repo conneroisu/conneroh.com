@@ -2,7 +2,7 @@
 id: typescript
 aliases: []
 tags: []
-icon: typescript
+icon: nf-dev-typescript
 title: TypeScript
 ---
 
