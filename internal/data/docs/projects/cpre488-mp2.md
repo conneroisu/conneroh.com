@@ -8,6 +8,7 @@ tags:
   - ide/vivado
   - hdl/vhdl
   - hdl/verilog
+  - protocol/uart
 description: The third Project from CPRE488 at Iowa State University
 title: CPRE488 MP2
 ---

@@ -201,13 +201,13 @@ func (md *Markdown) UpsertTag(
 	db *data.Database[master.Queries],
 	client *api.Client,
 ) (err error) {
-	slog.Info("upserting tag", "slug", md.Slug)
-	defer slog.Info("upserted tag", "slug", md.Slug)
+	slog.Info("upserting tag", "slug", md.Slug, "icon", md.Icon)
+	defer slog.Info("upserted tag", "slug", md.Slug, "icon", md.Icon)
 	var id int64
 	var tag master.Tag
 	tag, err = db.Queries.TagGetBySlug(ctx, md.Slug)
 	if err == nil {
-		slog.Debug("tag already exists - updating", "slug", md.Slug)
+		slog.Debug("tag already exists - updating", "slug", md.Slug, "icon", md.Icon)
 		if tag.RawContent == md.RawContent {
 			return db.Queries.TagUpdate(
 				ctx,
@@ -230,7 +230,7 @@ func (md *Markdown) UpsertTag(
 			tag.EmbeddingID,
 		)
 		if err != nil {
-			return
+			return err
 		}
 		// updated embedding
 		return db.Queries.TagUpdate(
