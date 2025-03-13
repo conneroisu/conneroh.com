@@ -1,0 +1,46 @@
+package views
+
+import (
+	"fmt"
+	"github.com/conneroisu/conneroh.com/internal/data/master"
+)
+
+templ TagEmbed(
+	tag master.Tag,
+) {
+	<div
+		x-data="{ open: false }"
+		x-on:mouseover="open = true"
+		x-on:mouseleave="open = false"
+		class="ctag"
+	>
+		<i
+			x-show="open"
+			class={ "nf " + tag.Icon + " mr-2" }
+			x-transition
+		></i>
+		<a
+			x-on:click="open = true"
+			x-show="!open"
+		>
+			{ tag.Slug }
+		</a>
+		<a
+			href={ templ.SafeURL(fmt.Sprintf("/tag/%s", tag.Slug)) }
+			x-on:click="open = false"
+			x-show="open"
+		>
+			{ tag.Slug }
+		</a>
+		<a
+			x-show="open"
+			class="nf nf-fa-plus mr-2"
+			x-transition
+		></a>
+		<a
+			x-show="open"
+			class="nf nf-fa-minus"
+			x-transition
+		></a>
+	</div>
+}

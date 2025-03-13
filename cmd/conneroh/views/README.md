@@ -8,6 +8,8 @@
 import "github.com/conneroisu/conneroh.com/cmd/conneroh/views"
 ```
 
+templ: version: v0.3.833
+
 Package views contains the HTML templates for the website.
 
 templ: version: v0.3.833
@@ -30,6 +32,7 @@ templ: version: v0.3.833
 - [func Project\(project \*master.FullProject, fullPosts \*\[\]master.FullPost, fullProjects \*\[\]master.FullProject, fullTags \*\[\]master.FullTag, fullPostsSlugMap \*map\[string\]master.FullPost, fullProjectsSlugMap \*map\[string\]master.FullProject, fullTagsSlugMap \*map\[string\]master.FullTag\) templ.Component](<#Project>)
 - [func Projects\(fullPosts \*\[\]master.FullPost, fullProjects \*\[\]master.FullProject, fullTags \*\[\]master.FullTag, fullPostsSlugMap \*map\[string\]master.FullPost, fullProjectsSlugMap \*map\[string\]master.FullProject, fullTagsSlugMap \*map\[string\]master.FullTag\) templ.Component](<#Projects>)
 - [func Tag\(tag \*master.FullTag, fullPosts \*\[\]master.FullPost, fullProjects \*\[\]master.FullProject, fullTags \*\[\]master.FullTag, fullPostsSlugMap \*map\[string\]master.FullPost, fullProjectsSlugMap \*map\[string\]master.FullProject, fullTagsSlugMap \*map\[string\]master.FullTag\) templ.Component](<#Tag>)
+- [func TagEmbed\(tag master.Tag\) templ.Component](<#TagEmbed>)
 - [func Tags\(fullPosts \*\[\]master.FullPost, fullProjects \*\[\]master.FullProject, fullTags \*\[\]master.FullTag, fullPostsSlugMap \*map\[string\]master.FullPost, fullProjectsSlugMap \*map\[string\]master.FullProject, fullTagsSlugMap \*map\[string\]master.FullTag\) templ.Component](<#Tags>)
 
 
@@ -88,7 +91,7 @@ func Project(project *master.FullProject, fullPosts *[]master.FullPost, fullProj
 
 
 <a name="Projects"></a>
-## func [Projects](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/projects_templ.go#L198-L205>)
+## func [Projects](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/projects_templ.go#L202-L209>)
 
 ```go
 func Projects(fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, fullTags *[]master.FullTag, fullPostsSlugMap *map[string]master.FullPost, fullProjectsSlugMap *map[string]master.FullProject, fullTagsSlugMap *map[string]master.FullTag) templ.Component
@@ -104,6 +107,15 @@ func Tag(tag *master.FullTag, fullPosts *[]master.FullPost, fullProjects *[]mast
 ```
 
 Tag component for displaying a single tag and its associated content
+
+<a name="TagEmbed"></a>
+## func [TagEmbed](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/components_templ.go#L13-L15>)
+
+```go
+func TagEmbed(tag master.Tag) templ.Component
+```
+
+
 
 <a name="Tags"></a>
 ## func [Tags](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/tags_templ.go#L18-L25>)

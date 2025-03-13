@@ -62,7 +62,7 @@ templ Searcher(
 }
 
 // SearchResult shows the count of filtered results
-templ SearchResult(totalVar string, filteredVar string) {
+templ SearchResultInfo(totalVar string, filteredVar string) {
 	<p
 		class="text-sm text-gray-500 dark:text-gray-400 mb-4"
 		x-text={ "`Showing ${" + filteredVar + ".length} of ${" + totalVar + ".length}`" }
