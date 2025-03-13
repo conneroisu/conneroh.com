@@ -314,9 +314,16 @@ LIMIT
 
 -- name: TagCreate :exec
 INSERT INTO
-    tags (title, content, raw_content, slug, embedding_id)
+    tags (
+        title,
+        description,
+        content,
+        raw_content,
+        slug,
+        embedding_id
+    )
 VALUES
-    (?, ?, ?, ?, ?);
+    (?, ?, ?, ?, ?, ?);
 
 -- name: TagUpdate :exec
 UPDATE
@@ -327,7 +334,8 @@ SET
     content = ?,
     icon = ?,
     raw_content = ?,
-    embedding_id = ?
+    embedding_id = ?,
+    description = ?
 WHERE
     id = ?;
 

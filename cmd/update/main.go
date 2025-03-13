@@ -217,6 +217,7 @@ func (md *Markdown) UpsertTag(
 					Title:       md.Title,
 					RawContent:  md.RawContent,
 					Content:     md.RenderContent,
+					Description: md.Description,
 					Icon:        md.Icon,
 					EmbeddingID: tag.EmbeddingID,
 				},
@@ -239,6 +240,7 @@ func (md *Markdown) UpsertTag(
 				ID:          tag.ID,
 				Slug:        md.Slug,
 				Title:       md.Title,
+				Description: md.Description,
 				RawContent:  md.RawContent,
 				Content:     md.RenderContent,
 				EmbeddingID: id,
@@ -255,6 +257,7 @@ func (md *Markdown) UpsertTag(
 		return db.Queries.TagCreate(ctx, master.TagCreateParams{
 			Slug:        md.Slug,
 			Title:       md.Title,
+			Description: md.Description,
 			RawContent:  md.RawContent,
 			Content:     md.RenderContent,
 			EmbeddingID: id,

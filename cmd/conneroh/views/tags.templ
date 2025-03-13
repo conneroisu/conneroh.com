@@ -94,7 +94,7 @@ templ Tags(
 					class="hidden"
 					data-tag-id={ fmt.Sprintf("%d", tag.ID) }
 					data-tag-name={ tag.Title }
-					data-tag-description={ tag.Content }
+					data-tag-description={ tag.Description }
 					data-tag-slug={ tag.Slug }
 					data-tag-section={ templ.EscapeString(getTagSection(tag.Slug)) }
 					data-tag-posts-count={ fmt.Sprintf("%d", len(tag.Posts)) }
@@ -184,7 +184,7 @@ templ Tag(
 			<div
 				class="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto"
 			>
-				@templ.Raw(tag.Content)
+				tag.Description
 			</div>
 		</header>
 		<div

@@ -1268,13 +1268,21 @@ func (q *Queries) ProjectsListByTag(ctx context.Context, tagID int64) ([]Project
 
 const tagCreate = `-- name: TagCreate :exec
 INSERT INTO
-    tags (title, content, raw_content, slug, embedding_id)
+    tags (
+        title,
+        description,
+        content,
+        raw_content,
+        slug,
+        embedding_id
+    )
 VALUES
-    (?, ?, ?, ?, ?)
+    (?, ?, ?, ?, ?, ?)
 `
 
 type TagCreateParams struct {
 	Title       string `db:"title" json:"title"`
+	Description string `db:"description" json:"description"`
 	Content     string `db:"content" json:"content"`
 	RawContent  string `db:"raw_content" json:"raw_content"`
 	Slug        string `db:"slug" json:"slug"`
@@ -1284,12 +1292,20 @@ type TagCreateParams struct {
 // TagCreate
 //
 //	INSERT INTO
-//	    tags (title, content, raw_content, slug, embedding_id)
+//	    tags (
+//	        title,
+//	        description,
+//	        content,
+//	        raw_content,
+//	        slug,
+//	        embedding_id
+//	    )
 //	VALUES
-//	    (?, ?, ?, ?, ?)
+//	    (?, ?, ?, ?, ?, ?)
 func (q *Queries) TagCreate(ctx context.Context, arg TagCreateParams) error {
 	_, err := q.db.ExecContext(ctx, tagCreate,
 		arg.Title,
+		arg.Description,
 		arg.Content,
 		arg.RawContent,
 		arg.Slug,
@@ -1300,7 +1316,7 @@ func (q *Queries) TagCreate(ctx context.Context, arg TagCreateParams) error {
 
 const tagGetByID = `-- name: TagGetByID :one
 SELECT
-    id, title, slug, content, raw_content, icon, created_at, updated_at, embedding_id
+    id, title, slug, description, content, raw_content, icon, created_at, updated_at, embedding_id
 FROM
     tags
 WHERE
@@ -1312,7 +1328,7 @@ LIMIT
 // TagGetByID
 //
 //	SELECT
-//	    id, title, slug, content, raw_content, icon, created_at, updated_at, embedding_id
+//	    id, title, slug, description, content, raw_content, icon, created_at, updated_at, embedding_id
 //	FROM
 //	    tags
 //	WHERE
@@ -1326,6 +1342,7 @@ func (q *Queries) TagGetByID(ctx context.Context, id int64) (Tag, error) {
 		&i.ID,
 		&i.Title,
 		&i.Slug,
+		&i.Description,
 		&i.Content,
 		&i.RawContent,
 		&i.Icon,
@@ -1338,7 +1355,7 @@ func (q *Queries) TagGetByID(ctx context.Context, id int64) (Tag, error) {
 
 const tagGetBySlug = `-- name: TagGetBySlug :one
 SELECT
-    id, title, slug, content, raw_content, icon, created_at, updated_at, embedding_id
+    id, title, slug, description, content, raw_content, icon, created_at, updated_at, embedding_id
 FROM
     tags
 WHERE
@@ -1350,7 +1367,7 @@ LIMIT
 // TagGetBySlug
 //
 //	SELECT
-//	    id, title, slug, content, raw_content, icon, created_at, updated_at, embedding_id
+//	    id, title, slug, description, content, raw_content, icon, created_at, updated_at, embedding_id
 //	FROM
 //	    tags
 //	WHERE
@@ -1364,6 +1381,7 @@ func (q *Queries) TagGetBySlug(ctx context.Context, slug string) (Tag, error) {
 		&i.ID,
 		&i.Title,
 		&i.Slug,
+		&i.Description,
 		&i.Content,
 		&i.RawContent,
 		&i.Icon,
@@ -1383,7 +1401,8 @@ SET
     content = ?,
     icon = ?,
     raw_content = ?,
-    embedding_id = ?
+    embedding_id = ?,
+    description = ?
 WHERE
     id = ?
 `
@@ -1395,6 +1414,7 @@ type TagUpdateParams struct {
 	Icon        string `db:"icon" json:"icon"`
 	RawContent  string `db:"raw_content" json:"raw_content"`
 	EmbeddingID int64  `db:"embedding_id" json:"embedding_id"`
+	Description string `db:"description" json:"description"`
 	ID          int64  `db:"id" json:"id"`
 }
 
@@ -1408,7 +1428,8 @@ type TagUpdateParams struct {
 //	    content = ?,
 //	    icon = ?,
 //	    raw_content = ?,
-//	    embedding_id = ?
+//	    embedding_id = ?,
+//	    description = ?
 //	WHERE
 //	    id = ?
 func (q *Queries) TagUpdate(ctx context.Context, arg TagUpdateParams) error {
@@ -1419,6 +1440,7 @@ func (q *Queries) TagUpdate(ctx context.Context, arg TagUpdateParams) error {
 		arg.Icon,
 		arg.RawContent,
 		arg.EmbeddingID,
+		arg.Description,
 		arg.ID,
 	)
 	return err
@@ -1426,7 +1448,7 @@ func (q *Queries) TagUpdate(ctx context.Context, arg TagUpdateParams) error {
 
 const tagsListAlphabetical = `-- name: TagsListAlphabetical :many
 SELECT
-    t.id, t.title, t.slug, t.content, t.raw_content, t.icon, t.created_at, t.updated_at, t.embedding_id
+    t.id, t.title, t.slug, t.description, t.content, t.raw_content, t.icon, t.created_at, t.updated_at, t.embedding_id
 FROM
     tags t
 ORDER BY
@@ -1436,7 +1458,7 @@ ORDER BY
 // TagsListAlphabetical
 //
 //	SELECT
-//	    t.id, t.title, t.slug, t.content, t.raw_content, t.icon, t.created_at, t.updated_at, t.embedding_id
+//	    t.id, t.title, t.slug, t.description, t.content, t.raw_content, t.icon, t.created_at, t.updated_at, t.embedding_id
 //	FROM
 //	    tags t
 //	ORDER BY
@@ -1454,6 +1476,7 @@ func (q *Queries) TagsListAlphabetical(ctx context.Context) ([]Tag, error) {
 			&i.ID,
 			&i.Title,
 			&i.Slug,
+			&i.Description,
 			&i.Content,
 			&i.RawContent,
 			&i.Icon,
@@ -1476,7 +1499,7 @@ func (q *Queries) TagsListAlphabetical(ctx context.Context) ([]Tag, error) {
 
 const tagsListByPost = `-- name: TagsListByPost :many
 SELECT
-    t.id, t.title, t.slug, t.content, t.raw_content, t.icon, t.created_at, t.updated_at, t.embedding_id
+    t.id, t.title, t.slug, t.description, t.content, t.raw_content, t.icon, t.created_at, t.updated_at, t.embedding_id
 FROM
     tags t
     JOIN post_tags pt ON t.id = pt.tag_id
@@ -1489,7 +1512,7 @@ ORDER BY
 // TagsListByPost
 //
 //	SELECT
-//	    t.id, t.title, t.slug, t.content, t.raw_content, t.icon, t.created_at, t.updated_at, t.embedding_id
+//	    t.id, t.title, t.slug, t.description, t.content, t.raw_content, t.icon, t.created_at, t.updated_at, t.embedding_id
 //	FROM
 //	    tags t
 //	    JOIN post_tags pt ON t.id = pt.tag_id
@@ -1510,6 +1533,7 @@ func (q *Queries) TagsListByPost(ctx context.Context, postID int64) ([]Tag, erro
 			&i.ID,
 			&i.Title,
 			&i.Slug,
+			&i.Description,
 			&i.Content,
 			&i.RawContent,
 			&i.Icon,
@@ -1532,7 +1556,7 @@ func (q *Queries) TagsListByPost(ctx context.Context, postID int64) ([]Tag, erro
 
 const tagsListByProject = `-- name: TagsListByProject :many
 SELECT
-    t.id, t.title, t.slug, t.content, t.raw_content, t.icon, t.created_at, t.updated_at, t.embedding_id
+    t.id, t.title, t.slug, t.description, t.content, t.raw_content, t.icon, t.created_at, t.updated_at, t.embedding_id
 FROM
     tags t
     JOIN project_tags pt ON t.id = pt.tag_id
@@ -1545,7 +1569,7 @@ ORDER BY
 // TagsListByProject
 //
 //	SELECT
-//	    t.id, t.title, t.slug, t.content, t.raw_content, t.icon, t.created_at, t.updated_at, t.embedding_id
+//	    t.id, t.title, t.slug, t.description, t.content, t.raw_content, t.icon, t.created_at, t.updated_at, t.embedding_id
 //	FROM
 //	    tags t
 //	    JOIN project_tags pt ON t.id = pt.tag_id
@@ -1566,6 +1590,7 @@ func (q *Queries) TagsListByProject(ctx context.Context, projectID int64) ([]Tag
 			&i.ID,
 			&i.Title,
 			&i.Slug,
+			&i.Description,
 			&i.Content,
 			&i.RawContent,
 			&i.Icon,

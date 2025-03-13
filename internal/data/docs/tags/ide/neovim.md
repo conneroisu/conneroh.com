@@ -1,7 +1,10 @@
 ---
 id: neovim
 aliases: []
-tags: []
+tags:
+  - ide/neovim
+  - programming-language/vimscript
+  - programming-language/lua
 description: My favorite editor, Neovim
 title: Neovim
 ---
