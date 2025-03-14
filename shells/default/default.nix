@@ -58,8 +58,7 @@ in
         nodePackages.typescript-language-server
         nodePackages.prettier
         sqlite-web
-        dvc
-        dvc-with-remotes
+        nodePackages.svgo
 
         # SQL Related
         sqlc
