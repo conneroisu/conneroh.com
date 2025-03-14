@@ -3,6 +3,7 @@ id: verilog
 aliases: []
 tags:
   - hdl
+description: Verilog is a hardware description language (HDL) used for modeling, designing, and verifying digital circuits and systems.
 title: Verilog
 ---
 

@@ -138,8 +138,6 @@ func Parse(fsPath string, embedFs embed.FS) (*Markdown, error) {
 		fsPath = strings.Replace(fsPath, "posts/", "", 1)
 	case docs.Tags:
 		fsPath = strings.Replace(fsPath, "tags/", "", 1)
-		// It is a tag page.
-		fm.Description = buf.String()
 	case docs.Projects:
 		fsPath = strings.Replace(fsPath, "projects/", "", 1)
 	}

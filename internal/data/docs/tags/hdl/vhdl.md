@@ -3,6 +3,7 @@ id: vhdl
 aliases: []
 tags:
   - hdl
+description: VHDL (VHSIC Hardware Description Language) is a hardware description language used to model and simulate digital circuits and systems.
 title: VHDL
 ---
 

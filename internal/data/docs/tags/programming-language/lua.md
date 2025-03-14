@@ -3,6 +3,7 @@ id: lua
 aliases: []
 tags:
   - programming-language
+description: Lua is a lightweight, high-level, and embeddable scripting language designed for flexibility and efficiency.
 title: Lua
 ---
 

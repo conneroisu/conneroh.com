@@ -2,6 +2,7 @@
 id: nix
 aliases: []
 tags: []
+description: Nix is a purely functional package manager and build system designed for reproducibility, reliability, and declarative system configuration.
 title: Nix
 ---
 

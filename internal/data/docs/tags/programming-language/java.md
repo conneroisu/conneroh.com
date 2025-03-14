@@ -3,6 +3,7 @@ id: java
 aliases: []
 tags:
   - programming-language
+description: Java is a high-level, object-oriented programming language developed by Sun Microsystems and released in 1995.
 icon: nf-dev-java
 title: Java
 ---

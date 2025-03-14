@@ -3,6 +3,7 @@ id: go
 aliases: []
 tags:
   - programming-language
+description: Golang, also known as Go, is an open-source programming language designed by Google and first released in 2009.
 title: Go
 ---
 

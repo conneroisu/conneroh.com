@@ -2,6 +2,7 @@
 id: matlab
 aliases: []
 tags: []
+description: MATLAB (Matrix Laboratory) is a high-level programming language and computing environment developed by MathWorks.
 title: Matlab
 ---
 
