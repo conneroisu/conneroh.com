@@ -12,6 +12,16 @@ templ Layout(title string) {
 			<meta name="language" content="English"/>
 			<link rel="stylesheet" href="/dist/style.css"/>
 			<script type="module" src="/dist/index.js"></script>
+			<script>
+ partytown = {
+        debug: true,
+        lib: "/dist/",
+      };
+      </script>
+			<script src="/dist/partytown.js"></script>
+			// <script src="/dist/partytown-media.js"></script>
+			// <script src="/dist/partytown-sw.js"></script>
+			// <script src="/dist/partytown-atomics.js"></script>
 		</head>
 		<body class="bg-white dark:bg-gray-900">
 			@header()

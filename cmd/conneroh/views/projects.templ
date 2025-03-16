@@ -245,10 +245,10 @@ templ Projects(
 				:key="project.id"
 			>
 				<div
-					class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1"
+					class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 p-6"
 				>
-					<div
-						class="p-6"
+					<a
+						:href="`/project/${project.slug}`"
 					>
 						<h2
 							class="text-xl font-semibold text-gray-900 dark:text-white mb-2"
@@ -279,7 +279,7 @@ templ Projects(
 							View Project
 							<i class="nf nf-cod-arrow_right h-4 w-4 ml-1 transition-transform duration-200 transform group-hover:translate-x-1"></i>
 						</a>
-					</div>
+					</a>
 				</div>
 			</template>
 		</div>

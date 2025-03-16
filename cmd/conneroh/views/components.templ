@@ -5,6 +5,29 @@ import (
 	"github.com/conneroisu/conneroh.com/internal/data/master"
 )
 
+templ Icon(
+	id string,
+) {
+	<script>
+const el = document.getElementById((document.body.appendChild(Object.assign(document.createElement('div'), { id: crypto.randomUUID() }))).id);
+</script>
+	<script type="text/partytown">
+  // fetch /dist/svg/{{ id }}.svg
+  // and insert it into the DOM
+    console.log("dom loaded");
+    const id = {{ id }};
+    const target = document.getElementById(id);
+    fetch({{ "/dist/svg/" + id + ".svg" }})
+      .then(response => response.text())
+      .then(data => {
+        const parser = new DOMParser();
+        const svg = parser.parseFromString(data, "image/svg+xml");
+        target.appendChild(svg.documentElement);
+      });
+</script>
+	<div id={ id }></div>
+}
+
 templ TagEmbed(
 	tag master.Tag,
 ) {
