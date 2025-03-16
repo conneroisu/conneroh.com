@@ -28,6 +28,20 @@ const el = document.getElementById((document.body.appendChild(Object.assign(docu
 	<div id={ id }></div>
 }
 
+templ Image(
+	src string,
+	alt string,
+	width string,
+	height string,
+) {
+	<img
+		src={ src }
+		alt={ alt }
+		width={ width }
+		height={ height }
+	/>
+}
+
 templ TagEmbed(
 	tag master.Tag,
 ) {

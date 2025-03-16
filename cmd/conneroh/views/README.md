@@ -26,6 +26,7 @@ templ: version: v0.3.833
 
 - [func Home\(fullPosts \*\[\]master.FullPost, fullProjects \*\[\]master.FullProject, fullTags \*\[\]master.FullTag, fullPostsSlugMap \*map\[string\]master.FullPost, fullProjectsSlugMap \*map\[string\]master.FullProject, fullTagsSlugMap \*map\[string\]master.FullTag\) templ.Component](<#Home>)
 - [func Icon\(id string\) templ.Component](<#Icon>)
+- [func Image\(src string, alt string, width string, height string\) templ.Component](<#Image>)
 - [func Morpher\(comp templ.Component\) templ.Component](<#Morpher>)
 - [func Page\(comp templ.Component\) templ.Component](<#Page>)
 - [func Post\(post \*master.FullPost, fullPosts \*\[\]master.FullPost, fullProjects \*\[\]master.FullProject, fullTags \*\[\]master.FullTag, fullPostSlugMap \*map\[string\]master.FullPost, fullProjectSlugMap \*map\[string\]master.FullProject, fullTagSlugMap \*map\[string\]master.FullTag\) templ.Component](<#Post>)
@@ -51,6 +52,15 @@ func Home(fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, full
 
 ```go
 func Icon(id string) templ.Component
+```
+
+
+
+<a name="Image"></a>
+## func [Image](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/components_templ.go#L60-L65>)
+
+```go
+func Image(src string, alt string, width string, height string) templ.Component
 ```
 
 
@@ -119,7 +129,7 @@ func Tag(tag *master.FullTag, fullPosts *[]master.FullPost, fullProjects *[]mast
 Tag component for displaying a single tag and its associated content
 
 <a name="TagEmbed"></a>
-## func [TagEmbed](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/components_templ.go#L60-L62>)
+## func [TagEmbed](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/components_templ.go#L146-L148>)
 
 ```go
 func TagEmbed(tag master.Tag) templ.Component
