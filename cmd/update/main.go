@@ -341,6 +341,9 @@ func (md *Markdown) UpsertProject(
 	db *data.Database[master.Queries],
 	client *api.Client,
 ) (project master.Project, err error) {
+	if md == nil {
+		return master.Project{}, errors.New("markdown is nil for a project")
+	}
 	slog.Info("upserting project", "slug", md.Slug)
 	defer slog.Info("upserted project", "slug", md.Slug)
 	var id int64
