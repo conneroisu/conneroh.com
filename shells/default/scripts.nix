@@ -21,10 +21,14 @@
     description = "Build the package";
   };
   update = {
-    exec = ''doppler run -- go run $REPO_ROOT/cmd/update'';
+    exec = ''go run $REPO_ROOT/cmd/update'';
     description = "Run update command with doppler";
   };
-  "generate-all-profile" = {
+  restart = {
+    exec = ''rm master.db && go run $REPO_ROOT/cmd/update'';
+    description = "Run restart command with doppler";
+  };
+  generate-all-profile = {
     exec = ''
       TIMEFORMAT="%R seconds"
 
