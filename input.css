@@ -12,6 +12,10 @@
   .deskheaditem {
     @apply text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white cursor-pointer
   }
+
+  .mobileheaditem {
+    @apply block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700
+  }
 }
 
 @theme inline {
