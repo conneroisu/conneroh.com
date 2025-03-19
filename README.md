@@ -137,6 +137,10 @@ go build -o conneroh ./cmd/conneroh
 ./conneroh
 ```
 
+## Resources
+
+- [ preload ]( https://htmx.org/extensions/preload/ )
+
 ## License
 
 This project is personal and not licensed for public use without permission. Use at your own risk.
@@ -144,3 +148,5 @@ This project is personal and not licensed for public use without permission. Use
 ## Author
 
 Conner Ohnesorge
+
+
