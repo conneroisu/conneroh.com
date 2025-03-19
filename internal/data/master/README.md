@@ -983,7 +983,7 @@ ORDER BY
 ```
 
 <a name="Queries.TagCreate"></a>
-### func \(\*Queries\) [TagCreate](<https://github.com/conneroisu/conneroh.com/blob/main/internal/data/master/queries.sql.go#L1305>)
+### func \(\*Queries\) [TagCreate](<https://github.com/conneroisu/conneroh.com/blob/main/internal/data/master/queries.sql.go#L1308>)
 
 ```go
 func (q *Queries) TagCreate(ctx context.Context, arg TagCreateParams) error
@@ -999,14 +999,15 @@ INSERT INTO
         content,
         raw_content,
         slug,
-        embedding_id
+        embedding_id,
+        icon
     )
 VALUES
-    (?, ?, ?, ?, ?, ?)
+    (?, ?, ?, ?, ?, ?, ?)
 ```
 
 <a name="Queries.TagGetByID"></a>
-### func \(\*Queries\) [TagGetByID](<https://github.com/conneroisu/conneroh.com/blob/main/internal/data/master/queries.sql.go#L1338>)
+### func \(\*Queries\) [TagGetByID](<https://github.com/conneroisu/conneroh.com/blob/main/internal/data/master/queries.sql.go#L1342>)
 
 ```go
 func (q *Queries) TagGetByID(ctx context.Context, id int64) (Tag, error)
@@ -1026,7 +1027,7 @@ LIMIT
 ```
 
 <a name="Queries.TagGetBySlug"></a>
-### func \(\*Queries\) [TagGetBySlug](<https://github.com/conneroisu/conneroh.com/blob/main/internal/data/master/queries.sql.go#L1377>)
+### func \(\*Queries\) [TagGetBySlug](<https://github.com/conneroisu/conneroh.com/blob/main/internal/data/master/queries.sql.go#L1381>)
 
 ```go
 func (q *Queries) TagGetBySlug(ctx context.Context, slug string) (Tag, error)
@@ -1046,7 +1047,7 @@ LIMIT
 ```
 
 <a name="Queries.TagUpdate"></a>
-### func \(\*Queries\) [TagUpdate](<https://github.com/conneroisu/conneroh.com/blob/main/internal/data/master/queries.sql.go#L1435>)
+### func \(\*Queries\) [TagUpdate](<https://github.com/conneroisu/conneroh.com/blob/main/internal/data/master/queries.sql.go#L1439>)
 
 ```go
 func (q *Queries) TagUpdate(ctx context.Context, arg TagUpdateParams) error
@@ -1070,7 +1071,7 @@ WHERE
 ```
 
 <a name="Queries.TagsListAlphabetical"></a>
-### func \(\*Queries\) [TagsListAlphabetical](<https://github.com/conneroisu/conneroh.com/blob/main/internal/data/master/queries.sql.go#L1466>)
+### func \(\*Queries\) [TagsListAlphabetical](<https://github.com/conneroisu/conneroh.com/blob/main/internal/data/master/queries.sql.go#L1470>)
 
 ```go
 func (q *Queries) TagsListAlphabetical(ctx context.Context) ([]Tag, error)
@@ -1088,7 +1089,7 @@ ORDER BY
 ```
 
 <a name="Queries.TagsListByPost"></a>
-### func \(\*Queries\) [TagsListByPost](<https://github.com/conneroisu/conneroh.com/blob/main/internal/data/master/queries.sql.go#L1523>)
+### func \(\*Queries\) [TagsListByPost](<https://github.com/conneroisu/conneroh.com/blob/main/internal/data/master/queries.sql.go#L1527>)
 
 ```go
 func (q *Queries) TagsListByPost(ctx context.Context, postID int64) ([]Tag, error)
@@ -1109,7 +1110,7 @@ ORDER BY
 ```
 
 <a name="Queries.TagsListByProject"></a>
-### func \(\*Queries\) [TagsListByProject](<https://github.com/conneroisu/conneroh.com/blob/main/internal/data/master/queries.sql.go#L1580>)
+### func \(\*Queries\) [TagsListByProject](<https://github.com/conneroisu/conneroh.com/blob/main/internal/data/master/queries.sql.go#L1584>)
 
 ```go
 func (q *Queries) TagsListByProject(ctx context.Context, projectID int64) ([]Tag, error)
@@ -1177,7 +1178,7 @@ type Tag struct {
 ```
 
 <a name="TagCreateParams"></a>
-## type [TagCreateParams](<https://github.com/conneroisu/conneroh.com/blob/main/internal/data/master/queries.sql.go#L1283-L1290>)
+## type [TagCreateParams](<https://github.com/conneroisu/conneroh.com/blob/main/internal/data/master/queries.sql.go#L1284-L1292>)
 
 
 
@@ -1189,11 +1190,12 @@ type TagCreateParams struct {
     RawContent  string `db:"raw_content" json:"raw_content"`
     Slug        string `db:"slug" json:"slug"`
     EmbeddingID int64  `db:"embedding_id" json:"embedding_id"`
+    Icon        string `db:"icon" json:"icon"`
 }
 ```
 
 <a name="TagUpdateParams"></a>
-## type [TagUpdateParams](<https://github.com/conneroisu/conneroh.com/blob/main/internal/data/master/queries.sql.go#L1410-L1419>)
+## type [TagUpdateParams](<https://github.com/conneroisu/conneroh.com/blob/main/internal/data/master/queries.sql.go#L1414-L1423>)
 
 
 

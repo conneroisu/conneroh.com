@@ -1274,10 +1274,11 @@ INSERT INTO
         content,
         raw_content,
         slug,
-        embedding_id
+        embedding_id,
+        icon
     )
 VALUES
-    (?, ?, ?, ?, ?, ?)
+    (?, ?, ?, ?, ?, ?, ?)
 `
 
 type TagCreateParams struct {
@@ -1287,6 +1288,7 @@ type TagCreateParams struct {
 	RawContent  string `db:"raw_content" json:"raw_content"`
 	Slug        string `db:"slug" json:"slug"`
 	EmbeddingID int64  `db:"embedding_id" json:"embedding_id"`
+	Icon        string `db:"icon" json:"icon"`
 }
 
 // TagCreate
@@ -1298,10 +1300,11 @@ type TagCreateParams struct {
 //	        content,
 //	        raw_content,
 //	        slug,
-//	        embedding_id
+//	        embedding_id,
+//	        icon
 //	    )
 //	VALUES
-//	    (?, ?, ?, ?, ?, ?)
+//	    (?, ?, ?, ?, ?, ?, ?)
 func (q *Queries) TagCreate(ctx context.Context, arg TagCreateParams) error {
 	_, err := q.db.ExecContext(ctx, tagCreate,
 		arg.Title,
@@ -1310,6 +1313,7 @@ func (q *Queries) TagCreate(ctx context.Context, arg TagCreateParams) error {
 		arg.RawContent,
 		arg.Slug,
 		arg.EmbeddingID,
+		arg.Icon,
 	)
 	return err
 }

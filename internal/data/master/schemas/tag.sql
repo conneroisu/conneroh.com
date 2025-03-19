@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS tags (
     description TEXT NOT NULL,
     content TEXT NOT NULL,
     raw_content TEXT NOT NULL,
-    icon TEXT NOT NULL DEFAULT 'nf-fa-tag',
+    icon TEXT NOT NULL DEFAULT 'tag',
     created_at INTEGER NOT NULL DEFAULT (unixepoch('now')),
     updated_at INTEGER NOT NULL DEFAULT (unixepoch('now')),
     embedding_id INTEGER NOT NULL,

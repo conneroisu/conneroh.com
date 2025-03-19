@@ -15,7 +15,9 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/a-h/templ"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh"
+	"github.com/conneroisu/conneroh.com/cmd/conneroh/views"
 	"github.com/conneroisu/conneroh.com/internal/data"
 	"github.com/conneroisu/conneroh.com/internal/data/docs"
 	"github.com/conneroisu/conneroh.com/internal/data/master"
@@ -34,6 +36,15 @@ import (
 	"go.abhg.dev/goldmark/mermaid"
 	"go.abhg.dev/goldmark/wikilink"
 )
+
+func quickRender(comp templ.Component) string {
+	var buf bytes.Buffer
+	err := comp.Render(context.Background(), &buf)
+	if err != nil {
+		panic(err)
+	}
+	return buf.String()
+}
 
 var (
 	md = goldmark.New(
@@ -150,7 +161,9 @@ func Parse(fsPath string, embedFs embed.FS) (*Markdown, error) {
 	fm.RawContent = string(b)
 
 	if fm.Icon == "" {
-		fm.Icon = "nf-fa-tag"
+		fm.Icon = quickRender(views.Icon("tag"))
+	} else {
+		fm.Icon = quickRender(views.Icon(fm.Icon))
 	}
 
 	return &fm, nil
@@ -241,6 +254,7 @@ func (md *Markdown) UpsertTag(
 				Description: md.Description,
 				RawContent:  md.RawContent,
 				Content:     md.RenderContent,
+				Icon:        md.Icon,
 				EmbeddingID: id,
 			},
 		)
@@ -259,6 +273,7 @@ func (md *Markdown) UpsertTag(
 			RawContent:  md.RawContent,
 			Content:     md.RenderContent,
 			EmbeddingID: id,
+			Icon:        md.Icon,
 		})
 	}
 	return
