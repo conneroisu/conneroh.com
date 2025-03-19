@@ -73,10 +73,11 @@ func Run(
 		wg         sync.WaitGroup
 	)
 
+	handler := NewServer(innerCtx, db)
 	// Configure server with timeouts
 	httpServer = &http.Server{
 		Addr:              net.JoinHostPort(defaultHost, defaultPort),
-		Handler:           NewServer(innerCtx, db),
+		Handler:           handler,
 		ReadTimeout:       readTimeout,
 		WriteTimeout:      writeTimeout,
 		IdleTimeout:       idleTimeout,

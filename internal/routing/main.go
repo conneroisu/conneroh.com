@@ -60,5 +60,6 @@ func (m APIMap) AddRoutes(
 			}
 		})
 	}
+
 	return nil
 }
