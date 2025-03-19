@@ -2,6 +2,7 @@ package conneroh
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"log/slog"
@@ -65,7 +66,11 @@ func Run(
 	if err != nil {
 		return err
 	}
-	innerCtx, stop := signal.NotifyContext(ctx, os.Interrupt, syscall.SIGTERM)
+	innerCtx, stop := signal.NotifyContext(
+		ctx,
+		os.Interrupt,
+		syscall.SIGTERM,
+	)
 	defer stop()
 
 	var (
@@ -76,7 +81,10 @@ func Run(
 	handler := NewServer(innerCtx, db)
 	// Configure server with timeouts
 	httpServer = &http.Server{
-		Addr:              net.JoinHostPort(defaultHost, defaultPort),
+		Addr: net.JoinHostPort(
+			defaultHost,
+			defaultPort,
+		),
 		Handler:           handler,
 		ReadTimeout:       readTimeout,
 		WriteTimeout:      writeTimeout,
@@ -91,7 +99,8 @@ func Run(
 		defer wg.Done()
 		slog.Info("server starting", slog.String("address", httpServer.Addr))
 
-		if err := httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		err := httpServer.ListenAndServe()
+		if err != nil && !errors.Is(err, http.ErrServerClosed) {
 			serverErrors <- fmt.Errorf("server error: %w", err)
 			slog.Error("server error", slog.String("error", err.Error()))
 		}
@@ -108,11 +117,15 @@ func Run(
 		slog.Info("shutting down server...")
 
 		// Create shutdown context with timeout
-		shutdownCtx, cancel := context.WithTimeout(ctx, shutdownTimeout)
+		shutdownCtx, cancel := context.WithTimeout(
+			ctx,
+			shutdownTimeout,
+		)
 		defer cancel()
 
 		// Attempt graceful shutdown
-		if err := httpServer.Shutdown(shutdownCtx); err != nil {
+		err := httpServer.Shutdown(shutdownCtx)
+		if err != nil {
 			slog.Error("error during server shutdown",
 				slog.String("error", err.Error()),
 				slog.Duration("timeout", shutdownTimeout),
