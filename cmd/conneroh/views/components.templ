@@ -8,13 +8,6 @@ import (
 templ Icon(
 	id string,
 ) {
-	<object
-		class="text-white"
-		type="image/svg+xml"
-		data={ fmt.Sprintf("/dist/svg/%s.svg", id) }
-	>
-		Your browser does not support SVG
-	</object>
 	<img
 		src={ fmt.Sprintf("/dist/svg/%s.svg", id) }
 	/>
