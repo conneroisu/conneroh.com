@@ -212,43 +212,6 @@ func Morphs(
 	}, nil
 }
 
-// // PluralHandler handles a singular resource (e.g. project, post, tag, home)
-// func PluralHandler[
-// 	T master.FullPost | master.FullProject | master.FullTag,
-// ](
-// 	ctx context.Context,
-// 	db *data.Database[master.Queries],
-// 	fullPosts *[]master.FullPost,
-// 	fullProjects *[]master.FullProject,
-// 	fullTags *[]master.FullTag,
-// 	fullPostSlugMap *map[string]master.FullPost,
-// 	fullProjectSlugMap *map[string]master.FullProject,
-// 	fullTagSlugMap *map[string]master.FullTag,
-// ) (routing.APIFn, error) {
-// 	return func(w http.ResponseWriter, r *http.Request) error {
-// 		return nil
-// 	}, nil
-// }
-//
-// // SingularHandler handles a singular resource (e.g. project, post, tag)
-// func SingularHandler[
-// 	T master.FullPost | master.FullProject | master.FullTag,
-// ](
-// 	ctx context.Context,
-// 	db *data.Database[master.Queries],
-// 	singular T,
-// 	fullPosts *[]master.FullPost,
-// 	fullProjects *[]master.FullProject,
-// 	fullTags *[]master.FullTag,
-// 	fullPostSlugMap *map[string]master.FullPost,
-// 	fullProjectSlugMap *map[string]master.FullProject,
-// 	fullTagSlugMap *map[string]master.FullTag,
-// ) (routing.APIFn, error) {
-// 	return func(w http.ResponseWriter, r *http.Request) error {
-// 		return nil
-// 	}, nil
-// }
-
 // Posts is the posts handler.
 func Posts(
 	_ context.Context,
@@ -270,7 +233,11 @@ func Posts(
 		// Apply filtering
 		filteredPosts := *fullPosts
 		if len(includeTags) > 0 || len(excludeTags) > 0 {
-			filteredPosts = filterPostsByTags(*fullPosts, includeTags, excludeTags)
+			filteredPosts = filterPostsByTags(
+				*fullPosts,
+				includeTags,
+				excludeTags,
+			)
 		}
 
 		// Set up context for the tag parameter
@@ -278,7 +245,14 @@ func Posts(
 		ctx = context.WithValue(ctx, currentURLContextKey, r.URL.String())
 
 		// Render the posts template with filtered posts
-		component := views.Page(views.Posts(&filteredPosts, fullProjects, fullTags, fullPostSlugMap, fullProjectSlugMap, fullTagSlugMap))
+		component := views.Page(views.Posts(
+			&filteredPosts,
+			fullProjects,
+			fullTags,
+			fullPostSlugMap,
+			fullProjectSlugMap,
+			fullTagSlugMap,
+		))
 		handler := templ.Handler(component)
 		handler.ServeHTTP(w, r.WithContext(ctx))
 		return nil
@@ -346,7 +320,10 @@ func parseTagFilters(tagsParam string) (includeTags, excludeTags []string) {
 }
 
 // filterPostsByTags filters posts based on include and exclude tag lists
-func filterPostsByTags(posts []master.FullPost, includeTags, excludeTags []string) []master.FullPost {
+func filterPostsByTags(
+	posts []master.FullPost,
+	includeTags, excludeTags []string,
+) []master.FullPost {
 	if len(includeTags) == 0 && len(excludeTags) == 0 {
 		return posts // No filtering needed
 	}
@@ -396,8 +373,8 @@ func filterPostsByTags(posts []master.FullPost, includeTags, excludeTags []strin
 
 // Projects is the projects handler.
 func Projects(
-	ctx context.Context,
-	db *data.Database[master.Queries],
+	_ context.Context,
+	_ *data.Database[master.Queries],
 	fullPosts *[]master.FullPost,
 	fullProjects *[]master.FullProject,
 	fullTags *[]master.FullTag,
@@ -422,8 +399,8 @@ func Projects(
 
 // Project is the project handler.
 func Project(
-	ctx context.Context,
-	db *data.Database[master.Queries],
+	_ context.Context,
+	_ *data.Database[master.Queries],
 	fullPosts *[]master.FullPost,
 	fullProjects *[]master.FullProject,
 	fullTags *[]master.FullTag,
