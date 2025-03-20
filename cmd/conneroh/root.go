@@ -61,13 +61,14 @@ func Run(
 	ctx context.Context,
 	getenv func(string) string,
 ) error {
-
 	db, err := NewDb(getenv)
 	if err != nil {
 		return err
 	}
+
+	// Create a separate context for signal handling
 	innerCtx, stop := signal.NotifyContext(
-		ctx,
+		context.Background(), // Use a fresh context instead of the parent ctx
 		os.Interrupt,
 		syscall.SIGTERM,
 	)
@@ -78,7 +79,8 @@ func Run(
 		wg         sync.WaitGroup
 	)
 
-	handler := NewServer(innerCtx, db)
+	handler := NewServer(ctx, db) // Use original context for server setup
+
 	// Configure server with timeouts
 	httpServer = &http.Server{
 		Addr: net.JoinHostPort(
@@ -93,12 +95,12 @@ func Run(
 	}
 
 	serverErrors := make(chan error, 1)
+
 	// Start server
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
 		slog.Info("server starting", slog.String("address", httpServer.Addr))
-
 		err := httpServer.ListenAndServe()
 		if err != nil && !errors.Is(err, http.ErrServerClosed) {
 			serverErrors <- fmt.Errorf("server error: %w", err)
@@ -106,19 +108,17 @@ func Run(
 		}
 	}()
 
-	// Shutdown handler
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-
-		// Wait for context cancellation (signal or parent context)
-		<-innerCtx.Done()
-
-		slog.Info("shutting down server...")
+	// Wait for either server error or shutdown signal
+	select {
+	case err := <-serverErrors:
+		return fmt.Errorf("server error: %w", err)
+	case <-innerCtx.Done():
+		// Signal received, initiate graceful shutdown
+		slog.Info("shutdown signal received, shutting down server...")
 
 		// Create shutdown context with timeout
 		shutdownCtx, cancel := context.WithTimeout(
-			ctx,
+			context.Background(), // Use a fresh context for shutdown
 			shutdownTimeout,
 		)
 		defer cancel()
@@ -131,19 +131,34 @@ func Run(
 				slog.Duration("timeout", shutdownTimeout),
 			)
 		}
-	}()
 
-	// Wait for server error or successful shutdown
-	select {
-	case err := <-serverErrors:
-		return fmt.Errorf("server error: %w", err)
-	case <-innerCtx.Done():
-		// Wait for graceful shutdown to complete
+		// Wait for all goroutines to finish
+		slog.Info("waiting for server shutdown to complete")
 		wg.Wait()
 		slog.Info("server shutdown completed")
 		return nil
 	case <-ctx.Done():
-		slog.Info("server shutdown ctx cancelled")
+		// Parent context cancelled
+		slog.Info("parent context cancelled, shutting down...")
+
+		// Create shutdown context with timeout
+		shutdownCtx, cancel := context.WithTimeout(
+			context.Background(), // Use a fresh context for shutdown
+			shutdownTimeout,
+		)
+		defer cancel()
+
+		// Attempt graceful shutdown
+		err := httpServer.Shutdown(shutdownCtx)
+		if err != nil {
+			slog.Error("error during server shutdown",
+				slog.String("error", err.Error()),
+				slog.Duration("timeout", shutdownTimeout),
+			)
+		}
+
+		// Wait for all goroutines to finish
+		wg.Wait()
 		return nil
 	}
 }
