@@ -1,0 +1,181 @@
+package components
+
+import (
+	"fmt"
+	"github.com/conneroisu/conneroh.com/internal/data"
+	"github.com/conneroisu/conneroh.com/internal/data/master"
+)
+
+templ Morpher(comp templ.Component) {
+	<div id="bodiody">
+		@comp
+	</div>
+}
+
+templ Icon(
+	id string,
+) {
+	<img
+		src={ fmt.Sprintf("/dist/svg/%s.svg", id) }
+	/>
+}
+
+templ Image(
+	src string,
+	alt string,
+	class string,
+) {
+	<img
+		src={ src }
+		alt={ alt }
+		class={ class }
+	/>
+}
+
+templ TagEmbed(
+	tag master.Tag,
+) {
+	<div
+		x-data="{ open: false }"
+		x-on:mouseover="open = true"
+		x-on:mouseleave="open = false"
+		class="ctag flex items-center"
+	>
+		<i
+			x-show="open"
+			class={ "nf " + tag.Icon + " mr-2" }
+			x-transition
+		></i>
+		<a
+			x-on:click="open = true"
+			x-show="!open"
+		>
+			{ tag.Slug }
+		</a>
+		<a
+			x-show="open"
+			hx-swap="outerHTML"
+			hx-get={ fmt.Sprintf("/hateoas/morphs/tag/%s", tag.Slug) }
+			hx-target="#bodiody"
+			hx-trigger="click"
+			hx-push-url="true"
+			preload="mouseover"
+			class="hover:underline"
+		>
+			{ tag.Slug }
+		</a>
+		<div
+			x-show="open"
+			x-transition
+		>
+			@Icon("circle-plus")
+		</div>
+		<div
+			x-show="open"
+			x-transition
+		>
+			@Icon("circle-minus")
+		</div>
+	</div>
+}
+
+templ PostEmbed(
+	post *master.FullPost,
+) {
+	<div
+		class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1"
+		x-transition:enter="transition ease-out duration-200"
+		x-transition:enter-start="opacity-0 transform translate-y-4"
+		x-transition:enter-end="opacity-100 transform translate-y-0"
+	>
+		<a
+			hx-target="#bodiody"
+			hx-swap="outerHTML"
+			hx-trigger="click"
+			hx-replace-url={ fmt.Sprintf("/post/%s", post.Slug) }
+			hx-get={ fmt.Sprintf("/hateoas/morphs/post/%s", post.Slug) }
+			hx-push-url="true"
+			class="block"
+		>
+			@Image(
+				post.BannerUrl,
+				post.Title,
+				"w-full h-48 object-cover object-center",
+			)
+			<div
+				class="absolute bottom-0 right-0 bg-blue-500 text-white text-xs px-2 py-1 rounded-tl-md"
+			>
+				{ data.FormatDate(post.CreatedAt) }
+			</div>
+			<div class="p-6">
+				<h2
+					class="text-xl font-semibold text-gray-900 dark:text-white mb-3 line-clamp-2 hover:underline"
+				>
+					{ post.Title }
+				</h2>
+				<p
+					class="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3"
+				>
+					{ post.Description }
+				</p>
+				<div class="flex flex-wrap gap-2 mb-4">
+					for _, tag := range post.Tags {
+						@TagEmbed(tag)
+					}
+				</div>
+				<div
+					class="flex justify-between items-center"
+				>
+					<span
+						class="text-blue-600 dark:text-blue-400 hover:underline text-sm font-medium flex items-center group"
+					>
+						Read More
+						@Icon("arrow-right")
+					</span>
+				</div>
+			</div>
+		</a>
+	</div>
+}
+
+templ ProjectEmbed(
+	project *master.FullProject,
+) {
+	<div
+		class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 p-6"
+	>
+		<a
+			hx-target="#bodiody"
+			hx-get={ fmt.Sprintf("/hateoas/morphs/project/%s", project.Slug) }
+			hx-swap="outerHTML"
+			hx-trigger="click"
+			hx-replace-url={ fmt.Sprintf("/project/%s", project.Slug) }
+			hx-push-url="true"
+			preload="mouseover"
+		>
+			<h2
+				class="text-xl font-semibold text-gray-900 dark:text-white mb-2"
+			>
+				{ project.Title }
+			</h2>
+			<p
+				class="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3"
+			>
+				{ project.Description }
+			</p>
+			<div
+				class="flex flex-wrap gap-2 mb-4"
+			>
+				for _, tag := range project.Tags {
+					@TagEmbed(tag)
+				}
+			</div>
+			<div
+				class="text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center group"
+			>
+				View Project
+				@Icon("arrow-right")
+			</div>
+		</a>
+	</div>
+}

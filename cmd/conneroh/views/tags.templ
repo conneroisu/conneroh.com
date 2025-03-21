@@ -151,8 +151,6 @@ templ Tags(
 				</a>
 			</template>
 		</div>
-		// Empty state
-		@layouts.EmptySearchResults("filteredTags()", "clearFilters()")
 	</div>
 }
 
@@ -173,7 +171,6 @@ templ Tag(
 			<div
 				class="inline-block mb-4 bg-blue-100 dark:bg-blue-900 p-4 rounded-full w-14"
 			>
-				// <i class={ "nf " + tag.Icon + " text-white text-2xl" }></i>
 				@templ.Raw(tag.Icon)
 			</div>
 			<h1

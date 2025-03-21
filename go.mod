@@ -14,6 +14,7 @@ require (
 	go.abhg.dev/goldmark/hashtag v0.3.1
 	go.abhg.dev/goldmark/mermaid v0.5.0
 	go.abhg.dev/goldmark/wikilink v0.6.0
+	golang.org/x/exp v0.0.0-20240325151524-a685a6edb6d8
 	golang.org/x/sync v0.10.0
 	modernc.org/sqlite v1.36.0
 )
@@ -30,7 +31,6 @@ require (
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/stretchr/testify v1.10.0 // indirect
-	golang.org/x/exp v0.0.0-20240325151524-a685a6edb6d8 // indirect
 	golang.org/x/sys v0.30.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	modernc.org/libc v1.61.13 // indirect

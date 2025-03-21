@@ -13,17 +13,18 @@ import (
 
 // RouteMap is a map of all routes.
 var RouteMap = routing.APIMap{
-	"GET /dist/":                      Dist,
-	"GET /favicon.ico":                Favicon,
-	"GET /{$}":                        Home,
-	"GET /projects":                   Projects,
-	"GET /posts":                      Posts,
-	"GET /tags":                       Tags,
-	"GET /project/{id}":               Project,
-	"GET /post/{id}":                  Post,
-	"GET /tag/{id...}":                Tag,
-	"GET /hateoas/morph/{view...}":    MorphView,
-	"GET /hateoas/morphs/{view}/{id}": Morphs,
+	"GET /dist/":                         Dist,
+	"GET /favicon.ico":                   Favicon,
+	"GET /{$}":                           Home,
+	"GET /projects":                      Projects,
+	"GET /posts":                         Posts,
+	"GET /tags":                          Tags,
+	"GET /project/{id}":                  Project,
+	"GET /post/{id}":                     Post,
+	"GET /tag/{id...}":                   Tag,
+	"GET /list/{targets}":                List,
+	"GET /hateoas/morph/{view...}":       MorphView,
+	"GET /hateoas/morphs/{view}/{id...}": Morphs,
 }
 
 // AddRoutes adds all routes to the router.

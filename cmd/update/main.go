@@ -17,7 +17,7 @@ import (
 
 	"github.com/a-h/templ"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh"
-	"github.com/conneroisu/conneroh.com/cmd/conneroh/views"
+	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
 	"github.com/conneroisu/conneroh.com/internal/data"
 	"github.com/conneroisu/conneroh.com/internal/data/docs"
 	"github.com/conneroisu/conneroh.com/internal/data/master"
@@ -161,9 +161,9 @@ func Parse(fsPath string, embedFs embed.FS) (*Markdown, error) {
 	fm.RawContent = string(b)
 
 	if fm.Icon == "" {
-		fm.Icon = quickRender(views.Icon("tag"))
+		fm.Icon = quickRender(components.Icon("tag"))
 	} else {
-		fm.Icon = quickRender(views.Icon(fm.Icon))
+		fm.Icon = quickRender(components.Icon(fm.Icon))
 	}
 
 	return &fm, nil

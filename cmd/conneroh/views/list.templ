@@ -1,0 +1,25 @@
+package views
+
+import "github.com/conneroisu/conneroh.com/internal/data/master"
+
+type ListTargets = string
+
+const (
+	ListTargetsPosts    ListTargets = "posts"
+	ListTargetsProjects ListTargets = "projects"
+	ListTargetsTags     ListTargets = "tags"
+)
+
+templ List(
+	target ListTargets,
+	posts *[]master.FullPost,
+	projects *[]master.FullProject,
+	tags *[]master.FullTag,
+	fullPostsSlugMap *map[string]master.FullPost,
+	fullProjectsSlugMap *map[string]master.FullProject,
+	fullTagsSlugMap *map[string]master.FullTag,
+) {
+	<div id="list">
+		<a href="/list/posts">Posts</a>
+	</div>
+}

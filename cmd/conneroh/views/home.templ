@@ -2,6 +2,7 @@ package views
 
 import (
 	"fmt"
+	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
 	"github.com/conneroisu/conneroh.com/internal/data/master"
 )
 
@@ -42,7 +43,10 @@ templ Home(
 						<a href="#projects" class="px-6 py-3 bg-gray-900 text-white dark:bg-white dark:text-gray-900 rounded-md font-medium hover:opacity-90 transition-opacity">
 							View Projects
 						</a>
-						<a href="#contact" class="px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-md font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+						<a
+							href="#contact"
+							class="px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-md font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+						>
 							Contact Me
 						</a>
 					</div>
@@ -84,15 +88,15 @@ templ Home(
 			>
 				<h2
 					class="text-3xl font-bold text-gray-900 dark:text-white mb-4 md:mb-0"
-				>Featured Projects</h2>
+				>
+					Featured Projects
+				</h2>
 				<a
 					href="/projects"
 					class="text-blue-600 dark:text-blue-400 hover:underline flex items-center"
 				>
 					View All Projects
-					<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
-						<path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-					</svg>
+					@components.Icon("arrow-right")
 				</a>
 			</div>
 			<div
@@ -143,9 +147,7 @@ templ Home(
 										class="text-blue-600 dark:text-blue-400 hover:underline text-sm font-medium flex items-center"
 									>
 										View Project
-										<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
-											<path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-										</svg>
+										@components.Icon("arrow-right")
 									</a>
 								</div>
 							</a>
@@ -173,18 +175,7 @@ templ Home(
 					class="text-blue-600 dark:text-blue-400 hover:underline flex items-center"
 				>
 					View All Posts
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						class="h-5 w-5 ml-2"
-						viewBox="0 0 20 20"
-						fill="currentColor"
-					>
-						<path
-							fill-rule="evenodd"
-							d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z"
-							clip-rule="evenodd"
-						></path>
-					</svg>
+					@components.Icon("arrow-right")
 				</a>
 			</div>
 			<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -292,21 +283,12 @@ templ Home(
 					class="text-blue-600 dark:text-blue-400 hover:underline flex items-center"
 				>
 					See All Skills/Technologies
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						class="h-5 w-5 ml-2"
-						viewBox="0 0 20 20"
-						fill="currentColor"
-					>
-						<path
-							fill-rule="evenodd"
-							d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z"
-							clip-rule="evenodd"
-						></path>
-					</svg>
+					@components.Icon("arrow-right")
 				</a>
 			</div>
-			<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+			<div
+				class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8"
+			>
 				for _, tag := range *fullTags {
 					<a
 						hx-target="#bodiody"
@@ -351,25 +333,25 @@ templ Home(
 						href="#"
 						class="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-700 dark:text-gray-300 hover:bg-blue-500 hover:text-white dark:hover:bg-blue-500 transition-colors"
 					>
-						@Icon("linkedin")
+						@components.Icon("linkedin")
 					</a>
 					<a
 						href="#"
 						class="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-700 dark:text-gray-300 hover:bg-gray-800 hover:text-white dark:hover:bg-gray-800 transition-colors"
 					>
-						@Icon("github")
+						@components.Icon("github")
 					</a>
 					<a
 						href="#"
 						class="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-700 dark:text-gray-300 hover:bg-blue-400 hover:text-white dark:hover:bg-blue-400 transition-colors"
 					>
-						@Icon("twitter")
+						@components.Icon("twitter")
 					</a>
 					<a
 						href="mailto:contact@example.com"
 						class="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-700 dark:text-gray-300 hover:bg-red-500 hover:text-white dark:hover:bg-red-500 transition-colors"
 					>
-						@Icon("mail")
+						@components.Icon("mail")
 					</a>
 				</div>
 				<div

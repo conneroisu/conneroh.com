@@ -1,5 +1,7 @@
 package layouts
 
+import "github.com/conneroisu/conneroh.com/cmd/conneroh/components"
+
 templ Layout(title string) {
 	<!DOCTYPE html>
 	<html lang="en">
@@ -22,6 +24,12 @@ templ Layout(title string) {
 	</html>
 }
 
+templ Page(comp templ.Component) {
+	@Layout("Page") {
+		@comp
+	}
+}
+
 templ header() {
 	<header>
 		<nav
@@ -39,9 +47,7 @@ templ header() {
 							@click="isMenuOpen = !isMenuOpen"
 							class="sm:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none mr-2"
 						>
-							<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-							</svg>
+							@components.Icon("menu")
 						</button>
 						// Logo - visible on all screens
 						<a
@@ -49,8 +55,8 @@ templ header() {
 							hx-get="/hateoas/morph/home"
 							hx-swap="outerHTML"
 							hx-trigger="click"
-							hx-replace-url="/"
 							hx-target="#bodiody"
+							hx-push-url="/"
 							aria-label="Back to Home"
 						>
 							Conner Ohnesorge
@@ -66,7 +72,7 @@ templ header() {
 								hx-get="/hateoas/morph/projects"
 								hx-swap="outerHTML"
 								hx-trigger="click"
-								hx-replace-url="/projects"
+								hx-push-url="/projects"
 							>
 								Projects
 							</a>
@@ -76,7 +82,7 @@ templ header() {
 								hx-get="/hateoas/morph/posts"
 								hx-swap="outerHTML"
 								hx-trigger="click"
-								hx-replace-url="/posts"
+								hx-push-url="/posts"
 							>
 								Posts
 							</a>
@@ -86,7 +92,7 @@ templ header() {
 								hx-get="/hateoas/morph/tags"
 								hx-swap="outerHTML"
 								hx-trigger="click"
-								hx-replace-url="/tags"
+								hx-push-url="/tags"
 							>
 								Tags
 							</a>
@@ -112,7 +118,7 @@ templ header() {
 						hx-get="/hateoas/morph/projects"
 						hx-swap="outerHTML"
 						hx-trigger="click"
-						hx-replace-url="/projects"
+						hx-push-url="/projects"
 						@click="isMenuOpen = false"
 					>
 						Projects
@@ -123,7 +129,7 @@ templ header() {
 						hx-get="/hateoas/morph/posts"
 						hx-swap="outerHTML"
 						hx-trigger="click"
-						hx-replace-url="/posts"
+						hx-push-url="/posts"
 						@click="isMenuOpen = false"
 					>
 						Posts
@@ -134,7 +140,7 @@ templ header() {
 						hx-get="/hateoas/morph/tags"
 						hx-swap="outerHTML"
 						hx-trigger="click"
-						hx-replace-url="/tags"
+						hx-push-url="/tags"
 						@click="isMenuOpen = false"
 					>
 						Tags

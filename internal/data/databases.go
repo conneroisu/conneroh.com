@@ -9,6 +9,7 @@ import (
 	"io"
 	"net/url"
 	"strings"
+	"time"
 
 	"github.com/conneroisu/conneroh.com/internal/data/generic"
 	"github.com/conneroisu/conneroh.com/internal/data/master"
@@ -83,4 +84,9 @@ func NewDb[
 // Close closes the database connection.
 func (d *Database[Q]) Close() error {
 	return d.DB.Close()
+}
+
+// FormatDate is helper functions for formatting data from the database int unix values.
+func FormatDate(timestamp int64) string {
+	return time.Unix(timestamp, 0).Format("Jan 02, 2006")
 }

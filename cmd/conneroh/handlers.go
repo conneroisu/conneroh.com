@@ -9,6 +9,8 @@ import (
 
 	"github.com/a-h/templ"
 	static "github.com/conneroisu/conneroh.com/cmd/conneroh/_static"
+	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
+	"github.com/conneroisu/conneroh.com/cmd/conneroh/layouts"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/views"
 	"github.com/conneroisu/conneroh.com/internal/data"
 	"github.com/conneroisu/conneroh.com/internal/data/master"
@@ -82,7 +84,7 @@ func Home(
 	fullTagsSlugMap *map[string]master.FullTag,
 ) (routing.APIFn, error) {
 	return func(w http.ResponseWriter, r *http.Request) error {
-		templ.Handler(views.Page(views.Home(
+		templ.Handler(layouts.Page(views.Home(
 			fullPosts,
 			fullProjects,
 			fullTags,
@@ -118,7 +120,7 @@ func MorphView(
 		if !ok {
 			return fmt.Errorf("unknown view: %s", view)
 		}
-		morphed := views.Morpher(val(
+		morphed := components.Morpher(val(
 			fullPosts,
 			fullProjects,
 			fullTags,
@@ -156,7 +158,7 @@ func Morphs(
 			if !ok {
 				return routing.ErrNotFound{URL: r.URL}
 			}
-			morphed := views.Morpher(views.Project(
+			morphed := components.Morpher(views.Project(
 				&proj,
 				fullPosts,
 				fullProjects,
@@ -174,7 +176,7 @@ func Morphs(
 			if !ok {
 				return routing.ErrNotFound{URL: r.URL}
 			}
-			morphed := views.Morpher(views.Post(
+			morphed := components.Morpher(views.Post(
 				&post,
 				fullPosts,
 				fullProjects,
@@ -192,7 +194,7 @@ func Morphs(
 			if !ok {
 				return routing.ErrNotFound{URL: r.URL}
 			}
-			morphed := views.Morpher(views.Tag(
+			morphed := components.Morpher(views.Tag(
 				&tag,
 				fullPosts,
 				fullProjects,
@@ -245,7 +247,7 @@ func Posts(
 		ctx = context.WithValue(ctx, currentURLContextKey, r.URL.String())
 
 		// Render the posts template with filtered posts
-		component := views.Page(views.Posts(
+		component := layouts.Page(views.Posts(
 			&filteredPosts,
 			fullProjects,
 			fullTags,
@@ -280,7 +282,7 @@ func Post(
 			return routing.ErrNotFound{URL: r.URL}
 		}
 		templ.Handler(
-			views.Page(views.Post(
+			layouts.Page(views.Post(
 				&post,
 				fullPosts,
 				fullProjects,
@@ -384,7 +386,7 @@ func Projects(
 ) (routing.APIFn, error) {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		templ.Handler(
-			views.Page(views.Projects(
+			layouts.Page(views.Projects(
 				fullPosts,
 				fullProjects,
 				fullTags,
@@ -418,7 +420,7 @@ func Project(
 			return routing.ErrNotFound{URL: r.URL}
 		}
 		templ.Handler(
-			views.Page(views.Project(&proj,
+			layouts.Page(views.Project(&proj,
 				fullPosts,
 				fullProjects,
 				fullTags,
@@ -443,7 +445,7 @@ func Tags(
 	fullTagSlugMap *map[string]master.FullTag,
 ) (routing.APIFn, error) {
 	handler := templ.Handler(
-		views.Page(views.Tags(
+		layouts.Page(views.Tags(
 			fullPosts,
 			fullProjects,
 			fullTags,
@@ -479,7 +481,7 @@ func Tag(
 			return routing.ErrNotFound{URL: r.URL}
 		}
 		templ.Handler(
-			views.Page(views.Tag(
+			layouts.Page(views.Tag(
 				&tag,
 				fullPosts,
 				fullProjects,
@@ -489,6 +491,63 @@ func Tag(
 				fullTagSlugMap,
 			)),
 		).ServeHTTP(w, r)
+		return nil
+	}, nil
+}
+
+// List handles the GET /list/{targets} endpoint.
+func List(
+	_ context.Context,
+	_ *data.Database[master.Queries],
+	fullPosts *[]master.FullPost,
+	fullProjects *[]master.FullProject,
+	fullTags *[]master.FullTag,
+	fullPostSlugMap *map[string]master.FullPost,
+	fullProjectSlugMap *map[string]master.FullProject,
+	fullTagSlugMap *map[string]master.FullTag,
+) (routing.APIFn, error) {
+	return func(w http.ResponseWriter, r *http.Request) error {
+		targets := r.PathValue("targets")
+		switch targets {
+		case views.ListTargetsPosts:
+			templ.Handler(
+				layouts.Page(views.List(
+					views.ListTargetsPosts,
+					fullPosts,
+					fullProjects,
+					fullTags,
+					fullPostSlugMap,
+					fullProjectSlugMap,
+					fullTagSlugMap,
+				)),
+			).ServeHTTP(w, r)
+		case views.ListTargetsProjects:
+			templ.Handler(
+				layouts.Page(views.List(
+					views.ListTargetsProjects,
+					fullPosts,
+					fullProjects,
+					fullTags,
+					fullPostSlugMap,
+					fullProjectSlugMap,
+					fullTagSlugMap,
+				)),
+			).ServeHTTP(w, r)
+		case views.ListTargetsTags:
+			templ.Handler(
+				layouts.Page(views.List(
+					views.ListTargetsTags,
+					fullPosts,
+					fullProjects,
+					fullTags,
+					fullPostSlugMap,
+					fullProjectSlugMap,
+					fullTagSlugMap,
+				)),
+			).ServeHTTP(w, r)
+		default:
+			return routing.ErrNotFound{URL: r.URL}
+		}
 		return nil
 	}, nil
 }

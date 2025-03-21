@@ -2,6 +2,7 @@ package views
 
 import (
 	"fmt"
+	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/layouts"
 	"github.com/conneroisu/conneroh.com/internal/data/master"
 )
@@ -237,6 +238,7 @@ templ Projects(
 						data-project-slug={ project.Slug }
 						data-project-tags={ formatTags(project.Tags) }
 					></div>
+					@components.ProjectEmbed(&project)
 				}
 			}
 			// Template for displaying projects
@@ -283,7 +285,5 @@ templ Projects(
 				</div>
 			</template>
 		</div>
-		// Empty State
-		@layouts.EmptySearchResults("filteredProjects()", "clearFilters()")
 	</div>
 }

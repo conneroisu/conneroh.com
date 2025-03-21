@@ -2,6 +2,7 @@ package views
 
 import (
 	"fmt"
+	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/layouts"
 	"github.com/conneroisu/conneroh.com/internal/data/master"
 	"time"
@@ -112,16 +113,7 @@ templ Posts(
 			<!-- Hidden data elements for Alpine to process -->
 			if posts != nil {
 				for _, post := range *posts {
-					<div
-						class="hidden"
-						data-post-id={ fmt.Sprintf("%d", post.ID) }
-						data-post-title={ post.Title }
-						data-post-description={ post.Description }
-						data-post-slug={ post.Slug }
-						data-post-date={ formatDate(post.CreatedAt) }
-						data-post-banner={ post.BannerUrl }
-						data-post-tags={ formatTags(post.Tags) }
-					></div>
+					@components.PostEmbed(&post)
 				}
 			}
 			<!-- Template for displaying posts -->
@@ -183,8 +175,6 @@ templ Posts(
 				</div>
 			</template>
 		</div>
-		<!-- Empty state -->
-		@layouts.EmptySearchResults("filteredPosts()", "clearFilters()")
 	</div>
 }
 
