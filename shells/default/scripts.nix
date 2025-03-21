@@ -4,6 +4,12 @@
     exec = ''$EDITOR $REPO_ROOT/flake.nix'';
     description = "Edit the flake.nix";
   };
+  clean = {
+    exec = ''
+      git clean -fdx
+    '';
+    description = "Clean Project";
+  };
   tests = {
     exec = ''go test -v -short ./...'';
     description = "Run go tests with short flag";
