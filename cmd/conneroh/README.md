@@ -116,7 +116,7 @@ func Morphs(_ context.Context, _ *data.Database[master.Queries], fullPosts *[]ma
 Morphs renders a morphed view.
 
 <a name="NewDb"></a>
-## func [NewDb](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/root.go#L55>)
+## func [NewDb](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/root.go#L59>)
 
 ```go
 func NewDb(_ func(string) string) (*data.Database[master.Queries], error)
@@ -170,7 +170,7 @@ func Projects(_ context.Context, _ *data.Database[master.Queries], fullPosts *[]
 Projects is the projects handler.
 
 <a name="Run"></a>
-## func [Run](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/root.go#L60-L63>)
+## func [Run](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/root.go#L64-L67>)
 
 ```go
 func Run(ctx context.Context, getenv func(string) string) error
