@@ -44,7 +44,11 @@ func NewServer(
 		log.Fatal(err)
 	}
 	slogLogHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		slog.Info("request", slog.String("method", r.Method), slog.String("url", r.URL.String()))
+		slog.Info(
+			"request",
+			slog.String("method", r.Method),
+			slog.String("url", r.URL.String()),
+		)
 		mux.ServeHTTP(w, r)
 	})
 	var handler http.Handler = slogLogHandler
