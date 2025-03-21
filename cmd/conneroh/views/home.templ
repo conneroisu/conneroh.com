@@ -307,34 +307,24 @@ templ Home(
 				</a>
 			</div>
 			<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-				if fullTags != nil && len(*fullTags) > 0 {
-					for _, tag := range *fullTags {
-						<a
-							hx-target="#bodiody"
-							hx-swap="outerHTML"
-							hx-trigger="click"
-							hx-replace-url={ fmt.Sprintf("/tag/%s", tag.Slug) }
-							hx-get={ fmt.Sprintf("/hateoas/morphs/tag/%s", tag.Slug) }
-							class="block bg-gray-50 dark:bg-gray-900 rounded-lg p-6 text-center hover:shadow-md transition-shadow"
+				for _, tag := range *fullTags {
+					<a
+						hx-target="#bodiody"
+						hx-swap="outerHTML"
+						hx-trigger="click"
+						hx-replace-url={ fmt.Sprintf("/tag/%s", tag.Slug) }
+						hx-get={ fmt.Sprintf("/hateoas/morphs/tag/%s", tag.Slug) }
+						class="block bg-gray-50 dark:bg-gray-900 rounded-lg p-6 text-center hover:shadow-md transition-shadow"
+					>
+						<div
+							class="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-4"
 						>
-							<div
-								class="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-4"
-							>
-								<span
-									class="text-blue-600 dark:text-blue-400"
-								>
-									<i id="icon" class={ "nf " + tag.Icon }></i>
-								</span>
-							</div>
-							<h3 class="font-medium text-gray-900 dark:text-white">
-								{ tag.Title }
-							</h3>
-						</a>
-					}
-				} else {
-					<div class="col-span-full text-center py-8">
-						<p class="text-gray-600 dark:text-gray-400">No skills/tags available at the moment.</p>
-					</div>
+							@templ.Raw(tag.Icon)
+						</div>
+						<h3 class="font-medium text-gray-900 dark:text-white">
+							{ tag.Title }
+						</h3>
+					</a>
 				}
 			</div>
 		</div>
