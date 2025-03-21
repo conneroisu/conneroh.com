@@ -34,7 +34,6 @@
     };
 
     systems.url = "github:nix-systems/default";
-    pre-commit-hooks.url = "github:cachix/git-hooks.nix";
   };
 
   nixConfig = {

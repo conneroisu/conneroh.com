@@ -21,14 +21,12 @@ in
   mkShell {
     shellHook = ''
       export REPO_ROOT=$(git rev-parse --show-toplevel)
-      ${inputs.self.checks.${pkgs.system}.pre-commit.shellHook}
       export CGO_CFLAGS="-O2"
 
       # Print available commands
       echo "Available commands:"
       ${lib.concatStringsSep "\n" (lib.mapAttrsToList (name: script: ''echo "  ${name} - ${script.description}"'') scripts)}
     '';
-    buildInputs = inputs.self.checks.${pkgs.system}.pre-commit.enabledPackages;
     packages = with pkgs;
       [
         # Nix
