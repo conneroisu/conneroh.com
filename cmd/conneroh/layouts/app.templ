@@ -29,17 +29,23 @@ templ header() {
 		>
 			<div
 				class="container mx-auto px-4 sm:px-6 lg:px-8"
+				x-data="{ isMenuOpen: false }"
 			>
-				// Desktop Navigation
-				<div
-					class="hidden sm:flex items-center justify-between h-16"
-				>
-					<div
-						class="flex items-center space-x-8"
-						preload="mouseover"
-					>
+				<div class="flex items-center justify-between h-16">
+					// Left side: Logo and navigation links
+					<div class="flex items-center">
+						// Mobile menu button
+						<button
+							@click="isMenuOpen = !isMenuOpen"
+							class="sm:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none mr-2"
+						>
+							<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+							</svg>
+						</button>
+						// Logo - visible on all screens
 						<a
-							class="text-xl font-bold text-gray-900 dark:text-white cursor-pointer"
+							class="text-xl font-bold text-gray-900 dark:text-white cursor-pointer pr-4"
 							hx-get="/hateoas/morph/home"
 							hx-swap="outerHTML"
 							hx-trigger="click"
@@ -49,114 +55,90 @@ templ header() {
 						>
 							Conner Ohnesorge
 						</a>
-						<a
-							class="deskheaditem"
-							hx-target="#bodiody"
-							hx-get="/hateoas/morph/projects"
-							hx-swap="outerHTML"
-							hx-trigger="click"
-							hx-replace-url="/projects"
+						// Desktop navigation links
+						<div
+							class="hidden sm:flex items-center ml-8 space-x-8"
+							preload="mouseover"
 						>
-							Projects
-						</a>
-						<a
-							class="deskheaditem"
-							hx-target="#bodiody"
-							hx-get="/hateoas/morph/posts"
-							hx-swap="outerHTML"
-							hx-trigger="click"
-							hx-replace-url="/posts"
-						>
-							Posts
-						</a>
-						<a
-							class="deskheaditem"
-							hx-target="#bodiody"
-							hx-get="/hateoas/morph/tags"
-							hx-swap="outerHTML"
-							hx-trigger="click"
-							hx-replace-url="/tags"
-						>
-							Tags
-						</a>
-					</div>
-					@headerSearch()
-				</div>
-				// Mobile Navigation
-				<div class="sm:hidden" x-data="{ isMenuOpen: false }">
-					<div
-						class="flex items-center justify-between h-16"
-						preload="ontouchstart"
-					>
-						// Mobile menu toggle on the left
-						<button
-							@click="isMenuOpen = !isMenuOpen"
-							class="p-2 rounded-md text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none"
-						>
-							<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-							</svg>
-						</button>
-						<a
-							class="text-xl font-bold text-gray-900 dark:text-white cursor-pointer"
-							hx-get="/hateoas/morph/home"
-							hx-swap="outerHTML"
-							hx-trigger="click"
-							hx-replace-url="/"
-							hx-target="#bodiody"
-						>
-							Conner Ohnesorge
-						</a>
-						// Mobile search on the right
-						<div class="flex items-center">
-							@headerSearch()
+							<a
+								class="deskheaditem"
+								hx-target="#bodiody"
+								hx-get="/hateoas/morph/projects"
+								hx-swap="outerHTML"
+								hx-trigger="click"
+								hx-replace-url="/projects"
+							>
+								Projects
+							</a>
+							<a
+								class="deskheaditem"
+								hx-target="#bodiody"
+								hx-get="/hateoas/morph/posts"
+								hx-swap="outerHTML"
+								hx-trigger="click"
+								hx-replace-url="/posts"
+							>
+								Posts
+							</a>
+							<a
+								class="deskheaditem"
+								hx-target="#bodiody"
+								hx-get="/hateoas/morph/tags"
+								hx-swap="outerHTML"
+								hx-trigger="click"
+								hx-replace-url="/tags"
+							>
+								Tags
+							</a>
 						</div>
 					</div>
-					// Mobile Menu
-					<div
-						x-show="isMenuOpen"
-						class="pt-2 pb-4 space-y-1"
-						x-transition:enter="transition ease-out duration-200"
-						x-transition:enter-start="opacity-0 transform -translate-y-2"
-						x-transition:enter-end="opacity-100 transform translate-y-0"
-						x-transition:leave="transition ease-in duration-150"
-						x-transition:leave-start="opacity-100 transform translate-y-0"
-						x-transition:leave-end="opacity-0 transform -translate-y-2"
+					// Right side: Search component - shared for both desktop and mobile
+					@headerSearch()
+				</div>
+				// Mobile navigation menu - toggled by button
+				<div
+					x-show="isMenuOpen"
+					class="sm:hidden pt-2 pb-4 space-y-1"
+					x-transition:enter="transition ease-out duration-200"
+					x-transition:enter-start="opacity-0 transform -translate-y-2"
+					x-transition:enter-end="opacity-100 transform translate-y-0"
+					x-transition:leave="transition ease-in duration-150"
+					x-transition:leave-start="opacity-100 transform translate-y-0"
+					x-transition:leave-end="opacity-0 transform -translate-y-2"
+				>
+					<a
+						class="mobileheaditem"
+						hx-target="#bodiody"
+						hx-get="/hateoas/morph/projects"
+						hx-swap="outerHTML"
+						hx-trigger="click"
+						hx-replace-url="/projects"
+						@click="isMenuOpen = false"
 					>
-						<a
-							class="mobileheaditem"
-							hx-target="#bodiody"
-							hx-get="/hateoas/morph/projects"
-							hx-swap="outerHTML"
-							hx-trigger="click"
-							hx-replace-url="/projects"
-							@click="isMenuOpen = false"
-						>
-							Projects
-						</a>
-						<a
-							class="mobileheaditem"
-							hx-target="#bodiody"
-							hx-get="/hateoas/morph/posts"
-							hx-swap="outerHTML"
-							hx-trigger="click"
-							hx-replace-url="/posts"
-							@click="isMenuOpen = false"
-						>
-							Posts
-						</a>
-						<a
-							class="mobileheaditem"
-							hx-target="#bodiody"
-							hx-get="/hateoas/morph/tags"
-							hx-swap="outerHTML"
-							hx-trigger="click"
-							hx-replace-url="/tags"
-							@click="isMenuOpen = false"
-						>
-							Tags
-						</a>
-					</div>
+						Projects
+					</a>
+					<a
+						class="mobileheaditem"
+						hx-target="#bodiody"
+						hx-get="/hateoas/morph/posts"
+						hx-swap="outerHTML"
+						hx-trigger="click"
+						hx-replace-url="/posts"
+						@click="isMenuOpen = false"
+					>
+						Posts
+					</a>
+					<a
+						class="mobileheaditem"
+						hx-target="#bodiody"
+						hx-get="/hateoas/morph/tags"
+						hx-swap="outerHTML"
+						hx-trigger="click"
+						hx-replace-url="/tags"
+						@click="isMenuOpen = false"
+					>
+						Tags
+					</a>
 				</div>
 			</div>
 		</nav>

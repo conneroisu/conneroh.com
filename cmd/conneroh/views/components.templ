@@ -2,8 +2,21 @@ package views
 
 import (
 	"fmt"
+	"github.com/conneroisu/conneroh.com/cmd/conneroh/layouts"
 	"github.com/conneroisu/conneroh.com/internal/data/master"
 )
+
+templ Page(comp templ.Component) {
+	@layouts.Layout("Page") {
+		@comp
+	}
+}
+
+templ Morpher(comp templ.Component) {
+	<div id="bodiody">
+		@comp
+	</div>
+}
 
 templ Icon(
 	id string,
