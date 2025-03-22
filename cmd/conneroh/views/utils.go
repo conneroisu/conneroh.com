@@ -8,8 +8,32 @@ import (
 	"strings"
 	"time"
 
+	"github.com/a-h/templ"
 	"github.com/conneroisu/conneroh.com/internal/data/master"
+	"github.com/conneroisu/conneroh.com/internal/routing"
 )
+
+// ListFn returns a fullFn for the list view.
+func ListFn(target ListTargets) routing.FullFn {
+	return func(
+		fullPosts *[]master.FullPost,
+		fullProjects *[]master.FullProject,
+		fullTags *[]master.FullTag,
+		fullPostSlugMap *map[string]master.FullPost,
+		fullProjectSlugMap *map[string]master.FullProject,
+		fullTagSlugMap *map[string]master.FullTag,
+	) templ.Component {
+		return List(
+			target,
+			fullPosts,
+			fullProjects,
+			fullTags,
+			fullPostSlugMap,
+			fullProjectSlugMap,
+			fullTagSlugMap,
+		)
+	}
+}
 
 func readTime(content string) string {
 	// Rough estimate - 200 words per minute reading speed

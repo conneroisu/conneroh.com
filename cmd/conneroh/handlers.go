@@ -21,15 +21,6 @@ const tagsParamContextKey contextKey = "tagsParam"
 const currentURLContextKey contextKey = "currentURL"
 
 type (
-	fullFn func(
-		fullPosts *[]master.FullPost,
-		fullProjects *[]master.FullProject,
-		fullTags *[]master.FullTag,
-		fullPostsSlugMap *map[string]master.FullPost,
-		fullProjectsSlugMap *map[string]master.FullProject,
-		fullTagsSlugMap *map[string]master.FullTag,
-	) templ.Component
-
 	// Context keys for passing data to templates
 	contextKey string
 )
@@ -108,10 +99,10 @@ func MorphView(
 	fullProjectSlugMap *map[string]master.FullProject,
 	fullTagSlugMap *map[string]master.FullTag,
 ) (routing.APIFn, error) {
-	var morphMap = map[string]fullFn{
-		"projects": views.Projects,
-		"posts":    views.Posts,
-		"tags":     views.Tags,
+	var morphMap = map[string]routing.FullFn{
+		"projects": views.ListFn(views.ListTargetsProjects),
+		"posts":    views.ListFn(views.ListTargetsPosts),
+		"tags":     views.ListFn(views.ListTargetsTags),
 		"home":     views.Home,
 	}
 	return func(w http.ResponseWriter, r *http.Request) error {
@@ -210,53 +201,6 @@ func Morphs(
 		default:
 			return routing.ErrNotFound{URL: r.URL}
 		}
-		return nil
-	}, nil
-}
-
-// Posts is the posts handler.
-func Posts(
-	_ context.Context,
-	_ *data.Database[master.Queries],
-	fullPosts *[]master.FullPost,
-	fullProjects *[]master.FullProject,
-	fullTags *[]master.FullTag,
-	fullPostSlugMap *map[string]master.FullPost,
-	fullProjectSlugMap *map[string]master.FullProject,
-	fullTagSlugMap *map[string]master.FullTag,
-) (routing.APIFn, error) {
-	return func(w http.ResponseWriter, r *http.Request) error {
-		// Get tag filters from the URL query
-		tagsParam := r.URL.Query().Get("tags")
-
-		// Parse +tag and -tag filters
-		includeTags, excludeTags := parseTagFilters(tagsParam)
-
-		// Apply filtering
-		filteredPosts := *fullPosts
-		if len(includeTags) > 0 || len(excludeTags) > 0 {
-			filteredPosts = filterPostsByTags(
-				*fullPosts,
-				includeTags,
-				excludeTags,
-			)
-		}
-
-		// Set up context for the tag parameter
-		ctx := context.WithValue(r.Context(), tagsParamContextKey, tagsParam)
-		ctx = context.WithValue(ctx, currentURLContextKey, r.URL.String())
-
-		// Render the posts template with filtered posts
-		component := layouts.Page(views.Posts(
-			&filteredPosts,
-			fullProjects,
-			fullTags,
-			fullPostSlugMap,
-			fullProjectSlugMap,
-			fullTagSlugMap,
-		))
-		handler := templ.Handler(component)
-		handler.ServeHTTP(w, r.WithContext(ctx))
 		return nil
 	}, nil
 }
@@ -373,32 +317,6 @@ func filterPostsByTags(
 	return filtered
 }
 
-// Projects is the projects handler.
-func Projects(
-	_ context.Context,
-	_ *data.Database[master.Queries],
-	fullPosts *[]master.FullPost,
-	fullProjects *[]master.FullProject,
-	fullTags *[]master.FullTag,
-	fullPostSlugMap *map[string]master.FullPost,
-	fullProjectSlugMap *map[string]master.FullProject,
-	fullTagSlugMap *map[string]master.FullTag,
-) (routing.APIFn, error) {
-	return func(w http.ResponseWriter, r *http.Request) error {
-		templ.Handler(
-			layouts.Page(views.Projects(
-				fullPosts,
-				fullProjects,
-				fullTags,
-				fullPostSlugMap,
-				fullProjectSlugMap,
-				fullTagSlugMap,
-			)),
-		).ServeHTTP(w, r)
-		return nil
-	}, nil
-}
-
 // Project is the project handler.
 func Project(
 	_ context.Context,
@@ -429,33 +347,6 @@ func Project(
 				fullTagSlugMap,
 			)),
 		).ServeHTTP(w, r)
-		return nil
-	}, nil
-}
-
-// Tags is the tags handler.
-func Tags(
-	_ context.Context,
-	_ *data.Database[master.Queries],
-	fullPosts *[]master.FullPost,
-	fullProjects *[]master.FullProject,
-	fullTags *[]master.FullTag,
-	fullPostSlugMap *map[string]master.FullPost,
-	fullProjectSlugMap *map[string]master.FullProject,
-	fullTagSlugMap *map[string]master.FullTag,
-) (routing.APIFn, error) {
-	handler := templ.Handler(
-		layouts.Page(views.Tags(
-			fullPosts,
-			fullProjects,
-			fullTags,
-			fullPostSlugMap,
-			fullProjectSlugMap,
-			fullTagSlugMap,
-		)),
-	)
-	return func(w http.ResponseWriter, r *http.Request) error {
-		handler.ServeHTTP(w, r)
 		return nil
 	}, nil
 }

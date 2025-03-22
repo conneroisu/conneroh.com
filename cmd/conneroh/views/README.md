@@ -10,36 +10,29 @@ import "github.com/conneroisu/conneroh.com/cmd/conneroh/views"
 
 templ: version: v0.3.833
 
+templ: version: v0.3.833
+
+templ: version: v0.3.833
+
+templ: version: v0.3.833
+
+templ: version: v0.3.833
+
 Package views contains the HTML templates for the website.
-
-templ: version: v0.3.833
-
-templ: version: v0.3.833
-
-templ: version: v0.3.833
-
-templ: version: v0.3.833
-
-templ: version: v0.3.833
 
 ## Index
 
 - [func Home\(fullPosts \*\[\]master.FullPost, fullProjects \*\[\]master.FullProject, fullTags \*\[\]master.FullTag, fullPostsSlugMap \*map\[string\]master.FullPost, fullProjectsSlugMap \*map\[string\]master.FullProject, fullTagsSlugMap \*map\[string\]master.FullTag\) templ.Component](<#Home>)
-- [func Icon\(id string\) templ.Component](<#Icon>)
-- [func Image\(src string, alt string, width string, height string\) templ.Component](<#Image>)
-- [func Morpher\(comp templ.Component\) templ.Component](<#Morpher>)
-- [func Page\(comp templ.Component\) templ.Component](<#Page>)
+- [func List\(target ListTargets, posts \*\[\]master.FullPost, projects \*\[\]master.FullProject, tags \*\[\]master.FullTag, fullPostsSlugMap \*map\[string\]master.FullPost, fullProjectsSlugMap \*map\[string\]master.FullProject, fullTagsSlugMap \*map\[string\]master.FullTag\) templ.Component](<#List>)
+- [func ListFn\(target ListTargets\) routing.FullFn](<#ListFn>)
 - [func Post\(post \*master.FullPost, fullPosts \*\[\]master.FullPost, fullProjects \*\[\]master.FullProject, fullTags \*\[\]master.FullTag, fullPostSlugMap \*map\[string\]master.FullPost, fullProjectSlugMap \*map\[string\]master.FullProject, fullTagSlugMap \*map\[string\]master.FullTag\) templ.Component](<#Post>)
-- [func Posts\(posts \*\[\]master.FullPost, fullProjects \*\[\]master.FullProject, fullTags \*\[\]master.FullTag, fullPostsSlugMap \*map\[string\]master.FullPost, fullProjectsSlugMap \*map\[string\]master.FullProject, fullTagsSlugMap \*map\[string\]master.FullTag\) templ.Component](<#Posts>)
 - [func Project\(project \*master.FullProject, fullPosts \*\[\]master.FullPost, fullProjects \*\[\]master.FullProject, fullTags \*\[\]master.FullTag, fullPostsSlugMap \*map\[string\]master.FullPost, fullProjectsSlugMap \*map\[string\]master.FullProject, fullTagsSlugMap \*map\[string\]master.FullTag\) templ.Component](<#Project>)
-- [func Projects\(fullPosts \*\[\]master.FullPost, fullProjects \*\[\]master.FullProject, fullTags \*\[\]master.FullTag, fullPostsSlugMap \*map\[string\]master.FullPost, fullProjectsSlugMap \*map\[string\]master.FullProject, fullTagsSlugMap \*map\[string\]master.FullTag\) templ.Component](<#Projects>)
 - [func Tag\(tag \*master.FullTag, fullPosts \*\[\]master.FullPost, fullProjects \*\[\]master.FullProject, fullTags \*\[\]master.FullTag, fullPostsSlugMap \*map\[string\]master.FullPost, fullProjectsSlugMap \*map\[string\]master.FullProject, fullTagsSlugMap \*map\[string\]master.FullTag\) templ.Component](<#Tag>)
-- [func TagEmbed\(tag master.Tag\) templ.Component](<#TagEmbed>)
-- [func Tags\(fullPosts \*\[\]master.FullPost, fullProjects \*\[\]master.FullProject, fullTags \*\[\]master.FullTag, fullPostsSlugMap \*map\[string\]master.FullPost, fullProjectsSlugMap \*map\[string\]master.FullProject, fullTagsSlugMap \*map\[string\]master.FullTag\) templ.Component](<#Tags>)
+- [type ListTargets](<#ListTargets>)
 
 
 <a name="Home"></a>
-## func [Home](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/home_templ.go#L16-L23>)
+## func [Home](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/home_templ.go#L17-L24>)
 
 ```go
 func Home(fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, fullTags *[]master.FullTag, fullPostsSlugMap *map[string]master.FullPost, fullProjectsSlugMap *map[string]master.FullProject, fullTagsSlugMap *map[string]master.FullTag) templ.Component
@@ -47,44 +40,26 @@ func Home(fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, full
 
 
 
-<a name="Icon"></a>
-## func [Icon](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/components_templ.go#L16-L18>)
+<a name="List"></a>
+## func [List](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/list_templ.go#L26-L34>)
 
 ```go
-func Icon(id string) templ.Component
+func List(target ListTargets, posts *[]master.FullPost, projects *[]master.FullProject, tags *[]master.FullTag, fullPostsSlugMap *map[string]master.FullPost, fullProjectsSlugMap *map[string]master.FullProject, fullTagsSlugMap *map[string]master.FullTag) templ.Component
 ```
 
 
 
-<a name="Image"></a>
-## func [Image](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/components_templ.go#L60-L65>)
+<a name="ListFn"></a>
+## func [ListFn](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/utils.go#L17>)
 
 ```go
-func Image(src string, alt string, width string, height string) templ.Component
+func ListFn(target ListTargets) routing.FullFn
 ```
 
-
-
-<a name="Morpher"></a>
-## func [Morpher](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/types_templ.go#L60>)
-
-```go
-func Morpher(comp templ.Component) templ.Component
-```
-
-
-
-<a name="Page"></a>
-## func [Page](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/types_templ.go#L13>)
-
-```go
-func Page(comp templ.Component) templ.Component
-```
-
-
+ListFn returns a fullFn for the list view.
 
 <a name="Post"></a>
-## func [Post](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/posts_templ.go#L186-L194>)
+## func [Post](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/posts_templ.go#L18-L26>)
 
 ```go
 func Post(post *master.FullPost, fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, fullTags *[]master.FullTag, fullPostSlugMap *map[string]master.FullPost, fullProjectSlugMap *map[string]master.FullProject, fullTagSlugMap *map[string]master.FullTag) templ.Component
@@ -92,17 +67,8 @@ func Post(post *master.FullPost, fullPosts *[]master.FullPost, fullProjects *[]m
 
 Individual Post component
 
-<a name="Posts"></a>
-## func [Posts](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/posts_templ.go#L18-L25>)
-
-```go
-func Posts(posts *[]master.FullPost, fullProjects *[]master.FullProject, fullTags *[]master.FullTag, fullPostsSlugMap *map[string]master.FullPost, fullProjectsSlugMap *map[string]master.FullProject, fullTagsSlugMap *map[string]master.FullTag) templ.Component
-```
-
-
-
 <a name="Project"></a>
-## func [Project](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/projects_templ.go#L17-L25>)
+## func [Project](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/projects_templ.go#L16-L24>)
 
 ```go
 func Project(project *master.FullProject, fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, fullTags *[]master.FullTag, fullPostsSlugMap *map[string]master.FullPost, fullProjectsSlugMap *map[string]master.FullProject, fullTagsSlugMap *map[string]master.FullTag) templ.Component
@@ -110,17 +76,8 @@ func Project(project *master.FullProject, fullPosts *[]master.FullPost, fullProj
 
 
 
-<a name="Projects"></a>
-## func [Projects](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/projects_templ.go#L198-L205>)
-
-```go
-func Projects(fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, fullTags *[]master.FullTag, fullPostsSlugMap *map[string]master.FullPost, fullProjectsSlugMap *map[string]master.FullProject, fullTagsSlugMap *map[string]master.FullTag) templ.Component
-```
-
-
-
 <a name="Tag"></a>
-## func [Tag](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/tags_templ.go#L207-L215>)
+## func [Tag](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/tags_templ.go#L17-L25>)
 
 ```go
 func Tag(tag *master.FullTag, fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, fullTags *[]master.FullTag, fullPostsSlugMap *map[string]master.FullPost, fullProjectsSlugMap *map[string]master.FullProject, fullTagsSlugMap *map[string]master.FullTag) templ.Component
@@ -128,23 +85,24 @@ func Tag(tag *master.FullTag, fullPosts *[]master.FullPost, fullProjects *[]mast
 
 Tag component for displaying a single tag and its associated content
 
-<a name="TagEmbed"></a>
-## func [TagEmbed](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/components_templ.go#L146-L148>)
+<a name="ListTargets"></a>
+## type [ListTargets](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/list_templ.go#L18>)
+
+
 
 ```go
-func TagEmbed(tag master.Tag) templ.Component
+type ListTargets = string
 ```
 
-
-
-<a name="Tags"></a>
-## func [Tags](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/tags_templ.go#L18-L25>)
+<a name="ListTargetsPosts"></a>
 
 ```go
-func Tags(fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, fullTags *[]master.FullTag, fullPostsSlugMap *map[string]master.FullPost, fullProjectsSlugMap *map[string]master.FullProject, fullTagsSlugMap *map[string]master.FullTag) templ.Component
+const (
+    ListTargetsPosts    ListTargets = "posts"
+    ListTargetsProjects ListTargets = "projects"
+    ListTargetsTags     ListTargets = "tags"
+)
 ```
-
-Tags shows all available tags
 
 Generated by [gomarkdoc](<https://github.com/princjef/gomarkdoc>)
 

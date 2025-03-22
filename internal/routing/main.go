@@ -5,9 +5,20 @@ import (
 	"log/slog"
 	"net/http"
 
+	"github.com/a-h/templ"
 	"github.com/conneroisu/conneroh.com/internal/data"
 	"github.com/conneroisu/conneroh.com/internal/data/master"
 )
+
+// FullFn is a function that handles a full request.
+type FullFn func(
+	fullPosts *[]master.FullPost,
+	fullProjects *[]master.FullProject,
+	fullTags *[]master.FullTag,
+	fullPostsSlugMap *map[string]master.FullPost,
+	fullProjectsSlugMap *map[string]master.FullProject,
+	fullTagsSlugMap *map[string]master.FullTag,
+) templ.Component
 
 // APIFn is a function that handles an API request.
 type APIFn func(http.ResponseWriter, *http.Request) error

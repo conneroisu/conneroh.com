@@ -1,6 +1,11 @@
 package views
 
-import "github.com/conneroisu/conneroh.com/internal/data/master"
+import (
+	"fmt"
+	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
+	"github.com/conneroisu/conneroh.com/cmd/conneroh/layouts"
+	"github.com/conneroisu/conneroh.com/internal/data/master"
+)
 
 type ListTargets = string
 
@@ -19,7 +24,505 @@ templ List(
 	fullProjectsSlugMap *map[string]master.FullProject,
 	fullTagsSlugMap *map[string]master.FullTag,
 ) {
-	<div id="list">
-		<a href="/list/posts">Posts</a>
+	switch target {
+		case ListTargetsPosts:
+			@postsTempl(
+				posts,
+				projects,
+				tags,
+				fullPostsSlugMap,
+				fullProjectsSlugMap,
+				fullTagsSlugMap,
+			)
+		case ListTargetsProjects:
+			@projectsTempl(
+				posts,
+				projects,
+				tags,
+				fullPostsSlugMap,
+				fullProjectsSlugMap,
+				fullTagsSlugMap,
+			)
+		case ListTargetsTags:
+			@tagsTempl(
+				posts,
+				projects,
+				tags,
+				fullPostsSlugMap,
+				fullProjectsSlugMap,
+				fullTagsSlugMap,
+			)
+	}
+}
+
+templ postsTempl(
+	posts *[]master.FullPost,
+	projects *[]master.FullProject,
+	tags *[]master.FullTag,
+	fullPostsSlugMap *map[string]master.FullPost,
+	fullProjectsSlugMap *map[string]master.FullProject,
+	fullTagsSlugMap *map[string]master.FullTag,
+) {
+	<div
+		class="container mx-auto px-4 py-8"
+		x-data="{
+			posts: [],
+			searchQuery: '',
+			selectedTag: '',
+			tags: [],
+			isLoading: true,
+			
+			init() {
+				// Initialize posts from the rendered template data
+				this.posts = Array.from(document.querySelectorAll('[data-post-id]')).map(post => ({
+					id: post.getAttribute('data-post-id'),
+					title: post.getAttribute('data-post-title'),
+					description: post.getAttribute('data-post-description'),
+					slug: post.getAttribute('data-post-slug'),
+					date: post.getAttribute('data-post-date'),
+					banner: post.getAttribute('data-post-banner'),
+					tags: JSON.parse(post.getAttribute('data-post-tags') || '[]')
+				}));
+				
+				// Extract all unique tags
+				const allTags = new Set();
+				this.posts.forEach(post => {
+					post.tags.forEach(tag => allTags.add(tag.name));
+				});
+				this.tags = Array.from(allTags).sort();
+				
+				// Check URL for existing tags or search parameters
+				const urlParams = new URLSearchParams(window.location.search);
+				this.searchQuery = urlParams.get('q') || '';
+				this.selectedTag = urlParams.get('tag') || '';
+				
+				// Hide loading screen after small delay for better transition
+				setTimeout(() => this.isLoading = false, 300);
+			},
+			
+			filteredPosts() {
+				return this.posts.filter(post => {
+					const matchesSearch = this.searchQuery === '' || 
+						post.title.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+						post.description.toLowerCase().includes(this.searchQuery.toLowerCase());
+				
+					const matchesTag = this.selectedTag === '' ||
+						post.tags.some(tag => tag.name === this.selectedTag);
+				
+					return matchesSearch && matchesTag;
+				});
+			},
+			
+			updateURL() {
+				// Update URL with current filters without page reload
+				const params = new URLSearchParams();
+				if (this.searchQuery) params.set('q', this.searchQuery);
+				if (this.selectedTag) params.set('tag', this.selectedTag);
+
+				const newURL = window.location.pathname + 
+					(params.toString() ? '?' + params.toString() : '');
+
+				window.history.replaceState({}, '', newURL);
+			},
+			
+			clearFilters() {
+				this.searchQuery = '';
+				this.selectedTag = '';
+				this.updateURL();
+			}
+		}"
+	>
+		<h1 class="text-3xl font-bold mb-6 text-gray-900 dark:text-white">Blog Posts</h1>
+		<!-- Search and Filter Controls -->
+		@layouts.Searcher(
+			"searchQuery",
+			"selectedTag",
+			"Search posts...",
+			"All Tags",
+			"tags",
+			"updateURL()",
+			"updateURL()",
+		)
+		<!-- Results info -->
+		@layouts.SearchResultInfo("posts", "filteredPosts()")
+		<!-- Loading state -->
+		<div x-show="isLoading" x-transition>
+			@layouts.LoadingState()
+		</div>
+		<!-- Posts Grid -->
+		<div
+			class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+			x-show="!isLoading"
+			x-transition:enter="transition ease-out duration-300"
+			x-transition:enter-start="opacity-0 transform scale-95"
+			x-transition:enter-end="opacity-100 transform scale-100"
+		>
+			<!-- Hidden data elements for Alpine to process -->
+			if posts != nil {
+				for _, post := range *posts {
+					@components.PostEmbed(&post)
+				}
+			}
+			<!-- Template for displaying posts -->
+			<template x-for="post in filteredPosts()" :key="post.id">
+				<div
+					class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1"
+					x-transition:enter="transition ease-out duration-200"
+					x-transition:enter-start="opacity-0 transform translate-y-4"
+					x-transition:enter-end="opacity-100 transform translate-y-0"
+				>
+					<a
+						hx-target="#bodiody"
+						hx-swap="outerHTML"
+						hx-trigger="click"
+						:hx-replace-url="/post/{post.slug}"
+						:hx-get="`/hateoas/morphs/post/${post.slug}`"
+						class="block"
+					>
+						<div class="relative">
+							<img
+								:src="post.banner || '/dist/placeholder.jpg'"
+								:alt="post.title"
+								class="w-full h-48 object-cover object-center"
+								loading="lazy"
+							/>
+							<div
+								class="absolute bottom-0 right-0 bg-blue-500 text-white text-xs px-2 py-1 rounded-tl-md"
+								x-text="post.date"
+							></div>
+						</div>
+						<div class="p-6">
+							<h2
+								class="text-xl font-semibold text-gray-900 dark:text-white mb-3 line-clamp-2"
+								x-text="post.title"
+							></h2>
+							<p
+								class="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3"
+								x-text="post.description"
+							></p>
+							<div class="flex flex-wrap gap-2 mb-4">
+								<template x-for="tag in post.tags" :key="tag.id">
+									<span
+										class="ctag"
+										x-text="tag.name"
+										@click.stop="selectedTag = tag.name; updateURL()"
+									></span>
+								</template>
+							</div>
+							<div class="flex justify-between items-center">
+								<span class="text-blue-600 dark:text-blue-400 hover:underline text-sm font-medium flex items-center group">
+									Read More
+									<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1 transition-transform duration-200 transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+									</svg>
+								</span>
+							</div>
+						</div>
+					</a>
+				</div>
+			</template>
+		</div>
+	</div>
+}
+
+templ projectsTempl(
+	posts *[]master.FullPost,
+	projects *[]master.FullProject,
+	tags *[]master.FullTag,
+	fullPostsSlugMap *map[string]master.FullPost,
+	fullProjectsSlugMap *map[string]master.FullProject,
+	fullTagsSlugMap *map[string]master.FullTag,
+) {
+	<div
+		class="container mx-auto px-4 py-8"
+		x-data="{
+			projects: [],
+			searchQuery: '',
+			selectedTag: '',
+			tags: [],
+			isLoading: true,
+			init() {
+				// Initialize projects from the rendered HTML
+				this.projects = Array.from(document.querySelectorAll('[data-project-id]')).map(project => {
+					return {
+						id: project.getAttribute('data-project-id'),
+						name: project.getAttribute('data-project-name'),
+						description: project.getAttribute('data-project-description'),
+						slug: project.getAttribute('data-project-slug'),
+						tags: JSON.parse(project.getAttribute('data-project-tags') || '[]')
+					};
+				});
+				const allTags = new Set();
+				this.projects.forEach(project => {
+					project.tags.forEach(tag => tag.name && allTags.add(tag.name));
+				});
+				this.tags = Array.from(allTags);
+				const urlParams = new URLSearchParams(window.location.search);
+				this.searchQuery = urlParams.get('q') || '';
+				this.selectedTag = urlParams.get('tag') || '';
+				
+				// Set loading state to false
+				setTimeout(() => this.isLoading = false, 300);
+			},
+			filteredProjects() {
+				return this.projects.filter(project => {
+					const matchesSearch = this.searchQuery === '' || 
+						project.name.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+						project.description.toLowerCase().includes(this.searchQuery.toLowerCase());
+					const matchesTag = this.selectedTag === '' ||
+						(project.tags && project.tags.some(tag => tag.name === this.selectedTag));
+					
+					return matchesSearch && matchesTag;
+				});
+			},
+			updateURL() {
+				// Update URL with current filters without page reload
+				const params = new URLSearchParams();
+				if (this.searchQuery) params.set('q', this.searchQuery);
+				if (this.selectedTag) params.set('tag', this.selectedTag);
+
+				const newURL = window.location.pathname + 
+					(params.toString() ? '?' + params.toString() : '');
+
+				window.history.replaceState({}, '', newURL);
+			},
+			clearFilters() {
+				this.searchQuery = '';
+				this.selectedTag = '';
+				this.updateURL();
+			}
+		}"
+	>
+		<h1
+			class="text-3xl font-bold mb-6 text-gray-900 dark:text-white"
+		>
+			Projects
+		</h1>
+		// Search and Filter Controls using the Searcher component
+		@layouts.Searcher(
+			"searchQuery",
+			"selectedTag",
+			"Search projects...",
+			"All Tags",
+			"tags",
+			"updateURL()",
+			"updateURL()",
+		)
+		// Results info
+		@layouts.SearchResultInfo("projects", "filteredProjects()")
+		// Loading state
+		<div x-show="isLoading">
+			@layouts.LoadingState()
+		</div>
+		// Projects Grid
+		<div
+			x-show="!isLoading"
+			class="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 grid-cols-1 gap-6"
+		>
+			// Hidden data elements for Alpine to process
+			if projects != nil {
+				for _, project := range *projects {
+					<div
+						class="hidden"
+						data-project-id={ fmt.Sprintf("%d", project.ID) }
+						data-project-name={ project.Title }
+						data-project-description={ project.Description }
+						data-project-slug={ project.Slug }
+						data-project-tags={ formatTags(project.Tags) }
+					></div>
+					@components.ProjectEmbed(&project)
+				}
+			}
+			// Template for displaying projects
+			<template
+				x-for="project in filteredProjects()"
+				:key="project.id"
+			>
+				<div
+					class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 p-6"
+				>
+					<a
+						:href="`/project/${project.slug}`"
+					>
+						<h2
+							class="text-xl font-semibold text-gray-900 dark:text-white mb-2"
+							x-text="project.name"
+						></h2>
+						<p
+							class="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3"
+							x-text="project.description"
+						></p>
+						<div
+							class="flex flex-wrap gap-2 mb-4"
+						>
+							<template
+								x-for="tag in project.tags"
+								:key="tag.id"
+							>
+								<span
+									class="ctag"
+									x-text="tag.name"
+									@click.stop="selectedTag = tag.name; updateURL()"
+								></span>
+							</template>
+						</div>
+						<a
+							:href="`/project/${project.slug}`"
+							class="text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center group"
+						>
+							View Project
+							<i class="nf nf-cod-arrow_right h-4 w-4 ml-1 transition-transform duration-200 transform group-hover:translate-x-1"></i>
+						</a>
+					</a>
+				</div>
+			</template>
+		</div>
+	</div>
+}
+
+templ tagsTempl(
+	posts *[]master.FullPost,
+	projects *[]master.FullProject,
+	tags *[]master.FullTag,
+	fullPostsSlugMap *map[string]master.FullPost,
+	fullProjectsSlugMap *map[string]master.FullProject,
+	fullTagsSlugMap *map[string]master.FullTag,
+) {
+	<div
+		class="container mx-auto px-4 py-8"
+		x-data="{
+			tags: [],
+			searchQuery: '',
+			selectedSection: '',
+			sections: [],
+			isLoading: true,
+			init() {
+				// Initialize the tags from the data attributes in the rendered HTML
+				this.tags = Array.from(document.querySelectorAll('[data-tag-id]')).map(tag => {
+					return {
+						id: tag.getAttribute('data-tag-id'),
+						name: tag.getAttribute('data-tag-name'),
+						description: tag.getAttribute('data-tag-description'),
+						slug: tag.getAttribute('data-tag-slug'),
+						section: tag.getAttribute('data-tag-section'),
+						postsCount: parseInt(tag.getAttribute('data-tag-posts-count') || '0'),
+						icon: tag.getAttribute('data-tag-icon'),
+						projectsCount: parseInt(tag.getAttribute('data-tag-projects-count') || '0')
+					};
+				});
+				
+				// Extract all unique sections
+				const allSections = new Set();
+				this.tags.forEach(tag => {
+					if (tag.section) allSections.add(tag.section);
+				});
+				this.sections = Array.from(allSections);
+				
+				// Set loading state to false
+				setTimeout(() => this.isLoading = false, 300);
+			},
+			filteredTags() {
+				return this.tags.filter(tag => {
+					const matchesSearch = this.searchQuery === '' || 
+						tag.name.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+						tag.description.toLowerCase().includes(this.searchQuery.toLowerCase());
+					
+					const matchesSection = this.selectedSection === '' || tag.section === this.selectedSection;
+					
+					return matchesSearch && matchesSection;
+				});
+			},
+			clearFilters() {
+				this.searchQuery = '';
+				this.selectedSection = '';
+			}
+		}"
+	>
+		<h1
+			class="text-3xl font-bold mb-6 text-gray-900 dark:text-white"
+		>
+			Tags
+		</h1>
+		// Search and Filter Controls using the Searcher component
+		@layouts.Searcher(
+			"searchQuery",
+			"selectedSection",
+			"Search tags...",
+			"All Sections",
+			"sections",
+			"",
+			"",
+		)
+		// Results Info
+		@layouts.SearchResultInfo("tags", "filteredTags()")
+		// Loading state
+		<div x-show="isLoading">
+			@layouts.LoadingState()
+		</div>
+		// Hidden tag data for Alpine
+		if tags != nil {
+			// Create a nested map for sections
+			for _, tag := range *tags {
+				<div
+					class="hidden"
+					data-tag-id={ fmt.Sprintf("%d", tag.ID) }
+					data-tag-name={ tag.Title }
+					data-tag-description={ tag.Description }
+					data-tag-slug={ tag.Slug }
+					data-tag-section={ templ.EscapeString(getTagSection(tag.Slug)) }
+					data-tag-posts-count={ fmt.Sprintf("%d", len(tag.Posts)) }
+					data-tag-icon={ tag.Icon }
+					data-tag-projects-count={ fmt.Sprintf("%d", len(tag.Projects)) }
+				></div>
+			}
+		}
+		// Tags Grid
+		<div
+			x-show="!isLoading"
+			class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+		>
+			<template
+				x-for="tag in filteredTags()"
+				:key="tag.id"
+			>
+				<a
+					:href="`/tag/${tag.slug}`"
+					class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1"
+				>
+					<div
+						class="p-6"
+					>
+						<div
+							class="flex items-center justify-between mb-3"
+						>
+							<h2
+								class="text-xl font-semibold text-gray-900 dark:text-white"
+								x-text="tag.name"
+							></h2>
+							<div
+								class="bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center h-8 w-8"
+								x-html="tag.icon"
+							></div>
+						</div>
+						<div
+							class="text-gray-600 dark:text-gray-300 mb-4 line-clamp-2"
+							x-text="tag.description"
+						></div>
+						<div
+							class="flex items-center justify-between text-sm"
+						>
+							<span
+								class="text-gray-500 dark:text-gray-400"
+								x-text="`${tag.postsCount} posts`"
+							></span>
+							<span
+								class="text-gray-500 dark:text-gray-400"
+								x-text="`${tag.projectsCount} projects`"
+							></span>
+						</div>
+					</div>
+				</a>
+			</template>
+		</div>
 	</div>
 }
