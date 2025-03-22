@@ -4,8 +4,6 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"slices"
-	"strings"
 
 	"github.com/a-h/templ"
 	static "github.com/conneroisu/conneroh.com/cmd/conneroh/_static"
@@ -15,14 +13,6 @@ import (
 	"github.com/conneroisu/conneroh.com/internal/data"
 	"github.com/conneroisu/conneroh.com/internal/data/master"
 	"github.com/conneroisu/conneroh.com/internal/routing"
-)
-
-const tagsParamContextKey contextKey = "tagsParam"
-const currentURLContextKey contextKey = "currentURL"
-
-type (
-	// Context keys for passing data to templates
-	contextKey string
 )
 
 // Dist is the dist handler for serving/distributing static files.
@@ -65,8 +55,8 @@ func Favicon(
 
 // Home is the home page handler.
 func Home(
-	ctx context.Context,
-	db *data.Database[master.Queries],
+	_ context.Context,
+	_ *data.Database[master.Queries],
 	fullPosts *[]master.FullPost,
 	fullProjects *[]master.FullProject,
 	fullTags *[]master.FullTag,
@@ -90,8 +80,8 @@ func Home(
 
 // MorphView renders a morphed view.
 func MorphView(
-	ctx context.Context,
-	db *data.Database[master.Queries],
+	_ context.Context,
+	_ *data.Database[master.Queries],
 	fullPosts *[]master.FullPost,
 	fullProjects *[]master.FullProject,
 	fullTags *[]master.FullTag,
@@ -238,83 +228,6 @@ func Post(
 		).ServeHTTP(w, r)
 		return nil
 	}, nil
-}
-
-// parseTagFilters extracts include and exclude tags from the tag parameter
-func parseTagFilters(tagsParam string) (includeTags, excludeTags []string) {
-	if tagsParam == "" {
-		return nil, nil
-	}
-
-	tags := strings.Fields(tagsParam)
-	for _, tag := range tags {
-		tag = strings.TrimSpace(tag)
-		if strings.HasPrefix(tag, "+") {
-			if tagName := strings.TrimPrefix(tag, "+"); tagName != "" {
-				includeTags = append(includeTags, strings.ToLower(tagName))
-			}
-		} else if strings.HasPrefix(tag, "-") {
-			if tagName := strings.TrimPrefix(tag, "-"); tagName != "" {
-				excludeTags = append(excludeTags, strings.ToLower(tagName))
-			}
-		} else if tag != "" {
-			// If no prefix, assume include
-			includeTags = append(includeTags, strings.ToLower(tag))
-		}
-	}
-	return includeTags, excludeTags
-}
-
-// filterPostsByTags filters posts based on include and exclude tag lists
-func filterPostsByTags(
-	posts []master.FullPost,
-	includeTags, excludeTags []string,
-) []master.FullPost {
-	if len(includeTags) == 0 && len(excludeTags) == 0 {
-		return posts // No filtering needed
-	}
-
-	var filtered []master.FullPost
-	for _, post := range posts {
-		// Convert post tags to lowercase for case-insensitive matching
-		postTags := make([]string, 0, len(post.Tags))
-		for _, tag := range post.Tags {
-			postTags = append(postTags, strings.ToLower(tag.Slug))
-		}
-
-		// Check if post should be excluded
-		excluded := false
-		for _, excludeTag := range excludeTags {
-			if slices.Contains(postTags, excludeTag) {
-				excluded = true
-			}
-			if excluded {
-				break
-			}
-		}
-		if excluded {
-			continue
-		}
-
-		// Check if post should be included
-		if len(includeTags) > 0 {
-			allTagsFound := true
-			for _, includeTag := range includeTags {
-				tagFound := slices.Contains(postTags, includeTag)
-				if !tagFound {
-					allTagsFound = false
-					break
-				}
-			}
-			if !allTagsFound {
-				continue
-			}
-		}
-
-		filtered = append(filtered, post)
-	}
-
-	return filtered
 }
 
 // Project is the project handler.

@@ -1,12 +1,19 @@
 import "htmx.org";
 import "htmx-ext-preload";
 import Alpine from "alpinejs";
+import intersect from "@alpinejs/intersect";
 
 declare global {
   interface Window {
     Alpine: typeof Alpine;
   }
 }
+
+window.Alpine = Alpine;
+
+Alpine.plugin(intersect);
+Alpine.start();
+
 
 type Post = {
   id: number;
@@ -24,9 +31,6 @@ type Tag = {
   slug: string;
 };
 
-window.Alpine = Alpine;
-
-Alpine.start();
 
 // This code will implement posts filtering by +tag and -tag
 // Function to parse URL query params and extract tag filters

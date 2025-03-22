@@ -10,6 +10,8 @@
     "typescript": "^5.7.3"
   },
   "dependencies": {
+    "@alpinejs/intersect": "^3.14.9",
+    "@types/alpinejs__intersect": "^3.13.4",
     "alpinejs": "^3.14.8",
     "htmx-ext-preload": "^2.1.1",
     "htmx.org": "2.0.4",
