@@ -21,7 +21,6 @@ import (
 	"github.com/conneroisu/conneroh.com/internal/data/docs"
 	"github.com/conneroisu/conneroh.com/internal/data/master"
 	mathjax "github.com/litao91/goldmark-mathjax"
-	"github.com/ollama/ollama/api"
 	enclave "github.com/quail-ink/goldmark-enclave"
 	"github.com/quail-ink/goldmark-enclave/core"
 	"github.com/yuin/goldmark"
@@ -168,54 +167,13 @@ func Parse(fsPath string, embedFs embed.FS) (*Markdown, error) {
 	return &fm, nil
 }
 
-// // UpsertEmbedding inserts or updates the embedding document in the database.
-// func UpsertEmbedding(
-//
-//	ctx context.Context,
-//	db *data.Database[master.Queries],
-//	client *api.Client,
-//	content string,
-//	existingID int64,
-//
-//	) (int64, error) {
-//		slog.Info("upserting embedding", "existingID", existingID)
-//		defer slog.Info("upserted embedding", "existingID", existingID)
-//		embed, err := client.Embeddings(ctx, &api.EmbeddingRequest{
-//			Model:  "granite-embedding:278m",
-//			Prompt: content,
-//		})
-//		if err != nil {
-//			return 0, fmt.Errorf("embedding generation request failed: %w", err)
-//		}
-//		jsVal, err := json.Marshal(embed)
-//		if err != nil {
-//			return 0, fmt.Errorf("failed to marshal embedding: %w", err)
-//		}
-//		// embedding already exists, update it
-//		if existingID != 0 {
-//			err = db.Queries.EmeddingUpdate(ctx, string(jsVal), existingID)
-//			if err != nil {
-//				return 0, fmt.Errorf("failed to update embedding: %w", err)
-//			}
-//			return existingID, nil
-//		}
-//		// embedding does not exist, create it
-//		id, err := db.Queries.EmbeddingsCreate(ctx, string(jsVal))
-//		if err != nil {
-//			return 0, fmt.Errorf("failed to create embedding: %w", err)
-//		}
-//		return id, nil
-//	}
-//
 // UpsertTag inserts or updates the tag document in the database.
 func (md *Markdown) UpsertTag(
 	ctx context.Context,
 	db *data.Database[master.Queries],
-	client *api.Client,
 ) (err error) {
 	slog.Info("upserting tag", "slug", md.Slug, "icon", md.Icon)
 	defer slog.Info("upserted tag", "slug", md.Slug, "icon", md.Icon)
-	var id int64
 	var tag master.Tag
 	tag, err = db.Queries.TagGetBySlug(ctx, md.Slug)
 	if err == nil {
@@ -231,19 +189,8 @@ func (md *Markdown) UpsertTag(
 					Content:     md.RenderContent,
 					Description: md.Description,
 					Icon:        md.Icon,
-					EmbeddingID: tag.EmbeddingID,
 				},
 			)
-		}
-		id, err = UpsertEmbedding(
-			ctx,
-			db,
-			client,
-			md.RawContent,
-			tag.EmbeddingID,
-		)
-		if err != nil {
-			return err
 		}
 		// updated embedding
 		return db.Queries.TagUpdate(
@@ -256,24 +203,18 @@ func (md *Markdown) UpsertTag(
 				RawContent:  md.RawContent,
 				Content:     md.RenderContent,
 				Icon:        md.Icon,
-				EmbeddingID: id,
 			},
 		)
 	}
 	// err is not nil (new tag)
 	if errors.Is(err, sql.ErrNoRows) {
 		slog.Debug("tag does not exist - creating", "slug", md.Slug)
-		id, err = UpsertEmbedding(ctx, db, client, md.RawContent, 0)
-		if err != nil {
-			return
-		}
 		return db.Queries.TagCreate(ctx, master.TagCreateParams{
 			Slug:        md.Slug,
 			Title:       md.Title,
 			Description: md.Description,
 			RawContent:  md.RawContent,
 			Content:     md.RenderContent,
-			EmbeddingID: id,
 			Icon:        md.Icon,
 		})
 	}
@@ -284,17 +225,15 @@ func (md *Markdown) UpsertTag(
 func (md *Markdown) UpsertPost(
 	ctx context.Context,
 	db *data.Database[master.Queries],
-	client *api.Client,
 ) (post master.Post, err error) {
 	slog.Info("upserting post", "slug", md.Slug)
 	defer slog.Info("upserted post", "slug", md.Slug)
-	var id int64
 	// check if the post already exists
 	post, err = db.Queries.PostGetBySlug(ctx, md.Slug)
 	if err == nil {
 		// same content
 		if post.RawContent == md.RawContent {
-			_, err = db.Queries.PostUpdate(
+			return db.Queries.PostUpdate(
 				ctx,
 				master.PostUpdateParams{
 					ID:          post.ID,
@@ -304,24 +243,10 @@ func (md *Markdown) UpsertPost(
 					Description: md.Description,
 					RawContent:  md.RawContent,
 					Content:     md.RenderContent,
-					EmbeddingID: post.EmbeddingID,
 				},
 			)
-			if err != nil {
-				return post, fmt.Errorf("failed to update post (PostUpdate): %w", err)
-			}
 		}
-		id, err = UpsertEmbedding(
-			ctx,
-			db,
-			client,
-			md.RawContent,
-			post.EmbeddingID,
-		)
-		if err != nil {
-			return post, fmt.Errorf("failed to update post (UpsertEmbedding): %w", err)
-		}
-		_, err = db.Queries.PostUpdate(
+		return db.Queries.PostUpdate(
 			ctx,
 			master.PostUpdateParams{
 				ID:          post.ID,
@@ -331,19 +256,11 @@ func (md *Markdown) UpsertPost(
 				Description: md.Description,
 				RawContent:  md.RawContent,
 				Content:     md.RenderContent,
-				EmbeddingID: id,
 			},
 		)
-		if err != nil {
-			return post, fmt.Errorf("failed to finish update post (PostUpdate): %w", err)
-		}
 	}
 	// err is not nil (new post)
 	if errors.Is(err, sql.ErrNoRows) {
-		id, err = UpsertEmbedding(ctx, db, client, md.RawContent, 0)
-		if err != nil {
-			return post, fmt.Errorf("failed to upsert embedding: %w", err)
-		}
 		return db.Queries.PostCreate(ctx, master.PostCreateParams{
 			Slug:        md.Slug,
 			Title:       md.Title,
@@ -351,7 +268,6 @@ func (md *Markdown) UpsertPost(
 			Description: md.Description,
 			RawContent:  md.RawContent,
 			Content:     md.RenderContent,
-			EmbeddingID: id,
 		})
 	}
 	return
@@ -361,46 +277,18 @@ func (md *Markdown) UpsertPost(
 func (md *Markdown) UpsertProject(
 	ctx context.Context,
 	db *data.Database[master.Queries],
-	client *api.Client,
 ) (project master.Project, err error) {
 	if md == nil {
 		return master.Project{}, errors.New("markdown is nil for a project")
 	}
 	slog.Info("upserting project", "slug", md.Slug)
 	defer slog.Info("upserted project", "slug", md.Slug)
-	var id int64
 	if md.Title == "" {
 		return master.Project{}, errors.New("title is empty")
 	}
 	project, err = db.Queries.ProjectGetBySlug(ctx, md.Slug)
 	if err == nil {
-		// project already exists with the same content, update metadata
-		if project.Content == md.RawContent {
-			return db.Queries.ProjectUpdate(
-				ctx,
-				master.ProjectUpdateParams{
-					ID:          project.ID,
-					Slug:        md.Slug,
-					Title:       md.Title,
-					BannerUrl:   md.BannerURL,
-					Description: md.Description,
-					Content:     md.RenderContent,
-					RawContent:  md.RawContent,
-					EmbeddingID: project.EmbeddingID,
-				},
-			)
-		}
 		// project already exists with a different content, update embedding
-		id, err = UpsertEmbedding(
-			ctx,
-			db,
-			client,
-			string(md.RawContent),
-			project.EmbeddingID,
-		)
-		if err != nil {
-			return
-		}
 		return db.Queries.ProjectUpdate(ctx, master.ProjectUpdateParams{
 			ID:          project.ID,
 			Slug:        md.Slug,
@@ -408,28 +296,16 @@ func (md *Markdown) UpsertProject(
 			BannerUrl:   md.BannerURL,
 			Description: md.Description,
 			Content:     md.RenderContent,
-			EmbeddingID: id,
 		})
 	}
 	// err is not nil (new project)
 	if errors.Is(err, sql.ErrNoRows) {
-		id, err = UpsertEmbedding(
-			ctx,
-			db,
-			client,
-			md.RawContent,
-			0,
-		)
-		if err != nil {
-			return
-		}
 		return db.Queries.ProjectCreate(ctx, master.ProjectCreateParams{
 			Slug:        md.Slug,
 			Title:       md.Title,
 			BannerUrl:   md.BannerURL,
 			Description: md.Description,
 			Content:     md.RenderContent,
-			EmbeddingID: id,
 		})
 	}
 	slog.Error("project update failed", "err", err)
@@ -454,10 +330,6 @@ func Run(
 	if err != nil {
 		return err
 	}
-	client, err := api.ClientFromEnvironment()
-	if err != nil {
-		return err
-	}
 
 	err = fs.WalkDir(
 		docs.Tags,
@@ -473,7 +345,7 @@ func Run(
 			if err != nil {
 				return fmt.Errorf("failed to parse tag %s: %w", path, err)
 			}
-			return parsed.UpsertTag(ctx, db, client)
+			return parsed.UpsertTag(ctx, db)
 		},
 	)
 	if err != nil {
@@ -495,7 +367,7 @@ func Run(
 			if err != nil {
 				return fmt.Errorf("failed to parse post %s: %w", path, err)
 			}
-			post, err = parsed.UpsertPost(ctx, db, client)
+			post, err = parsed.UpsertPost(ctx, db)
 			if err != nil {
 				return fmt.Errorf("failed to upsert post %s: %w", path, err)
 			}
@@ -524,7 +396,7 @@ func Run(
 			if err != nil {
 				return fmt.Errorf("failed to parse project %s: %w", path, err)
 			}
-			project, err := parsed.UpsertProject(ctx, db, client)
+			project, err := parsed.UpsertProject(ctx, db)
 			if err != nil {
 				return fmt.Errorf("failed to upsert project %s: %w", path, err)
 			}

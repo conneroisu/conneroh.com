@@ -143,13 +143,13 @@ templ postsTempl(
 			"updateURL()",
 			"updateURL()",
 		)
-		<!-- Results info -->
+		// Results Info
 		@layouts.SearchResultInfo("posts", "filteredPosts()")
-		<!-- Loading state -->
+		// Loading State
 		<div x-show="isLoading" x-transition>
 			@layouts.LoadingState()
 		</div>
-		<!-- Posts Grid -->
+		// Posts Grid
 		<div
 			class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
 			x-show="!isLoading"
@@ -175,7 +175,7 @@ templ postsTempl(
 						hx-target="#bodiody"
 						hx-swap="outerHTML"
 						hx-trigger="click"
-						:hx-replace-url="/post/{post.slug}"
+						:hx-push-url="/post/{post.slug}"
 						:hx-get="`/hateoas/morphs/post/${post.slug}`"
 						class="block"
 					>

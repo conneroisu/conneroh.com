@@ -3,15 +3,21 @@ id: iastate-reflection
 aliases: []
 tags: []
 description: This is a reflection on my time at Iowa State University.
+projects:
+  - cpre488-mp1
+  - cpre488-mp2
 title: A Reflective Journey - Navigating Your Cumulative Experience at Iowa State University
 ---
 
 # A Reflective Journey: Navigating Your Cumulative Experience at Iowa State University
 
-Conner Ohnesorge
+
+## Introduction
 
 Reflecting on my journey through Iowa State University, it becomes increasingly clear how my diverse educational experiences, hands-on projects, extracurricular engagements, and professional internships have enriched my engineering capabilities. These experiences have not only shaped my career aspirations but thoroughly prepared me for the challenges and opportunities inherent in the engineering profession. Initially, I approached my academic career with broad curiosity about various engineering disciplines, but as my understanding deepened through coursework and hands-on experience, I became particularly fascinated by embedded systems and artificial intelligence (AI). The practical challenges of integrating hardware and software in embedded systems appealed to my analytical nature, while AI intrigued me with its potential to transform industries and solve complex, real-world problems. These areas allowed me to combine creativity, technical rigor, and innovative problem-solving, aligning closely with my personal strengths and professional aspirations.
 
+
+## CprE 288: Embedded Systems
 One of the earliest and most formative experiences of my academic career was CprE 288: Embedded Systems. This course provided comprehensive exposure to embedded programming, microcontroller architecture, and hardware-software integration through various labs and projects, culminating in an impactful final project. Throughout the semester, each lab built foundational skills essential for our final project. Early labs introduced us to fundamental concepts such as GPIO and ADC modules, where we learned to interface basic input-output devices and measure distances using IR sensors. In later labs, we transitioned to more complex components, such as the PING ultrasonic sensor for distance measurement bringing me back to my First Tech Challenge (FTC) days. These experiences emphasized the importance of precise timing and calibration, as even minor deviations could lead to measurement inaccuracies.
 
 In one lab, we specifically worked with PWM to control servo motors, gaining practical experience in precise rotational positioning. This lab informed our approach to controlling the Roomba robot’s navigation in the final project. Another critical lab involved integrating interrupt-driven programming to handle asynchronous events, which became essential in managing sensor data and system responses in real-time.
@@ -24,6 +30,8 @@ Initially, I viewed embedded systems as predominantly hardware-oriented; however
 
 Throughout CprE 288, I recognized how minor errors could dramatically affect overall system functionality. Small coding oversights, sensor calibration errors, or slight hardware incompatibilities required vigilant attention to detail and thorough testing. Ultimately, CprE 288 further improved my technical abilities and cultivated essential professional skills such as adaptability, critical thinking, and continuous learning, all vital for my future engineering career.
 
+## CPrE 488: Embedded Systems Design
+
 Expanding upon the foundation laid in CprE 288, my journey progressed with the challenging yet rewarding CprE 488, Embedded Systems Design. Throughout CprE 488, several mini-projects greatly enhanced my expertise and broadened my perspective on engineering solutions, societal implications, and professional practices. 
 
 One particularly transformative experience was implementing a Positional Pulse Modulation (PPM) detection and generation system using a Zedboard FPGA, Vivado, and Vitis. This project required comprehensive design using VHDL design, FPGA hardware interfacing, and strategic debugging practices. A crucial engineering challenge was safely managing voltage discrepancies between the FPGA and the HA-T6A RC controller, which involved integrating a Sparkfun Logic Level Converter to ensure the protection of sensitive electronics. This experience reinforced the importance of electrical compatibility and the innovative use of interfacing solutions to preserve hardware integrity.
@@ -34,9 +42,15 @@ Another influential project was developing an embedded Linux environment on the 
 
 Throughout these projects, effective communication and detailed documentation were pivotal. My experiences in CprE 488 emphasized a comprehensive approach to engineering problems. More specifically, the class reinforced addressing technical, economic, societal, and environmental considerations holistically to solve intricate engineering challenges.
 
+## AGEDS 461: Technology Transfer and the Role of Agricultural and Extension Education
+
 My educational journey was enriched by experiences beyond technical realms. General education electives, particularly AGEDS 461, Technology Transfer and the Role of Agricultural and Extension Education, played a critical role in shaping my engineering perspective, further igniting my passion for utilizing AI to address real-world challenges. For my capstone project, I proposed a novel AI-driven approach, employing satellite imagery to evaluate the adoption of agricultural technologies in developing regions. This project deepened my appreciation for the ethical implications of technological interventions and highlighted the importance of providing unbiased, equitable solutions to underserved communities. A key insight from this project was recognizing how satellite imagery could offer transparent, scalable data, enhancing the accuracy and fairness of agricultural technology assessments. This experience challenged my understanding of the global implications of technological advancements and emphasized the ethical responsibilities engineers bear.
 
+## Other Courses
+
 Additional courses such as Arch 321 (History of the American City) and Econ 101 (Principles of Microeconomics) provided me with broader insights into urban development dynamics and fundamental economic theories. These courses enhanced my ability to assess engineering solutions through multifaceted lenses. Holistic awareness is vital in creating innovative and sustainable engineering solutions capable of positively impacting differing populations. Also, these courses improved my critical thinking skills, enabling me to evaluate and propose engineering solutions that consider complex societal interactions and dependencies.
+
+## Extracurricular Engagements
 
 Outside the classroom, involvement in various extracurricular activities enriched my personal and professional development. Co-founding the Controlled Environments Club at Iowa State University provided invaluable experience in leadership, teamwork, and innovation. This led to the successful establishment of the club in the list of official Iowa State clubs and organizations.
 
@@ -52,4 +66,5 @@ Professionally, my internships and work experiences served a bridge between acad
 
 My senior design project, Semantic Segmentation Optimization, represents the culmination of my engineering education at Iowa State. This project involves developing an assistive wheelchair technology leveraging advanced AI algorithms for real-time monitoring and improved safety, highlighting the synthesis of complex software systems, sophisticated hardware integration, and disciplined project management. This project has already strengthened my ability to work collaboratively across interdisciplinary teams, integrating software engineering, AI model development, and hardware design to produce a more efficent system.
 
+## Conclusion
 In conclusion, my comprehensive journey through Iowa State University has equipped me with essential technical skills, an ethical foundation, and a versatile innovative mindset critical for addressing contemporary engineering challenges. Reflecting upon this journey, I am well-prepared and committed to continuous learning and adaptation, ensuring my engineering contributions positively impact society.
