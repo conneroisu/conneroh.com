@@ -71,12 +71,12 @@ func Run(
 	}
 
 	// Create a separate context for signal handling
-	innerCtx, stop := signal.NotifyContext(
+	innerCtx, cancel := signal.NotifyContext(
 		context.Background(), // Use a fresh context instead of the parent ctx
 		os.Interrupt,
 		syscall.SIGTERM,
 	)
-	defer stop()
+	defer cancel()
 
 	var (
 		httpServer *http.Server
@@ -108,7 +108,6 @@ func Run(
 		err := httpServer.ListenAndServe()
 		if err != nil && !errors.Is(err, http.ErrServerClosed) {
 			serverErrors <- fmt.Errorf("server error: %w", err)
-			slog.Error("server error", slog.String("error", err.Error()))
 		}
 	}()
 

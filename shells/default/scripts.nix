@@ -32,11 +32,11 @@
   };
   update = {
     exec = ''go run $REPO_ROOT/cmd/update'';
-    description = "Run update command with doppler";
+    description = "Update the database.";
   };
   restart = {
     exec = ''rm -f $REPO_ROOT/master.db && go run $REPO_ROOT/cmd/update'';
-    description = "Run restart command with doppler";
+    description = "Execute restart command with doppler";
   };
   generate-all-profile = {
     exec = ''
@@ -171,7 +171,7 @@
     description = "Format code files";
   };
   run = {
-    exec = ''air'';
+    exec = ''cd $REPO_ROOT && air'';
     description = "Run the application with air for hot reloading";
   };
 }
