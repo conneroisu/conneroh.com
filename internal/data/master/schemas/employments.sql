@@ -8,5 +8,6 @@ CREATE TABLE IF NOT EXISTS employments (
     updated_at TEXT NOT NULL DEFAULT (unixepoch('now')),
     start_date INTEGER NOT NULL,
     end_date INTEGER NOT NULL,
-    company TEXT NOT NULL
+    company_id INTEGER NOT NULL,
+    FOREIGN KEY(company_id) REFERENCES companies(id)
 ) STRICT;

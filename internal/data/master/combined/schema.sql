@@ -3,6 +3,16 @@
 --	sqlcquash: v0.0.2
 
 
+CREATE TABLE IF NOT EXISTS companies (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    slug TEXT NOT NULL,
+    description TEXT NOT NULL,
+    icon TEXT NOT NULL,
+    created_at INTEGER NOT NULL DEFAULT (unixepoch('now')),
+    updated_at TEXT NOT NULL DEFAULT (unixepoch('now'))
+) STRICT;
+
 CREATE TABLE IF NOT EXISTS embeddings (
     id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
     embedding TEXT,
@@ -27,7 +37,8 @@ CREATE TABLE IF NOT EXISTS employments (
     updated_at TEXT NOT NULL DEFAULT (unixepoch('now')),
     start_date INTEGER NOT NULL,
     end_date INTEGER NOT NULL,
-    company TEXT NOT NULL
+    company_id INTEGER NOT NULL,
+    FOREIGN KEY(company_id) REFERENCES companies(id)
 ) STRICT;
 
 -- dialect: sqlite

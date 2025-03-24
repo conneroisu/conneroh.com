@@ -23,7 +23,7 @@ INSERT INTO
         banner_url,
         start_date,
         end_date,
-        company
+        company_id
     )
 VALUES
     (
@@ -46,6 +46,6 @@ SET
     banner_url = ?,
     start_date = ?,
     end_date = ?,
-    company = ?
+    company_id = ?
 WHERE
     id = ?;

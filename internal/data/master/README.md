@@ -15,6 +15,7 @@ Package master contains the master schema for the database.
 ## Index
 
 - [Variables](<#variables>)
+- [type Company](<#Company>)
 - [type Embedding](<#Embedding>)
 - [type EmbeddingsGetByIDRow](<#EmbeddingsGetByIDRow>)
 - [type Employment](<#Employment>)
@@ -109,8 +110,25 @@ var Schema string
 var Seed string
 ```
 
+<a name="Company"></a>
+## type [Company](<https://github.com/conneroisu/conneroh.com/blob/main/internal/data/master/models.go#L7-L15>)
+
+
+
+```go
+type Company struct {
+    ID          int64  `db:"id" json:"id"`
+    Name        string `db:"name" json:"name"`
+    Slug        string `db:"slug" json:"slug"`
+    Description string `db:"description" json:"description"`
+    Icon        string `db:"icon" json:"icon"`
+    CreatedAt   int64  `db:"created_at" json:"created_at"`
+    UpdatedAt   string `db:"updated_at" json:"updated_at"`
+}
+```
+
 <a name="Embedding"></a>
-## type [Embedding](<https://github.com/conneroisu/conneroh.com/blob/main/internal/data/master/models.go#L7-L11>)
+## type [Embedding](<https://github.com/conneroisu/conneroh.com/blob/main/internal/data/master/models.go#L17-L21>)
 
 
 
@@ -135,7 +153,7 @@ type EmbeddingsGetByIDRow struct {
 ```
 
 <a name="Employment"></a>
-## type [Employment](<https://github.com/conneroisu/conneroh.com/blob/main/internal/data/master/models.go#L13-L24>)
+## type [Employment](<https://github.com/conneroisu/conneroh.com/blob/main/internal/data/master/models.go#L23-L34>)
 
 
 
@@ -150,12 +168,12 @@ type Employment struct {
     UpdatedAt   string `db:"updated_at" json:"updated_at"`
     StartDate   int64  `db:"start_date" json:"start_date"`
     EndDate     int64  `db:"end_date" json:"end_date"`
-    Company     string `db:"company" json:"company"`
+    CompanyID   int64  `db:"company_id" json:"company_id"`
 }
 ```
 
 <a name="EmploymentTag"></a>
-## type [EmploymentTag](<https://github.com/conneroisu/conneroh.com/blob/main/internal/data/master/models.go#L26-L29>)
+## type [EmploymentTag](<https://github.com/conneroisu/conneroh.com/blob/main/internal/data/master/models.go#L36-L39>)
 
 
 
@@ -179,7 +197,7 @@ type EmploymentsCreateParams struct {
     BannerUrl   string `db:"banner_url" json:"banner_url"`
     StartDate   int64  `db:"start_date" json:"start_date"`
     EndDate     int64  `db:"end_date" json:"end_date"`
-    Company     string `db:"company" json:"company"`
+    CompanyID   int64  `db:"company_id" json:"company_id"`
 }
 ```
 
@@ -196,7 +214,7 @@ type EmploymentsUpdateParams struct {
     BannerUrl   string `db:"banner_url" json:"banner_url"`
     StartDate   int64  `db:"start_date" json:"start_date"`
     EndDate     int64  `db:"end_date" json:"end_date"`
-    Company     string `db:"company" json:"company"`
+    CompanyID   int64  `db:"company_id" json:"company_id"`
     ID          int64  `db:"id" json:"id"`
 }
 ```
@@ -241,7 +259,7 @@ type FullTag struct {
 ```
 
 <a name="Post"></a>
-## type [Post](<https://github.com/conneroisu/conneroh.com/blob/main/internal/data/master/models.go#L31-L41>)
+## type [Post](<https://github.com/conneroisu/conneroh.com/blob/main/internal/data/master/models.go#L41-L51>)
 
 
 
@@ -276,7 +294,7 @@ type PostCreateParams struct {
 ```
 
 <a name="PostProject"></a>
-## type [PostProject](<https://github.com/conneroisu/conneroh.com/blob/main/internal/data/master/models.go#L43-L46>)
+## type [PostProject](<https://github.com/conneroisu/conneroh.com/blob/main/internal/data/master/models.go#L53-L56>)
 
 
 
@@ -288,7 +306,7 @@ type PostProject struct {
 ```
 
 <a name="PostTag"></a>
-## type [PostTag](<https://github.com/conneroisu/conneroh.com/blob/main/internal/data/master/models.go#L48-L51>)
+## type [PostTag](<https://github.com/conneroisu/conneroh.com/blob/main/internal/data/master/models.go#L58-L61>)
 
 
 
@@ -317,7 +335,7 @@ type PostUpdateParams struct {
 ```
 
 <a name="Project"></a>
-## type [Project](<https://github.com/conneroisu/conneroh.com/blob/main/internal/data/master/models.go#L53-L63>)
+## type [Project](<https://github.com/conneroisu/conneroh.com/blob/main/internal/data/master/models.go#L63-L73>)
 
 
 
@@ -352,7 +370,7 @@ type ProjectCreateParams struct {
 ```
 
 <a name="ProjectTag"></a>
-## type [ProjectTag](<https://github.com/conneroisu/conneroh.com/blob/main/internal/data/master/models.go#L65-L68>)
+## type [ProjectTag](<https://github.com/conneroisu/conneroh.com/blob/main/internal/data/master/models.go#L75-L78>)
 
 
 
@@ -543,7 +561,7 @@ INSERT INTO
         banner_url,
         start_date,
         end_date,
-        company
+        company_id
     )
 VALUES
     (
@@ -568,7 +586,7 @@ EmploymentsGet
 
 ```
 SELECT
-    id, title, slug, description, banner_url, created_at, updated_at, start_date, end_date, company
+    id, title, slug, description, banner_url, created_at, updated_at, start_date, end_date, company_id
 FROM
     employments
 WHERE
@@ -586,7 +604,7 @@ EmploymentsList
 
 ```
 SELECT
-    id, title, slug, description, banner_url, created_at, updated_at, start_date, end_date, company
+    id, title, slug, description, banner_url, created_at, updated_at, start_date, end_date, company_id
 FROM
     employments
 ORDER BY
@@ -612,7 +630,7 @@ SET
     banner_url = ?,
     start_date = ?,
     end_date = ?,
-    company = ?
+    company_id = ?
 WHERE
     id = ?
 ```
@@ -1385,7 +1403,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries
 WithTx returns a new Queries instance with the given transaction.
 
 <a name="Tag"></a>
-## type [Tag](<https://github.com/conneroisu/conneroh.com/blob/main/internal/data/master/models.go#L70-L80>)
+## type [Tag](<https://github.com/conneroisu/conneroh.com/blob/main/internal/data/master/models.go#L80-L90>)
 
 
 
