@@ -10,6 +10,16 @@ type Embedding struct {
 	CreatedAt int64   `db:"created_at" json:"created_at"`
 }
 
+type Employment struct {
+	ID          int64  `db:"id" json:"id"`
+	Title       string `db:"title" json:"title"`
+	Slug        string `db:"slug" json:"slug"`
+	Description string `db:"description" json:"description"`
+	BannerUrl   string `db:"banner_url" json:"banner_url"`
+	CreatedAt   int64  `db:"created_at" json:"created_at"`
+	UpdatedAt   string `db:"updated_at" json:"updated_at"`
+}
+
 type Post struct {
 	ID          int64  `db:"id" json:"id"`
 	Title       string `db:"title" json:"title"`
@@ -59,4 +69,9 @@ type Tag struct {
 	Icon        string `db:"icon" json:"icon"`
 	CreatedAt   int64  `db:"created_at" json:"created_at"`
 	UpdatedAt   int64  `db:"updated_at" json:"updated_at"`
+}
+
+type WorkTag struct {
+	WorkID int64 `db:"work_id" json:"work_id"`
+	TagID  int64 `db:"tag_id" json:"tag_id"`
 }

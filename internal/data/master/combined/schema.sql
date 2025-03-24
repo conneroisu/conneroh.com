@@ -9,6 +9,24 @@ CREATE TABLE IF NOT EXISTS embeddings (
     created_at INTEGER NOT NULL DEFAULT (unixepoch('now'))
 ) STRICT;
 
+CREATE TABLE IF NOT EXISTS work_tags (
+    work_id INTEGER NOT NULL,
+    tag_id INTEGER NOT NULL,
+    PRIMARY KEY (work_id, tag_id),
+    FOREIGN KEY (work_id) REFERENCES employments(id),
+    FOREIGN KEY (tag_id) REFERENCES tags(id)
+) STRICT;
+
+CREATE TABLE IF NOT EXISTS employments (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    slug TEXT NOT NULL,
+    description TEXT NOT NULL,
+    banner_url TEXT NOT NULL,
+    created_at INTEGER NOT NULL DEFAULT (unixepoch('now')),
+    updated_at TEXT NOT NULL DEFAULT (unixepoch('now'))
+) STRICT;
+
 -- dialect: sqlite
 CREATE TABLE IF NOT EXISTS posts (
     id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,

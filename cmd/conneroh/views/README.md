@@ -41,7 +41,7 @@ func Home(fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, full
 
 
 <a name="List"></a>
-## func [List](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/list_templ.go#L26-L34>)
+## func [List](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/list_templ.go#L27-L35>)
 
 ```go
 func List(target ListTargets, posts *[]master.FullPost, projects *[]master.FullProject, tags *[]master.FullTag, fullPostsSlugMap *map[string]master.FullPost, fullProjectsSlugMap *map[string]master.FullProject, fullTagsSlugMap *map[string]master.FullTag) templ.Component
@@ -101,6 +101,7 @@ const (
     ListTargetsPosts    ListTargets = "posts"
     ListTargetsProjects ListTargets = "projects"
     ListTargetsTags     ListTargets = "tags"
+    ListTargetsWorks    ListTargets = "works"
 )
 ```
 

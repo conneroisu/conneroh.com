@@ -13,6 +13,7 @@ const (
 	ListTargetsPosts    ListTargets = "posts"
 	ListTargetsProjects ListTargets = "projects"
 	ListTargetsTags     ListTargets = "tags"
+	ListTargetsWorks    ListTargets = "works"
 )
 
 templ List(
@@ -525,4 +526,14 @@ templ tagsTempl(
 			</template>
 		</div>
 	</div>
+}
+
+templ worksTempl(
+	posts *[]master.FullPost,
+	projects *[]master.FullProject,
+	tags *[]master.FullTag,
+	fullPostsSlugMap *map[string]master.FullPost,
+	fullProjectsSlugMap *map[string]master.FullProject,
+	fullTagsSlugMap *map[string]master.FullTag,
+) {
 }
