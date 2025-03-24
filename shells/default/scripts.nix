@@ -14,7 +14,7 @@
     exec = ''go test -v -short ./...'';
     description = "Run go tests with short flag";
   };
-  "unit-tests" = {
+  unit-tests = {
     exec = ''go test -v ./...'';
     description = "Run all go tests";
   };
@@ -31,7 +31,7 @@
     description = "Run update command with doppler";
   };
   restart = {
-    exec = ''rm master.db && go run $REPO_ROOT/cmd/update'';
+    exec = ''rm -f $REPO_ROOT/master.db && go run $REPO_ROOT/cmd/update'';
     description = "Run restart command with doppler";
   };
   generate-all-profile = {
