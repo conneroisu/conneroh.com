@@ -73,6 +73,7 @@ in
         flyctl
         wireguard-tools
         openssl.dev
+        llama-cpp
       ]
       # Add the generated script packages
       ++ scriptPackages;

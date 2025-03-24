@@ -71,25 +71,25 @@ func (q *Queries) EmbeddingsGetByID(ctx context.Context, id int64) (EmbeddingsGe
 	return i, err
 }
 
-const emeddingUpdate = `-- name: EmeddingUpdate :exec
+const embeddingsUpdate = `-- name: EmbeddingsUpdate :exec
 UPDATE
     embeddings
 SET
     embedding = ?
 WHERE
-    id = ?
+    id = ? RETURNING id
 `
 
-// EmeddingUpdate
+// EmbeddingsUpdate
 //
 //	UPDATE
 //	    embeddings
 //	SET
 //	    embedding = ?
 //	WHERE
-//	    id = ?
-func (q *Queries) EmeddingUpdate(ctx context.Context, embedding *string, iD int64) error {
-	_, err := q.db.ExecContext(ctx, emeddingUpdate, embedding, iD)
+//	    id = ? RETURNING id
+func (q *Queries) EmbeddingsUpdate(ctx context.Context, embedding *string, iD int64) error {
+	_, err := q.db.ExecContext(ctx, embeddingsUpdate, embedding, iD)
 	return err
 }
 

@@ -37,7 +37,7 @@ Package master contains the master schema for the database.
   - [func New\(db generic.DBTX\) \*Queries](<#New>)
   - [func \(q \*Queries\) EmbeddingsCreate\(ctx context.Context, embedding \*string\) \(int64, error\)](<#Queries.EmbeddingsCreate>)
   - [func \(q \*Queries\) EmbeddingsGetByID\(ctx context.Context, id int64\) \(EmbeddingsGetByIDRow, error\)](<#Queries.EmbeddingsGetByID>)
-  - [func \(q \*Queries\) EmeddingUpdate\(ctx context.Context, embedding \*string, iD int64\) error](<#Queries.EmeddingUpdate>)
+  - [func \(q \*Queries\) EmbeddingsUpdate\(ctx context.Context, embedding \*string, iD int64\) error](<#Queries.EmbeddingsUpdate>)
   - [func \(q \*Queries\) EmploymentTagsCreate\(ctx context.Context, employmentID int64, tagID int64\) error](<#Queries.EmploymentTagsCreate>)
   - [func \(q \*Queries\) EmploymentTagsDelete\(ctx context.Context, employmentID int64, tagID int64\) error](<#Queries.EmploymentTagsDelete>)
   - [func \(q \*Queries\) EmploymentTagsGet\(ctx context.Context, employmentID int64, tagID int64\) \(EmploymentTag, error\)](<#Queries.EmploymentTagsGet>)
@@ -445,14 +445,14 @@ LIMIT
     1
 ```
 
-<a name="Queries.EmeddingUpdate"></a>
-### func \(\*Queries\) [EmeddingUpdate](<https://github.com/conneroisu/conneroh.com/blob/main/internal/data/master/queries.sql.go#L91>)
+<a name="Queries.EmbeddingsUpdate"></a>
+### func \(\*Queries\) [EmbeddingsUpdate](<https://github.com/conneroisu/conneroh.com/blob/main/internal/data/master/queries.sql.go#L91>)
 
 ```go
-func (q *Queries) EmeddingUpdate(ctx context.Context, embedding *string, iD int64) error
+func (q *Queries) EmbeddingsUpdate(ctx context.Context, embedding *string, iD int64) error
 ```
 
-EmeddingUpdate
+EmbeddingsUpdate
 
 ```
 UPDATE
@@ -460,7 +460,7 @@ UPDATE
 SET
     embedding = ?
 WHERE
-    id = ?
+    id = ? RETURNING id
 ```
 
 <a name="Queries.EmploymentTagsCreate"></a>

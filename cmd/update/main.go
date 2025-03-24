@@ -6,6 +6,7 @@ import (
 	"context"
 	"database/sql"
 	"embed"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io/fs"
@@ -41,7 +42,7 @@ var client = ollama.NewClient(
 	ollama.WithTimeout(time.Minute * 5),
 )
 
-func embeddingUpsert(ctx context.Context, input string) int {
+func embeddingUpsert(ctx context.Context, db data.Database[master.Queries], input string, id int64) int64 {
 	resp, err := client.Embeddings(ctx, ollama.EmbeddingsRequest{
 		Model:  "nomic-embed-text",
 		Prompt: input,
@@ -49,7 +50,24 @@ func embeddingUpsert(ctx context.Context, input string) int {
 	if err != nil {
 		panic(err)
 	}
-	return 0
+	jsVal, err := json.Marshal(resp)
+	if err != nil {
+		panic(err)
+	}
+	val := string(jsVal)
+
+	if id == 0 {
+		id, err = db.Queries.EmbeddingsCreate(ctx, &val)
+		if err != nil {
+			panic(err)
+		}
+		return id
+	}
+	err = db.Queries.EmbeddingsUpdate(ctx, &val, id)
+	if err != nil {
+		panic(err)
+	}
+	return id
 }
 
 func quickRender(comp templ.Component) string {

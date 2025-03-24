@@ -15,10 +15,10 @@ WHERE
 LIMIT
     1;
 
--- name: EmeddingUpdate :exec
+-- name: EmbeddingsUpdate :exec
 UPDATE
     embeddings
 SET
     embedding = ?
 WHERE
-    id = ?;
+    id = ? RETURNING id;
