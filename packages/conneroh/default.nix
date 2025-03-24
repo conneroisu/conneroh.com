@@ -11,7 +11,7 @@ pkgs.buildGo124Module {
   version = "0.0.1";
   src = ./../../.;
   subPackages = ["cmd/conneroh"];
-  vendorHash = "";
+  vendorHash = "sha256-nm3JEU+6MuA0bCXfAswgb7JZBmysypDIKjvw+PJFltY=";
   doCheck = true;
   checkPhase = ''
     echo "Running conneroh for 3 seconds to ensure it works..."
