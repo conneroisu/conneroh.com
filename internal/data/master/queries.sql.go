@@ -201,12 +201,10 @@ INSERT INTO
         description,
         banner_url,
         start_date,
-        end_date,
-        company_id
+        end_date
     )
 VALUES
     (
-        ?,
         ?,
         ?,
         ?,
@@ -223,7 +221,6 @@ type EmploymentsCreateParams struct {
 	BannerUrl   string `db:"banner_url" json:"banner_url"`
 	StartDate   int64  `db:"start_date" json:"start_date"`
 	EndDate     int64  `db:"end_date" json:"end_date"`
-	CompanyID   int64  `db:"company_id" json:"company_id"`
 }
 
 // EmploymentsCreate
@@ -235,12 +232,10 @@ type EmploymentsCreateParams struct {
 //	        description,
 //	        banner_url,
 //	        start_date,
-//	        end_date,
-//	        company_id
+//	        end_date
 //	    )
 //	VALUES
 //	    (
-//	        ?,
 //	        ?,
 //	        ?,
 //	        ?,
@@ -256,14 +251,13 @@ func (q *Queries) EmploymentsCreate(ctx context.Context, arg EmploymentsCreatePa
 		arg.BannerUrl,
 		arg.StartDate,
 		arg.EndDate,
-		arg.CompanyID,
 	)
 	return err
 }
 
 const employmentsGet = `-- name: EmploymentsGet :one
 SELECT
-    id, title, slug, description, banner_url, created_at, updated_at, start_date, end_date, company_id
+    id, title, slug, description, banner_url, created_at, updated_at, start_date, end_date
 FROM
     employments
 WHERE
@@ -273,7 +267,7 @@ WHERE
 // EmploymentsGet
 //
 //	SELECT
-//	    id, title, slug, description, banner_url, created_at, updated_at, start_date, end_date, company_id
+//	    id, title, slug, description, banner_url, created_at, updated_at, start_date, end_date
 //	FROM
 //	    employments
 //	WHERE
@@ -291,14 +285,13 @@ func (q *Queries) EmploymentsGet(ctx context.Context, id int64) (Employment, err
 		&i.UpdatedAt,
 		&i.StartDate,
 		&i.EndDate,
-		&i.CompanyID,
 	)
 	return i, err
 }
 
 const employmentsList = `-- name: EmploymentsList :many
 SELECT
-    id, title, slug, description, banner_url, created_at, updated_at, start_date, end_date, company_id
+    id, title, slug, description, banner_url, created_at, updated_at, start_date, end_date
 FROM
     employments
 ORDER BY
@@ -308,7 +301,7 @@ ORDER BY
 // EmploymentsList
 //
 //	SELECT
-//	    id, title, slug, description, banner_url, created_at, updated_at, start_date, end_date, company_id
+//	    id, title, slug, description, banner_url, created_at, updated_at, start_date, end_date
 //	FROM
 //	    employments
 //	ORDER BY
@@ -332,7 +325,6 @@ func (q *Queries) EmploymentsList(ctx context.Context) ([]Employment, error) {
 			&i.UpdatedAt,
 			&i.StartDate,
 			&i.EndDate,
-			&i.CompanyID,
 		); err != nil {
 			return nil, err
 		}
@@ -356,8 +348,7 @@ SET
     description = ?,
     banner_url = ?,
     start_date = ?,
-    end_date = ?,
-    company_id = ?
+    end_date = ?
 WHERE
     id = ?
 `
@@ -369,7 +360,6 @@ type EmploymentsUpdateParams struct {
 	BannerUrl   string `db:"banner_url" json:"banner_url"`
 	StartDate   int64  `db:"start_date" json:"start_date"`
 	EndDate     int64  `db:"end_date" json:"end_date"`
-	CompanyID   int64  `db:"company_id" json:"company_id"`
 	ID          int64  `db:"id" json:"id"`
 }
 
@@ -383,8 +373,7 @@ type EmploymentsUpdateParams struct {
 //	    description = ?,
 //	    banner_url = ?,
 //	    start_date = ?,
-//	    end_date = ?,
-//	    company_id = ?
+//	    end_date = ?
 //	WHERE
 //	    id = ?
 func (q *Queries) EmploymentsUpdate(ctx context.Context, arg EmploymentsUpdateParams) error {
@@ -395,7 +384,6 @@ func (q *Queries) EmploymentsUpdate(ctx context.Context, arg EmploymentsUpdatePa
 		arg.BannerUrl,
 		arg.StartDate,
 		arg.EndDate,
-		arg.CompanyID,
 		arg.ID,
 	)
 	return err

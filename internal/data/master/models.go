@@ -4,16 +4,6 @@
 
 package master
 
-type Company struct {
-	ID          int64  `db:"id" json:"id"`
-	Name        string `db:"name" json:"name"`
-	Slug        string `db:"slug" json:"slug"`
-	Description string `db:"description" json:"description"`
-	Icon        string `db:"icon" json:"icon"`
-	CreatedAt   int64  `db:"created_at" json:"created_at"`
-	UpdatedAt   string `db:"updated_at" json:"updated_at"`
-}
-
 type Embedding struct {
 	ID        int64   `db:"id" json:"id"`
 	Embedding *string `db:"embedding" json:"embedding"`
@@ -30,7 +20,6 @@ type Employment struct {
 	UpdatedAt   string `db:"updated_at" json:"updated_at"`
 	StartDate   int64  `db:"start_date" json:"start_date"`
 	EndDate     int64  `db:"end_date" json:"end_date"`
-	CompanyID   int64  `db:"company_id" json:"company_id"`
 }
 
 type EmploymentTag struct {
