@@ -6,17 +6,13 @@
   stdenv,
   ...
 }:
-pkgs.buildGo124Module {
+pkgs.buildGoModule {
   pname = "conneroh";
   version = "0.0.1";
-  src = ./../../.;
-  subPackages = ["cmd/conneroh"];
+  src = ../../.;
+  subPackages = ["."];
+  nativeBuildInputs = [];
   vendorHash = "sha256-nm3JEU+6MuA0bCXfAswgb7JZBmysypDIKjvw+PJFltY=";
-  doCheck = true;
-  checkPhase = ''
-    echo "Running conneroh for 3 seconds to ensure it works..."
-    timeout 3 ./result/bin/conneroh || true
-  '';
   preBuild = ''
     ${pkgs.templ}/bin/templ generate
   '';

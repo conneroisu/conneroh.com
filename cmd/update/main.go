@@ -345,7 +345,11 @@ func Run(
 			if err != nil {
 				return fmt.Errorf("failed to parse tag %s: %w", path, err)
 			}
-			return parsed.UpsertTag(ctx, db)
+			err = parsed.UpsertTag(ctx, db)
+			if err != nil {
+				return fmt.Errorf("failed to upsert tag %s: %w", path, err)
+			}
+			return nil
 		},
 	)
 	if err != nil {
