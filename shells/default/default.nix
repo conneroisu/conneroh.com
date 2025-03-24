@@ -10,7 +10,7 @@
   buildWithSpecificGo = pkg: pkg.override {inherit buildGoModule;};
 
   # Import scripts from scripts.nix
-  scripts = import ./scripts.nix {inherit lib;};
+  scripts = import ./scripts.nix {inherit lib pkgs;};
 
   # Convert scripts to packages
   scriptPackages =

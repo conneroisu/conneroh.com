@@ -1,5 +1,9 @@
 # Scripts for development shell
-{lib}: {
+{
+  pkgs,
+  lib,
+  ...
+}: {
   dx = {
     exec = ''$EDITOR $REPO_ROOT/flake.nix'';
     description = "Edit the flake.nix";
@@ -23,7 +27,7 @@
     description = "Run golangci-lint";
   };
   build = {
-    exec = ''nix build .#packages.x86_64-linux.conneroh'';
+    exec = ''nix build --accept-flake-config .#packages.x86_64-linux.conneroh'';
     description = "Build the package";
   };
   update = {
@@ -106,14 +110,14 @@
     '';
     description = "Generate all with profiling information";
   };
-  "generate-reload" = {
+  generate-reload = {
     exec = ''
       templ generate $REPO_ROOT &
       wait
     '';
     description = "Generate templ files and wait for completion";
   };
-  "generate-all" = {
+  generate-all = {
     exec = ''
       go generate $REPO_ROOT/... &
 
