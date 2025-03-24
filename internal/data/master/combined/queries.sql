@@ -80,10 +80,12 @@ INSERT INTO
         description,
         banner_url,
         start_date,
-        end_date
+        end_date,
+        embedding_id
     )
 VALUES
     (
+        ?,
         ?,
         ?,
         ?,
@@ -101,7 +103,8 @@ SET
     description = ?,
     banner_url = ?,
     start_date = ?,
-    end_date = ?
+    end_date = ?,
+    embedding_id = ?
 WHERE
     id = ?;
 
@@ -123,10 +126,11 @@ INSERT INTO
         slug,
         content,
         raw_content,
-        banner_url
+        banner_url,
+        embedding_id
     )
 VALUES
-    (?, ?, ?, ?, ?, ?) RETURNING *;
+    (?, ?, ?, ?, ?, ?, ?) RETURNING *;
 
 -- name: PostUpdate :one
 UPDATE
@@ -137,7 +141,8 @@ SET
     slug = ?,
     content = ?,
     raw_content = ?,
-    banner_url = ?
+    banner_url = ?,
+    embedding_id = ?
 WHERE
     id = ? RETURNING *;
 
@@ -295,10 +300,11 @@ INSERT INTO
         description,
         content,
         raw_content,
-        banner_url
+        banner_url,
+        embedding_id
     )
 VALUES
-    (?, ?, ?, ?, ?, ?) RETURNING *;
+    (?, ?, ?, ?, ?, ?, ?) RETURNING *;
 
 -- name: ProjectUpdate :one
 UPDATE
@@ -309,7 +315,8 @@ SET
     description = ?,
     content = ?,
     raw_content = ?,
-    banner_url = ?
+    banner_url = ?,
+    embedding_id = ?
 WHERE
     id = ? RETURNING *;
 
@@ -393,10 +400,11 @@ INSERT INTO
         content,
         raw_content,
         slug,
-        icon
+        icon,
+        embedding_id
     )
 VALUES
-    (?, ?, ?, ?, ?, ?);
+    (?, ?, ?, ?, ?, ?, ?);
 
 -- name: TagUpdate :exec
 UPDATE
@@ -407,7 +415,8 @@ SET
     content = ?,
     icon = ?,
     raw_content = ?,
-    description = ?
+    description = ?,
+    embedding_id = ?
 WHERE
     id = ?;
 

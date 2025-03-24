@@ -13,6 +13,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/a-h/templ"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh"
@@ -21,6 +22,7 @@ import (
 	"github.com/conneroisu/conneroh.com/internal/data/docs"
 	"github.com/conneroisu/conneroh.com/internal/data/master"
 	mathjax "github.com/litao91/goldmark-mathjax"
+	ollama "github.com/prathyushnallamothu/ollamago"
 	enclave "github.com/quail-ink/goldmark-enclave"
 	"github.com/quail-ink/goldmark-enclave/core"
 	"github.com/yuin/goldmark"
@@ -34,6 +36,21 @@ import (
 	"go.abhg.dev/goldmark/mermaid"
 	"go.abhg.dev/goldmark/wikilink"
 )
+
+var client = ollama.NewClient(
+	ollama.WithTimeout(time.Minute * 5),
+)
+
+func embeddingUpsert(ctx context.Context, input string) int {
+	resp, err := client.Embeddings(ctx, ollama.EmbeddingsRequest{
+		Model:  "nomic-embed-text",
+		Prompt: input,
+	})
+	if err != nil {
+		panic(err)
+	}
+	return 0
+}
 
 func quickRender(comp templ.Component) string {
 	var buf bytes.Buffer

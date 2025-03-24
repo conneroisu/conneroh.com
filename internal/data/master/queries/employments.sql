@@ -22,10 +22,12 @@ INSERT INTO
         description,
         banner_url,
         start_date,
-        end_date
+        end_date,
+        embedding_id
     )
 VALUES
     (
+        ?,
         ?,
         ?,
         ?,
@@ -43,6 +45,7 @@ SET
     description = ?,
     banner_url = ?,
     start_date = ?,
-    end_date = ?
+    end_date = ?,
+    embedding_id = ?
 WHERE
     id = ?;

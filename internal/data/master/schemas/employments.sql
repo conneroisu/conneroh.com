@@ -7,5 +7,7 @@ CREATE TABLE IF NOT EXISTS employments (
     created_at INTEGER NOT NULL DEFAULT (unixepoch('now')),
     updated_at TEXT NOT NULL DEFAULT (unixepoch('now')),
     start_date INTEGER NOT NULL,
-    end_date INTEGER NOT NULL
+    end_date INTEGER NOT NULL,
+    embedding_id INTEGER NOT NULL,
+    FOREIGN KEY(embedding_id) REFERENCES embeddings(id)
 ) STRICT;

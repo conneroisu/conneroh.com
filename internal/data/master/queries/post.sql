@@ -16,10 +16,11 @@ INSERT INTO
         slug,
         content,
         raw_content,
-        banner_url
+        banner_url,
+        embedding_id
     )
 VALUES
-    (?, ?, ?, ?, ?, ?) RETURNING *;
+    (?, ?, ?, ?, ?, ?, ?) RETURNING *;
 
 -- name: PostUpdate :one
 UPDATE
@@ -30,7 +31,8 @@ SET
     slug = ?,
     content = ?,
     raw_content = ?,
-    banner_url = ?
+    banner_url = ?,
+    embedding_id = ?
 WHERE
     id = ? RETURNING *;
 
