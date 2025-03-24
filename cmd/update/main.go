@@ -6,7 +6,6 @@ import (
 	"context"
 	"database/sql"
 	"embed"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io/fs"
@@ -41,7 +40,7 @@ func quickRender(comp templ.Component) string {
 	var buf bytes.Buffer
 	err := comp.Render(context.Background(), &buf)
 	if err != nil {
-		panic(err)
+		panic(fmt.Errorf("render error: %w", err))
 	}
 	return buf.String()
 }
@@ -169,43 +168,45 @@ func Parse(fsPath string, embedFs embed.FS) (*Markdown, error) {
 	return &fm, nil
 }
 
-// UpsertEmbedding inserts or updates the embedding document in the database.
-func UpsertEmbedding(
-	ctx context.Context,
-	db *data.Database[master.Queries],
-	client *api.Client,
-	content string,
-	existingID int64,
-) (int64, error) {
-	slog.Info("upserting embedding", "existingID", existingID)
-	defer slog.Info("upserted embedding", "existingID", existingID)
-	embed, err := client.Embeddings(ctx, &api.EmbeddingRequest{
-		Model:  "granite-embedding:278m",
-		Prompt: content,
-	})
-	if err != nil {
-		return 0, err
-	}
-	jsVal, err := json.Marshal(embed)
-	if err != nil {
-		return 0, err
-	}
-	// embedding already exists, update it
-	if existingID != 0 {
-		err = db.Queries.EmeddingUpdate(ctx, string(jsVal), existingID)
-		if err != nil {
-			return 0, err
-		}
-		return existingID, nil
-	}
-	// embedding does not exist, create it
-	id, err := db.Queries.EmbeddingsCreate(ctx, string(jsVal))
-	if err != nil {
-		return 0, err
-	}
-	return id, nil
-}
-
+// // UpsertEmbedding inserts or updates the embedding document in the database.
+// func UpsertEmbedding(
+//
+//	ctx context.Context,
+//	db *data.Database[master.Queries],
+//	client *api.Client,
+//	content string,
+//	existingID int64,
+//
+//	) (int64, error) {
+//		slog.Info("upserting embedding", "existingID", existingID)
+//		defer slog.Info("upserted embedding", "existingID", existingID)
+//		embed, err := client.Embeddings(ctx, &api.EmbeddingRequest{
+//			Model:  "granite-embedding:278m",
+//			Prompt: content,
+//		})
+//		if err != nil {
+//			return 0, fmt.Errorf("embedding generation request failed: %w", err)
+//		}
+//		jsVal, err := json.Marshal(embed)
+//		if err != nil {
+//			return 0, fmt.Errorf("failed to marshal embedding: %w", err)
+//		}
+//		// embedding already exists, update it
+//		if existingID != 0 {
+//			err = db.Queries.EmeddingUpdate(ctx, string(jsVal), existingID)
+//			if err != nil {
+//				return 0, fmt.Errorf("failed to update embedding: %w", err)
+//			}
+//			return existingID, nil
+//		}
+//		// embedding does not exist, create it
+//		id, err := db.Queries.EmbeddingsCreate(ctx, string(jsVal))
+//		if err != nil {
+//			return 0, fmt.Errorf("failed to create embedding: %w", err)
+//		}
+//		return id, nil
+//	}
+//
 // UpsertTag inserts or updates the tag document in the database.
 func (md *Markdown) UpsertTag(
 	ctx context.Context,
@@ -293,7 +294,7 @@ func (md *Markdown) UpsertPost(
 	if err == nil {
 		// same content
 		if post.RawContent == md.RawContent {
-			return db.Queries.PostUpdate(
+			_, err = db.Queries.PostUpdate(
 				ctx,
 				master.PostUpdateParams{
 					ID:          post.ID,
@@ -306,6 +307,9 @@ func (md *Markdown) UpsertPost(
 					EmbeddingID: post.EmbeddingID,
 				},
 			)
+			if err != nil {
+				return post, fmt.Errorf("failed to update post (PostUpdate): %w", err)
+			}
 		}
 		id, err = UpsertEmbedding(
 			ctx,
@@ -315,9 +319,9 @@ func (md *Markdown) UpsertPost(
 			post.EmbeddingID,
 		)
 		if err != nil {
-			return
+			return post, fmt.Errorf("failed to update post (UpsertEmbedding): %w", err)
 		}
-		return db.Queries.PostUpdate(
+		_, err = db.Queries.PostUpdate(
 			ctx,
 			master.PostUpdateParams{
 				ID:          post.ID,
@@ -330,12 +334,15 @@ func (md *Markdown) UpsertPost(
 				EmbeddingID: id,
 			},
 		)
+		if err != nil {
+			return post, fmt.Errorf("failed to finish update post (PostUpdate): %w", err)
+		}
 	}
 	// err is not nil (new post)
 	if errors.Is(err, sql.ErrNoRows) {
 		id, err = UpsertEmbedding(ctx, db, client, md.RawContent, 0)
 		if err != nil {
-			return
+			return post, fmt.Errorf("failed to upsert embedding: %w", err)
 		}
 		return db.Queries.PostCreate(ctx, master.PostCreateParams{
 			Slug:        md.Slug,
@@ -457,15 +464,14 @@ func Run(
 		"tags",
 		func(path string, d fs.DirEntry, err error) error {
 			if err != nil {
-				return err
+				return fmt.Errorf("failed to walk tags: %w", err)
 			}
 			if d.IsDir() || !strings.HasSuffix(path, ".md") {
 				return nil
 			}
 			parsed, err := Parse(path, docs.Tags)
 			if err != nil {
-				slog.Error("failed to parse tag", "path", path, "err", err)
-				return err
+				return fmt.Errorf("failed to parse tag %s: %w", path, err)
 			}
 			return parsed.UpsertTag(ctx, db, client)
 		},
@@ -487,13 +493,17 @@ func Run(
 			}
 			parsed, err := Parse(path, docs.Posts)
 			if err != nil {
-				return err
+				return fmt.Errorf("failed to parse post %s: %w", path, err)
 			}
 			post, err = parsed.UpsertPost(ctx, db, client)
 			if err != nil {
-				return err
+				return fmt.Errorf("failed to upsert post %s: %w", path, err)
 			}
-			return db.Queries.UpsertPostTags(ctx, parsed.Tags, post.ID)
+			err = db.Queries.UpsertPostTags(ctx, parsed.Tags, post.ID)
+			if err != nil {
+				return fmt.Errorf("failed to upsert post tags: %v", err)
+			}
+			return nil
 		},
 	)
 	if err != nil {
@@ -505,18 +515,18 @@ func Run(
 		"projects",
 		func(path string, d fs.DirEntry, err error) error {
 			if err != nil {
-				return err
+				return fmt.Errorf("failed to walk projects: %w", err)
 			}
 			if d.IsDir() || !strings.HasSuffix(path, ".md") {
 				return nil
 			}
 			parsed, err := Parse(path, docs.Projects)
 			if err != nil {
-				return err
+				return fmt.Errorf("failed to parse project %s: %w", path, err)
 			}
 			project, err := parsed.UpsertProject(ctx, db, client)
 			if err != nil {
-				return err
+				return fmt.Errorf("failed to upsert project %s: %w", path, err)
 			}
 			err = db.Queries.UpsertProjectTags(ctx, parsed.Tags, project.ID)
 			if err != nil {

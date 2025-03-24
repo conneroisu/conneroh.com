@@ -8,7 +8,5 @@ CREATE TABLE IF NOT EXISTS tags (
     raw_content TEXT NOT NULL,
     icon TEXT NOT NULL DEFAULT 'tag',
     created_at INTEGER NOT NULL DEFAULT (unixepoch('now')),
-    updated_at INTEGER NOT NULL DEFAULT (unixepoch('now')),
-    embedding_id INTEGER NOT NULL,
-    FOREIGN KEY (embedding_id) REFERENCES embeddings(id)
+    updated_at INTEGER NOT NULL DEFAULT (unixepoch('now'))
 ) STRICT;

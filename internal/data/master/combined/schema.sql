@@ -5,7 +5,7 @@
 
 CREATE TABLE IF NOT EXISTS embeddings (
     id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-    embedding TEXT NOT NULL,
+    embedding TEXT,
     created_at INTEGER NOT NULL DEFAULT (unixepoch('now'))
 ) STRICT;
 
@@ -19,9 +19,7 @@ CREATE TABLE IF NOT EXISTS posts (
     raw_content TEXT NOT NULL,
     banner_url TEXT NOT NULL,
     created_at INTEGER NOT NULL DEFAULT (unixepoch('now')),
-    updated_at TEXT NOT NULL DEFAULT (unixepoch('now')),
-    embedding_id INTEGER NOT NULL,
-    FOREIGN KEY(embedding_id) REFERENCES embeddings(id)
+    updated_at TEXT NOT NULL DEFAULT (unixepoch('now'))
 ) STRICT;
 
 -- dialect: sqlite
@@ -50,9 +48,7 @@ CREATE TABLE IF NOT EXISTS projects (
     raw_content TEXT NOT NULL,
     banner_url TEXT NOT NULL,
     created_at INTEGER NOT NULL DEFAULT (unixepoch('now')),
-    updated_at INTEGER NOT NULL DEFAULT (unixepoch('now')),
-    embedding_id INTEGER NOT NULL,
-    FOREIGN KEY(embedding_id) REFERENCES embeddings(id)
+    updated_at INTEGER NOT NULL DEFAULT (unixepoch('now'))
 ) STRICT;
 
 -- dialect: sqlite
@@ -73,7 +69,5 @@ CREATE TABLE IF NOT EXISTS tags (
     raw_content TEXT NOT NULL,
     icon TEXT NOT NULL DEFAULT 'tag',
     created_at INTEGER NOT NULL DEFAULT (unixepoch('now')),
-    updated_at INTEGER NOT NULL DEFAULT (unixepoch('now')),
-    embedding_id INTEGER NOT NULL,
-    FOREIGN KEY (embedding_id) REFERENCES embeddings(id)
+    updated_at INTEGER NOT NULL DEFAULT (unixepoch('now'))
 ) STRICT;

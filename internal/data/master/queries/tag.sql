@@ -26,11 +26,10 @@ INSERT INTO
         content,
         raw_content,
         slug,
-        embedding_id,
         icon
     )
 VALUES
-    (?, ?, ?, ?, ?, ?, ?);
+    (?, ?, ?, ?, ?, ?);
 
 -- name: TagUpdate :exec
 UPDATE
@@ -41,7 +40,6 @@ SET
     content = ?,
     icon = ?,
     raw_content = ?,
-    embedding_id = ?,
     description = ?
 WHERE
     id = ?;

@@ -34,11 +34,10 @@ INSERT INTO
         description,
         content,
         raw_content,
-        banner_url,
-        embedding_id
+        banner_url
     )
 VALUES
-    (?, ?, ?, ?, ?, ?, ?) RETURNING *;
+    (?, ?, ?, ?, ?, ?) RETURNING *;
 
 -- name: ProjectUpdate :one
 UPDATE
@@ -49,8 +48,7 @@ SET
     description = ?,
     content = ?,
     raw_content = ?,
-    banner_url = ?,
-    embedding_id = ?
+    banner_url = ?
 WHERE
     id = ? RETURNING *;
 
