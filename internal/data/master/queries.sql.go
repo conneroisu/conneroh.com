@@ -93,6 +93,314 @@ func (q *Queries) EmeddingUpdate(ctx context.Context, embedding *string, iD int6
 	return err
 }
 
+const employmentTagsCreate = `-- name: EmploymentTagsCreate :exec
+INSERT INTO
+    employment_tags (employment_id, tag_id)
+VALUES
+    (?, ?)
+`
+
+// EmploymentTagsCreate
+//
+//	INSERT INTO
+//	    employment_tags (employment_id, tag_id)
+//	VALUES
+//	    (?, ?)
+func (q *Queries) EmploymentTagsCreate(ctx context.Context, employmentID int64, tagID int64) error {
+	_, err := q.db.ExecContext(ctx, employmentTagsCreate, employmentID, tagID)
+	return err
+}
+
+const employmentTagsDelete = `-- name: EmploymentTagsDelete :exec
+DELETE FROM
+    employment_tags
+WHERE
+    employment_id = ?
+    AND tag_id = ?
+`
+
+// EmploymentTagsDelete
+//
+//	DELETE FROM
+//	    employment_tags
+//	WHERE
+//	    employment_id = ?
+//	    AND tag_id = ?
+func (q *Queries) EmploymentTagsDelete(ctx context.Context, employmentID int64, tagID int64) error {
+	_, err := q.db.ExecContext(ctx, employmentTagsDelete, employmentID, tagID)
+	return err
+}
+
+const employmentTagsGet = `-- name: EmploymentTagsGet :one
+SELECT
+    employment_id, tag_id
+FROM
+    employment_tags
+WHERE
+    employment_id = ?
+    AND tag_id = ?
+`
+
+// EmploymentTagsGet
+//
+//	SELECT
+//	    employment_id, tag_id
+//	FROM
+//	    employment_tags
+//	WHERE
+//	    employment_id = ?
+//	    AND tag_id = ?
+func (q *Queries) EmploymentTagsGet(ctx context.Context, employmentID int64, tagID int64) (EmploymentTag, error) {
+	row := q.db.QueryRowContext(ctx, employmentTagsGet, employmentID, tagID)
+	var i EmploymentTag
+	err := row.Scan(&i.EmploymentID, &i.TagID)
+	return i, err
+}
+
+const employmentTagsList = `-- name: EmploymentTagsList :many
+SELECT
+    employment_id, tag_id
+FROM
+    employment_tags
+`
+
+// EmploymentTagsList
+//
+//	SELECT
+//	    employment_id, tag_id
+//	FROM
+//	    employment_tags
+func (q *Queries) EmploymentTagsList(ctx context.Context) ([]EmploymentTag, error) {
+	rows, err := q.db.QueryContext(ctx, employmentTagsList)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []EmploymentTag
+	for rows.Next() {
+		var i EmploymentTag
+		if err := rows.Scan(&i.EmploymentID, &i.TagID); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const employmentsCreate = `-- name: EmploymentsCreate :exec
+INSERT INTO
+    employments (
+        title,
+        slug,
+        description,
+        banner_url,
+        start_date,
+        end_date,
+        company
+    )
+VALUES
+    (
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?,
+        ?
+    )
+`
+
+type EmploymentsCreateParams struct {
+	Title       string `db:"title" json:"title"`
+	Slug        string `db:"slug" json:"slug"`
+	Description string `db:"description" json:"description"`
+	BannerUrl   string `db:"banner_url" json:"banner_url"`
+	StartDate   int64  `db:"start_date" json:"start_date"`
+	EndDate     int64  `db:"end_date" json:"end_date"`
+	Company     string `db:"company" json:"company"`
+}
+
+// EmploymentsCreate
+//
+//	INSERT INTO
+//	    employments (
+//	        title,
+//	        slug,
+//	        description,
+//	        banner_url,
+//	        start_date,
+//	        end_date,
+//	        company
+//	    )
+//	VALUES
+//	    (
+//	        ?,
+//	        ?,
+//	        ?,
+//	        ?,
+//	        ?,
+//	        ?,
+//	        ?
+//	    )
+func (q *Queries) EmploymentsCreate(ctx context.Context, arg EmploymentsCreateParams) error {
+	_, err := q.db.ExecContext(ctx, employmentsCreate,
+		arg.Title,
+		arg.Slug,
+		arg.Description,
+		arg.BannerUrl,
+		arg.StartDate,
+		arg.EndDate,
+		arg.Company,
+	)
+	return err
+}
+
+const employmentsGet = `-- name: EmploymentsGet :one
+SELECT
+    id, title, slug, description, banner_url, created_at, updated_at, start_date, end_date, company
+FROM
+    employments
+WHERE
+    id = ?
+`
+
+// EmploymentsGet
+//
+//	SELECT
+//	    id, title, slug, description, banner_url, created_at, updated_at, start_date, end_date, company
+//	FROM
+//	    employments
+//	WHERE
+//	    id = ?
+func (q *Queries) EmploymentsGet(ctx context.Context, id int64) (Employment, error) {
+	row := q.db.QueryRowContext(ctx, employmentsGet, id)
+	var i Employment
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.Slug,
+		&i.Description,
+		&i.BannerUrl,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.StartDate,
+		&i.EndDate,
+		&i.Company,
+	)
+	return i, err
+}
+
+const employmentsList = `-- name: EmploymentsList :many
+SELECT
+    id, title, slug, description, banner_url, created_at, updated_at, start_date, end_date, company
+FROM
+    employments
+ORDER BY
+    created_at DESC
+`
+
+// EmploymentsList
+//
+//	SELECT
+//	    id, title, slug, description, banner_url, created_at, updated_at, start_date, end_date, company
+//	FROM
+//	    employments
+//	ORDER BY
+//	    created_at DESC
+func (q *Queries) EmploymentsList(ctx context.Context) ([]Employment, error) {
+	rows, err := q.db.QueryContext(ctx, employmentsList)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Employment
+	for rows.Next() {
+		var i Employment
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.Slug,
+			&i.Description,
+			&i.BannerUrl,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.StartDate,
+			&i.EndDate,
+			&i.Company,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const employmentsUpdate = `-- name: EmploymentsUpdate :exec
+UPDATE
+    employments
+SET
+    title = ?,
+    slug = ?,
+    description = ?,
+    banner_url = ?,
+    start_date = ?,
+    end_date = ?,
+    company = ?
+WHERE
+    id = ?
+`
+
+type EmploymentsUpdateParams struct {
+	Title       string `db:"title" json:"title"`
+	Slug        string `db:"slug" json:"slug"`
+	Description string `db:"description" json:"description"`
+	BannerUrl   string `db:"banner_url" json:"banner_url"`
+	StartDate   int64  `db:"start_date" json:"start_date"`
+	EndDate     int64  `db:"end_date" json:"end_date"`
+	Company     string `db:"company" json:"company"`
+	ID          int64  `db:"id" json:"id"`
+}
+
+// EmploymentsUpdate
+//
+//	UPDATE
+//	    employments
+//	SET
+//	    title = ?,
+//	    slug = ?,
+//	    description = ?,
+//	    banner_url = ?,
+//	    start_date = ?,
+//	    end_date = ?,
+//	    company = ?
+//	WHERE
+//	    id = ?
+func (q *Queries) EmploymentsUpdate(ctx context.Context, arg EmploymentsUpdateParams) error {
+	_, err := q.db.ExecContext(ctx, employmentsUpdate,
+		arg.Title,
+		arg.Slug,
+		arg.Description,
+		arg.BannerUrl,
+		arg.StartDate,
+		arg.EndDate,
+		arg.Company,
+		arg.ID,
+	)
+	return err
+}
+
 const postCreate = `-- name: PostCreate :one
 INSERT INTO
     posts (

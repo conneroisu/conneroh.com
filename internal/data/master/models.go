@@ -18,6 +18,14 @@ type Employment struct {
 	BannerUrl   string `db:"banner_url" json:"banner_url"`
 	CreatedAt   int64  `db:"created_at" json:"created_at"`
 	UpdatedAt   string `db:"updated_at" json:"updated_at"`
+	StartDate   int64  `db:"start_date" json:"start_date"`
+	EndDate     int64  `db:"end_date" json:"end_date"`
+	Company     string `db:"company" json:"company"`
+}
+
+type EmploymentTag struct {
+	EmploymentID int64 `db:"employment_id" json:"employment_id"`
+	TagID        int64 `db:"tag_id" json:"tag_id"`
 }
 
 type Post struct {
@@ -69,9 +77,4 @@ type Tag struct {
 	Icon        string `db:"icon" json:"icon"`
 	CreatedAt   int64  `db:"created_at" json:"created_at"`
 	UpdatedAt   int64  `db:"updated_at" json:"updated_at"`
-}
-
-type WorkTag struct {
-	WorkID int64 `db:"work_id" json:"work_id"`
-	TagID  int64 `db:"tag_id" json:"tag_id"`
 }
