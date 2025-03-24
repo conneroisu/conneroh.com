@@ -17,6 +17,9 @@ pkgs.buildGo124Module {
     echo "Running conneroh for 3 seconds to ensure it works..."
     timeout 3 ./result/bin/conneroh || true
   '';
+  preBuild = ''
+    ${pkgs.templ}/bin/templ generate
+  '';
   meta = {
     description = "Personal Website";
     homepage = "https://github.com/conneroisu/conneroh.com";
