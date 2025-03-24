@@ -10,3 +10,7 @@ title: libsqlz
 ---
 
 # libsqlz
+
+```bash
+zig fetch https://github.com/conneroisu/libsqlz
+```
