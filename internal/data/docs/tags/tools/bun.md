@@ -5,6 +5,7 @@ tags: []
 description: Bun is a JavaScript runtime and package manager.
 title: bun
 ---
-# bun
-Bun is a JavaScript runtime and package manager.
 
+# bun
+
+Bun is a JavaScript runtime and package manager.

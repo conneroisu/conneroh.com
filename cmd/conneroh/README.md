@@ -1,11 +1,13 @@
 # conneroh
 
 Two-main view-types:
+
 - Plural Search
 - Singular View
 - Home
 
 Two-main layouts:
+
 - Morpher (htmx page morphing)
 - Page (standard page)
 
@@ -94,7 +96,7 @@ func Home(_ context.Context, _ *data.Database[master.Queries], fullPosts *[]mast
 Home is the home page handler.
 
 <a name="List"></a>
-## func [List](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/handlers.go#L303-L312>)
+## func [List](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/handlers.go#L296-L305>)
 
 ```go
 func List(_ context.Context, _ *data.Database[master.Queries], fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, fullTags *[]master.FullTag, fullPostSlugMap *map[string]master.FullPost, fullProjectSlugMap *map[string]master.FullProject, fullTagSlugMap *map[string]master.FullTag) (routing.APIFn, error)
@@ -139,7 +141,7 @@ func NewServer(ctx context.Context, db *data.Database[master.Queries]) http.Hand
 NewServer creates a new web\-ui server
 
 <a name="Post"></a>
-## func [Post](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/handlers.go#L199-L208>)
+## func [Post](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/handlers.go#L192-L201>)
 
 ```go
 func Post(_ context.Context, _ *data.Database[master.Queries], fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, fullTags *[]master.FullTag, fullPostSlugMap *map[string]master.FullPost, fullProjectSlugMap *map[string]master.FullProject, fullTagSlugMap *map[string]master.FullTag) (routing.APIFn, error)
@@ -148,7 +150,7 @@ func Post(_ context.Context, _ *data.Database[master.Queries], fullPosts *[]mast
 Post is the post handler.
 
 <a name="Project"></a>
-## func [Project](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/handlers.go#L234-L243>)
+## func [Project](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/handlers.go#L227-L236>)
 
 ```go
 func Project(_ context.Context, _ *data.Database[master.Queries], fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, fullTags *[]master.FullTag, fullPostSlugMap *map[string]master.FullPost, fullProjectSlugMap *map[string]master.FullProject, fullTagSlugMap *map[string]master.FullTag) (routing.APIFn, error)
@@ -166,7 +168,7 @@ func Run(ctx context.Context, getenv func(string) string) error
 Run is the entry point for the application.
 
 <a name="Tag"></a>
-## func [Tag](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/handlers.go#L268-L277>)
+## func [Tag](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/handlers.go#L261-L270>)
 
 ```go
 func Tag(_ context.Context, _ *data.Database[master.Queries], fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, fullTags *[]master.FullTag, fullPostSlugMap *map[string]master.FullPost, fullProjectSlugMap *map[string]master.FullProject, fullTagSlugMap *map[string]master.FullTag) (routing.APIFn, error)

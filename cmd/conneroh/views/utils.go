@@ -14,7 +14,7 @@ import (
 )
 
 // ListFn returns a fullFn for the list view.
-func ListFn(target ListTargets) routing.FullFn {
+func ListFn(target ListTarget) routing.FullFn {
 	return func(
 		fullPosts *[]master.FullPost,
 		fullProjects *[]master.FullProject,
@@ -50,23 +50,6 @@ func readTime(content string) string {
 func formatDate(timestamp int64) string {
 	t := time.Unix(timestamp, 0)
 	return t.Format("Jan 02, 2006")
-}
-
-func formatTags(tags []master.Tag) string {
-	// This is a simplified representation - in a real app, you might want to use a JSON library
-	if len(tags) == 0 {
-		return "[]"
-	}
-
-	result := "["
-	for i, tag := range tags {
-		if i > 0 {
-			result += ","
-		}
-		result += fmt.Sprintf(`{"id":%d,"name":"%s","slug":"%s"}`, tag.ID, tag.Title, tag.Slug)
-	}
-	result += "]"
-	return result
 }
 
 // Helper function to determine the section for a tag

@@ -90,9 +90,9 @@ func MorphView(
 	fullTagSlugMap *map[string]master.FullTag,
 ) (routing.APIFn, error) {
 	var morphMap = map[string]routing.FullFn{
-		"projects": views.ListFn(views.ListTargetsProjects),
-		"posts":    views.ListFn(views.ListTargetsPosts),
-		"tags":     views.ListFn(views.ListTargetsTags),
+		"projects": views.ListFn(views.ListTargetProjects),
+		"posts":    views.ListFn(views.ListTargetPosts),
+		"tags":     views.ListFn(views.ListTargetTags),
 		"home":     views.Home,
 	}
 	return func(w http.ResponseWriter, r *http.Request) error {
@@ -139,25 +139,22 @@ func Morphs(
 			if !ok {
 				return routing.ErrNotFound{URL: r.URL}
 			}
-			morphed := components.Morpher(views.Project(
-				&proj,
-				fullPosts,
-				fullProjects,
-				fullTags,
-				fullPostSlugMap,
-				fullProjectSlugMap,
-				fullTagSlugMap,
-			))
-			err := morphed.Render(r.Context(), w)
-			if err != nil {
-				return err
-			}
+			templ.Handler(
+				components.Morpher(views.Project(
+					&proj,
+					fullPosts,
+					fullProjects,
+					fullTags,
+					fullPostSlugMap,
+					fullProjectSlugMap,
+					fullTagSlugMap,
+				))).ServeHTTP(w, r)
 		case "post":
 			post, ok := (*fullPostSlugMap)[id]
 			if !ok {
 				return routing.ErrNotFound{URL: r.URL}
 			}
-			morphed := components.Morpher(views.Post(
+			templ.Handler(components.Morpher(views.Post(
 				&post,
 				fullPosts,
 				fullProjects,
@@ -165,11 +162,7 @@ func Morphs(
 				fullPostSlugMap,
 				fullProjectSlugMap,
 				fullTagSlugMap,
-			))
-			err := morphed.Render(r.Context(), w)
-			if err != nil {
-				return err
-			}
+			))).ServeHTTP(w, r)
 		case "tag":
 			tag, ok := (*fullTagSlugMap)[id]
 			if !ok {
@@ -313,10 +306,10 @@ func List(
 	return func(w http.ResponseWriter, r *http.Request) error {
 		targets := r.PathValue("targets")
 		switch targets {
-		case views.ListTargetsPosts:
+		case views.ListTargetPosts:
 			templ.Handler(
 				layouts.Page(views.List(
-					views.ListTargetsPosts,
+					views.ListTargetPosts,
 					fullPosts,
 					fullProjects,
 					fullTags,
@@ -325,10 +318,10 @@ func List(
 					fullTagSlugMap,
 				)),
 			).ServeHTTP(w, r)
-		case views.ListTargetsProjects:
+		case views.ListTargetProjects:
 			templ.Handler(
 				layouts.Page(views.List(
-					views.ListTargetsProjects,
+					views.ListTargetProjects,
 					fullPosts,
 					fullProjects,
 					fullTags,
@@ -337,10 +330,10 @@ func List(
 					fullTagSlugMap,
 				)),
 			).ServeHTTP(w, r)
-		case views.ListTargetsTags:
+		case views.ListTargetTags:
 			templ.Handler(
 				layouts.Page(views.List(
-					views.ListTargetsTags,
+					views.ListTargetTags,
 					fullPosts,
 					fullProjects,
 					fullTags,

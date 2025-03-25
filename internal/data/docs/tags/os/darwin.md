@@ -6,6 +6,4 @@ description: Apple's Operating System for Macintosh computers
 title: Darwin XOS
 ---
 
-
 # Darwin
-

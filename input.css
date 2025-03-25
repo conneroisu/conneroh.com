@@ -6,15 +6,15 @@
 
 @layer components {
   .ctag {
-    @apply inline-block px-3 py-1 text-sm font-medium rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors
+    @apply inline-block px-3 py-1 text-sm font-medium rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors;
   }
 
   .deskheaditem {
-    @apply text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white cursor-pointer
+    @apply text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white cursor-pointer;
   }
 
   .mobileheaditem {
-    @apply block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700
+    @apply block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700;
   }
 }
 

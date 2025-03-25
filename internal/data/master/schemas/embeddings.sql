@@ -1,5 +1,8 @@
 CREATE TABLE IF NOT EXISTS embeddings (
     id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-    embedding TEXT,
+    embedding TEXT NOT NULL,
+    x TEXT NOT NULL,
+    y TEXT NOT NULL,
+    z TEXT NOT NULL,
     created_at INTEGER NOT NULL DEFAULT (unixepoch('now'))
 ) STRICT;

@@ -5,8 +5,10 @@ import (
 	"context"
 	"database/sql"
 	_ "embed"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"strconv"
 
 	"golang.org/x/exp/slog"
 )
@@ -29,51 +31,83 @@ var Schema string
 var Seed string
 
 type (
+	// Embedded is a struct with a large number of float64 fields.
+	Embedded struct {
+		X   float64
+		Y   float64
+		Z   float64
+		Vec [768]float64 `json:"embedding"`
+	}
 	// FullPost is a post with all its projects and tags.
 	FullPost struct {
 		Post
+		Embedded
 		Projects []Project
 		Tags     []Tag
 	}
 	// FullProject is a project with all its posts and tags.
 	FullProject struct {
 		Project
+		Embedded
 		Posts []Post
 		Tags  []Tag
 	}
 	// FullTag is a tag with all its posts and projects.
 	FullTag struct {
 		Tag
+		Embedded
 		Posts    []Post
 		Projects []Project
 	}
 )
+
+// Fill fills the Embedded struct with the embedding.
+func (e *Embedded) Fill(emb Embedding) {
+	e.X = MustParseFloat64(emb.X)
+	e.Y = MustParseFloat64(emb.Y)
+	e.Z = MustParseFloat64(emb.Z)
+}
+
+// MustParseFloat64 panics if the string cannot be parsed as a float64.
+func MustParseFloat64(s string) float64 {
+	f, err := strconv.ParseFloat(s, 64)
+	if err != nil {
+		panic(err)
+	}
+	return f
+}
 
 // FullPostsList returns all posts with all their projects and tags.
 func (q *Queries) FullPostsList(
 	ctx context.Context,
 	posts []Post,
 ) (*[]FullPost, error) {
-	var (
-		fullPosts    []FullPost
-		postProjects []Project
-		postTags     []Tag
-		post         Post
-		err          error
-	)
-	for _, post = range posts {
-		postProjects, err = q.ProjectsListByPost(ctx, post.ID)
+	var fullPosts []FullPost
+
+	for _, post := range posts {
+		postProjects, err := q.ProjectsListByPost(ctx, post.ID)
 		if err != nil {
 			return nil, err
 		}
-		postTags, err = q.TagsListByPost(ctx, post.ID)
+		postTags, err := q.TagsListByPost(ctx, post.ID)
 		if err != nil {
 			return nil, err
 		}
+		embedding, err := q.EmbeddingsGetByID(ctx, post.EmbeddingID)
+		if err != nil {
+			return nil, err
+		}
+		var emb Embedded
+		err = json.Unmarshal([]byte(embedding.Embedding), &emb)
+		if err != nil {
+			return nil, err
+		}
+		emb.Fill(embedding)
 		fullPosts = append(fullPosts, FullPost{
 			Post:     post,
 			Projects: postProjects,
 			Tags:     postTags,
+			Embedded: emb,
 		})
 	}
 	return &fullPosts, nil
@@ -86,25 +120,33 @@ func (q *Queries) FullPostsSlugMapGet(
 	posts []Post,
 ) (*map[string]FullPost, error) {
 	var (
-		postsMap     = make(map[string]FullPost)
-		postProjects []Project
-		postTags     []Tag
-		post         Post
-		err          error
+		postsMap = make(map[string]FullPost)
+		post     Post
 	)
 	for _, post = range posts {
-		postProjects, err = q.ProjectsListByPost(ctx, post.ID)
+		postProjects, err := q.ProjectsListByPost(ctx, post.ID)
 		if err != nil {
 			return nil, err
 		}
-		postTags, err = q.TagsListByPost(ctx, post.ID)
+		postTags, err := q.TagsListByPost(ctx, post.ID)
 		if err != nil {
 			return nil, err
 		}
+		embedding, err := q.EmbeddingsGetByID(ctx, post.EmbeddingID)
+		if err != nil {
+			return nil, err
+		}
+		var emb Embedded
+		err = json.Unmarshal([]byte(embedding.Embedding), &emb)
+		if err != nil {
+			return nil, err
+		}
+		emb.Fill(embedding)
 		postsMap[post.Slug] = FullPost{
 			Post:     post,
 			Projects: postProjects,
 			Tags:     postTags,
+			Embedded: emb,
 		}
 	}
 	return &postsMap, nil
@@ -125,10 +167,21 @@ func (q *Queries) FullProjectsList(
 		if err != nil {
 			return nil, err
 		}
+		embedding, err := q.EmbeddingsGetByID(ctx, project.EmbeddingID)
+		if err != nil {
+			return nil, err
+		}
+		emb := Embedded{}
+		err = json.Unmarshal([]byte(embedding.Embedding), &emb)
+		if err != nil {
+			return nil, err
+		}
+		emb.Fill(embedding)
 		fullProjects = append(fullProjects, FullProject{
-			Project: project,
-			Posts:   projectPosts,
-			Tags:    projectTags,
+			Project:  project,
+			Posts:    projectPosts,
+			Tags:     projectTags,
+			Embedded: emb,
 		})
 	}
 	return &fullProjects, nil
@@ -139,28 +192,35 @@ func (q *Queries) FullProjectsSlugMapGet(
 	ctx context.Context,
 	projects []Project,
 ) (*map[string]FullProject, error) {
-	var (
-		fullProjects = make(map[string]FullProject)
-		projectTags  []Tag
-		projectPosts []Post
-		project      Project
-		err          error
-	)
-	for _, project = range projects {
-		projectPosts, err = q.PostsListByProject(ctx, project.ID)
+	var fullProjects = make(map[string]FullProject)
+
+	for _, project := range projects {
+		projectPosts, err := q.PostsListByProject(ctx, project.ID)
 		if err != nil {
 			return nil, err
 		}
-		projectTags, err = q.TagsListByProject(ctx, project.ID)
+		projectTags, err := q.TagsListByProject(ctx, project.ID)
 		if err != nil {
 			return nil, err
 		}
+		embedding, err := q.EmbeddingsGetByID(ctx, project.EmbeddingID)
+		if err != nil {
+			return nil, err
+		}
+		var emb Embedded
+		err = json.Unmarshal([]byte(embedding.Embedding), &emb)
+		if err != nil {
+			return nil, err
+		}
+		emb.Fill(embedding)
 		fullProjects[project.Slug] = FullProject{
-			Project: project,
-			Posts:   projectPosts,
-			Tags:    projectTags,
+			Project:  project,
+			Posts:    projectPosts,
+			Tags:     projectTags,
+			Embedded: emb,
 		}
 	}
+
 	return &fullProjects, nil
 }
 
@@ -170,6 +230,7 @@ func (q *Queries) FullTagsList(
 	tags []Tag,
 ) (*[]FullTag, error) {
 	var fullTags []FullTag
+
 	for _, tag := range tags {
 		tagProjects, err := q.ProjectsListByTag(ctx, tag.ID)
 		if err != nil {
@@ -179,10 +240,21 @@ func (q *Queries) FullTagsList(
 		if err != nil {
 			return nil, err
 		}
+		embedding, err := q.EmbeddingsGetByID(ctx, tag.EmbeddingID)
+		if err != nil {
+			return nil, err
+		}
+		emb := Embedded{}
+		err = json.Unmarshal([]byte(embedding.Embedding), &emb)
+		if err != nil {
+			return nil, err
+		}
+		emb.Fill(embedding)
 		fullTags = append(fullTags, FullTag{
 			Tag:      tag,
 			Posts:    tagPosts,
 			Projects: tagProjects,
+			Embedded: emb,
 		})
 	}
 	return &fullTags, nil
@@ -193,28 +265,35 @@ func (q *Queries) FullTagsSlugMapGet(
 	ctx context.Context,
 	tags []Tag,
 ) (*map[string]FullTag, error) {
-	var (
-		fullTags    = make(map[string]FullTag)
-		tagProjects []Project
-		tagPosts    []Post
-		tag         Tag
-		err         error
-	)
-	for _, tag = range tags {
-		tagProjects, err = q.ProjectsListByTag(ctx, tag.ID)
+	var fullTags = make(map[string]FullTag)
+
+	for _, tag := range tags {
+		tagProjects, err := q.ProjectsListByTag(ctx, tag.ID)
 		if err != nil {
 			return nil, err
 		}
-		tagPosts, err = q.PostsListByTag(ctx, tag.ID)
+		tagPosts, err := q.PostsListByTag(ctx, tag.ID)
 		if err != nil {
 			return nil, err
 		}
+		embedding, err := q.EmbeddingsGetByID(ctx, tag.EmbeddingID)
+		if err != nil {
+			return nil, err
+		}
+		var emb Embedded
+		err = json.Unmarshal([]byte(embedding.Embedding), &emb)
+		if err != nil {
+			return nil, err
+		}
+		emb.Fill(embedding)
 		fullTags[tag.Slug] = FullTag{
 			Tag:      tag,
 			Posts:    tagPosts,
 			Projects: tagProjects,
+			Embedded: emb,
 		}
 	}
+
 	return &fullTags, nil
 }
 

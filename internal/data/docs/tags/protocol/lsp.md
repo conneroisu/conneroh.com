@@ -7,5 +7,3 @@ title: LSP
 ---
 
 The Language Server Protocol made open source by Microsoft.
-
-

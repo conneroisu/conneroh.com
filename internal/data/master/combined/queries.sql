@@ -5,14 +5,13 @@
 
 -- name: EmbeddingsCreate :one
 INSERT INTO
-    embeddings (embedding)
+    embeddings (embedding, x, y, z)
 VALUES
-    (?) RETURNING id;
+    (?, ?, ?, ?) RETURNING id;
 
 -- name: EmbeddingsGetByID :one
 SELECT
-    id,
-    embedding
+    *
 FROM
     embeddings
 WHERE
@@ -24,7 +23,10 @@ LIMIT
 UPDATE
     embeddings
 SET
-    embedding = ?
+    embedding = ?,
+    x = ?,
+    y = ?,
+    z = ?
 WHERE
     id = ? RETURNING id;
 

@@ -30,7 +30,6 @@ func AddRoutes(
 	h *http.ServeMux,
 	db *data.Database[master.Queries],
 ) error {
-	slog.Info("getting full data")
 	var (
 		posts    []master.Post
 		projects []master.Project
@@ -91,7 +90,6 @@ func AddRoutes(
 	if err := eg.Wait(); err != nil {
 		return err
 	}
-	slog.Info("got full data")
 
 	slog.Info("adding routes")
 	defer slog.Info("added routes")

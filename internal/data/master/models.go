@@ -5,9 +5,12 @@
 package master
 
 type Embedding struct {
-	ID        int64   `db:"id" json:"id"`
-	Embedding *string `db:"embedding" json:"embedding"`
-	CreatedAt int64   `db:"created_at" json:"created_at"`
+	ID        int64  `db:"id" json:"id"`
+	Embedding string `db:"embedding" json:"embedding"`
+	X         string `db:"x" json:"x"`
+	Y         string `db:"y" json:"y"`
+	Z         string `db:"z" json:"z"`
+	CreatedAt int64  `db:"created_at" json:"created_at"`
 }
 
 type Employment struct {

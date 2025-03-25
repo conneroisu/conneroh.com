@@ -9,5 +9,3 @@ title: Text Dataset Aid Obsidian Plugin
 # Text Dataset Aid Obsidian Plugin
 
 A plugin to aid in creating text datasets for language models in Obsidian.
-
-

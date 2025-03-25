@@ -6,6 +6,4 @@ description: MIPS is a 32-bit reduced instruction set computing (RISC) architect
 title: MIPS
 ---
 
-
 # MIPS
-

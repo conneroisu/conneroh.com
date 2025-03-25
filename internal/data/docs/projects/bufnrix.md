@@ -25,5 +25,3 @@ Nix powered protobuf tools
 - #golang
 - #nixos
 - #nixpkgs
-
-

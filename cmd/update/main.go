@@ -11,8 +11,10 @@ import (
 	"fmt"
 	"io/fs"
 	"log/slog"
+	"math/rand/v2"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
@@ -36,13 +38,45 @@ import (
 	"go.abhg.dev/goldmark/hashtag"
 	"go.abhg.dev/goldmark/mermaid"
 	"go.abhg.dev/goldmark/wikilink"
+	"gonum.org/v1/gonum/mat"
 )
 
 var client = ollama.NewClient(
 	ollama.WithTimeout(time.Minute * 5),
 )
 
-func embeddingUpsert(ctx context.Context, db data.Database[master.Queries], input string, id int64) int64 {
+// Project a single embedding to 3D using a projection matrix
+func projectTo3D(embedding []float64, projectionMatrix *mat.Dense) (x, y, z float64) {
+	// Create a vector from the embedding
+	embedVec := mat.NewVecDense(len(embedding), embedding)
+
+	// Project to 3D
+	result := mat.NewVecDense(3, nil)
+	result.MulVec(projectionMatrix.T(), embedVec)
+
+	// Extract x, y, z coordinates
+	x = result.AtVec(0)
+	y = result.AtVec(1)
+	z = result.AtVec(2)
+
+	return
+}
+
+// Generate a random projection matrix for demonstration
+// In practice, this would be calculated using PCA or another technique
+func generateProjectionMatrix(inputDim, outputDim int) *mat.Dense {
+	data := make([]float64, inputDim*outputDim)
+	for i := range data {
+		data[i] = rand.Float64()*2 - 1 // Random values between -1 and 1
+	}
+	return mat.NewDense(inputDim, outputDim, data)
+}
+func embeddingUpsert(
+	ctx context.Context,
+	db *data.Database[master.Queries],
+	input string,
+	id int64,
+) int64 {
 	resp, err := client.Embeddings(ctx, ollama.EmbeddingsRequest{
 		Model:  "nomic-embed-text",
 		Prompt: input,
@@ -56,14 +90,26 @@ func embeddingUpsert(ctx context.Context, db data.Database[master.Queries], inpu
 	}
 	val := string(jsVal)
 
+	proj := generateProjectionMatrix(768, 3)
+	x, y, z := projectTo3D(resp.Embedding, proj)
 	if id == 0 {
-		id, err = db.Queries.EmbeddingsCreate(ctx, &val)
+		id, err = db.Queries.EmbeddingsCreate(ctx, master.EmbeddingsCreateParams{
+			Embedding: val,
+			X:         strconv.FormatFloat(x, 'f', -1, 64),
+			Y:         strconv.FormatFloat(y, 'f', -1, 64),
+			Z:         strconv.FormatFloat(z, 'f', -1, 64),
+		})
 		if err != nil {
 			panic(err)
 		}
 		return id
 	}
-	err = db.Queries.EmbeddingsUpdate(ctx, &val, id)
+	err = db.Queries.EmbeddingsUpdate(ctx, master.EmbeddingsUpdateParams{
+		Embedding: val,
+		X:         strconv.FormatFloat(x, 'f', -1, 64),
+		Y:         strconv.FormatFloat(y, 'f', -1, 64),
+		Z:         strconv.FormatFloat(z, 'f', -1, 64),
+	})
 	if err != nil {
 		panic(err)
 	}
@@ -185,8 +231,12 @@ func Parse(fsPath string, embedFs embed.FS) (*Markdown, error) {
 	case docs.Projects:
 		fsPath = strings.Replace(fsPath, "projects/", "", 1)
 	}
+	if filepath.Ext(fsPath) != ".md" {
+		return nil, nil
+	}
 	fsPath = strings.TrimSuffix(fsPath, filepath.Ext(fsPath))
 	fm.Slug = fsPath
+	slog.Info("Parsed file", slog.String("path", fsPath))
 	fm.RenderContent = buf.String()
 	if fm.Description == "" {
 		return nil, fmt.Errorf("description is empty for %s", fsPath)
@@ -212,7 +262,7 @@ func (md *Markdown) UpsertTag(
 	var tag master.Tag
 	tag, err = db.Queries.TagGetBySlug(ctx, md.Slug)
 	if err == nil {
-		slog.Debug("tag already exists - updating", "slug", md.Slug, "icon", md.Icon)
+		// same content
 		if tag.RawContent == md.RawContent {
 			return db.Queries.TagUpdate(
 				ctx,
@@ -224,10 +274,11 @@ func (md *Markdown) UpsertTag(
 					Content:     md.RenderContent,
 					Description: md.Description,
 					Icon:        md.Icon,
+					EmbeddingID: tag.EmbeddingID,
 				},
 			)
 		}
-		// updated embedding
+		// different content
 		return db.Queries.TagUpdate(
 			ctx,
 			master.TagUpdateParams{
@@ -238,6 +289,7 @@ func (md *Markdown) UpsertTag(
 				RawContent:  md.RawContent,
 				Content:     md.RenderContent,
 				Icon:        md.Icon,
+				EmbeddingID: embeddingUpsert(ctx, db, md.RawContent, tag.EmbeddingID),
 			},
 		)
 	}
@@ -251,6 +303,7 @@ func (md *Markdown) UpsertTag(
 			RawContent:  md.RawContent,
 			Content:     md.RenderContent,
 			Icon:        md.Icon,
+			EmbeddingID: embeddingUpsert(ctx, db, md.RawContent, 0),
 		})
 	}
 	return
@@ -263,7 +316,7 @@ func (md *Markdown) UpsertPost(
 ) (post master.Post, err error) {
 	slog.Info("upserting post", "slug", md.Slug)
 	defer slog.Info("upserted post", "slug", md.Slug)
-	// check if the post already exists
+
 	post, err = db.Queries.PostGetBySlug(ctx, md.Slug)
 	if err == nil {
 		// same content
@@ -278,9 +331,11 @@ func (md *Markdown) UpsertPost(
 					Description: md.Description,
 					RawContent:  md.RawContent,
 					Content:     md.RenderContent,
+					EmbeddingID: post.EmbeddingID,
 				},
 			)
 		}
+		// different content
 		return db.Queries.PostUpdate(
 			ctx,
 			master.PostUpdateParams{
@@ -291,6 +346,7 @@ func (md *Markdown) UpsertPost(
 				Description: md.Description,
 				RawContent:  md.RawContent,
 				Content:     md.RenderContent,
+				EmbeddingID: embeddingUpsert(ctx, db, md.RawContent, post.EmbeddingID),
 			},
 		)
 	}
@@ -303,6 +359,7 @@ func (md *Markdown) UpsertPost(
 			Description: md.Description,
 			RawContent:  md.RawContent,
 			Content:     md.RenderContent,
+			EmbeddingID: embeddingUpsert(ctx, db, md.RawContent, 0),
 		})
 	}
 	return
@@ -323,7 +380,23 @@ func (md *Markdown) UpsertProject(
 	}
 	project, err = db.Queries.ProjectGetBySlug(ctx, md.Slug)
 	if err == nil {
-		// project already exists with a different content, update embedding
+		// same content
+		if project.RawContent == md.RawContent {
+			return db.Queries.ProjectUpdate(
+				ctx,
+				master.ProjectUpdateParams{
+					ID:          project.ID,
+					Slug:        md.Slug,
+					Title:       md.Title,
+					BannerUrl:   md.BannerURL,
+					Description: md.Description,
+					Content:     md.RenderContent,
+					EmbeddingID: project.EmbeddingID,
+				},
+			)
+		}
+
+		// different content
 		return db.Queries.ProjectUpdate(ctx, master.ProjectUpdateParams{
 			ID:          project.ID,
 			Slug:        md.Slug,
@@ -331,6 +404,7 @@ func (md *Markdown) UpsertProject(
 			BannerUrl:   md.BannerURL,
 			Description: md.Description,
 			Content:     md.RenderContent,
+			EmbeddingID: embeddingUpsert(ctx, db, md.RawContent, project.EmbeddingID),
 		})
 	}
 	// err is not nil (new project)
@@ -341,6 +415,7 @@ func (md *Markdown) UpsertProject(
 			BannerUrl:   md.BannerURL,
 			Description: md.Description,
 			Content:     md.RenderContent,
+			EmbeddingID: embeddingUpsert(ctx, db, md.RawContent, 0),
 		})
 	}
 	slog.Error("project update failed", "err", err)
@@ -366,6 +441,7 @@ func Run(
 		return err
 	}
 
+	parsedTags := []*Markdown{}
 	err = fs.WalkDir(
 		docs.Tags,
 		"tags",
@@ -380,17 +456,24 @@ func Run(
 			if err != nil {
 				return fmt.Errorf("failed to parse tag %s: %w", path, err)
 			}
-			err = parsed.UpsertTag(ctx, db)
-			if err != nil {
-				return fmt.Errorf("failed to upsert tag %s: %w", path, err)
+			if parsed == nil {
+				return nil
 			}
+			parsedTags = append(parsedTags, parsed)
 			return nil
 		},
 	)
 	if err != nil {
 		return fmt.Errorf("failed to update tags: %v", err)
 	}
+	for _, parsed := range parsedTags {
+		err = parsed.UpsertTag(ctx, db)
+		if err != nil {
+			return fmt.Errorf("failed to upsert tag %s: %w", parsed.Title, err)
+		}
+	}
 
+	parsedPosts := []*Markdown{}
 	var post master.Post
 	err = fs.WalkDir(
 		docs.Posts,
@@ -406,14 +489,10 @@ func Run(
 			if err != nil {
 				return fmt.Errorf("failed to parse post %s: %w", path, err)
 			}
-			post, err = parsed.UpsertPost(ctx, db)
-			if err != nil {
-				return fmt.Errorf("failed to upsert post %s: %w", path, err)
+			if parsed == nil {
+				return nil
 			}
-			err = db.Queries.UpsertPostTags(ctx, parsed.Tags, post.ID)
-			if err != nil {
-				return fmt.Errorf("failed to upsert post tags: %v", err)
-			}
+			parsedPosts = append(parsedPosts, parsed)
 			return nil
 		},
 	)
@@ -421,6 +500,18 @@ func Run(
 		return fmt.Errorf("failed to update posts: %v", err)
 	}
 
+	for _, parsed := range parsedPosts {
+		post, err = parsed.UpsertPost(ctx, db)
+		if err != nil {
+			return fmt.Errorf("failed to upsert post %s: %w", parsed.Title, err)
+		}
+		err = db.Queries.UpsertPostTags(ctx, parsed.Tags, post.ID)
+		if err != nil {
+			return fmt.Errorf("failed to upsert post tags: %v", err)
+		}
+	}
+
+	parsedProjects := []*Markdown{}
 	err = fs.WalkDir(
 		docs.Projects,
 		"projects",
@@ -435,19 +526,26 @@ func Run(
 			if err != nil {
 				return fmt.Errorf("failed to parse project %s: %w", path, err)
 			}
-			project, err := parsed.UpsertProject(ctx, db)
-			if err != nil {
-				return fmt.Errorf("failed to upsert project %s: %w", path, err)
+			if parsed == nil {
+				return nil
 			}
-			err = db.Queries.UpsertProjectTags(ctx, parsed.Tags, project.ID)
-			if err != nil {
-				return fmt.Errorf("failed to upsert project tags: %v", err)
-			}
+			parsedProjects = append(parsedProjects, parsed)
 			return nil
 		},
 	)
 	if err != nil {
 		return fmt.Errorf("failed to update projects: %v", err)
+	}
+
+	for _, parsed := range parsedProjects {
+		project, err := parsed.UpsertProject(ctx, db)
+		if err != nil {
+			return fmt.Errorf("failed to upsert project %s: %w", parsed.Title, err)
+		}
+		err = db.Queries.UpsertProjectTags(ctx, parsed.Tags, project.ID)
+		if err != nil {
+			return fmt.Errorf("failed to upsert project tags: %v", err)
+		}
 	}
 	return nil
 }

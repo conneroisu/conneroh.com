@@ -8,5 +8,3 @@ title: MySQL
 ---
 
 # MySQL
-
-

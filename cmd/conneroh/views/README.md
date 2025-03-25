@@ -23,12 +23,13 @@ Package views contains the HTML templates for the website.
 ## Index
 
 - [func Home\(fullPosts \*\[\]master.FullPost, fullProjects \*\[\]master.FullProject, fullTags \*\[\]master.FullTag, fullPostsSlugMap \*map\[string\]master.FullPost, fullProjectsSlugMap \*map\[string\]master.FullProject, fullTagsSlugMap \*map\[string\]master.FullTag\) templ.Component](<#Home>)
-- [func List\(target ListTargets, posts \*\[\]master.FullPost, projects \*\[\]master.FullProject, tags \*\[\]master.FullTag, fullPostsSlugMap \*map\[string\]master.FullPost, fullProjectsSlugMap \*map\[string\]master.FullProject, fullTagsSlugMap \*map\[string\]master.FullTag\) templ.Component](<#List>)
-- [func ListFn\(target ListTargets\) routing.FullFn](<#ListFn>)
+- [func List\(target ListTarget, posts \*\[\]master.FullPost, projects \*\[\]master.FullProject, tags \*\[\]master.FullTag, fullPostsSlugMap \*map\[string\]master.FullPost, fullProjectsSlugMap \*map\[string\]master.FullProject, fullTagsSlugMap \*map\[string\]master.FullTag\) templ.Component](<#List>)
+- [func ListFn\(target ListTarget\) routing.FullFn](<#ListFn>)
 - [func Post\(post \*master.FullPost, fullPosts \*\[\]master.FullPost, fullProjects \*\[\]master.FullProject, fullTags \*\[\]master.FullTag, fullPostSlugMap \*map\[string\]master.FullPost, fullProjectSlugMap \*map\[string\]master.FullProject, fullTagSlugMap \*map\[string\]master.FullTag\) templ.Component](<#Post>)
 - [func Project\(project \*master.FullProject, fullPosts \*\[\]master.FullPost, fullProjects \*\[\]master.FullProject, fullTags \*\[\]master.FullTag, fullPostsSlugMap \*map\[string\]master.FullPost, fullProjectsSlugMap \*map\[string\]master.FullProject, fullTagsSlugMap \*map\[string\]master.FullTag\) templ.Component](<#Project>)
+- [func Search\(target ListTarget\) templ.Component](<#Search>)
 - [func Tag\(tag \*master.FullTag, fullPosts \*\[\]master.FullPost, fullProjects \*\[\]master.FullProject, fullTags \*\[\]master.FullTag, fullPostsSlugMap \*map\[string\]master.FullPost, fullProjectsSlugMap \*map\[string\]master.FullProject, fullTagsSlugMap \*map\[string\]master.FullTag\) templ.Component](<#Tag>)
-- [type ListTargets](<#ListTargets>)
+- [type ListTarget](<#ListTarget>)
 
 
 <a name="Home"></a>
@@ -41,10 +42,10 @@ func Home(fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, full
 
 
 <a name="List"></a>
-## func [List](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/list_templ.go#L27-L35>)
+## func [List](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/list_templ.go#L84-L92>)
 
 ```go
-func List(target ListTargets, posts *[]master.FullPost, projects *[]master.FullProject, tags *[]master.FullTag, fullPostsSlugMap *map[string]master.FullPost, fullProjectsSlugMap *map[string]master.FullProject, fullTagsSlugMap *map[string]master.FullTag) templ.Component
+func List(target ListTarget, posts *[]master.FullPost, projects *[]master.FullProject, tags *[]master.FullTag, fullPostsSlugMap *map[string]master.FullPost, fullProjectsSlugMap *map[string]master.FullProject, fullTagsSlugMap *map[string]master.FullTag) templ.Component
 ```
 
 
@@ -53,7 +54,7 @@ func List(target ListTargets, posts *[]master.FullPost, projects *[]master.FullP
 ## func [ListFn](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/utils.go#L17>)
 
 ```go
-func ListFn(target ListTargets) routing.FullFn
+func ListFn(target ListTarget) routing.FullFn
 ```
 
 ListFn returns a fullFn for the list view.
@@ -76,6 +77,15 @@ func Project(project *master.FullProject, fullPosts *[]master.FullPost, fullProj
 
 
 
+<a name="Search"></a>
+## func [Search](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/list_templ.go#L27-L29>)
+
+```go
+func Search(target ListTarget) templ.Component
+```
+
+
+
 <a name="Tag"></a>
 ## func [Tag](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/tags_templ.go#L17-L25>)
 
@@ -85,23 +95,23 @@ func Tag(tag *master.FullTag, fullPosts *[]master.FullPost, fullProjects *[]mast
 
 Tag component for displaying a single tag and its associated content
 
-<a name="ListTargets"></a>
-## type [ListTargets](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/list_templ.go#L18>)
+<a name="ListTarget"></a>
+## type [ListTarget](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/list_templ.go#L18>)
 
 
 
 ```go
-type ListTargets = string
+type ListTarget = string
 ```
 
-<a name="ListTargetsPosts"></a>
+<a name="ListTargetPosts"></a>
 
 ```go
 const (
-    ListTargetsPosts    ListTargets = "posts"
-    ListTargetsProjects ListTargets = "projects"
-    ListTargetsTags     ListTargets = "tags"
-    ListTargetsWorks    ListTargets = "works"
+    ListTargetPosts       ListTarget = "posts"
+    ListTargetProjects    ListTarget = "projects"
+    ListTargetTags        ListTarget = "tags"
+    ListTargetEmployments ListTarget = "employments"
 )
 ```
 
