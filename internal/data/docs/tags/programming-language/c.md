@@ -3,7 +3,7 @@ id: c
 aliases: []
 tags: []
 description: C is a low-level general-purpose programming language.
-icon: nf-dev-c
+icon: c-plain
 title: C
 ---
 

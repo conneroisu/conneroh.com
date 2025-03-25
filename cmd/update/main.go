@@ -2,25 +2,18 @@
 package main
 
 import (
-	"bytes"
 	"context"
 	"database/sql"
-	"embed"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/fs"
 	"log/slog"
 	"math/rand/v2"
 	"os"
-	"path/filepath"
 	"strconv"
-	"strings"
 	"time"
 
-	"github.com/a-h/templ"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh"
-	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
 	"github.com/conneroisu/conneroh.com/internal/data"
 	"github.com/conneroisu/conneroh.com/internal/data/docs"
 	"github.com/conneroisu/conneroh.com/internal/data/master"
@@ -39,6 +32,10 @@ import (
 	"go.abhg.dev/goldmark/mermaid"
 	"go.abhg.dev/goldmark/wikilink"
 	"gonum.org/v1/gonum/mat"
+)
+
+const (
+	embeddingSize = 768
 )
 
 var client = ollama.NewClient(
@@ -89,8 +86,7 @@ func embeddingUpsert(
 		panic(err)
 	}
 	val := string(jsVal)
-
-	proj := generateProjectionMatrix(768, 3)
+	proj := generateProjectionMatrix(embeddingSize, 3)
 	x, y, z := projectTo3D(resp.Embedding, proj)
 	if id == 0 {
 		id, err = db.Queries.EmbeddingsCreate(ctx, master.EmbeddingsCreateParams{
@@ -114,15 +110,6 @@ func embeddingUpsert(
 		panic(err)
 	}
 	return id
-}
-
-func quickRender(comp templ.Component) string {
-	var buf bytes.Buffer
-	err := comp.Render(context.Background(), &buf)
-	if err != nil {
-		panic(fmt.Errorf("render error: %w", err))
-	}
-	return buf.String()
 }
 
 var (
@@ -202,56 +189,6 @@ type Markdown struct {
 	RenderContent string `yaml:"-"`
 }
 
-// Parse parses the markdown file at the given path.
-func Parse(fsPath string, embedFs embed.FS) (*Markdown, error) {
-	b, err := embedFs.ReadFile(fsPath)
-	if err != nil {
-		return nil, err
-	}
-	var fm Markdown
-	buf := bytes.NewBufferString("")
-	ctx := parser.NewContext()
-	err = md.Convert(b, buf, parser.WithContext(ctx))
-	if err != nil {
-		return nil, err
-	}
-	d := frontmatter.Get(ctx)
-	if d == nil {
-		return nil, nil
-	}
-	err = d.Decode(&fm)
-	if err != nil {
-		return nil, err
-	}
-	switch embedFs {
-	case docs.Posts:
-		fsPath = strings.Replace(fsPath, "posts/", "", 1)
-	case docs.Tags:
-		fsPath = strings.Replace(fsPath, "tags/", "", 1)
-	case docs.Projects:
-		fsPath = strings.Replace(fsPath, "projects/", "", 1)
-	}
-	if filepath.Ext(fsPath) != ".md" {
-		return nil, nil
-	}
-	fsPath = strings.TrimSuffix(fsPath, filepath.Ext(fsPath))
-	fm.Slug = fsPath
-	slog.Info("Parsed file", slog.String("path", fsPath))
-	fm.RenderContent = buf.String()
-	if fm.Description == "" {
-		return nil, fmt.Errorf("description is empty for %s", fsPath)
-	}
-	fm.RawContent = string(b)
-
-	if fm.Icon == "" {
-		fm.Icon = quickRender(components.Icon("tag"))
-	} else {
-		fm.Icon = quickRender(components.Icon(fm.Icon))
-	}
-
-	return &fm, nil
-}
-
 // UpsertTag inserts or updates the tag document in the database.
 func (md *Markdown) UpsertTag(
 	ctx context.Context,
@@ -262,38 +199,25 @@ func (md *Markdown) UpsertTag(
 	var tag master.Tag
 	tag, err = db.Queries.TagGetBySlug(ctx, md.Slug)
 	if err == nil {
-		// same content
-		if tag.RawContent == md.RawContent {
-			return db.Queries.TagUpdate(
-				ctx,
-				master.TagUpdateParams{
-					ID:          tag.ID,
-					Slug:        md.Slug,
-					Title:       md.Title,
-					RawContent:  md.RawContent,
-					Content:     md.RenderContent,
-					Description: md.Description,
-					Icon:        md.Icon,
-					EmbeddingID: tag.EmbeddingID,
-				},
-			)
+		var embedID = tag.EmbeddingID
+		if tag.RawContent != md.RawContent {
+			embedID = embeddingUpsert(ctx, db, md.RawContent, tag.EmbeddingID)
 		}
-		// different content
 		return db.Queries.TagUpdate(
 			ctx,
 			master.TagUpdateParams{
 				ID:          tag.ID,
 				Slug:        md.Slug,
 				Title:       md.Title,
-				Description: md.Description,
 				RawContent:  md.RawContent,
 				Content:     md.RenderContent,
+				Description: md.Description,
 				Icon:        md.Icon,
-				EmbeddingID: embeddingUpsert(ctx, db, md.RawContent, tag.EmbeddingID),
+				EmbeddingID: embedID,
 			},
 		)
 	}
-	// err is not nil (new tag)
+
 	if errors.Is(err, sql.ErrNoRows) {
 		slog.Debug("tag does not exist - creating", "slug", md.Slug)
 		return db.Queries.TagCreate(ctx, master.TagCreateParams{
@@ -319,23 +243,10 @@ func (md *Markdown) UpsertPost(
 
 	post, err = db.Queries.PostGetBySlug(ctx, md.Slug)
 	if err == nil {
-		// same content
-		if post.RawContent == md.RawContent {
-			return db.Queries.PostUpdate(
-				ctx,
-				master.PostUpdateParams{
-					ID:          post.ID,
-					Slug:        md.Slug,
-					Title:       md.Title,
-					BannerUrl:   md.BannerURL,
-					Description: md.Description,
-					RawContent:  md.RawContent,
-					Content:     md.RenderContent,
-					EmbeddingID: post.EmbeddingID,
-				},
-			)
+		var embedID = post.EmbeddingID
+		if post.RawContent != md.RawContent {
+			embedID = embeddingUpsert(ctx, db, md.RawContent, post.EmbeddingID)
 		}
-		// different content
 		return db.Queries.PostUpdate(
 			ctx,
 			master.PostUpdateParams{
@@ -346,7 +257,7 @@ func (md *Markdown) UpsertPost(
 				Description: md.Description,
 				RawContent:  md.RawContent,
 				Content:     md.RenderContent,
-				EmbeddingID: embeddingUpsert(ctx, db, md.RawContent, post.EmbeddingID),
+				EmbeddingID: embedID,
 			},
 		)
 	}
@@ -380,32 +291,22 @@ func (md *Markdown) UpsertProject(
 	}
 	project, err = db.Queries.ProjectGetBySlug(ctx, md.Slug)
 	if err == nil {
-		// same content
-		if project.RawContent == md.RawContent {
-			return db.Queries.ProjectUpdate(
-				ctx,
-				master.ProjectUpdateParams{
-					ID:          project.ID,
-					Slug:        md.Slug,
-					Title:       md.Title,
-					BannerUrl:   md.BannerURL,
-					Description: md.Description,
-					Content:     md.RenderContent,
-					EmbeddingID: project.EmbeddingID,
-				},
-			)
+		var embedID = project.EmbeddingID
+		if project.RawContent != md.RawContent {
+			embedID = embeddingUpsert(ctx, db, md.RawContent, project.EmbeddingID)
 		}
-
-		// different content
-		return db.Queries.ProjectUpdate(ctx, master.ProjectUpdateParams{
-			ID:          project.ID,
-			Slug:        md.Slug,
-			Title:       md.Title,
-			BannerUrl:   md.BannerURL,
-			Description: md.Description,
-			Content:     md.RenderContent,
-			EmbeddingID: embeddingUpsert(ctx, db, md.RawContent, project.EmbeddingID),
-		})
+		return db.Queries.ProjectUpdate(
+			ctx,
+			master.ProjectUpdateParams{
+				ID:          project.ID,
+				Slug:        md.Slug,
+				Title:       md.Title,
+				BannerUrl:   md.BannerURL,
+				Description: md.Description,
+				Content:     md.RenderContent,
+				EmbeddingID: embedID,
+			},
+		)
 	}
 	// err is not nil (new project)
 	if errors.Is(err, sql.ErrNoRows) {
@@ -441,30 +342,9 @@ func Run(
 		return err
 	}
 
-	parsedTags := []*Markdown{}
-	err = fs.WalkDir(
-		docs.Tags,
-		"tags",
-		func(path string, d fs.DirEntry, err error) error {
-			if err != nil {
-				return fmt.Errorf("failed to walk tags: %w", err)
-			}
-			if d.IsDir() || !strings.HasSuffix(path, ".md") {
-				return nil
-			}
-			parsed, err := Parse(path, docs.Tags)
-			if err != nil {
-				return fmt.Errorf("failed to parse tag %s: %w", path, err)
-			}
-			if parsed == nil {
-				return nil
-			}
-			parsedTags = append(parsedTags, parsed)
-			return nil
-		},
-	)
+	parsedTags, err := pathParse("tags", docs.Tags)
 	if err != nil {
-		return fmt.Errorf("failed to update tags: %v", err)
+		return err
 	}
 	for _, parsed := range parsedTags {
 		err = parsed.UpsertTag(ctx, db)
@@ -473,33 +353,11 @@ func Run(
 		}
 	}
 
-	parsedPosts := []*Markdown{}
-	var post master.Post
-	err = fs.WalkDir(
-		docs.Posts,
-		"posts",
-		func(path string, d fs.DirEntry, err error) error {
-			if err != nil {
-				return err
-			}
-			if d.IsDir() || !strings.HasSuffix(path, ".md") {
-				return nil
-			}
-			parsed, err := Parse(path, docs.Posts)
-			if err != nil {
-				return fmt.Errorf("failed to parse post %s: %w", path, err)
-			}
-			if parsed == nil {
-				return nil
-			}
-			parsedPosts = append(parsedPosts, parsed)
-			return nil
-		},
-	)
+	parsedPosts, err := pathParse("posts", docs.Posts)
 	if err != nil {
-		return fmt.Errorf("failed to update posts: %v", err)
+		return err
 	}
-
+	var post master.Post
 	for _, parsed := range parsedPosts {
 		post, err = parsed.UpsertPost(ctx, db)
 		if err != nil {
@@ -511,30 +369,9 @@ func Run(
 		}
 	}
 
-	parsedProjects := []*Markdown{}
-	err = fs.WalkDir(
-		docs.Projects,
-		"projects",
-		func(path string, d fs.DirEntry, err error) error {
-			if err != nil {
-				return fmt.Errorf("failed to walk projects: %w", err)
-			}
-			if d.IsDir() || !strings.HasSuffix(path, ".md") {
-				return nil
-			}
-			parsed, err := Parse(path, docs.Projects)
-			if err != nil {
-				return fmt.Errorf("failed to parse project %s: %w", path, err)
-			}
-			if parsed == nil {
-				return nil
-			}
-			parsedProjects = append(parsedProjects, parsed)
-			return nil
-		},
-	)
+	parsedProjects, err := pathParse("projects", docs.Projects)
 	if err != nil {
-		return fmt.Errorf("failed to update projects: %v", err)
+		return fmt.Errorf("failed to parse projects: %v", err)
 	}
 
 	for _, parsed := range parsedProjects {

@@ -141,7 +141,7 @@ func Morphs(
 			}
 			templ.Handler(
 				components.Morpher(views.Project(
-					&proj,
+					proj,
 					fullPosts,
 					fullProjects,
 					fullTags,
@@ -155,7 +155,7 @@ func Morphs(
 				return routing.ErrNotFound{URL: r.URL}
 			}
 			templ.Handler(components.Morpher(views.Post(
-				&post,
+				post,
 				fullPosts,
 				fullProjects,
 				fullTags,
@@ -169,7 +169,7 @@ func Morphs(
 				return routing.ErrNotFound{URL: r.URL}
 			}
 			morphed := components.Morpher(views.Tag(
-				&tag,
+				tag,
 				fullPosts,
 				fullProjects,
 				fullTags,
@@ -210,7 +210,7 @@ func Post(
 		}
 		templ.Handler(
 			layouts.Page(views.Post(
-				&post,
+				post,
 				fullPosts,
 				fullProjects,
 				fullTags,
@@ -244,7 +244,8 @@ func Project(
 			return routing.ErrNotFound{URL: r.URL}
 		}
 		templ.Handler(
-			layouts.Page(views.Project(&proj,
+			layouts.Page(views.Project(
+				proj,
 				fullPosts,
 				fullProjects,
 				fullTags,
@@ -279,7 +280,7 @@ func Tag(
 		}
 		templ.Handler(
 			layouts.Page(views.Tag(
-				&tag,
+				tag,
 				fullPosts,
 				fullProjects,
 				fullTags,
@@ -303,48 +304,59 @@ func List(
 	fullProjectSlugMap *map[string]master.FullProject,
 	fullTagSlugMap *map[string]master.FullTag,
 ) (routing.APIFn, error) {
+	targetMap := map[views.ListTarget]templ.Component{
+		views.ListTargetPosts: views.List(
+			views.ListTargetPosts,
+			fullPosts,
+			fullProjects,
+			fullTags,
+			fullPostSlugMap,
+			fullProjectSlugMap,
+			fullTagSlugMap,
+		),
+		views.ListTargetProjects: views.List(
+			views.ListTargetProjects,
+			fullPosts,
+			fullProjects,
+			fullTags,
+			fullPostSlugMap,
+			fullProjectSlugMap,
+			fullTagSlugMap,
+		),
+		views.ListTargetTags: views.List(
+			views.ListTargetTags,
+			fullPosts,
+			fullProjects,
+			fullTags,
+			fullPostSlugMap,
+			fullProjectSlugMap,
+			fullTagSlugMap,
+		),
+	}
 	return func(w http.ResponseWriter, r *http.Request) error {
-		targets := r.PathValue("targets")
-		switch targets {
-		case views.ListTargetPosts:
-			templ.Handler(
-				layouts.Page(views.List(
-					views.ListTargetPosts,
-					fullPosts,
-					fullProjects,
-					fullTags,
-					fullPostSlugMap,
-					fullProjectSlugMap,
-					fullTagSlugMap,
-				)),
-			).ServeHTTP(w, r)
-		case views.ListTargetProjects:
-			templ.Handler(
-				layouts.Page(views.List(
-					views.ListTargetProjects,
-					fullPosts,
-					fullProjects,
-					fullTags,
-					fullPostSlugMap,
-					fullProjectSlugMap,
-					fullTagSlugMap,
-				)),
-			).ServeHTTP(w, r)
-		case views.ListTargetTags:
-			templ.Handler(
-				layouts.Page(views.List(
-					views.ListTargetTags,
-					fullPosts,
-					fullProjects,
-					fullTags,
-					fullPostSlugMap,
-					fullProjectSlugMap,
-					fullTagSlugMap,
-				)),
-			).ServeHTTP(w, r)
-		default:
+		target := r.PathValue("targets")
+		if target == "" {
+			return routing.ErrMissingParam{ID: target, View: "List"}
+		}
+		comp, ok := targetMap[target]
+		if !ok {
 			return routing.ErrNotFound{URL: r.URL}
 		}
+		templ.Handler(layouts.Page(comp)).ServeHTTP(w, r)
 		return nil
 	}, nil
+}
+
+// Single handles the GET /single/{target}/{id...} endpoint.
+func Single(
+	_ context.Context,
+	_ *data.Database[master.Queries],
+	fullPosts *[]master.FullPost,
+	fullProjects *[]master.FullProject,
+	fullTags *[]master.FullTag,
+	fullPostSlugMap *map[string]master.FullPost,
+	fullProjectSlugMap *map[string]master.FullProject,
+	fullTagSlugMap *map[string]master.FullTag,
+) (routing.APIFn, error) {
+	return func(w http.ResponseWriter, r *http.Request) error { return nil }, nil
 }

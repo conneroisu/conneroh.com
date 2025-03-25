@@ -38,6 +38,7 @@ Package conneroh provides implementations for conneroh.
 - [func Post\(\_ context.Context, \_ \*data.Database\[master.Queries\], fullPosts \*\[\]master.FullPost, fullProjects \*\[\]master.FullProject, fullTags \*\[\]master.FullTag, fullPostSlugMap \*map\[string\]master.FullPost, fullProjectSlugMap \*map\[string\]master.FullProject, fullTagSlugMap \*map\[string\]master.FullTag\) \(routing.APIFn, error\)](<#Post>)
 - [func Project\(\_ context.Context, \_ \*data.Database\[master.Queries\], fullPosts \*\[\]master.FullPost, fullProjects \*\[\]master.FullProject, fullTags \*\[\]master.FullTag, fullPostSlugMap \*map\[string\]master.FullPost, fullProjectSlugMap \*map\[string\]master.FullProject, fullTagSlugMap \*map\[string\]master.FullTag\) \(routing.APIFn, error\)](<#Project>)
 - [func Run\(ctx context.Context, getenv func\(string\) string\) error](<#Run>)
+- [func Single\(\_ context.Context, \_ \*data.Database\[master.Queries\], fullPosts \*\[\]master.FullPost, fullProjects \*\[\]master.FullProject, fullTags \*\[\]master.FullTag, fullPostSlugMap \*map\[string\]master.FullPost, fullProjectSlugMap \*map\[string\]master.FullProject, fullTagSlugMap \*map\[string\]master.FullTag\) \(routing.APIFn, error\)](<#Single>)
 - [func Tag\(\_ context.Context, \_ \*data.Database\[master.Queries\], fullPosts \*\[\]master.FullPost, fullProjects \*\[\]master.FullProject, fullTags \*\[\]master.FullTag, fullPostSlugMap \*map\[string\]master.FullPost, fullProjectSlugMap \*map\[string\]master.FullProject, fullTagSlugMap \*map\[string\]master.FullTag\) \(routing.APIFn, error\)](<#Tag>)
 
 
@@ -96,7 +97,7 @@ func Home(_ context.Context, _ *data.Database[master.Queries], fullPosts *[]mast
 Home is the home page handler.
 
 <a name="List"></a>
-## func [List](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/handlers.go#L296-L305>)
+## func [List](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/handlers.go#L297-L306>)
 
 ```go
 func List(_ context.Context, _ *data.Database[master.Queries], fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, fullTags *[]master.FullTag, fullPostSlugMap *map[string]master.FullPost, fullProjectSlugMap *map[string]master.FullProject, fullTagSlugMap *map[string]master.FullTag) (routing.APIFn, error)
@@ -167,8 +168,17 @@ func Run(ctx context.Context, getenv func(string) string) error
 
 Run is the entry point for the application.
 
+<a name="Single"></a>
+## func [Single](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/handlers.go#L351-L360>)
+
+```go
+func Single(_ context.Context, _ *data.Database[master.Queries], fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, fullTags *[]master.FullTag, fullPostSlugMap *map[string]master.FullPost, fullProjectSlugMap *map[string]master.FullProject, fullTagSlugMap *map[string]master.FullTag) (routing.APIFn, error)
+```
+
+Single handles the GET /single/\{target\}/\{id...\} endpoint.
+
 <a name="Tag"></a>
-## func [Tag](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/handlers.go#L261-L270>)
+## func [Tag](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/handlers.go#L262-L271>)
 
 ```go
 func Tag(_ context.Context, _ *data.Database[master.Queries], fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, fullTags *[]master.FullTag, fullPostSlugMap *map[string]master.FullPost, fullProjectSlugMap *map[string]master.FullProject, fullTagSlugMap *map[string]master.FullTag) (routing.APIFn, error)

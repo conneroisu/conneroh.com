@@ -2,12 +2,13 @@ package views
 
 import (
 	"fmt"
+	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
 	"github.com/conneroisu/conneroh.com/internal/data/master"
 )
 
 // Tag component for displaying a single tag and its associated content
 templ Tag(
-	tag *master.FullTag,
+	tag master.FullTag,
 	fullPosts *[]master.FullPost,
 	fullProjects *[]master.FullProject,
 	fullTags *[]master.FullTag,
@@ -22,7 +23,7 @@ templ Tag(
 			<div
 				class="inline-block mb-4 bg-blue-100 dark:bg-blue-900 p-4 rounded-full w-14"
 			>
-				@templ.Raw(tag.Icon)
+				@components.Icon(tag.Icon)
 			</div>
 			<h1
 				class="text-4xl font-bold text-gray-900 dark:text-white mb-4"
@@ -186,7 +187,7 @@ templ Tag(
 						for _, relatedTag := range *fullTags {
 							// Skip the current tag
 							if relatedTag.ID == tag.ID {
-							} else if haveCommonItems(tag, &relatedTag) {
+							} else if haveCommonItems(&tag, &relatedTag) {
 								<a
 									href={ templ.SafeURL(fmt.Sprintf("/tag/%s", relatedTag.Slug)) }
 									class="bg-white dark:bg-gray-800 rounded-lg p-4 hover:shadow-md transition-shadow duration-300 flex items-center"

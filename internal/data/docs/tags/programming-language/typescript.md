@@ -3,7 +3,7 @@ id: typescript
 aliases: []
 tags: []
 description: TypeScript is a superset of JavaScript that compiles to plain JavaScript.
-icon: nf-dev-typescript
+icon: typescript-plain
 title: TypeScript
 ---
 

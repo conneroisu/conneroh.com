@@ -2,11 +2,12 @@ package views
 
 import (
 	"fmt"
+	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
 	"github.com/conneroisu/conneroh.com/internal/data/master"
 )
 
 templ Project(
-	project *master.FullProject,
+	project master.FullProject,
 	fullPosts *[]master.FullPost,
 	fullProjects *[]master.FullProject,
 	fullTags *[]master.FullTag,
@@ -60,7 +61,7 @@ templ Project(
 				<div
 					class="mt-6 flex items-center text-sm text-gray-500 dark:text-gray-400"
 				>
-					<i class="nf nf-cod-calendar mr-2 text-lg"></i>
+					@components.Icon("calendar")
 					<span>Created: { formatDate(project.CreatedAt) }</span>
 				</div>
 			</div>

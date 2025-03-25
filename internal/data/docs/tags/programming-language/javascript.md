@@ -3,7 +3,7 @@ id: javascript
 aliases: []
 tags: []
 description: JavaScript is a high-level, interpreted programming language that is primarily used for web development.
-icon: nf-dev-javascript
+icon: javascript-plain
 title: JavaScript
 ---
 

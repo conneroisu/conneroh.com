@@ -3,7 +3,7 @@ id: git
 aliases: []
 tags: []
 description: Version control system for tracking changes in source code made by Linus Torvalds.
-icon: nf-dev-git
+icon: git-plain
 title: Git
 ---
 

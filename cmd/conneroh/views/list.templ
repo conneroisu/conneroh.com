@@ -30,6 +30,7 @@ templ search(
 		hx-target={ fmt.Sprintf("#list-%s", target) }
 		hx-indicator=".htmx-indicator"
 	/>
+	<div id={ fmt.Sprintf("list-suggest-%s", target) }></div>
 }
 
 templ List(

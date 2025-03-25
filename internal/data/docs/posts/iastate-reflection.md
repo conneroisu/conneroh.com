@@ -1,7 +1,8 @@
 ---
 id: iastate-reflection
 aliases: []
-tags: []
+tags:
+  - academics/cpre488
 description: This is a reflection on my time at Iowa State University.
 projects:
   - cpre488-mp1
