@@ -4,6 +4,7 @@ aliases: []
 tags:
   - programming-language
 description: C++ is a high-performance, general-purpose programming language developed by Bjarne Stroustrup in the early 1980s as an extension of C, incorporating object-oriented features while maintaining efficiency and low-level control.
+icon: cplusplus-plain
 title: C++
 ---
 

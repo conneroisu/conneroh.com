@@ -294,7 +294,7 @@ templ Home(
 						hx-target="#bodiody"
 						hx-swap="outerHTML"
 						hx-trigger="click"
-						hx-replace-url={ fmt.Sprintf("/tag/%s", tag.Slug) }
+						hx-push-url={ fmt.Sprintf("/tag/%s", tag.Slug) }
 						hx-get={ fmt.Sprintf("/hateoas/morphs/tag/%s", tag.Slug) }
 						class="block bg-gray-50 dark:bg-gray-900 rounded-lg p-6 text-center hover:shadow-md transition-shadow"
 					>
