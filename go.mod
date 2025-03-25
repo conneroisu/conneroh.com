@@ -4,10 +4,10 @@ go 1.24.0
 
 require (
 	github.com/a-h/templ v0.3.833
+	github.com/go-echarts/go-echarts/v2 v2.5.2
 	github.com/litao91/goldmark-mathjax v0.0.0-20210217064022-a43cf739a50f
 	github.com/prathyushnallamothu/ollamago v1.0.0
 	github.com/quail-ink/goldmark-enclave v0.1.5
-	github.com/stretchr/testify v1.10.0
 	github.com/yuin/goldmark v1.7.8
 	github.com/yuin/goldmark-highlighting/v2 v2.0.0-20230729083705-37449abec8cc
 	go.abhg.dev/goldmark/anchor v0.1.1
@@ -24,16 +24,16 @@ require (
 require (
 	github.com/BurntSushi/toml v1.2.1 // indirect
 	github.com/alecthomas/chroma/v2 v2.2.0 // indirect
-	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dlclark/regexp2 v1.11.4 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/forPelevin/gomoji v1.1.3 // indirect
 	github.com/google/uuid v1.6.0 // indirect
+	github.com/kr/text v0.2.0 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/ncruces/go-strftime v0.1.9 // indirect
-	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
+	github.com/stretchr/testify v1.10.0 // indirect
 	golang.org/x/sys v0.30.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	modernc.org/libc v1.61.13 // indirect

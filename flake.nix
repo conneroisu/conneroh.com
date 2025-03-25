@@ -4,11 +4,6 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 
-    flake-parts = {
-      url = "github:hercules-ci/flake-parts";
-      inputs.nixpkgs-lib.follows = "nixpkgs";
-    };
-
     flake-utils = {
       url = "github:numtide/flake-utils";
       inputs.systems.follows = "systems";
@@ -18,11 +13,6 @@
       url = "github:nlewo/nix2container";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "flake-utils";
-    };
-
-    snowfall-lib = {
-      url = "github:snowfallorg/lib";
-      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     mk-shell-bin.url = "github:rrbutani/nix-mk-shell-bin";
@@ -107,12 +97,9 @@
           '';
           description = "Generate templ files and wait for completion";
         };
-        generate-all = {
+        generate-js = {
           exec = ''
-            go generate $REPO_ROOT/... &
-
-            templ generate $REPO_ROOT &
-
+            export REPO_ROOT=$(git rev-parse --show-toplevel) # needed
             bun build \
                 $REPO_ROOT/index.js \
                 --minify \
@@ -120,7 +107,17 @@
                 --minify-whitespace  \
                 --minify-identifiers \
                 --outdir $REPO_ROOT/cmd/conneroh/_static/dist/ &
+          '';
+          description = "Generate js files";
+        };
 
+        generate-all = {
+          exec = ''
+            go generate $REPO_ROOT/... &
+
+            templ generate $REPO_ROOT &
+
+            generate-js &
             tailwindcss \
                 --minify \
                 -i $REPO_ROOT/input.css \
