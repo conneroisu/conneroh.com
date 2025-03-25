@@ -51,7 +51,7 @@ func List(target ListTarget, posts *[]master.FullPost, projects *[]master.FullPr
 
 
 <a name="ListFn"></a>
-## func [ListFn](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/utils.go#L17>)
+## func [ListFn](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/utils.go#L16>)
 
 ```go
 func ListFn(target ListTarget) routing.FullFn

@@ -5,7 +5,6 @@ package views
 
 import (
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/a-h/templ"
@@ -50,14 +49,6 @@ func readTime(content string) string {
 func formatDate(timestamp int64) string {
 	t := time.Unix(timestamp, 0)
 	return t.Format("Jan 02, 2006")
-}
-
-// Helper function to determine the section for a tag
-func getTagSection(tagName string) string {
-	if strings.Contains(tagName, "/") {
-		return strings.Split(tagName, "/")[0]
-	}
-	return "misc"
 }
 
 // Helper function to check if two tags have common posts or projects

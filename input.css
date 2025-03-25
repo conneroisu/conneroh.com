@@ -16,6 +16,42 @@
   .mobileheaditem {
     @apply block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700;
   }
+
+  article .anchor.permalink {
+    @apply text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white cursor-pointer hover:underline;
+  }
+
+  article h1 {
+    @apply text-3xl font-bold text-gray-900 dark:text-white py-4;
+  }
+
+  article h2 {
+    @apply text-2xl font-bold text-gray-900 dark:text-white py-4;
+  }
+
+  article h3 {
+    @apply text-xl font-bold text-gray-900 dark:text-white py-4;
+  }
+
+  article h4 {
+    @apply text-lg font-bold text-gray-900 dark:text-white py-4;
+  }
+
+  article h5 {
+    @apply text-base font-bold text-gray-900 dark:text-white py-4;
+  }
+
+  article h6 {
+    @apply text-sm font-bold text-gray-900 dark:text-white py-4;
+  }
+
+  article p {
+    @apply text-gray-700 dark:text-gray-400 py-4;
+  }
+
+  article ul {
+    @apply text-gray-700 dark:text-gray-400 py-5;
+  }
 }
 
 @theme inline {
