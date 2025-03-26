@@ -3,18 +3,15 @@ package views
 import (
 	"fmt"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
-	"github.com/conneroisu/conneroh.com/internal/data/master"
+	"github.com/conneroisu/conneroh.com/internal/data/gen"
 )
 
 // Tag component for displaying a single tag and its associated content
 templ Tag(
-	tag master.FullTag,
-	fullPosts *[]master.FullPost,
-	fullProjects *[]master.FullProject,
-	fullTags *[]master.FullTag,
-	fullPostsSlugMap *map[string]master.FullPost,
-	fullProjectsSlugMap *map[string]master.FullProject,
-	fullTagsSlugMap *map[string]master.FullTag,
+	tag gen.Tag,
+	fullPosts *[]gen.Post,
+	fullProjects *[]gen.Project,
+	fullTags *[]gen.Tag,
 ) {
 	<div class="container mx-auto px-4 py-8 max-w-4xl">
 		<header
@@ -81,12 +78,8 @@ templ Tag(
 								href={ templ.SafeURL(fmt.Sprintf("/post/%s", post.Slug)) }
 								class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
 							>
-								if post.BannerUrl != "" {
-									<img
-										src={ post.BannerUrl }
-										alt={ post.Title }
-										class="w-full h-40 object-cover"
-									/>
+								if post.BannerPath != "" {
+									@components.Image(post.BannerPath, post.Title, "w-full h-40 object-cover")
 								} else {
 									<div
 										class="w-full h-40 bg-gray-200 dark:bg-gray-700 flex items-center justify-center"
@@ -118,7 +111,7 @@ templ Tag(
 										<span
 											class="text-sm text-gray-500 dark:text-gray-400"
 										>
-											{ formatDate(post.CreatedAt) }
+											{ post.CreatedAt.Format("Jan 2, 2006") }
 										</span>
 									</div>
 								</div>
@@ -158,7 +151,7 @@ templ Tag(
 										View project
 									</span>
 									<span class="text-sm text-gray-500 dark:text-gray-400">
-										{ formatDate(project.CreatedAt) }
+										{ project.CreatedAt.Format("Jan 2, 2006") }
 									</span>
 								</div>
 							</a>
@@ -186,7 +179,7 @@ templ Tag(
 					>
 						for _, relatedTag := range *fullTags {
 							// Skip the current tag
-							if relatedTag.ID == tag.ID {
+							if relatedTag.Slug == tag.Slug {
 							} else if haveCommonItems(&tag, &relatedTag) {
 								<a
 									href={ templ.SafeURL(fmt.Sprintf("/tag/%s", relatedTag.Slug)) }

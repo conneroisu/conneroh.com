@@ -27,16 +27,16 @@ Package conneroh provides implementations for conneroh.
 
 - [Variables](<#variables>)
 - [func AddRoutes\(ctx context.Context, h \*http.ServeMux, db \*data.Database\[master.Queries\]\) error](<#AddRoutes>)
-- [func Dist\(\_ context.Context, \_ \*data.Database\[master.Queries\], \_ \*\[\]master.FullPost, \_ \*\[\]master.FullProject, \_ \*\[\]master.FullTag, \_ \*map\[string\]master.FullPost, \_ \*map\[string\]master.FullProject, \_ \*map\[string\]master.FullTag\) \(routing.APIFn, error\)](<#Dist>)
-- [func Favicon\(\_ context.Context, \_ \*data.Database\[master.Queries\], \_ \*\[\]master.FullPost, \_ \*\[\]master.FullProject, \_ \*\[\]master.FullTag, \_ \*map\[string\]master.FullPost, \_ \*map\[string\]master.FullProject, \_ \*map\[string\]master.FullTag\) \(routing.APIFn, error\)](<#Favicon>)
-- [func Home\(\_ context.Context, \_ \*data.Database\[master.Queries\], fullPosts \*\[\]master.FullPost, fullProjects \*\[\]master.FullProject, fullTags \*\[\]master.FullTag, fullPostsSlugMap \*map\[string\]master.FullPost, fullProjectsSlugMap \*map\[string\]master.FullProject, fullTagsSlugMap \*map\[string\]master.FullTag\) \(routing.APIFn, error\)](<#Home>)
-- [func List\(\_ context.Context, \_ \*data.Database\[master.Queries\], fullPosts \*\[\]master.FullPost, fullProjects \*\[\]master.FullProject, fullTags \*\[\]master.FullTag, fullPostSlugMap \*map\[string\]master.FullPost, fullProjectSlugMap \*map\[string\]master.FullProject, fullTagSlugMap \*map\[string\]master.FullTag\) \(routing.APIFn, error\)](<#List>)
-- [func ListMorph\(\_ context.Context, \_ \*data.Database\[master.Queries\], fullPosts \*\[\]master.FullPost, fullProjects \*\[\]master.FullProject, fullTags \*\[\]master.FullTag, fullPostSlugMap \*map\[string\]master.FullPost, fullProjectSlugMap \*map\[string\]master.FullProject, fullTagSlugMap \*map\[string\]master.FullTag\) \(routing.APIFn, error\)](<#ListMorph>)
+- [func Dist\(\_ context.Context, \_ \*data.Database\[master.Queries\], \_ \*\[\]gen.Post, \_ \*\[\]gen.Project, \_ \*\[\]gen.Tag, \_ \*map\[string\]gen.Post, \_ \*map\[string\]gen.Project, \_ \*map\[string\]gen.Tag\) \(routing.APIFn, error\)](<#Dist>)
+- [func Favicon\(\_ context.Context, \_ \*data.Database\[master.Queries\], \_ \*\[\]gen.Post, \_ \*\[\]gen.Project, \_ \*\[\]gen.Tag, \_ \*map\[string\]gen.Post, \_ \*map\[string\]gen.Project, \_ \*map\[string\]gen.Tag\) \(routing.APIFn, error\)](<#Favicon>)
+- [func Home\(\_ context.Context, \_ \*data.Database\[master.Queries\], fullPosts \*\[\]gen.Post, fullProjects \*\[\]gen.Project, fullTags \*\[\]gen.Tag, fullPostsSlugMap \*map\[string\]gen.Post, fullProjectsSlugMap \*map\[string\]gen.Project, fullTagsSlugMap \*map\[string\]gen.Tag\) \(routing.APIFn, error\)](<#Home>)
+- [func List\(\_ context.Context, \_ \*data.Database\[master.Queries\], fullPosts \*\[\]gen.Post, fullProjects \*\[\]gen.Project, fullTags \*\[\]gen.Tag, fullPostSlugMap \*map\[string\]gen.Post, fullProjectSlugMap \*map\[string\]gen.Project, fullTagSlugMap \*map\[string\]gen.Tag\) \(routing.APIFn, error\)](<#List>)
+- [func ListMorph\(\_ context.Context, \_ \*data.Database\[master.Queries\], fullPosts \*\[\]gen.Post, fullProjects \*\[\]gen.Project, fullTags \*\[\]gen.Tag, fullPostSlugMap \*map\[string\]gen.Post, fullProjectSlugMap \*map\[string\]gen.Project, fullTagSlugMap \*map\[string\]gen.Tag\) \(routing.APIFn, error\)](<#ListMorph>)
 - [func NewDb\(\_ func\(string\) string\) \(\*data.Database\[master.Queries\], error\)](<#NewDb>)
 - [func NewServer\(ctx context.Context, db \*data.Database\[master.Queries\]\) http.Handler](<#NewServer>)
 - [func Run\(ctx context.Context, getenv func\(string\) string\) error](<#Run>)
-- [func Single\(\_ context.Context, \_ \*data.Database\[master.Queries\], fullPosts \*\[\]master.FullPost, fullProjects \*\[\]master.FullProject, fullTags \*\[\]master.FullTag, fullPostSlugMap \*map\[string\]master.FullPost, fullProjectSlugMap \*map\[string\]master.FullProject, fullTagSlugMap \*map\[string\]master.FullTag\) \(routing.APIFn, error\)](<#Single>)
-- [func SingleMorph\(\_ context.Context, \_ \*data.Database\[master.Queries\], fullPosts \*\[\]master.FullPost, fullProjects \*\[\]master.FullProject, fullTags \*\[\]master.FullTag, fullPostSlugMap \*map\[string\]master.FullPost, fullProjectSlugMap \*map\[string\]master.FullProject, fullTagSlugMap \*map\[string\]master.FullTag\) \(routing.APIFn, error\)](<#SingleMorph>)
+- [func Single\(\_ context.Context, \_ \*data.Database\[master.Queries\], fullPosts \*\[\]gen.Post, fullProjects \*\[\]gen.Project, fullTags \*\[\]gen.Tag, fullPostSlugMap \*map\[string\]gen.Post, fullProjectSlugMap \*map\[string\]gen.Project, fullTagSlugMap \*map\[string\]gen.Tag\) \(routing.APIFn, error\)](<#Single>)
+- [func SingleMorph\(\_ context.Context, \_ \*data.Database\[master.Queries\], fullPosts \*\[\]gen.Post, fullProjects \*\[\]gen.Project, fullTags \*\[\]gen.Tag, fullPostSlugMap \*map\[string\]gen.Post, fullProjectSlugMap \*map\[string\]gen.Project, fullTagSlugMap \*map\[string\]gen.Tag\) \(routing.APIFn, error\)](<#SingleMorph>)
 
 
 ## Variables
@@ -68,7 +68,7 @@ AddRoutes adds all routes to the router.
 ## func [Dist](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/handlers.go#L19-L28>)
 
 ```go
-func Dist(_ context.Context, _ *data.Database[master.Queries], _ *[]master.FullPost, _ *[]master.FullProject, _ *[]master.FullTag, _ *map[string]master.FullPost, _ *map[string]master.FullProject, _ *map[string]master.FullTag) (routing.APIFn, error)
+func Dist(_ context.Context, _ *data.Database[master.Queries], _ *[]gen.Post, _ *[]gen.Project, _ *[]gen.Tag, _ *map[string]gen.Post, _ *map[string]gen.Project, _ *map[string]gen.Tag) (routing.APIFn, error)
 ```
 
 Dist is the dist handler for serving/distributing static files.
@@ -77,7 +77,7 @@ Dist is the dist handler for serving/distributing static files.
 ## func [Favicon](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/handlers.go#L36-L45>)
 
 ```go
-func Favicon(_ context.Context, _ *data.Database[master.Queries], _ *[]master.FullPost, _ *[]master.FullProject, _ *[]master.FullTag, _ *map[string]master.FullPost, _ *map[string]master.FullProject, _ *map[string]master.FullTag) (routing.APIFn, error)
+func Favicon(_ context.Context, _ *data.Database[master.Queries], _ *[]gen.Post, _ *[]gen.Project, _ *[]gen.Tag, _ *map[string]gen.Post, _ *map[string]gen.Project, _ *map[string]gen.Tag) (routing.APIFn, error)
 ```
 
 Favicon is the favicon handler.
@@ -86,7 +86,7 @@ Favicon is the favicon handler.
 ## func [Home](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/handlers.go#L57-L66>)
 
 ```go
-func Home(_ context.Context, _ *data.Database[master.Queries], fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, fullTags *[]master.FullTag, fullPostsSlugMap *map[string]master.FullPost, fullProjectsSlugMap *map[string]master.FullProject, fullTagsSlugMap *map[string]master.FullTag) (routing.APIFn, error)
+func Home(_ context.Context, _ *data.Database[master.Queries], fullPosts *[]gen.Post, fullProjects *[]gen.Project, fullTags *[]gen.Tag, fullPostsSlugMap *map[string]gen.Post, fullProjectsSlugMap *map[string]gen.Project, fullTagsSlugMap *map[string]gen.Tag) (routing.APIFn, error)
 ```
 
 Home is the home page handler.
@@ -95,7 +95,7 @@ Home is the home page handler.
 ## func [List](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/handlers.go#L216-L225>)
 
 ```go
-func List(_ context.Context, _ *data.Database[master.Queries], fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, fullTags *[]master.FullTag, fullPostSlugMap *map[string]master.FullPost, fullProjectSlugMap *map[string]master.FullProject, fullTagSlugMap *map[string]master.FullTag) (routing.APIFn, error)
+func List(_ context.Context, _ *data.Database[master.Queries], fullPosts *[]gen.Post, fullProjects *[]gen.Project, fullTags *[]gen.Tag, fullPostSlugMap *map[string]gen.Post, fullProjectSlugMap *map[string]gen.Project, fullTagSlugMap *map[string]gen.Tag) (routing.APIFn, error)
 ```
 
 List handles the GET /list/\{targets\} endpoint.
@@ -104,7 +104,7 @@ List handles the GET /list/\{targets\} endpoint.
 ## func [ListMorph](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/handlers.go#L82-L91>)
 
 ```go
-func ListMorph(_ context.Context, _ *data.Database[master.Queries], fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, fullTags *[]master.FullTag, fullPostSlugMap *map[string]master.FullPost, fullProjectSlugMap *map[string]master.FullProject, fullTagSlugMap *map[string]master.FullTag) (routing.APIFn, error)
+func ListMorph(_ context.Context, _ *data.Database[master.Queries], fullPosts *[]gen.Post, fullProjects *[]gen.Project, fullTags *[]gen.Tag, fullPostSlugMap *map[string]gen.Post, fullProjectSlugMap *map[string]gen.Project, fullTagSlugMap *map[string]gen.Tag) (routing.APIFn, error)
 ```
 
 ListMorph renders a morphed view.
@@ -140,7 +140,7 @@ Run is the entry point for the application.
 ## func [Single](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/handlers.go#L270-L279>)
 
 ```go
-func Single(_ context.Context, _ *data.Database[master.Queries], fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, fullTags *[]master.FullTag, fullPostSlugMap *map[string]master.FullPost, fullProjectSlugMap *map[string]master.FullProject, fullTagSlugMap *map[string]master.FullTag) (routing.APIFn, error)
+func Single(_ context.Context, _ *data.Database[master.Queries], fullPosts *[]gen.Post, fullProjects *[]gen.Project, fullTags *[]gen.Tag, fullPostSlugMap *map[string]gen.Post, fullProjectSlugMap *map[string]gen.Project, fullTagSlugMap *map[string]gen.Tag) (routing.APIFn, error)
 ```
 
 Single handles the GET /\{target\}/\{id...\} endpoint.
@@ -149,7 +149,7 @@ Single handles the GET /\{target\}/\{id...\} endpoint.
 ## func [SingleMorph](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/handlers.go#L145-L154>)
 
 ```go
-func SingleMorph(_ context.Context, _ *data.Database[master.Queries], fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, fullTags *[]master.FullTag, fullPostSlugMap *map[string]master.FullPost, fullProjectSlugMap *map[string]master.FullProject, fullTagSlugMap *map[string]master.FullTag) (routing.APIFn, error)
+func SingleMorph(_ context.Context, _ *data.Database[master.Queries], fullPosts *[]gen.Post, fullProjects *[]gen.Project, fullTags *[]gen.Tag, fullPostSlugMap *map[string]gen.Post, fullProjectSlugMap *map[string]gen.Project, fullTagSlugMap *map[string]gen.Tag) (routing.APIFn, error)
 ```
 
 SingleMorph renders a morphed view.

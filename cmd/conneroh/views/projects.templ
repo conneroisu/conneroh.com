@@ -3,17 +3,14 @@ package views
 import (
 	"fmt"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
-	"github.com/conneroisu/conneroh.com/internal/data/master"
+	"github.com/conneroisu/conneroh.com/internal/data/gen"
 )
 
 templ Project(
-	project master.FullProject,
-	fullPosts *[]master.FullPost,
-	fullProjects *[]master.FullProject,
-	fullTags *[]master.FullTag,
-	fullPostsSlugMap *map[string]master.FullPost,
-	fullProjectsSlugMap *map[string]master.FullProject,
-	fullTagsSlugMap *map[string]master.FullTag,
+	project gen.Project,
+	fullPosts *[]gen.Post,
+	fullProjects *[]gen.Project,
+	fullTags *[]gen.Tag,
 ) {
 	<div class="container mx-auto px-4 py-8 max-w-4xl">
 		<header class="mb-8">
@@ -62,7 +59,7 @@ templ Project(
 					class="mt-6 flex items-center text-sm text-gray-500 dark:text-gray-400"
 				>
 					@components.Icon("calendar")
-					<span>Created: { formatDate(project.CreatedAt) }</span>
+					<span>Created: { project.CreatedAt.Format("Jan 2, 2006") }</span>
 				</div>
 			</div>
 		</div>

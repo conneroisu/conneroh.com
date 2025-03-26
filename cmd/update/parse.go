@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"embed"
 	"fmt"
 	"io/fs"
@@ -9,13 +10,75 @@ import (
 	"strings"
 
 	"github.com/conneroisu/conneroh.com/internal/data/docs"
+	"github.com/conneroisu/conneroh.com/internal/data/gen"
+	mathjax "github.com/litao91/goldmark-mathjax"
+	ollama "github.com/prathyushnallamothu/ollamago"
+	enclave "github.com/quail-ink/goldmark-enclave"
+	"github.com/quail-ink/goldmark-enclave/core"
+	"github.com/yuin/goldmark"
+	highlighting "github.com/yuin/goldmark-highlighting/v2"
+	"github.com/yuin/goldmark/extension"
 	"github.com/yuin/goldmark/parser"
+	"github.com/yuin/goldmark/renderer/html"
+	"go.abhg.dev/goldmark/anchor"
 	"go.abhg.dev/goldmark/frontmatter"
+	"go.abhg.dev/goldmark/hashtag"
+	"go.abhg.dev/goldmark/mermaid"
+	"go.abhg.dev/goldmark/wikilink"
+)
+
+var (
+	md = goldmark.New(
+		goldmark.WithExtensions(
+			extension.GFM, extension.Footnote,
+			extension.Strikethrough, extension.Table,
+			extension.TaskList, extension.DefinitionList,
+			mathjax.MathJax, &wikilink.Extender{},
+			extension.NewTypographer(
+				extension.WithTypographicSubstitutions(
+					extension.TypographicSubstitutions{
+						extension.Apostrophe: []byte("'"),
+					}),
+			),
+			enclave.New(&core.Config{DefaultImageAltPrefix: "caption: "}),
+			extension.NewFootnote(
+				extension.WithFootnoteIDPrefix("fn"),
+			),
+			&anchor.Extender{
+				Position: anchor.Before,
+				Texter:   anchor.Text("#"),
+				Attributer: anchor.Attributes{
+					"class": "anchor permalink p-4",
+				},
+			},
+			&mermaid.Extender{
+				RenderMode: mermaid.RenderModeClient,
+			},
+			&frontmatter.Extender{
+				Formats: []frontmatter.Format{frontmatter.YAML},
+			},
+			&hashtag.Extender{
+				Variant: hashtag.ObsidianVariant,
+			},
+			highlighting.NewHighlighting(highlighting.WithStyle("monokai")),
+		),
+		goldmark.WithParserOptions(
+			parser.WithAutoHeadingID(),
+			parser.WithAttribute(),
+		),
+		goldmark.WithRendererOptions(
+			html.WithHardWraps(),
+			extension.WithFootnoteBacklinkClass("footnote-backref"),
+			extension.WithFootnoteLinkClass("footnote-ref"),
+		),
+	)
 )
 
 // pathParse parses the markdown files in the given path.
-func pathParse(fsPath string, embedFs embed.FS) ([]*Markdown, error) {
-	var parseds []*Markdown
+func pathParse[
+	T gen.Post | gen.Project | gen.Tag,
+](fsPath string, embedFs embed.FS) ([]T, error) {
+	var parseds []T
 	err := fs.WalkDir(
 		embedFs,
 		fsPath,
@@ -26,14 +89,14 @@ func pathParse(fsPath string, embedFs embed.FS) ([]*Markdown, error) {
 			if d.IsDir() || !strings.HasSuffix(path, ".md") {
 				return nil
 			}
-			parsed, err := parse(path, embedFs)
+			parsed, err := parse[T](path, embedFs)
 			if err != nil {
 				return fmt.Errorf("failed to parse project %s: %w", path, err)
 			}
 			if parsed == nil {
 				return nil
 			}
-			parseds = append(parseds, parsed)
+			parseds = append(parseds, *parsed)
 			return nil
 		},
 	)
@@ -44,14 +107,16 @@ func pathParse(fsPath string, embedFs embed.FS) ([]*Markdown, error) {
 }
 
 // parse parses the markdown file at the given path.
-func parse(fsPath string, embedFs embed.FS) (*Markdown, error) {
+func parse[
+	T gen.Post | gen.Project | gen.Tag,
+](fsPath string, embedFs embed.FS) (*T, error) {
 	if filepath.Ext(fsPath) != ".md" {
 		return nil, nil
 	}
 
 	var (
 		ctx      = parser.NewContext()
-		fm       Markdown
+		fm       gen.Embedded
 		metadata = frontmatter.Get(ctx)
 		body     []byte
 		buf      = bytes.NewBufferString("")
@@ -87,7 +152,7 @@ func parse(fsPath string, embedFs embed.FS) (*Markdown, error) {
 	}
 	fsPath = strings.TrimSuffix(fsPath, filepath.Ext(fsPath))
 	fm.Slug = fsPath
-	fm.RenderContent = buf.String()
+	fm.Content = buf.String()
 	if fm.Description == "" {
 		return nil, fmt.Errorf("description is empty for %s", fsPath)
 	}
@@ -97,5 +162,33 @@ func parse(fsPath string, embedFs embed.FS) (*Markdown, error) {
 		fm.Icon = "tag"
 	}
 
-	return &fm, nil
+	if fm.Content == "" {
+		return nil, fmt.Errorf("content is empty for %s", fsPath)
+	}
+	fm.Vec, fm.X, fm.Y, fm.Z, err = embedIt(context.TODO(), fm.RawContent)
+	if err != nil {
+		return nil, err
+	}
+
+	return gen.New[T](fm), nil
+}
+
+func embedIt(
+	ctx context.Context,
+	input string,
+) ([gen.EmbedLength]float64, float64, float64, float64, error) {
+	resp, err := client.Embeddings(ctx, ollama.EmbeddingsRequest{
+		Model:  "nomic-embed-text",
+		Prompt: input,
+	})
+	if err != nil {
+		return [gen.EmbedLength]float64{}, 0, 0, 0, err
+	}
+	proj := generateProjectionMatrix(embeddingSize, 3)
+	x, y, z := projectTo3D(resp.Embedding, proj)
+	embs := [gen.EmbedLength]float64{}
+	for i := range embs {
+		embs[i] = resp.Embedding[i]
+	}
+	return embs, x, y, z, nil
 }

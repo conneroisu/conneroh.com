@@ -2,19 +2,16 @@ package views
 
 import (
 	"fmt"
-	"github.com/conneroisu/conneroh.com/internal/data/master"
-	"time"
+	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
+	"github.com/conneroisu/conneroh.com/internal/data/gen"
 )
 
 // Individual Post component
 templ Post(
-	post master.FullPost,
-	fullPosts *[]master.FullPost,
-	fullProjects *[]master.FullProject,
-	fullTags *[]master.FullTag,
-	fullPostSlugMap *map[string]master.FullPost,
-	fullProjectSlugMap *map[string]master.FullProject,
-	fullTagSlugMap *map[string]master.FullTag,
+	post gen.Post,
+	fullPosts *[]gen.Post,
+	fullProjects *[]gen.Project,
+	fullTags *[]gen.Tag,
 ) {
 	<article class="container mx-auto px-4 py-8 max-w-3xl">
 		<div class="mb-8">
@@ -26,10 +23,8 @@ templ Post(
 			<div
 				class="flex items-center text-gray-500 dark:text-gray-400 mb-6"
 			>
-				<time
-					datetime={ time.Unix(post.CreatedAt, 0).Format("2006-01-02") }
-				>
-					{ formatDate(post.CreatedAt) }
+				<time>
+					{ post.CreatedAt.Format("Jan 2, 2006") }
 				</time>
 				<span class="mx-2">•</span>
 				<span>{ readTime(post.Content) } min read</span>
@@ -44,12 +39,8 @@ templ Post(
 					</a>
 				}
 			</div>
-			if post.BannerUrl != "" {
-				<img
-					src={ post.BannerUrl }
-					alt={ post.Title }
-					class="w-full h-64 md:h-96 object-cover object-center rounded-lg shadow-md mb-8"
-				/>
+			if post.BannerPath != "" {
+				@components.Image(post.BannerPath, post.Title, "w-full h-64 md:h-96 object-cover object-center rounded-lg shadow-md mb-8")
 			}
 		</div>
 		<div

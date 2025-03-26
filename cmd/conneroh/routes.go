@@ -2,104 +2,50 @@ package conneroh
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"net/http"
 
-	"github.com/conneroisu/conneroh.com/internal/data"
-	"github.com/conneroisu/conneroh.com/internal/data/master"
+	"github.com/a-h/templ"
+	static "github.com/conneroisu/conneroh.com/cmd/conneroh/_static"
+	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
+	"github.com/conneroisu/conneroh.com/cmd/conneroh/layouts"
+	"github.com/conneroisu/conneroh.com/cmd/conneroh/views"
+	"github.com/conneroisu/conneroh.com/internal/data/gen"
 	"github.com/conneroisu/conneroh.com/internal/routing"
-	"golang.org/x/sync/errgroup"
 )
-
-// RouteMap is a map of all routes.
-var RouteMap = routing.APIMap{
-	"GET /dist/":                         Dist,
-	"GET /favicon.ico":                   Favicon,
-	"GET /{$}":                           Home,
-	"GET /{target}/{id...}":              Single,
-	"GET /{targets}":                     List,
-	"GET /hateoas/morph/{view...}":       ListMorph,
-	"GET /hateoas/morphs/{view}/{id...}": SingleMorph,
-}
 
 // AddRoutes adds all routes to the router.
 func AddRoutes(
 	ctx context.Context,
 	h *http.ServeMux,
-	db *data.Database[master.Queries],
 ) error {
-	var (
-		posts    []master.Post
-		projects []master.Project
-		tags     []master.Tag
-
-		fullPosts      *[]master.FullPost
-		fullProjects   *[]master.FullProject
-		fullTags       *[]master.FullTag
-		projectSlugMap *map[string]master.FullProject
-		tagSlugMap     *map[string]master.FullTag
-		postSlugMap    *map[string]master.FullPost
-	)
-	eg := errgroup.Group{}
-
-	// get shared data
-	eg.Go(func() (err error) {
-		posts, err = db.Queries.PostsList(ctx)
-		return err
-	})
-	eg.Go(func() (err error) {
-		projects, err = db.Queries.ProjectsList(ctx)
-		return err
-	})
-	eg.Go(func() (err error) {
-		tags, err = db.Queries.TagsListAlphabetical(ctx)
-		return err
-	})
-
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-
-	eg.Go(func() (err error) {
-		fullPosts, err = db.Queries.FullPostsList(ctx, posts)
-		return err
-	})
-	eg.Go(func() (err error) {
-		fullTags, err = db.Queries.FullTagsList(ctx, tags)
-		return err
-	})
-	eg.Go(func() (err error) {
-		fullProjects, err = db.Queries.FullProjectsList(ctx, projects)
-		return err
-	})
-	eg.Go(func() (err error) {
-		projectSlugMap, err = db.Queries.FullProjectsSlugMapGet(ctx, projects)
-		return err
-	})
-	eg.Go(func() (err error) {
-		tagSlugMap, err = db.Queries.FullTagsSlugMapGet(ctx, tags)
-		return err
-	})
-	eg.Go(func() (err error) {
-		postSlugMap, err = db.Queries.FullPostsSlugMapGet(ctx, posts)
-		return err
-	})
-
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-
 	slog.Info("adding routes")
 	defer slog.Info("added routes")
-	return RouteMap.AddRoutes(
-		ctx,
-		h,
-		db,
-		fullPosts,
-		fullProjects,
-		fullTags,
-		postSlugMap,
-		projectSlugMap,
-		tagSlugMap,
-	)
+
+	h.Handle("/{$}", templ.Handler(layouts.Page(views.Home(&gen.AllPosts, &gen.AllProjects, &gen.AllTags))))
+	h.Handle("GET /hateoas/morph/home", templ.Handler(components.Morpher(views.Home(&gen.AllPosts, &gen.AllProjects, &gen.AllTags))))
+	h.Handle("GET /dist/", http.FileServer(http.FS(static.Dist)))
+
+	h.Handle("GET /posts", templ.Handler(layouts.Page(views.List(routing.PluralTargetPost, &gen.AllPosts, &gen.AllProjects, &gen.AllTags))))
+	h.Handle("GET /hateoas/morph/posts", templ.Handler(components.Morpher(views.List(routing.PluralTargetPost, &gen.AllPosts, &gen.AllProjects, &gen.AllTags))))
+	h.Handle("GET /projects", templ.Handler(layouts.Page(views.List(routing.PluralTargetProject, &gen.AllPosts, &gen.AllProjects, &gen.AllTags))))
+	h.Handle("GET /hateoas/morph/projects", templ.Handler(components.Morpher(views.List(routing.PluralTargetProject, &gen.AllPosts, &gen.AllProjects, &gen.AllTags))))
+	h.Handle("GET /tags", templ.Handler(layouts.Page(views.List(routing.PluralTargetTag, &gen.AllPosts, &gen.AllProjects, &gen.AllTags))))
+	h.Handle("GET /hateoas/morph/tags", templ.Handler(components.Morpher(views.List(routing.PluralTargetTag, &gen.AllPosts, &gen.AllProjects, &gen.AllTags))))
+
+	for _, p := range gen.AllPosts {
+		h.Handle(fmt.Sprintf("GET /post/%s", p.Slug), templ.Handler(layouts.Page(views.Post(p, &gen.AllPosts, &gen.AllProjects, &gen.AllTags))))
+		h.Handle(fmt.Sprintf("GET /hateoas/morphs/post/%s", p.Slug), templ.Handler(components.Morpher(views.Post(p, &gen.AllPosts, &gen.AllProjects, &gen.AllTags))))
+	}
+	for _, p := range gen.AllProjects {
+		h.Handle(fmt.Sprintf("GET /project/%s", p.Slug), templ.Handler(layouts.Page(views.Project(p, &gen.AllPosts, &gen.AllProjects, &gen.AllTags))))
+		h.Handle(fmt.Sprintf("GET /hateoas/morphs/project/%s", p.Slug), templ.Handler(components.Morpher(views.Project(p, &gen.AllPosts, &gen.AllProjects, &gen.AllTags))))
+	}
+	for _, t := range gen.AllTags {
+		h.Handle(fmt.Sprintf("GET /tag/%s", t.Slug), templ.Handler(layouts.Page(views.Tag(t, &gen.AllPosts, &gen.AllProjects, &gen.AllTags))))
+		h.Handle(fmt.Sprintf("GET /hateoas/morphs/tag/%s", t.Slug), templ.Handler(components.Morpher(views.Tag(t, &gen.AllPosts, &gen.AllProjects, &gen.AllTags))))
+	}
+
+	return nil
 }

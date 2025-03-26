@@ -3,16 +3,13 @@ package views
 import (
 	"fmt"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
-	"github.com/conneroisu/conneroh.com/internal/data/master"
+	"github.com/conneroisu/conneroh.com/internal/data/gen"
 )
 
 templ Home(
-	fullPosts *[]master.FullPost,
-	fullProjects *[]master.FullProject,
-	fullTags *[]master.FullTag,
-	fullPostsSlugMap *map[string]master.FullPost,
-	fullProjectsSlugMap *map[string]master.FullProject,
-	fullTagsSlugMap *map[string]master.FullTag,
+	fullPosts *[]gen.Post,
+	fullProjects *[]gen.Project,
+	fullTags *[]gen.Tag,
 ) {
 	// Hero Section
 	<section
@@ -188,9 +185,9 @@ templ Home(
 							<div
 								class="h-48 bg-gray-200 dark:bg-gray-700 overflow-hidden"
 							>
-								if post.BannerUrl != "" {
+								if post.BannerPath != "" {
 									<img
-										src={ post.BannerUrl }
+										src={ post.BannerPath }
 										alt={ post.Title }
 										class="w-full h-full object-cover"
 									/>

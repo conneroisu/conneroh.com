@@ -19,7 +19,7 @@ Package routing provides implementations for routing.
 - [type APIFn](<#APIFn>)
 - [type APIHandler](<#APIHandler>)
 - [type APIMap](<#APIMap>)
-  - [func \(m APIMap\) AddRoutes\(ctx context.Context, mux \*http.ServeMux, db \*data.Database\[master.Queries\], fullPosts \*\[\]master.FullPost, fullProjects \*\[\]master.FullProject, fullTags \*\[\]master.FullTag, postsSlugMap \*map\[string\]master.FullPost, projectsSlugMap \*map\[string\]master.FullProject, tagsSlugMap \*map\[string\]master.FullTag\) error](<#APIMap.AddRoutes>)
+  - [func \(m APIMap\) AddRoutes\(ctx context.Context, mux \*http.ServeMux, db \*data.Database\[master.Queries\], fullPosts \*\[\]gen.Post, fullProjects \*\[\]gen.Project, fullTags \*\[\]gen.Tag, postsSlugMap \*map\[string\]gen.Post, projectsSlugMap \*map\[string\]gen.Project, tagsSlugMap \*map\[string\]gen.Tag\) error](<#APIMap.AddRoutes>)
 - [type ErrMissingParam](<#ErrMissingParam>)
   - [func \(e ErrMissingParam\) Error\(\) string](<#ErrMissingParam.Error>)
 - [type ErrNotFound](<#ErrNotFound>)
@@ -48,12 +48,12 @@ APIHandler is a function that returns an APIFn.
 type APIHandler func(
     ctx context.Context,
     db *data.Database[master.Queries],
-    fullPosts *[]master.FullPost,
-    fullProjects *[]master.FullProject,
-    fullTags *[]master.FullTag,
-    postsSlugMap *map[string]master.FullPost,
-    projectsSlugMap *map[string]master.FullProject,
-    tagsSlugMap *map[string]master.FullTag,
+    fullPosts *[]gen.Post,
+    fullProjects *[]gen.Project,
+    fullTags *[]gen.Tag,
+    postsSlugMap *map[string]gen.Post,
+    projectsSlugMap *map[string]gen.Project,
+    tagsSlugMap *map[string]gen.Tag,
 ) (APIFn, error)
 ```
 
@@ -70,7 +70,7 @@ type APIMap map[string]APIHandler
 ### func \(APIMap\) [AddRoutes](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/main.go#L39-L49>)
 
 ```go
-func (m APIMap) AddRoutes(ctx context.Context, mux *http.ServeMux, db *data.Database[master.Queries], fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, fullTags *[]master.FullTag, postsSlugMap *map[string]master.FullPost, projectsSlugMap *map[string]master.FullProject, tagsSlugMap *map[string]master.FullTag) error
+func (m APIMap) AddRoutes(ctx context.Context, mux *http.ServeMux, db *data.Database[master.Queries], fullPosts *[]gen.Post, fullProjects *[]gen.Project, fullTags *[]gen.Tag, postsSlugMap *map[string]gen.Post, projectsSlugMap *map[string]gen.Project, tagsSlugMap *map[string]gen.Tag) error
 ```
 
 AddRoutes adds all routes to the router.

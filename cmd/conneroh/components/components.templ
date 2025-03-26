@@ -2,7 +2,7 @@ package components
 
 import (
 	"fmt"
-	"github.com/conneroisu/conneroh.com/internal/data/master"
+	"github.com/conneroisu/conneroh.com/internal/data/gen"
 )
 
 templ Morpher(comp templ.Component) {
@@ -33,7 +33,7 @@ templ Image(
 }
 
 templ TagControl(
-	tag master.Tag,
+	tag *gen.Tag,
 ) {
 	<div
 		x-data="{ open: false }"
