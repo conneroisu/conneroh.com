@@ -35,28 +35,6 @@ func Single(
 	}
 }
 
-// ListFn returns a fullFn for the list view.
-func ListFn(target ListTarget) routing.FullFn {
-	return func(
-		fullPosts *[]master.FullPost,
-		fullProjects *[]master.FullProject,
-		fullTags *[]master.FullTag,
-		fullPostSlugMap *map[string]master.FullPost,
-		fullProjectSlugMap *map[string]master.FullProject,
-		fullTagSlugMap *map[string]master.FullTag,
-	) templ.Component {
-		return List(
-			target,
-			fullPosts,
-			fullProjects,
-			fullTags,
-			fullPostSlugMap,
-			fullProjectSlugMap,
-			fullTagSlugMap,
-		)
-	}
-}
-
 func readTime(content string) string {
 	// Rough estimate - 200 words per minute reading speed
 	words := len(content) / 5 // Average word length is 5 characters
