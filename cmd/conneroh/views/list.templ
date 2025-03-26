@@ -5,19 +5,11 @@ import (
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/layouts"
 	"github.com/conneroisu/conneroh.com/internal/data/master"
-)
-
-type ListTarget = string
-
-const (
-	ListTargetPosts       ListTarget = "posts"
-	ListTargetProjects    ListTarget = "projects"
-	ListTargetTags        ListTarget = "tags"
-	ListTargetEmployments ListTarget = "employments"
+	"github.com/conneroisu/conneroh.com/internal/routing"
 )
 
 templ search(
-	target ListTarget,
+	target routing.PluralTarget,
 ) {
 	// TODO: Add search bar/FINISH this (should interact with List())
 	<input
@@ -34,7 +26,7 @@ templ search(
 }
 
 templ List(
-	target ListTarget,
+	target routing.PluralTarget,
 	posts *[]master.FullPost,
 	projects *[]master.FullProject,
 	tags *[]master.FullTag,
@@ -60,15 +52,15 @@ templ List(
 			class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
 		>
 			switch target {
-				case ListTargetPosts:
+				case routing.PluralTargetPost:
 					for _, post := range *posts {
 						@components.PostEmbed(&post)
 					}
-				case ListTargetProjects:
+				case routing.PluralTargetProject:
 					for _, project := range *projects {
 						@components.ProjectEmbed(&project)
 					}
-				case ListTargetTags:
+				case routing.PluralTargetTag:
 					for _, tag := range *tags {
 						@components.TagEmbed(tag)
 					}
