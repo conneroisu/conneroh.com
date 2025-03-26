@@ -92,7 +92,7 @@ func Home(_ context.Context, _ *data.Database[master.Queries], fullPosts *[]mast
 Home is the home page handler.
 
 <a name="List"></a>
-## func [List](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/handlers.go#L192-L201>)
+## func [List](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/handlers.go#L216-L225>)
 
 ```go
 func List(_ context.Context, _ *data.Database[master.Queries], fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, fullTags *[]master.FullTag, fullPostSlugMap *map[string]master.FullPost, fullProjectSlugMap *map[string]master.FullProject, fullTagSlugMap *map[string]master.FullTag) (routing.APIFn, error)
@@ -137,7 +137,7 @@ func Run(ctx context.Context, getenv func(string) string) error
 Run is the entry point for the application.
 
 <a name="Single"></a>
-## func [Single](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/handlers.go#L246-L255>)
+## func [Single](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/handlers.go#L270-L279>)
 
 ```go
 func Single(_ context.Context, _ *data.Database[master.Queries], fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, fullTags *[]master.FullTag, fullPostSlugMap *map[string]master.FullPost, fullProjectSlugMap *map[string]master.FullProject, fullTagSlugMap *map[string]master.FullTag) (routing.APIFn, error)
@@ -146,7 +146,7 @@ func Single(_ context.Context, _ *data.Database[master.Queries], fullPosts *[]ma
 Single handles the GET /\{target\}/\{id...\} endpoint.
 
 <a name="SingleMorph"></a>
-## func [SingleMorph](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/handlers.go#L121-L130>)
+## func [SingleMorph](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/handlers.go#L145-L154>)
 
 ```go
 func SingleMorph(_ context.Context, _ *data.Database[master.Queries], fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, fullTags *[]master.FullTag, fullPostSlugMap *map[string]master.FullPost, fullProjectSlugMap *map[string]master.FullProject, fullTagSlugMap *map[string]master.FullTag) (routing.APIFn, error)

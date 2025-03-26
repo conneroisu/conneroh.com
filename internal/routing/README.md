@@ -138,7 +138,7 @@ type FullFn func(
 PluralTarget is the target of a plural view. string
 
 ```go
-type PluralTarget string
+type PluralTarget = string
 ```
 
 <a name="PluralTargetPost"></a>
