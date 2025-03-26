@@ -21,14 +21,7 @@ type FullFn func(
 ) templ.Component
 
 // SingleFn returns a fullFn for the single view.
-type SingleFn func(
-	fullPosts *[]master.FullPost,
-	fullProjects *[]master.FullProject,
-	fullTags *[]master.FullTag,
-	fullPostSlugMap *map[string]master.FullPost,
-	fullProjectSlugMap *map[string]master.FullProject,
-	fullTagSlugMap *map[string]master.FullTag,
-) func(target SingleTarget, id string) templ.Component
+type SingleFn func(target SingleTarget, id string) templ.Component
 
 // APIFn is a function that handles an API request.
 type APIFn func(http.ResponseWriter, *http.Request) error
@@ -87,7 +80,7 @@ func (m APIMap) AddRoutes(
 
 // SingleTarget is the target of a single view.
 // string
-type SingleTarget string
+type SingleTarget = string
 
 const (
 	// SingleTargetPost is the target of a single post view.

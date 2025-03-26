@@ -78,8 +78,8 @@ func Home(
 
 }
 
-// MorphView renders a morphed view.
-func MorphView(
+// ListMorph renders a morphed view.
+func ListMorph(
 	_ context.Context,
 	_ *data.Database[master.Queries],
 	fullPosts *[]master.FullPost,
@@ -117,8 +117,8 @@ func MorphView(
 	}, nil
 }
 
-// Morphs renders a morphed view.
-func Morphs(
+// SingleMorph renders a morphed view.
+func SingleMorph(
 	_ context.Context,
 	_ *data.Database[master.Queries],
 	fullPosts *[]master.FullPost,
@@ -188,111 +188,6 @@ func Morphs(
 	}, nil
 }
 
-// Post is the post handler.
-func Post(
-	_ context.Context,
-	_ *data.Database[master.Queries],
-	fullPosts *[]master.FullPost,
-	fullProjects *[]master.FullProject,
-	fullTags *[]master.FullTag,
-	fullPostSlugMap *map[string]master.FullPost,
-	fullProjectSlugMap *map[string]master.FullProject,
-	fullTagSlugMap *map[string]master.FullTag,
-) (routing.APIFn, error) {
-	return func(w http.ResponseWriter, r *http.Request) error {
-		id := r.PathValue("id")
-		if id == "" {
-			return routing.ErrMissingParam{ID: id, View: "Post"}
-		}
-		post, ok := (*fullPostSlugMap)[id]
-		if !ok {
-			return routing.ErrNotFound{URL: r.URL}
-		}
-		templ.Handler(
-			layouts.Page(views.Post(
-				post,
-				fullPosts,
-				fullProjects,
-				fullTags,
-				fullPostSlugMap,
-				fullProjectSlugMap,
-				fullTagSlugMap,
-			)),
-		).ServeHTTP(w, r)
-		return nil
-	}, nil
-}
-
-// Project is the project handler.
-func Project(
-	_ context.Context,
-	_ *data.Database[master.Queries],
-	fullPosts *[]master.FullPost,
-	fullProjects *[]master.FullProject,
-	fullTags *[]master.FullTag,
-	fullPostSlugMap *map[string]master.FullPost,
-	fullProjectSlugMap *map[string]master.FullProject,
-	fullTagSlugMap *map[string]master.FullTag,
-) (routing.APIFn, error) {
-	return func(w http.ResponseWriter, r *http.Request) error {
-		id := r.PathValue("id")
-		if id == "" {
-			return routing.ErrMissingParam{}
-		}
-		proj, ok := (*fullProjectSlugMap)[id]
-		if !ok {
-			return routing.ErrNotFound{URL: r.URL}
-		}
-		templ.Handler(
-			layouts.Page(views.Project(
-				proj,
-				fullPosts,
-				fullProjects,
-				fullTags,
-				fullPostSlugMap,
-				fullProjectSlugMap,
-				fullTagSlugMap,
-			)),
-		).ServeHTTP(w, r)
-		return nil
-	}, nil
-}
-
-// Tag is the tag handler.
-func Tag(
-	_ context.Context,
-	_ *data.Database[master.Queries],
-	fullPosts *[]master.FullPost,
-	fullProjects *[]master.FullProject,
-	fullTags *[]master.FullTag,
-	fullPostSlugMap *map[string]master.FullPost,
-	fullProjectSlugMap *map[string]master.FullProject,
-	fullTagSlugMap *map[string]master.FullTag,
-) (routing.APIFn, error) {
-	return func(w http.ResponseWriter, r *http.Request) error {
-		id := r.PathValue("id")
-		if id == "" {
-			return routing.ErrMissingParam{ID: id, View: "Tag"}
-		}
-		tag, ok := (*fullTagSlugMap)[id]
-		if !ok {
-			return routing.ErrNotFound{URL: r.URL}
-		}
-		templ.Handler(
-			layouts.Page(views.Tag(
-				tag,
-				fullPosts,
-				fullProjects,
-				fullTags,
-				fullPostSlugMap,
-				fullProjectSlugMap,
-				fullTagSlugMap,
-			)),
-		).ServeHTTP(w, r)
-		return nil
-	}, nil
-}
-
 // List handles the GET /list/{targets} endpoint.
 func List(
 	_ context.Context,
@@ -347,7 +242,7 @@ func List(
 	}, nil
 }
 
-// Single handles the GET /single/{target}/{id...} endpoint.
+// Single handles the GET /{target}/{id...} endpoint.
 func Single(
 	_ context.Context,
 	_ *data.Database[master.Queries],
@@ -358,5 +253,46 @@ func Single(
 	fullProjectSlugMap *map[string]master.FullProject,
 	fullTagSlugMap *map[string]master.FullTag,
 ) (routing.APIFn, error) {
-	return func(w http.ResponseWriter, r *http.Request) error { return nil }, nil
+	singleMap := map[routing.SingleTarget]routing.SingleFn{
+		routing.SingleTargetPost: views.Single(
+			fullPosts,
+			fullProjects,
+			fullTags,
+			fullPostSlugMap,
+			fullProjectSlugMap,
+			fullTagSlugMap,
+		),
+		routing.SingleTargetProject: views.Single(
+			fullPosts,
+			fullProjects,
+			fullTags,
+			fullPostSlugMap,
+			fullProjectSlugMap,
+			fullTagSlugMap,
+		),
+		routing.SingleTargetTag: views.Single(
+			fullPosts,
+			fullProjects,
+			fullTags,
+			fullPostSlugMap,
+			fullProjectSlugMap,
+			fullTagSlugMap,
+		),
+	}
+	return func(w http.ResponseWriter, r *http.Request) error {
+		target := r.PathValue("target")
+		if target == "" {
+			return routing.ErrMissingParam{ID: target, View: "Single"}
+		}
+		id := r.PathValue("id")
+		if id == "" {
+			return routing.ErrMissingParam{ID: id, View: fmt.Sprintf("Single %s", target)}
+		}
+		comp, ok := singleMap[target]
+		if !ok {
+			return routing.ErrNotFound{URL: r.URL}
+		}
+		templ.Handler(layouts.Page(comp(target, id))).ServeHTTP(w, r)
+		return nil
+	}, nil
 }

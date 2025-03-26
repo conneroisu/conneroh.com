@@ -12,6 +12,29 @@ import (
 	"github.com/conneroisu/conneroh.com/internal/routing"
 )
 
+func Single(
+	posts *[]master.FullPost, projects *[]master.FullProject, tags *[]master.FullTag, postSlugMap *map[string]master.FullPost, projectSlugMap *map[string]master.FullProject, tagSlugMap *map[string]master.FullTag,
+) func(
+	target routing.SingleTarget,
+	id string,
+) templ.Component {
+	return func(
+		target routing.SingleTarget,
+		id string,
+	) templ.Component {
+		return single(
+			target,
+			id,
+			posts,
+			projects,
+			tags,
+			postSlugMap,
+			projectSlugMap,
+			tagSlugMap,
+		)
+	}
+}
+
 // ListFn returns a fullFn for the list view.
 func ListFn(target ListTarget) routing.FullFn {
 	return func(
