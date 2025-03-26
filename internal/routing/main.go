@@ -10,15 +10,9 @@ import (
 	"github.com/conneroisu/conneroh.com/internal/data/master"
 )
 
-// FullFn is a function that handles a full request.
-type FullFn func(
-	fullPosts *[]master.FullPost,
-	fullProjects *[]master.FullProject,
-	fullTags *[]master.FullTag,
-	fullPostsSlugMap *map[string]master.FullPost,
-	fullProjectsSlugMap *map[string]master.FullProject,
-	fullTagsSlugMap *map[string]master.FullTag,
-) templ.Component
+type StaticViewer interface {
+	~*SingleFn
+}
 
 // SingleFn returns a fullFn for the single view.
 type SingleFn func(target SingleTarget, id string) templ.Component

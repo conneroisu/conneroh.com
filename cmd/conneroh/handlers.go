@@ -91,7 +91,7 @@ func ListMorph(
 ) (routing.APIFn, error) {
 	var morphMap = map[string]templ.Component{
 		routing.PluralTargetProject: views.List(
-			views.ListTargetProjects,
+			routing.PluralTargetProject,
 			fullPosts,
 			fullProjects,
 			fullTags,
@@ -100,7 +100,7 @@ func ListMorph(
 			fullTagSlugMap,
 		),
 		routing.PluralTargetPost: views.List(
-			views.ListTargetPosts,
+			routing.PluralTargetPost,
 			fullPosts,
 			fullProjects,
 			fullTags,
@@ -109,7 +109,7 @@ func ListMorph(
 			fullTagSlugMap,
 		),
 		routing.PluralTargetTag: views.List(
-			views.ListTargetTags,
+			routing.PluralTargetTag,
 			fullPosts,
 			fullProjects,
 			fullTags,
@@ -223,9 +223,9 @@ func List(
 	fullProjectSlugMap *map[string]master.FullProject,
 	fullTagSlugMap *map[string]master.FullTag,
 ) (routing.APIFn, error) {
-	targetMap := map[views.ListTarget]templ.Component{
-		views.ListTargetPosts: views.List(
-			views.ListTargetPosts,
+	targetMap := map[routing.PluralTarget]templ.Component{
+		routing.PluralTargetPost: views.List(
+			routing.PluralTargetPost,
 			fullPosts,
 			fullProjects,
 			fullTags,
@@ -233,8 +233,8 @@ func List(
 			fullProjectSlugMap,
 			fullTagSlugMap,
 		),
-		views.ListTargetProjects: views.List(
-			views.ListTargetProjects,
+		routing.PluralTargetProject: views.List(
+			routing.PluralTargetProject,
 			fullPosts,
 			fullProjects,
 			fullTags,
@@ -242,8 +242,8 @@ func List(
 			fullProjectSlugMap,
 			fullTagSlugMap,
 		),
-		views.ListTargetTags: views.List(
-			views.ListTargetTags,
+		routing.PluralTargetTag: views.List(
+			routing.PluralTargetTag,
 			fullPosts,
 			fullProjects,
 			fullTags,
