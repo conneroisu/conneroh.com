@@ -25,11 +25,10 @@ The site organizes content into projects, posts, and tags, all backed by a SQLit
 
 - **Backend**: Go
 - **Templates**: templ
-- **Database**: SQLite (via turso)
+- **Database**: SQLite
 - **CSS**: Tailwind CSS
 - **Frontend Interactivity**: Alpine.js
 - **Dynamic Content**: HTMX
-- **Icons**: Nerd Fonts
 - **Build/Development**: Nix, air (for live reloading)
 
 ## Project Structure
@@ -39,6 +38,7 @@ The site organizes content into projects, posts, and tags, all backed by a SQLit
 │   ├── conneroh/        # Main web application
 │   │   ├── layouts/     # Layout templates
 │   │   ├── views/       # View templates
+│   │   ├── components/  # Component templates
 │   │   └── _static/     # Static assets
 │   └── update/          # Content update utility
 ├── internal/            # Private application code
@@ -70,14 +70,6 @@ The application uses a SQLite database with the following main tables:
 
 - Go 1.24 or later
 - Nix (optional, for reproducible development environment)
-- Turso account (for database)
-
-### Environment Variables
-
-The application requires the following environment variables:
-
-- `TURSO_URI` - Turso database URI
-- `TURSO_TOKEN` - Turso authentication token
 
 ### Development with Nix
 
@@ -127,7 +119,9 @@ go run ./cmd/update
 
 ## Deployment
 
-The application can be deployed as a standalone binary or as a Docker container. A Dockerfile is provided for containerized deployment.
+The application can be deployed as a standalone binary or as a Docker container.
+
+A container geneation step in the Nix development shell is provided for convenience.
 
 ```bash
 # Build the application
