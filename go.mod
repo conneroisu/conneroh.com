@@ -4,7 +4,8 @@ go 1.24.0
 
 require (
 	github.com/a-h/templ v0.3.833
-	github.com/go-echarts/go-echarts/v2 v2.5.2
+	github.com/conneroisu/genstruct v0.0.0-20250326125243-bb7b0698e751
+	github.com/dave/jennifer v1.7.1
 	github.com/litao91/goldmark-mathjax v0.0.0-20210217064022-a43cf739a50f
 	github.com/prathyushnallamothu/ollamago v1.0.0
 	github.com/quail-ink/goldmark-enclave v0.1.5
@@ -28,6 +29,7 @@ require (
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/forPelevin/gomoji v1.1.3 // indirect
 	github.com/google/uuid v1.6.0 // indirect
+	github.com/kr/pretty v0.1.0 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/ncruces/go-strftime v0.1.9 // indirect
@@ -35,6 +37,7 @@ require (
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/stretchr/testify v1.10.0 // indirect
 	golang.org/x/sys v0.30.0 // indirect
+	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	modernc.org/libc v1.61.13 // indirect
 	modernc.org/mathutil v1.7.1 // indirect

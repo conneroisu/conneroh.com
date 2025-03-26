@@ -10,10 +10,6 @@ import (
 	"github.com/conneroisu/conneroh.com/internal/data/master"
 )
 
-type StaticViewer interface {
-	~*SingleFn
-}
-
 // SingleFn returns a fullFn for the single view.
 type SingleFn func(target SingleTarget, id string) templ.Component
 
