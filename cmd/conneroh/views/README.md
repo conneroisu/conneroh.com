@@ -29,6 +29,7 @@ Package views contains the HTML templates for the website.
 - [func ListFn\(target ListTarget\) routing.FullFn](<#ListFn>)
 - [func Post\(post master.FullPost, fullPosts \*\[\]master.FullPost, fullProjects \*\[\]master.FullProject, fullTags \*\[\]master.FullTag, fullPostSlugMap \*map\[string\]master.FullPost, fullProjectSlugMap \*map\[string\]master.FullProject, fullTagSlugMap \*map\[string\]master.FullTag\) templ.Component](<#Post>)
 - [func Project\(project master.FullProject, fullPosts \*\[\]master.FullPost, fullProjects \*\[\]master.FullProject, fullTags \*\[\]master.FullTag, fullPostsSlugMap \*map\[string\]master.FullPost, fullProjectsSlugMap \*map\[string\]master.FullProject, fullTagsSlugMap \*map\[string\]master.FullTag\) templ.Component](<#Project>)
+- [func Single\(posts \*\[\]master.FullPost, projects \*\[\]master.FullProject, tags \*\[\]master.FullTag, postSlugMap \*map\[string\]master.FullPost, projectSlugMap \*map\[string\]master.FullProject, tagSlugMap \*map\[string\]master.FullTag\) func\(target routing.SingleTarget, id string\) templ.Component](<#Single>)
 - [func Tag\(tag master.FullTag, fullPosts \*\[\]master.FullPost, fullProjects \*\[\]master.FullProject, fullTags \*\[\]master.FullTag, fullPostsSlugMap \*map\[string\]master.FullPost, fullProjectsSlugMap \*map\[string\]master.FullProject, fullTagsSlugMap \*map\[string\]master.FullTag\) templ.Component](<#Tag>)
 - [type ListTarget](<#ListTarget>)
 
@@ -52,7 +53,7 @@ func List(target ListTarget, posts *[]master.FullPost, projects *[]master.FullPr
 
 
 <a name="ListFn"></a>
-## func [ListFn](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/utils.go#L16>)
+## func [ListFn](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/utils.go#L39>)
 
 ```go
 func ListFn(target ListTarget) routing.FullFn
@@ -74,6 +75,15 @@ Individual Post component
 
 ```go
 func Project(project master.FullProject, fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, fullTags *[]master.FullTag, fullPostsSlugMap *map[string]master.FullPost, fullProjectsSlugMap *map[string]master.FullProject, fullTagsSlugMap *map[string]master.FullTag) templ.Component
+```
+
+
+
+<a name="Single"></a>
+## func [Single](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/utils.go#L15-L20>)
+
+```go
+func Single(posts *[]master.FullPost, projects *[]master.FullProject, tags *[]master.FullTag, postSlugMap *map[string]master.FullPost, projectSlugMap *map[string]master.FullProject, tagSlugMap *map[string]master.FullTag) func(target routing.SingleTarget, id string) templ.Component
 ```
 
 

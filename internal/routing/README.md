@@ -31,7 +31,7 @@ Package routing provides implementations for routing.
 
 
 <a name="APIFn"></a>
-## type [APIFn](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/main.go#L34>)
+## type [APIFn](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/main.go#L53>)
 
 APIFn is a function that handles an API request.
 
@@ -40,7 +40,7 @@ type APIFn func(http.ResponseWriter, *http.Request) error
 ```
 
 <a name="APIHandler"></a>
-## type [APIHandler](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/main.go#L37-L46>)
+## type [APIHandler](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/main.go#L56-L65>)
 
 APIHandler is a function that returns an APIFn.
 
@@ -58,7 +58,7 @@ type APIHandler func(
 ```
 
 <a name="APIMap"></a>
-## type [APIMap](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/main.go#L49>)
+## type [APIMap](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/main.go#L68>)
 
 APIMap is a map of API functions.
 
@@ -67,7 +67,7 @@ type APIMap map[string]APIHandler
 ```
 
 <a name="APIMap.AddRoutes"></a>
-### func \(APIMap\) [AddRoutes](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/main.go#L52-L62>)
+### func \(APIMap\) [AddRoutes](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/main.go#L71-L81>)
 
 ```go
 func (m APIMap) AddRoutes(ctx context.Context, mux *http.ServeMux, db *data.Database[master.Queries], fullPosts *[]master.FullPost, fullProjects *[]master.FullProject, fullTags *[]master.FullTag, postsSlugMap *map[string]master.FullPost, projectsSlugMap *map[string]master.FullProject, tagsSlugMap *map[string]master.FullTag) error
@@ -117,7 +117,7 @@ func (e ErrNotFound) Error() string
 Error implements the error interface on ErrNotFound.
 
 <a name="FullFn"></a>
-## type [FullFn](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/main.go#L14-L21>)
+## type [FullFn](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/main.go#L40-L47>)
 
 FullFn is a function that handles a full request.
 
@@ -133,7 +133,7 @@ type FullFn func(
 ```
 
 <a name="PluralTarget"></a>
-## type [PluralTarget](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/main.go#L103>)
+## type [PluralTarget](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/main.go#L28>)
 
 PluralTarget is the target of a plural view. string
 
@@ -155,28 +155,21 @@ const (
 ```
 
 <a name="SingleFn"></a>
-## type [SingleFn](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/main.go#L24-L31>)
+## type [SingleFn](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/main.go#L50>)
 
 SingleFn returns a fullFn for the single view.
 
 ```go
-type SingleFn func(
-    fullPosts *[]master.FullPost,
-    fullProjects *[]master.FullProject,
-    fullTags *[]master.FullTag,
-    fullPostSlugMap *map[string]master.FullPost,
-    fullProjectSlugMap *map[string]master.FullProject,
-    fullTagSlugMap *map[string]master.FullTag,
-) func(target SingleTarget, id string) templ.Component
+type SingleFn func(target SingleTarget, id string) templ.Component
 ```
 
 <a name="SingleTarget"></a>
-## type [SingleTarget](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/main.go#L90>)
+## type [SingleTarget](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/main.go#L15>)
 
 SingleTarget is the target of a single view. string
 
 ```go
-type SingleTarget string
+type SingleTarget = string
 ```
 
 <a name="SingleTargetPost"></a>

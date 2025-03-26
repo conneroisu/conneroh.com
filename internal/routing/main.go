@@ -25,7 +25,7 @@ const (
 
 // PluralTarget is the target of a plural view.
 // string
-type PluralTarget string
+type PluralTarget = string
 
 const (
 	// PluralTargetPost is the target of a plural post view.

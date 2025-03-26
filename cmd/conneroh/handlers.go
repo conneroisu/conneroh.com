@@ -89,11 +89,42 @@ func ListMorph(
 	fullProjectSlugMap *map[string]master.FullProject,
 	fullTagSlugMap *map[string]master.FullTag,
 ) (routing.APIFn, error) {
-	var morphMap = map[string]routing.FullFn{
-		"projects": views.ListFn(views.ListTargetProjects),
-		"posts":    views.ListFn(views.ListTargetPosts),
-		"tags":     views.ListFn(views.ListTargetTags),
-		"home":     views.Home,
+	var morphMap = map[string]templ.Component{
+		routing.PluralTargetProject: views.List(
+			views.ListTargetProjects,
+			fullPosts,
+			fullProjects,
+			fullTags,
+			fullPostSlugMap,
+			fullProjectSlugMap,
+			fullTagSlugMap,
+		),
+		routing.PluralTargetPost: views.List(
+			views.ListTargetPosts,
+			fullPosts,
+			fullProjects,
+			fullTags,
+			fullPostSlugMap,
+			fullProjectSlugMap,
+			fullTagSlugMap,
+		),
+		routing.PluralTargetTag: views.List(
+			views.ListTargetTags,
+			fullPosts,
+			fullProjects,
+			fullTags,
+			fullPostSlugMap,
+			fullProjectSlugMap,
+			fullTagSlugMap,
+		),
+		"home": views.Home(
+			fullPosts,
+			fullProjects,
+			fullTags,
+			fullPostSlugMap,
+			fullProjectSlugMap,
+			fullTagSlugMap,
+		),
 	}
 	return func(w http.ResponseWriter, r *http.Request) error {
 		view := r.PathValue("view")
@@ -101,14 +132,7 @@ func ListMorph(
 		if !ok {
 			return fmt.Errorf("unknown view: %s", view)
 		}
-		morphed := components.Morpher(val(
-			fullPosts,
-			fullProjects,
-			fullTags,
-			fullPostSlugMap,
-			fullProjectSlugMap,
-			fullTagSlugMap,
-		))
+		morphed := components.Morpher(val)
 		err := morphed.Render(r.Context(), w)
 		if err != nil {
 			return err
