@@ -5,7 +5,6 @@ package views
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
 )
@@ -19,12 +18,6 @@ func readTime(content string) string {
 		return "1"
 	}
 	return fmt.Sprintf("%d", minutes)
-}
-
-// Helper functions for formatting data for Alpine.js
-func formatDate(timestamp int64) string {
-	t := time.Unix(timestamp, 0)
-	return t.Format("Jan 02, 2006")
 }
 
 // Helper function to check if two tags have common posts or projects
