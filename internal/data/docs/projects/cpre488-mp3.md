@@ -9,6 +9,7 @@ tags:
   - ide/vivado
   - hdl/vhdl
   - hdl/verilog
+  - edu/iastate
 description: Mini-project 3 for CPRE488
 title: cpre488-mp3
 ---

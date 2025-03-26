@@ -18,70 +18,58 @@ templ: version: v0.3.833
 
 templ: version: v0.3.833
 
-templ: version: v0.3.833
-
 Package views contains the HTML templates for the website.
 
 ## Index
 
-- [func Home\(fullPosts \*\[\]gen.Post, fullProjects \*\[\]gen.Project, fullTags \*\[\]gen.Tag, fullPostsSlugMap \*map\[string\]gen.Post, fullProjectsSlugMap \*map\[string\]gen.Project, fullTagsSlugMap \*map\[string\]gen.Tag\) templ.Component](<#Home>)
-- [func List\(target routing.PluralTarget, posts \*\[\]gen.Post, projects \*\[\]gen.Project, tags \*\[\]gen.Tag, fullPostsSlugMap \*map\[string\]gen.Post, fullProjectsSlugMap \*map\[string\]gen.Project, fullTagsSlugMap \*map\[string\]gen.Tag\) templ.Component](<#List>)
-- [func Post\(post gen.Post, fullPosts \*\[\]gen.Post, fullProjects \*\[\]gen.Project, fullTags \*\[\]gen.Tag, fullPostSlugMap \*map\[string\]gen.Post, fullProjectSlugMap \*map\[string\]gen.Project, fullTagSlugMap \*map\[string\]gen.Tag\) templ.Component](<#Post>)
-- [func Project\(project gen.Project, fullPosts \*\[\]gen.Post, fullProjects \*\[\]gen.Project, fullTags \*\[\]gen.Tag, fullPostsSlugMap \*map\[string\]gen.Post, fullProjectsSlugMap \*map\[string\]gen.Project, fullTagsSlugMap \*map\[string\]gen.Tag\) templ.Component](<#Project>)
-- [func Single\(posts \*\[\]gen.Post, projects \*\[\]gen.Project, tags \*\[\]gen.Tag, postSlugMap \*map\[string\]gen.Post, projectSlugMap \*map\[string\]gen.Project, tagSlugMap \*map\[string\]gen.Tag\) func\(target routing.SingleTarget, id string\) templ.Component](<#Single>)
-- [func Tag\(tag gen.Tag, fullPosts \*\[\]gen.Post, fullProjects \*\[\]gen.Project, fullTags \*\[\]gen.Tag, fullPostsSlugMap \*map\[string\]gen.Post, fullProjectsSlugMap \*map\[string\]gen.Project, fullTagsSlugMap \*map\[string\]gen.Tag\) templ.Component](<#Tag>)
+- [func Home\(fullPosts \*\[\]gen.Post, fullProjects \*\[\]gen.Project, fullTags \*\[\]gen.Tag\) templ.Component](<#Home>)
+- [func List\(target routing.PluralTarget, posts \*\[\]gen.Post, projects \*\[\]gen.Project, tags \*\[\]gen.Tag\) templ.Component](<#List>)
+- [func Post\(post gen.Post, fullPosts \*\[\]gen.Post, fullProjects \*\[\]gen.Project, fullTags \*\[\]gen.Tag\) templ.Component](<#Post>)
+- [func Project\(project gen.Project, fullPosts \*\[\]gen.Post, fullProjects \*\[\]gen.Project, fullTags \*\[\]gen.Tag\) templ.Component](<#Project>)
+- [func Tag\(tag gen.Tag, fullPosts \*\[\]gen.Post, fullProjects \*\[\]gen.Project, fullTags \*\[\]gen.Tag\) templ.Component](<#Tag>)
 
 
 <a name="Home"></a>
-## func [Home](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/home_templ.go#L17-L24>)
+## func [Home](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/home_templ.go#L17-L21>)
 
 ```go
-func Home(fullPosts *[]gen.Post, fullProjects *[]gen.Project, fullTags *[]gen.Tag, fullPostsSlugMap *map[string]gen.Post, fullProjectsSlugMap *map[string]gen.Project, fullTagsSlugMap *map[string]gen.Tag) templ.Component
+func Home(fullPosts *[]gen.Post, fullProjects *[]gen.Project, fullTags *[]gen.Tag) templ.Component
 ```
 
 
 
 <a name="List"></a>
-## func [List](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/list_templ.go#L102-L110>)
+## func [List](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/list_templ.go#L102-L107>)
 
 ```go
-func List(target routing.PluralTarget, posts *[]gen.Post, projects *[]gen.Project, tags *[]gen.Tag, fullPostsSlugMap *map[string]gen.Post, fullProjectsSlugMap *map[string]gen.Project, fullTagsSlugMap *map[string]gen.Tag) templ.Component
+func List(target routing.PluralTarget, posts *[]gen.Post, projects *[]gen.Project, tags *[]gen.Tag) templ.Component
 ```
 
 
 
 <a name="Post"></a>
-## func [Post](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/posts_templ.go#L18-L26>)
+## func [Post](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/posts_templ.go#L18-L23>)
 
 ```go
-func Post(post gen.Post, fullPosts *[]gen.Post, fullProjects *[]gen.Project, fullTags *[]gen.Tag, fullPostSlugMap *map[string]gen.Post, fullProjectSlugMap *map[string]gen.Project, fullTagSlugMap *map[string]gen.Tag) templ.Component
+func Post(post gen.Post, fullPosts *[]gen.Post, fullProjects *[]gen.Project, fullTags *[]gen.Tag) templ.Component
 ```
 
 Individual Post component
 
 <a name="Project"></a>
-## func [Project](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/projects_templ.go#L17-L25>)
+## func [Project](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/projects_templ.go#L17-L22>)
 
 ```go
-func Project(project gen.Project, fullPosts *[]gen.Post, fullProjects *[]gen.Project, fullTags *[]gen.Tag, fullPostsSlugMap *map[string]gen.Post, fullProjectsSlugMap *map[string]gen.Project, fullTagsSlugMap *map[string]gen.Tag) templ.Component
-```
-
-
-
-<a name="Single"></a>
-## func [Single](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/utils.go#L15-L20>)
-
-```go
-func Single(posts *[]gen.Post, projects *[]gen.Project, tags *[]gen.Tag, postSlugMap *map[string]gen.Post, projectSlugMap *map[string]gen.Project, tagSlugMap *map[string]gen.Tag) func(target routing.SingleTarget, id string) templ.Component
+func Project(project gen.Project, fullPosts *[]gen.Post, fullProjects *[]gen.Project, fullTags *[]gen.Tag) templ.Component
 ```
 
 
 
 <a name="Tag"></a>
-## func [Tag](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/tags_templ.go#L18-L26>)
+## func [Tag](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/tags_templ.go#L18-L23>)
 
 ```go
-func Tag(tag gen.Tag, fullPosts *[]gen.Post, fullProjects *[]gen.Project, fullTags *[]gen.Tag, fullPostsSlugMap *map[string]gen.Post, fullProjectsSlugMap *map[string]gen.Project, fullTagsSlugMap *map[string]gen.Tag) templ.Component
+func Tag(tag gen.Tag, fullPosts *[]gen.Post, fullProjects *[]gen.Project, fullTags *[]gen.Tag) templ.Component
 ```
 
 Tag component for displaying a single tag and its associated content
