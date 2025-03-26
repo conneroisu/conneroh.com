@@ -3,16 +3,13 @@ package views
 import (
 	"fmt"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
-	"github.com/conneroisu/conneroh.com/internal/data/master"
+	"github.com/conneroisu/conneroh.com/internal/data/gen"
 )
 
 templ Home(
-	fullPosts *[]master.FullPost,
-	fullProjects *[]master.FullProject,
-	fullTags *[]master.FullTag,
-	fullPostsSlugMap *map[string]master.FullPost,
-	fullProjectsSlugMap *map[string]master.FullProject,
-	fullTagsSlugMap *map[string]master.FullTag,
+	fullPosts *[]gen.Post,
+	fullProjects *[]gen.Project,
+	fullTags *[]gen.Tag,
 ) {
 	// Hero Section
 	<section
@@ -188,9 +185,9 @@ templ Home(
 							<div
 								class="h-48 bg-gray-200 dark:bg-gray-700 overflow-hidden"
 							>
-								if post.BannerUrl != "" {
+								if post.BannerPath != "" {
 									<img
-										src={ post.BannerUrl }
+										src={ post.BannerPath }
 										alt={ post.Title }
 										class="w-full h-full object-cover"
 									/>
@@ -330,25 +327,25 @@ templ Home(
 				>
 					// Social links
 					<a
-						href="#"
+						href="https://www.linkedin.com/in/conner-ohnesorge-b720a4238"
 						class="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-700 dark:text-gray-300 hover:bg-blue-500 hover:text-white dark:hover:bg-blue-500 transition-colors"
 					>
 						@components.Icon("linkedin")
 					</a>
 					<a
-						href="#"
+						href="https://github.com/conneroisu"
 						class="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-700 dark:text-gray-300 hover:bg-gray-800 hover:text-white dark:hover:bg-gray-800 transition-colors"
 					>
 						@components.Icon("github")
 					</a>
 					<a
-						href="#"
+						href="https://x.com/ConnerOhnesorge"
 						class="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-700 dark:text-gray-300 hover:bg-blue-400 hover:text-white dark:hover:bg-blue-400 transition-colors"
 					>
 						@components.Icon("twitter")
 					</a>
 					<a
-						href="mailto:contact@example.com"
+						href="mailto:conneroisu@outlook.com"
 						class="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-700 dark:text-gray-300 hover:bg-red-500 hover:text-white dark:hover:bg-red-500 transition-colors"
 					>
 						@components.Icon("mail")

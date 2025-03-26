@@ -9,6 +9,8 @@ tags:
   - hdl/vhdl
   - hdl/verilog
   - protocol/uart
+  - edu/iastate
+  - edu/iastate/cpre488
 description: The third Project from CPRE488 at Iowa State University
 title: CPRE488 MP2
 ---

@@ -5044,7 +5044,7 @@ In a templ file, you might have a structure like this:
 ```go
 // Define a templ block
 templ Tags(
-    fullTags *[]master.FullTag
+    fullTags *[]gen.Tag
 ) {
     <div>
         if fullTags != nil {
@@ -5071,7 +5071,7 @@ If functions were placed inline within the template block, the code could become
 ```go
 // Define a templ block with inline function
 templ Tags(
-    fullTags *[]master.FullTag
+    fullTags *[]gen.Tag
 ) {
     <div>
         if fullTags != nil {

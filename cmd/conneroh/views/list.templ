@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/layouts"
-	"github.com/conneroisu/conneroh.com/internal/data/master"
+	"github.com/conneroisu/conneroh.com/internal/data/gen"
 	"github.com/conneroisu/conneroh.com/internal/routing"
 )
 
@@ -27,12 +27,9 @@ templ search(
 
 templ List(
 	target routing.PluralTarget,
-	posts *[]master.FullPost,
-	projects *[]master.FullProject,
-	tags *[]master.FullTag,
-	fullPostsSlugMap *map[string]master.FullPost,
-	fullProjectsSlugMap *map[string]master.FullProject,
-	fullTagsSlugMap *map[string]master.FullTag,
+	posts *[]gen.Post,
+	projects *[]gen.Project,
+	tags *[]gen.Tag,
 ) {
 	<div
 		class="container mx-auto px-4 py-8"

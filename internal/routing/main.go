@@ -1,13 +1,11 @@
 package routing
 
 import (
-	"context"
 	"log/slog"
 	"net/http"
 
 	"github.com/a-h/templ"
-	"github.com/conneroisu/conneroh.com/internal/data"
-	"github.com/conneroisu/conneroh.com/internal/data/master"
+	"github.com/conneroisu/conneroh.com/internal/data/gen"
 )
 
 // SingleFn returns a fullFn for the single view.
@@ -18,14 +16,12 @@ type APIFn func(http.ResponseWriter, *http.Request) error
 
 // APIHandler is a function that returns an APIFn.
 type APIHandler func(
-	ctx context.Context,
-	db *data.Database[master.Queries],
-	fullPosts *[]master.FullPost,
-	fullProjects *[]master.FullProject,
-	fullTags *[]master.FullTag,
-	postsSlugMap *map[string]master.FullPost,
-	projectsSlugMap *map[string]master.FullProject,
-	tagsSlugMap *map[string]master.FullTag,
+	fullPosts *[]gen.Post,
+	fullProjects *[]gen.Project,
+	fullTags *[]gen.Tag,
+	postsSlugMap *map[string]gen.Post,
+	projectsSlugMap *map[string]gen.Project,
+	tagsSlugMap *map[string]gen.Tag,
 ) (APIFn, error)
 
 // APIMap is a map of API functions.
@@ -33,20 +29,16 @@ type APIMap map[string]APIHandler
 
 // AddRoutes adds all routes to the router.
 func (m APIMap) AddRoutes(
-	ctx context.Context,
 	mux *http.ServeMux,
-	db *data.Database[master.Queries],
-	fullPosts *[]master.FullPost,
-	fullProjects *[]master.FullProject,
-	fullTags *[]master.FullTag,
-	postsSlugMap *map[string]master.FullPost,
-	projectsSlugMap *map[string]master.FullProject,
-	tagsSlugMap *map[string]master.FullTag,
+	fullPosts *[]gen.Post,
+	fullProjects *[]gen.Project,
+	fullTags *[]gen.Tag,
+	postsSlugMap *map[string]gen.Post,
+	projectsSlugMap *map[string]gen.Project,
+	tagsSlugMap *map[string]gen.Tag,
 ) error {
 	for path, fn := range m {
 		h, err := fn(
-			ctx,
-			db,
 			fullPosts,
 			fullProjects,
 			fullTags,

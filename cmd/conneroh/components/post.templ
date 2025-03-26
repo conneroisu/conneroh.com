@@ -2,12 +2,11 @@ package components
 
 import (
 	"fmt"
-	"github.com/conneroisu/conneroh.com/internal/data"
-	"github.com/conneroisu/conneroh.com/internal/data/master"
+	"github.com/conneroisu/conneroh.com/internal/data/gen"
 )
 
 templ PostEmbed(
-	post *master.FullPost,
+	post *gen.Post,
 ) {
 	<div
 		class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1"
@@ -24,14 +23,14 @@ templ PostEmbed(
 			class="block cursor-pointer"
 		>
 			@Image(
-				post.BannerUrl,
+				post.BannerPath,
 				post.Title,
 				"w-full h-48 object-cover object-center",
 			)
 			<div
 				class="absolute bottom-0 right-0 bg-blue-500 text-white text-xs px-2 py-1 rounded-tl-md"
 			>
-				{ data.FormatDate(post.CreatedAt) }
+				{ post.CreatedAt.Format("Jan 02, 2006") }
 			</div>
 			<div class="p-6">
 				<h2

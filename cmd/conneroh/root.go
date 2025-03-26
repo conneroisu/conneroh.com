@@ -13,9 +13,6 @@ import (
 	"sync"
 	"syscall"
 	"time"
-
-	"github.com/conneroisu/conneroh.com/internal/data"
-	"github.com/conneroisu/conneroh.com/internal/data/master"
 )
 
 const (
@@ -31,13 +28,11 @@ const (
 // NewServer creates a new web-ui server
 func NewServer(
 	ctx context.Context,
-	db *data.Database[master.Queries],
 ) http.Handler {
 	mux := http.NewServeMux()
 	err := AddRoutes(
 		ctx,
 		mux,
-		db,
 	)
 	if err != nil {
 		slog.Error("error adding routes", slog.String("error", err.Error()))
@@ -55,21 +50,12 @@ func NewServer(
 	return handler
 }
 
-// NewDb creates a new database connection.
-func NewDb(_ func(string) string) (*data.Database[master.Queries], error) {
-	return data.NewDb(master.New, "master.db")
-}
-
 // Run is the entry point for the application.
 func Run(
 	ctx context.Context,
 	getenv func(string) string,
 ) error {
 	start := time.Now()
-	db, err := NewDb(getenv)
-	if err != nil {
-		return err
-	}
 
 	// Create a separate context for signal handling
 	innerCtx, cancel := signal.NotifyContext(
@@ -84,7 +70,7 @@ func Run(
 		wg         sync.WaitGroup
 	)
 
-	handler := NewServer(ctx, db) // Use original context for server setup
+	handler := NewServer(ctx) // Use original context for server setup
 
 	// Configure server with timeouts
 	httpServer = &http.Server{

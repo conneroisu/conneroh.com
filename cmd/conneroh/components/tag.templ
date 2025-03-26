@@ -2,12 +2,12 @@ package components
 
 import (
 	"fmt"
-	"github.com/conneroisu/conneroh.com/internal/data/master"
+	"github.com/conneroisu/conneroh.com/internal/data/gen"
 	"strconv"
 )
 
 templ TagEmbed(
-	tag master.FullTag,
+	tag gen.Tag,
 ) {
 	<a
 		hx-target="#bodiody"
