@@ -5,7 +5,6 @@ import (
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
 	"github.com/conneroisu/conneroh.com/internal/routing"
-	"github.com/samber/lo"
 )
 
 templ search(
@@ -51,7 +50,7 @@ templ List(
 		class="container mx-auto px-4 py-8"
 	>
 		<h1 class="text-3xl font-bold mb-6 text-gray-900 dark:text-white">
-			@templ.Raw(lo.Capitalize(string(target)))
+			Search { target }
 		</h1>
 		@search(
 			target,

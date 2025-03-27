@@ -233,6 +233,9 @@
           subPackages = ["."];
           nativeBuildInputs = [];
           vendorHash = "sha256-KeUHn4w8Xc0He/mg6XJoK+0276WiTw5phIquwY7Usaw=";
+          prePatch = ''
+            ${pkgs.templ}/bin/templ generate
+          '';
           preBuild = ''
             ${pkgs.templ}/bin/templ generate
           '';

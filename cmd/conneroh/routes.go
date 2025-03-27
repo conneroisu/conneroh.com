@@ -17,7 +17,7 @@ import (
 
 // AddRoutes adds all routes to the router.
 func AddRoutes(
-	ctx context.Context,
+	_ context.Context,
 	h *http.ServeMux,
 ) error {
 	slog.Info("adding routes")

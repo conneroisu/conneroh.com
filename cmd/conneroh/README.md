@@ -25,7 +25,7 @@ Package conneroh provides implementations for conneroh.
 
 ## Index
 
-- [func AddRoutes\(ctx context.Context, h \*http.ServeMux\) error](<#AddRoutes>)
+- [func AddRoutes\(\_ context.Context, h \*http.ServeMux\) error](<#AddRoutes>)
 - [func NewServer\(ctx context.Context\) http.Handler](<#NewServer>)
 - [func Run\(ctx context.Context, getenv func\(string\) string\) error](<#Run>)
 
@@ -34,7 +34,7 @@ Package conneroh provides implementations for conneroh.
 ## func [AddRoutes](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/routes.go#L19-L22>)
 
 ```go
-func AddRoutes(ctx context.Context, h *http.ServeMux) error
+func AddRoutes(_ context.Context, h *http.ServeMux) error
 ```
 
 AddRoutes adds all routes to the router.
