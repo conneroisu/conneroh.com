@@ -7,7 +7,10 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-//go:generate gomarkdoc -o README.md -e .
+const (
+	// EmbedLength is the length of the embedding.
+	EmbedLength = 768
+)
 
 // CustomTime allows us to customize the YAML time parsing
 type CustomTime struct {
@@ -33,11 +36,6 @@ func (ct *CustomTime) UnmarshalYAML(value *yaml.Node) error {
 	return nil
 }
 
-const (
-	// EmbedLength is the length of the embedding.
-	EmbedLength = 768
-)
-
 type (
 	// Post is a post with all its projects and tags.
 	Post struct {
@@ -56,7 +54,7 @@ type (
 		Embedded
 	}
 
-	// Embedded is a base struct for all embedded structs.
+	// Embedded is a base struct for all embeddedable structs.
 	Embedded struct {
 		Title           string               `yaml:"title"`
 		Slug            string               `yaml:"slug"`

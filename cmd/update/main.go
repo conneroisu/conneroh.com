@@ -33,30 +33,34 @@ import (
 	"gonum.org/v1/gonum/mat"
 )
 
-var client = ollama.NewClient(
-	ollama.WithTimeout(time.Minute * 5),
-)
+var parseTargets = map[string]embed.FS{
+	"posts":    docs.Posts,
+	"projects": docs.Projects,
+	"tags":     docs.Tags,
+}
+
+var client = ollama.NewClient(ollama.WithTimeout(time.Minute * 5))
 
 func main() {
-	if err := Run(); err != nil {
+	if err := Run(context.Background()); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 }
 
 // Run parses all markdown files in the database.
-func Run() error {
-	parsedTags, err := pathParse[gen.Tag]("tags", docs.Tags)
+func Run(ctx context.Context) error {
+	parsedTags, err := pathParse[gen.Tag](ctx, "tags", docs.Tags)
 	if err != nil {
 		return err
 	}
 
-	parsedPosts, err := pathParse[gen.Post]("posts", docs.Posts)
+	parsedPosts, err := pathParse[gen.Post](ctx, "posts", docs.Posts)
 	if err != nil {
 		return err
 	}
 
-	parsedProjects, err := pathParse[gen.Project]("projects", docs.Projects)
+	parsedProjects, err := pathParse[gen.Project](ctx, "projects", docs.Projects)
 	if err != nil {
 		return fmt.Errorf("failed to parse projects: %v", err)
 	}
@@ -90,7 +94,6 @@ func projectTo3D(embedding []float64, projectionMatrix *mat.Dense) (x, y, z floa
 }
 
 // Generate a random projection matrix for demonstration
-// In practice, this would be calculated using PCA or another technique
 func generateProjectionMatrix(inputDim, outputDim int) *mat.Dense {
 	data := make([]float64, inputDim*outputDim)
 	for i := range data {
@@ -149,7 +152,7 @@ var (
 // pathParse parses the markdown files in the given path.
 func pathParse[
 	T gen.Post | gen.Project | gen.Tag,
-](fsPath string, embedFs embed.FS) ([]T, error) {
+](ctx context.Context, fsPath string, embedFs embed.FS) ([]T, error) {
 	var parseds []T
 	err := fs.WalkDir(
 		embedFs,
@@ -161,7 +164,7 @@ func pathParse[
 			if d.IsDir() || !strings.HasSuffix(path, ".md") {
 				return nil
 			}
-			parsed, err := parse[T](path, embedFs)
+			parsed, err := parse[T](ctx, path, embedFs)
 			if err != nil {
 				return fmt.Errorf("failed to parse project %s: %w", path, err)
 			}
@@ -181,15 +184,11 @@ func pathParse[
 // parse parses the markdown file at the given path.
 func parse[
 	T gen.Post | gen.Project | gen.Tag,
-](fsPath string, embedFs embed.FS) (*T, error) {
-	if filepath.Ext(fsPath) != ".md" {
-		return nil, nil
-	}
-
+](ctx context.Context, fsPath string, embedFs embed.FS) (*T, error) {
 	var (
-		ctx      = parser.NewContext()
+		pCtx     = parser.NewContext()
 		fm       gen.Embedded
-		metadata = frontmatter.Get(ctx)
+		metadata = frontmatter.Get(pCtx)
 		body     []byte
 		buf      = bytes.NewBufferString("")
 		err      error
@@ -199,11 +198,11 @@ func parse[
 	if err != nil {
 		return nil, err
 	}
-	err = md.Convert(body, buf, parser.WithContext(ctx))
+	err = md.Convert(body, buf, parser.WithContext(pCtx))
 	if err != nil {
 		return nil, err
 	}
-	metadata = frontmatter.Get(ctx)
+	metadata = frontmatter.Get(pCtx)
 	if metadata == nil {
 		return nil, fmt.Errorf("frontmatter is nil for %s", fsPath)
 	}
@@ -237,7 +236,7 @@ func parse[
 	if fm.Content == "" {
 		return nil, fmt.Errorf("content is empty for %s", fsPath)
 	}
-	fm.Vec, fm.X, fm.Y, fm.Z, err = embedIt(context.TODO(), fm.RawContent)
+	fm.Vec, fm.X, fm.Y, fm.Z, err = embedIt(ctx, fm.RawContent)
 	if err != nil {
 		return nil, err
 	}
