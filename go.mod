@@ -5,7 +5,6 @@ go 1.24.0
 require (
 	github.com/a-h/templ v0.3.833
 	github.com/conneroisu/genstruct v0.0.6
-	github.com/go-echarts/go-echarts/v2 v2.5.2
 	github.com/litao91/goldmark-mathjax v0.0.0-20210217064022-a43cf739a50f
 	github.com/prathyushnallamothu/ollamago v1.0.0
 	github.com/quail-ink/goldmark-enclave v0.1.5

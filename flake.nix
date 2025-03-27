@@ -222,20 +222,24 @@
           ++ scriptPackages;
       };
 
-      packages = rec {
-        conneroh = buildWithSpecificGo {
-          pname = "conneroh";
+      packages = let
+        app-name = "conneroh.com";
+      in rec {
+        conneroh = buildGoModule {
+          # pname = app-name;
+          name = app-name;
           version = "0.0.1";
-          src = ../../.;
+          src = ./.;
           subPackages = ["."];
           nativeBuildInputs = [];
-          vendorHash = "sha256-nm3JEU+6MuA0bCXfAswgb7JZBmysypDIKjvw+PJFltY=";
+          vendorHash = "sha256-KeUHn4w8Xc0He/mg6XJoK+0276WiTw5phIquwY7Usaw=";
           preBuild = ''
             ${pkgs.templ}/bin/templ generate
           '';
         };
         C-conneroh = pkgs.dockerTools.buildLayeredImage {
-          name = "conneroh.com";
+          # pname = app-name;
+          name = app-name;
           tag = "latest";
           contents = [
             conneroh
@@ -256,6 +260,32 @@
             echo "$(git rev-parse HEAD)" > REVISION
           '';
         };
+        deployPackage = pkgs.writeShellScriptBin "deploy" ''
+          set -e
+
+          # Check if FLY_AUTH_TOKEN is set
+          if [ -z ''${FLY_AUTH_TOKEN+x} ]; then
+            echo "Error: FLY_AUTH_TOKEN environment variable is not set"
+            echo "Please set it with: export FLY_AUTH_TOKEN=your-token"
+            exit 1
+          fi
+
+          echo "Copying image to Fly.io registry..."
+          ${pkgs.skopeo}/bin/skopeo --insecure-policy copy \
+            docker-archive:"$IMAGE_PATH" \
+            docker://registry.fly.io/$APP_NAME:latest \
+            --dest-creds x:"$FLY_AUTH_TOKEN" \
+            --format v2s2
+
+          echo "Triggering deployment..."
+          ${pkgs.curl}/bin/curl -X POST \
+            -H "Authorization: Bearer $FLY_AUTH_TOKEN" \
+            -H "Content-Type: application/json" \
+            "https://api.fly.io/api/v1/apps/$APP_NAME/deploys" \
+            -d "{\"image\":\"registry.fly.io/$APP_NAME:latest\"}"
+
+          echo "Deployment initiated!"
+        '';
       };
     });
 }
