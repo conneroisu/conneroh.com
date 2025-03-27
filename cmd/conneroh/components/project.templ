@@ -36,12 +36,18 @@ templ ProjectEmbed(
 					@TagControl(tag)
 				}
 			</div>
-			<div
+			<a
 				class="text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center group"
+				hx-target="#bodiody"
+				hx-get={ fmt.Sprintf("/hateoas/morphs/project/%s", project.Slug) }
+				hx-swap="outerHTML"
+				hx-trigger="click"
+				hx-push-url={ fmt.Sprintf("/project/%s", project.Slug) }
+				preload="mouseover"
 			>
 				View Project
 				@Icon("arrow-right")
-			</div>
+			</a>
 		</a>
 	</div>
 }
