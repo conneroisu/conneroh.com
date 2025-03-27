@@ -1,8 +1,37 @@
 package gen
 
-import "time"
+import (
+	"fmt"
+	"time"
+
+	"gopkg.in/yaml.v3"
+)
 
 //go:generate gomarkdoc -o README.md -e .
+
+// CustomTime allows us to customize the YAML time parsing
+type CustomTime struct {
+	time.Time
+}
+
+// UnmarshalYAML implements the yaml.Unmarshaler interface
+func (ct *CustomTime) UnmarshalYAML(value *yaml.Node) error {
+	// Try parsing as date-only format first
+	t, err := time.Parse("2006-01-02", value.Value)
+	if err == nil {
+		ct.Time = t
+		return nil
+	}
+
+	// If that fails, try the standard RFC3339 format
+	t, err = time.Parse(time.RFC3339, value.Value)
+	if err != nil {
+		return fmt.Errorf("cannot parse %q as date: %v", value.Value, err)
+	}
+
+	ct.Time = t
+	return nil
+}
 
 const (
 	// EmbedLength is the length of the embedding.

@@ -39,7 +39,7 @@ func Home(fullPosts *[]gen.Post, fullProjects *[]gen.Project, fullTags *[]gen.Ta
 
 
 <a name="List"></a>
-## func [List](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/list_templ.go#L102-L107>)
+## func [List](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/list_templ.go#L122-L127>)
 
 ```go
 func List(target routing.PluralTarget, posts *[]gen.Post, projects *[]gen.Project, tags *[]gen.Tag) templ.Component
