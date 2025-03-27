@@ -2,9 +2,11 @@
 id: c
 aliases: []
 tags: []
+created_at: 2025-03-27T14:13:15.000-06:00
 description: C is a low-level general-purpose programming language.
 icon: c-plain
 title: C
+updated_at: 2025-03-27T14:13:15.000-06:00
 ---
 
 C is a general-purpose programming language.

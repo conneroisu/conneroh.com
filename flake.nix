@@ -224,6 +224,7 @@
 
       packages = let
         app-name = "conneroh.com";
+        app-config = ./fly.toml;
       in rec {
         conneroh = buildGoModule {
           # pname = app-name;
@@ -263,26 +264,23 @@
         deployPackage = pkgs.writeShellScriptBin "deploy" ''
           set -e
 
-          # Check if FLY_AUTH_TOKEN is set
-          if [ -z ''${FLY_AUTH_TOKEN+x} ]; then
-            echo "Error: FLY_AUTH_TOKEN environment variable is not set"
-            echo "Please set it with: export FLY_AUTH_TOKEN=your-token"
-            exit 1
-          fi
+          # # Check if FLY_AUTH_TOKEN is set
+          # if [ -z ''${FLY_AUTH_TOKEN+x} ]; then
+          #   echo "Error: FLY_AUTH_TOKEN environment variable is not set"
+          #   echo "Please set it with: export FLY_AUTH_TOKEN=your-token"
+          #   exit 1
+          # fi
 
           echo "Copying image to Fly.io registry..."
-          ${pkgs.skopeo}/bin/skopeo --insecure-policy copy \
-            docker-archive:"$IMAGE_PATH" \
-            docker://registry.fly.io/$APP_NAME:latest \
-            --dest-creds x:"$FLY_AUTH_TOKEN" \
-            --format v2s2
+          export PATH="${pkgs.lib.makeBinPath [(pkgs.docker.override {clientOnly = true;}) pkgs.flyctl]}:$PATH"
+          archive=${C-conneroh}
+          config=${app-config}
+          echo "Deploying $archive to $config"
 
-          echo "Triggering deployment..."
-          ${pkgs.curl}/bin/curl -X POST \
-            -H "Authorization: Bearer $FLY_AUTH_TOKEN" \
-            -H "Content-Type: application/json" \
-            "https://api.fly.io/api/v1/apps/$APP_NAME/deploys" \
-            -d "{\"image\":\"registry.fly.io/$APP_NAME:latest\"}"
+          image=$(docker load < $archive | awk '{ print $3; }')
+          echo "Using fly to deploy $image"
+          docker push registry.fly.io/conneroh-com/$image:latest
+          flyctl deploy -c $config -i $image --verbose
 
           echo "Deployment initiated!"
         '';

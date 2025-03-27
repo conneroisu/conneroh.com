@@ -10,7 +10,7 @@ projects:
   - cpre488-mp1
   - cpre488-mp2
 title: A Reflective Journey - Navigating Your Cumulative Experience at Iowa State University
-updated_at: 2025-03-27T05:49:31.000-06:00
+updated_at: 2025-03-27T14:13:10.000-06:00
 ---
 
 # A Reflective Journey: Navigating Your Cumulative Experience at Iowa State University

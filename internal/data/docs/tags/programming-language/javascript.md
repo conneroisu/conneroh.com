@@ -2,9 +2,11 @@
 id: javascript
 aliases: []
 tags: []
+created_at: 2025-03-27T14:13:16.000-06:00
 description: JavaScript is a high-level, interpreted programming language that is primarily used for web development.
 icon: javascript-plain
 title: JavaScript
+updated_at: 2025-03-27T14:13:16.000-06:00
 ---
 
 JavaScript is a high-level, interpreted programming language that is primarily used for web development.
