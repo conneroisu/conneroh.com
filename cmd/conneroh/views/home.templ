@@ -58,7 +58,11 @@ templ Home(
 							class="absolute inset-0 flex items-center justify-center text-white font-bold text-xl"
 						>
 							// Placeholder for profile image, replace with actual image
-							<span>CDO</span>
+							@components.Image(
+								"/dist/img/hero.jpeg",
+								"me",
+								"bg-blue-500 dark:bg-blue-600 rounded-full relative shadow-lg mx-auto",
+							)
 						</div>
 						// Decorative elements
 						<div
@@ -309,7 +313,10 @@ templ Home(
 		</div>
 	</section>
 	// Contact Section
-	<section id="contact" class="py-16 bg-gray-50 dark:bg-gray-900">
+	<section
+		id="contact"
+		class="py-16 bg-gray-50 dark:bg-gray-900"
+	>
 		<div class="container px-4 mx-auto">
 			<div class="max-w-2xl mx-auto text-center">
 				<h2
