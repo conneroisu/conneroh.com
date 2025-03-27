@@ -2,34 +2,6 @@ package layouts
 
 import "github.com/conneroisu/conneroh.com/cmd/conneroh/components"
 
-templ Layout(title string) {
-	<!DOCTYPE html>
-	<html lang="en">
-		<head>
-			<title>{ title }</title>
-			<meta charset="UTF-8"/>
-			<meta name="viewport" content="width=device-width, initial-scale=1"/>
-			<meta name="robots" content="index, follow"/>
-			<meta name="revisit-after" content="7 days"/>
-			<meta name="language" content="English"/>
-			<link rel="stylesheet" href="/dist/style.css"/>
-			<script type="module" src="/dist/index.js"></script>
-		</head>
-		<body class="bg-white dark:bg-gray-900" hx-ext="preload">
-			@header()
-			<div id="bodiody">
-				{ children... }
-			</div>
-		</body>
-	</html>
-}
-
-templ Page(comp templ.Component) {
-	@Layout("Page") {
-		@comp
-	}
-}
-
 templ header() {
 	<header>
 		<nav

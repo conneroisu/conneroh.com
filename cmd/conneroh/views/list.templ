@@ -3,7 +3,6 @@ package views
 import (
 	"fmt"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
-	"github.com/conneroisu/conneroh.com/cmd/conneroh/layouts"
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
 	"github.com/conneroisu/conneroh.com/internal/routing"
 )
@@ -12,16 +11,24 @@ templ search(
 	target routing.PluralTarget,
 ) {
 	// TODO: Add search bar/FINISH this (should interact with List())
-	<input
-		class="form-control"
-		type="search"
-		name="search"
-		placeholder={ fmt.Sprintf("Search %s...", target) }
-		hx-post={ fmt.Sprintf("/search/%s", target) }
-		hx-trigger="input changed delay:500ms, keyup[key=='Enter'], load"
-		hx-target={ fmt.Sprintf("#list-%s", target) }
-		hx-indicator=".htmx-indicator"
-	/>
+	<div class="p-3 border-b border-gray-200 dark:border-gray-700">
+		<div class="relative">
+			<input
+				class="form-control"
+				type="search"
+				name="search"
+				input="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+				placeholder={ fmt.Sprintf("Search %s...", target) }
+				hx-post={ fmt.Sprintf("/search/%s", target) }
+				hx-trigger="input changed delay:500ms, keyup[key=='Enter'], load"
+				hx-target={ fmt.Sprintf("#list-%s", target) }
+				hx-indicator=".htmx-indicator"
+			/>
+			<div class="absolute left-3 top-2.5 text-gray-400 dark:text-gray-500">
+				@components.Icon("search")
+			</div>
+		</div>
+	</div>
 	<div id={ fmt.Sprintf("list-suggest-%s", target) }></div>
 }
 
@@ -35,14 +42,8 @@ templ List(
 		class="container mx-auto px-4 py-8"
 	>
 		<h1 class="text-3xl font-bold mb-6 text-gray-900 dark:text-white">Blog Posts</h1>
-		@layouts.Searcher(
-			"searchQuery",
-			"selectedTag",
-			"Search posts...",
-			"All Tags",
-			"tags",
-			"updateURL()",
-			"updateURL()",
+		@search(
+			target,
 		)
 		<div
 			id={ fmt.Sprintf("list-%s", target) }
