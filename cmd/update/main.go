@@ -33,12 +33,6 @@ import (
 	"gonum.org/v1/gonum/mat"
 )
 
-var parseTargets = map[string]embed.FS{
-	"posts":    docs.Posts,
-	"projects": docs.Projects,
-	"tags":     docs.Tags,
-}
-
 var client = ollama.NewClient(ollama.WithTimeout(time.Minute * 5))
 
 func main() {
