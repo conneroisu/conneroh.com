@@ -17,7 +17,6 @@ It follows a modern server-side rendering approach with HTMX for dynamic content
 - **Client-side interactions** powered by Alpine.js
 - **Full-text search** capabilities
 - **Tag-based navigation** to easily find related content
-- **Markdown content** for easy authoring and maintenance
 
 ## Tech Stack
 
@@ -40,20 +39,21 @@ It follows a modern server-side rendering approach with HTMX for dynamic content
 │   └── update/          # Content update utility
 ├── internal/            # Private application code
 │   ├── data/            # Data access layer
-│   │   └── docs/        # Markdown content
-│   │       ├── posts/   # Blog posts
-│   │       ├── projects/# Project descriptions
-│   │       └── tags/    # Tag descriptions
+│   │   ├── docs/        # Markdown content
+│   │   │   ├── posts/   # Blog posts
+│   │   │   ├── projects/# Project descriptions
+│   │   │   └── tags/    # Tag descriptions
+│   │   └── gen/         # Generated data structures
 │   └── routing/         # HTTP routing
 └── [various config files]
 ```
 
-- `posts` - Blog articles
-- `projects` - Portfolio projects
-- `tags` - Skills and categories
-- `post_tags` - Relationship between posts and tags
-- `project_tags` - Relationship between projects and tags
-- `embeddings` - Vector embeddings for search functionality. Nearly all content is indexed with embeddings.
+The site organizes content into three main types:
+- **Posts** - Blog articles
+- **Projects** - Portfolio projects
+- **Tags** - Skills and categories
+
+Content relationships are maintained through associations between these entities.
 
 ## Setup and Development
 
@@ -75,7 +75,7 @@ cd conneroh.com
 nix develop
 
 # Generate code and assets
-generate-all
+nix-generate-all
 
 # Initialize the database
 update
@@ -97,9 +97,6 @@ go mod download
 # Install required tools
 go install github.com/a-h/templ/cmd/templ@latest
 go install github.com/cosmtrek/air@latest
-go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
-npm install -g tailwindcss
-npm install -g bun
 
 # Generate code
 templ generate
@@ -116,11 +113,11 @@ go run ./cmd/update
 air
 ```
 
-### Content Management
+## Content Management
 
 Content is managed through Markdown files located in `internal/data/docs/`. The format for content files is:
 
-#### Blog Post Example (`internal/data/docs/posts/example-post.md`):
+### Blog Post Example (`internal/data/docs/posts/example-post.md`):
 
 ```markdown
 ---
@@ -129,14 +126,12 @@ slug: example-post-slug
 description: Short description of the post
 created_at: 2025-03-27T05:48:53.000-06:00
 updated_at: 2025-03-27T14:13:10.000-06:00
-banner_url: https://example.com/image.jpg  # Optional
+banner_path: /dist/img/example-banner.jpg  # Optional
 tags:
   - go
   - web-development
 projects:
   - related-project-slug  # Optional related projects
-posts:
-  - example-post-slug  # Optional related posts
 ---
 
 # Markdown Content
@@ -144,7 +139,7 @@ posts:
 The actual content of the post in Markdown format...
 ```
 
-#### Updating Content
+### Updating Content
 
 To update the database with new or modified content:
 
@@ -156,6 +151,17 @@ update
 go run ./cmd/update
 ```
 
+## Deployment
+
+The site is deployed using Fly.io. The deployment process is automated in the GitHub workflow located in `.github/workflows/fly-deploy.yml`.
+
+To deploy manually:
+
+```bash
+nix run .#deployPackage
+```
+
+## Technical Implementation Details
 
 ### Template Rendering with templ
 
@@ -203,24 +209,9 @@ Alpine.js is used for client-side interactivity:
 </div>
 ```
 
-## Deployment
-
-```bash
-nix run .#deployPackage
-```
-
 ## Contributing
 
 This project is personal, but suggestions and bug reports are welcome. Please open an issue or submit a pull request.
-
-
-## Resources
-
-- [ preload ](https://htmx.org/extensions/preload/)
-
-## License
-
-This project is personal and not licensed for public use without permission. Use at your own risk.
 
 ## Author
 
