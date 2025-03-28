@@ -53,38 +53,6 @@
 
       bunDeps = pkgs.callPackage ./bun.nix {};
 
-      # Create a bundler derivation to bundle index.js
-      bundleJs = pkgs.stdenv.mkDerivation {
-        name = "bundled-js";
-        src = ./.;
-        nativeBuildInputs = with pkgs; [
-          bun
-          makeWrapper
-        ];
-
-        buildPhase = ''
-          # Set up node_modules
-          mkdir -p node_modules
-          ln -s ${bunDeps.nodeModules}/node_modules/* node_modules/ || true
-
-          # Create output directory
-          mkdir -p $out/dist
-
-          # Bundle the application
-          ${pkgs.bun}/bin/bun build \
-            ./index.js \
-            --minify \
-            --minify-syntax \
-            --minify-whitespace \
-            --minify-identifiers \
-            --outdir $out/dist/
-        '';
-
-        installPhase = ''
-          # No additional installation needed as files are already in $out/dist
-        '';
-      };
-
       scripts = {
         dx = {
           exec = ''$EDITOR $REPO_ROOT/flake.nix'';
