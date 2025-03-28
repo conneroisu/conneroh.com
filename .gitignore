@@ -13,3 +13,4 @@ test.db
 .vscode
 *_templ.go
 *.db-journal
+result
