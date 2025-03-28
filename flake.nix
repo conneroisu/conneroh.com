@@ -158,24 +158,15 @@
 
         nix-generate-all = {
           exec = ''
-            ${pkgs.templ}/bin/templ generate
-
-            mkdir -p node_modules
-            ln -sf ${bunDeps.nodeModules}/node_modules/* node_modules/ || true
-
-            ${pkgs.bun}/bin/bun build \
-                ./index.js \
-                --minify \
-                --minify-syntax \
-                --minify-whitespace  \
-                --minify-identifiers \
-                --outdir ./cmd/conneroh/_static/dist/
+            ${pkgs.templ}/bin/templ generate &
 
             ${pkgs.tailwindcss}/bin/tailwindcss \
                 --minify \
                 -i ./input.css \
                 -o ./cmd/conneroh/_static/dist/style.css \
-                --cwd .
+                --cwd . &
+
+            wait
           '';
           description = "Generate all files in parallel";
         };
