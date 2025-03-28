@@ -196,32 +196,7 @@
         "mk-shell-bin": "mk-shell-bin",
         "nix2container": "nix2container",
         "nixpkgs": "nixpkgs_2",
-        "sqlcquash": "sqlcquash",
         "systems": "systems_2"
-      }
-    },
-    "sqlcquash": {
-      "inputs": {
-        "flake-utils": [
-          "flake-utils"
-        ],
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1737392891,
-        "narHash": "sha256-d7ulk6H1NxqBUjPmsZ44QRNr6SEXBnyPd87H0w53lM8=",
-        "owner": "conneroisu",
-        "repo": "sqlcquash",
-        "rev": "30fd06aec1590864b4721c8a1d53573168c58aa9",
-        "type": "github"
-      },
-      "original": {
-        "owner": "conneroisu",
-        "ref": "main",
-        "repo": "sqlcquash",
-        "type": "github"
       }
     },
     "systems": {

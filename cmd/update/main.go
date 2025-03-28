@@ -7,7 +7,7 @@ import (
 	"embed"
 	"fmt"
 	"io/fs"
-	"math/rand/v2"
+	"math"
 	"os"
 	"path/filepath"
 	"strings"
@@ -75,9 +75,9 @@ func projectTo3D(embedding []float64, projectionMatrix *mat.Dense) (x, y, z floa
 	// Create a vector from the embedding
 	embedVec := mat.NewVecDense(len(embedding), embedding)
 
-	// Project to 3D
+	// Project to 3D - no need to transpose
 	result := mat.NewVecDense(3, nil)
-	result.MulVec(projectionMatrix.T(), embedVec)
+	result.MulVec(projectionMatrix, embedVec)
 
 	// Extract x, y, z coordinates
 	x = result.AtVec(0)
@@ -87,13 +87,42 @@ func projectTo3D(embedding []float64, projectionMatrix *mat.Dense) (x, y, z floa
 	return
 }
 
-// Generate a random projection matrix for demonstration
+// Generate a deterministic projection matrix for dimensionality reduction
 func generateProjectionMatrix(inputDim, outputDim int) *mat.Dense {
-	data := make([]float64, inputDim*outputDim)
-	for i := range data {
-		data[i] = rand.Float64()*2 - 1 // Random values between -1 and 1
+	// Create a matrix with dimensions [outputDim x inputDim]
+	// This will multiply directly with the input vector without transposition
+	matrix := mat.NewDense(outputDim, inputDim, nil)
+
+	// For each output dimension
+	for i := 0; i < outputDim; i++ {
+		// Calculate a center point for this dimension's projection focus
+		center := (i * inputDim) / outputDim
+
+		for j := 0; j < inputDim; j++ {
+			// Calculate a weight based on distance from the center point
+			// Use a Gaussian-like function for smooth projection
+			dist := float64(j - center)
+			weight := math.Exp(-0.5 * (dist * dist) / float64(inputDim/10))
+
+			// Set the weight in the projection matrix
+			matrix.Set(i, j, weight)
+		}
+
+		// Normalize the row to unit length
+		var rowSum float64
+		for j := 0; j < inputDim; j++ {
+			rowSum += matrix.At(i, j) * matrix.At(i, j)
+		}
+
+		rowSum = math.Sqrt(rowSum)
+		if rowSum > 0 {
+			for j := 0; j < inputDim; j++ {
+				matrix.Set(i, j, matrix.At(i, j)/rowSum)
+			}
+		}
 	}
-	return mat.NewDense(inputDim, outputDim, data)
+
+	return matrix
 }
 
 var (
