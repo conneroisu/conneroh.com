@@ -6,7 +6,6 @@
     "postinstall": "bun2nix -o bun.nix"
   },
   "devDependencies": {
-    "@flydotio/dockerfile": "^0.7.9",
     "@types/alpinejs": "^3.13.11",
     "@types/bun": "latest"
   },
