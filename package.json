@@ -2,6 +2,9 @@
   "name": "conneroh.com",
   "module": "index.js",
   "type": "module",
+  "scripts": {
+    "postinstall": "bun2nix -o bun.nix"
+  },
   "devDependencies": {
     "@types/alpinejs": "^3.13.11",
     "@types/bun": "latest"

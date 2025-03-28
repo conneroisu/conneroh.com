@@ -22,6 +22,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "flake-utils";
     };
+    bun2nix.url = "github:baileyluTCD/bun2nix";
 
     systems.url = "github:nix-systems/default";
   };
@@ -55,41 +56,84 @@
       buildGoModule = pkgs.buildGoModule.override {go = pkgs.go_1_24;};
       buildWithSpecificGo = pkg: pkg.override {inherit buildGoModule;};
 
+      # Correctly call the bun.nix file
+      bunDeps = pkgs.callPackage ./bun.nix {};
+
+      # Create a bundler derivation to bundle index.js
+      bundleJs = pkgs.stdenv.mkDerivation {
+        name = "bundled-js";
+        src = ./.;
+        nativeBuildInputs = with pkgs; [
+          bun
+          makeWrapper
+        ];
+
+        buildPhase = ''
+          # Set up node_modules
+          mkdir -p node_modules
+          ln -s ${bunDeps.nodeModules}/node_modules/* node_modules/ || true
+
+          # Create output directory
+          mkdir -p $out/dist
+
+          # Bundle the application
+          ${pkgs.bun}/bin/bun build \
+            ./index.js \
+            --minify \
+            --minify-syntax \
+            --minify-whitespace \
+            --minify-identifiers \
+            --outdir $out/dist/
+        '';
+
+        installPhase = ''
+          # No additional installation needed as files are already in $out/dist
+        '';
+      };
+
       scripts = {
         dx = {
           exec = ''$EDITOR $REPO_ROOT/flake.nix'';
           description = "Edit the flake.nix";
         };
+
         clean = {
           exec = ''
             git clean -fdx
           '';
           description = "Clean Project";
         };
+
         tests = {
           exec = ''go test -v -short ./...'';
           description = "Run go tests with short flag";
         };
+
         unit-tests = {
           exec = ''go test -v ./...'';
           description = "Run all go tests";
         };
+
         lint = {
           exec = ''golangci-lint run'';
           description = "Run golangci-lint";
         };
+
         build = {
           exec = ''nix build --accept-flake-config .#packages.x86_64-linux.conneroh'';
           description = "Build the package";
         };
+
         update = {
           exec = ''go run $REPO_ROOT/cmd/update'';
           description = "Update the database.";
         };
+
         restart = {
           exec = ''rm -f $REPO_ROOT/master.db && go run $REPO_ROOT/cmd/update'';
           description = "Execute restart command with doppler";
         };
+
         generate-reload = {
           exec = ''
             templ generate $REPO_ROOT &
@@ -97,10 +141,13 @@
           '';
           description = "Generate templ files and wait for completion";
         };
+
         generate-js = {
           exec = ''
             export REPO_ROOT=$(git rev-parse --show-toplevel) # needed
-            bun build \
+            ln -sf ${bunDeps.nodeModules}/node_modules $REPO_ROOT/node_modules
+
+            ${pkgs.bun}/bin/bun build \
                 $REPO_ROOT/index.js \
                 --minify \
                 --minify-syntax \
@@ -111,20 +158,27 @@
           description = "Generate js files";
         };
 
-        generate-all = {
+        nix-generate-all = {
           exec = ''
-            go generate $REPO_ROOT/... &
+            ${pkgs.templ}/bin/templ generate
 
-            templ generate $REPO_ROOT &
+            # Link node_modules instead of running bun install
+            mkdir -p node_modules
+            ln -sf ${bunDeps.nodeModules}/node_modules/* node_modules/ || true
 
-            generate-js &
-            tailwindcss \
+            ${pkgs.bun}/bin/bun build \
+                ./index.js \
                 --minify \
-                -i $REPO_ROOT/input.css \
-                -o $REPO_ROOT/cmd/conneroh/_static/dist/style.css \
-                --cwd $REPO_ROOT &
+                --minify-syntax \
+                --minify-whitespace  \
+                --minify-identifiers \
+                --outdir ./cmd/conneroh/_static/dist/
 
-            wait
+            ${pkgs.tailwindcss}/bin/tailwindcss \
+                --minify \
+                -i ./input.css \
+                -o ./cmd/conneroh/_static/dist/style.css \
+                --cwd .
           '';
           description = "Generate all files in parallel";
         };
@@ -169,13 +223,19 @@
 
           # Print available commands
           echo "Available commands:"
-          ${pkgs.lib.concatStringsSep "\n" (pkgs.lib.mapAttrsToList (name: script: ''echo "  ${name} - ${script.description}"'') scripts)}
+          ${pkgs.lib.concatStringsSep "\n" (
+            pkgs.lib.mapAttrsToList (
+              name: script: ''echo "  ${name} - ${script.description}"''
+            )
+            scripts
+          )}
         '';
         packages = with pkgs;
           [
             # Nix
             alejandra
             nixd
+            inputs.bun2nix.defaultPackage.${pkgs.system}.bin
 
             # Go Tools
             go_1_24
@@ -208,15 +268,12 @@
             sqldiff
             inputs.sqlcquash.packages."${pkgs.system}".default
             sleek
-            bc
-
-            # C/C++
-            clang-tools
 
             # Infra
             flyctl
             wireguard-tools
             openssl.dev
+            skopeo
           ]
           # Add the generated script packages
           ++ scriptPackages;
@@ -227,21 +284,25 @@
         app-config = ./fly.toml;
       in rec {
         conneroh = buildGoModule {
-          # pname = app-name;
+          pname = app-name;
           name = app-name;
           version = "0.0.1";
           src = ./.;
           subPackages = ["."];
-          nativeBuildInputs = [];
+          nativeBuildInputs = [pkgs.bun];
           vendorHash = "sha256-KeUHn4w8Xc0He/mg6XJoK+0276WiTw5phIquwY7Usaw=";
           preBuild = ''
-            ${pkgs.templ}/bin/templ generate
+            # Link node_modules from bunDeps
+            mkdir -p node_modules
+            ln -sf ${bunDeps.nodeModules}/node_modules/* node_modules/ || true
+
+            ${scripts.nix-generate-all.exec}
           '';
         };
         C-conneroh = pkgs.dockerTools.buildLayeredImage {
-          # pname = app-name;
           name = app-name;
           tag = "latest";
+          created = "now";
           contents = [
             conneroh
             pkgs.cacert
@@ -264,26 +325,28 @@
         deployPackage = pkgs.writeShellScriptBin "deploy" ''
           set -e
 
-          # # Check if FLY_AUTH_TOKEN is set
-          # if [ -z ''${FLY_AUTH_TOKEN+x} ]; then
-          #   echo "Error: FLY_AUTH_TOKEN environment variable is not set"
-          #   echo "Please set it with: export FLY_AUTH_TOKEN=your-token"
-          #   exit 1
-          # fi
+          echo "Copying image to Fly.io registry..."
+
+          # Check if FLY_AUTH_TOKEN is set
+          if [ -z "$FLY_AUTH_TOKEN" ]; then
+            echo "FLY_AUTH_TOKEN is not set. Getting it from doppler..."
+            FLY_AUTH_TOKEN=$(doppler secrets get --plain FLY_AUTH_TOKEN)
+          fi
 
           echo "Copying image to Fly.io registry..."
-          export PATH="${pkgs.lib.makeBinPath [(pkgs.docker.override {clientOnly = true;}) pkgs.flyctl]}:$PATH"
-          archive=${C-conneroh}
-          config=${app-config}
-          echo "Deploying $archive to $config"
+          ${pkgs.skopeo}/bin/skopeo copy \
+            --insecure-policy \
+            docker-archive:"${C-conneroh}" \
+            docker://registry.fly.io/conneroh-com:latest \
+            --dest-creds x:"$FLY_AUTH_TOKEN" \
+            --format v2s2
 
-          image=$(docker load < $archive | awk '{ print $3; }')
-          echo "Using fly to deploy $image"
-          docker push registry.fly.io/conneroh-com/$image:latest
-          flyctl deploy -c $config -i $image --verbose
-
-          echo "Deployment initiated!"
+          echo "Deploying to Fly.io..."
+          fly deploy --remote-only -c ${app-config} -i registry.fly.io/conneroh-com
         '';
+
+        # Add the bundled JS as a package
+        bundledJs = bundleJs;
       };
     });
 }
