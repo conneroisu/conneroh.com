@@ -46,13 +46,8 @@ It follows a modern server-side rendering approach with HTMX for dynamic content
 │   │   │   └── tags/    # Tag descriptions
 │   │   └── master/      # Database schema and queries
 │   └── routing/         # HTTP routing
-├── shells/              # Development environment shells
 └── [various config files]
 ```
-
-## Database Schema
-
-The application uses a SQLite database with the following main tables:
 
 - `posts` - Blog articles
 - `projects` - Portfolio projects
@@ -133,13 +128,16 @@ Content is managed through Markdown files located in `internal/data/docs/`. The 
 title: Example Post Title
 slug: example-post-slug
 description: Short description of the post
-created_at: 1640995200  # Unix timestamp
+created_at: 2025-03-27T05:48:53.000-06:00
+updated_at: 2025-03-27T14:13:10.000-06:00
 banner_url: https://example.com/image.jpg  # Optional
 tags:
   - go
   - web-development
 projects:
   - related-project-slug  # Optional related projects
+posts:
+  - example-post-slug  # Optional related posts
 ---
 
 # Markdown Content
@@ -208,33 +206,8 @@ Alpine.js is used for client-side interactivity:
 
 ## Deployment
 
-The application can be deployed as a standalone binary or as a Docker container.
-
-### Building a Docker Container
-
 ```bash
-# With Nix
-nix build .#packages.x86_64-linux.C-conneroh
-# Load into Docker
-docker load < result
-# Run the container
-docker run -p 8080:8080 conneroh.com:latest
-```
-
-### Running the Docker Container
-
-```bash
-docker run -p 8080:8080 conneroh.com:latest
-```
-
-### Direct Binary
-
-```bash
-# Build the application
-go build -o conneroh ./cmd/conneroh
-
-# Run the built application
-./conneroh
+nix run .#deployPackage
 ```
 
 ## Contributing

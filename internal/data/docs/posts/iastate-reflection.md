@@ -4,13 +4,13 @@ aliases:
   - "A Reflective Journey: Navigating Your Cumulative Experience at Iowa State University"
 tags:
   - academics/cpre488
-created: 2025-03-27T05:48:53.000-06:00
+created_at: 2025-03-27T05:48:53.000-06:00
 description: This is a reflection on my time at Iowa State University.
 projects:
   - cpre488-mp1
   - cpre488-mp2
 title: A Reflective Journey - Navigating Your Cumulative Experience at Iowa State University
-updated_at: 2025-03-27T14:13:10.000-06:00
+updated_at: 2025-03-27T19:49:48.000-06:00
 ---
 
 # A Reflective Journey: Navigating Your Cumulative Experience at Iowa State University
