@@ -62,7 +62,13 @@ templ Post(
 				>
 					for _, project := range post.Projects {
 						<a
-							hx-push-url={ fmt.Sprintf("/hateoas/morph/project/%s", project.Slug) }
+							hx-get={ fmt.Sprintf("/hateoas/morphs/project/%s", project.Slug) }
+							hx-push-url={ fmt.Sprintf("/project/%s", project.Slug) }
+							hx-target="#bodiody"
+							hx-swap="outerHTML"
+							hx-trigger="click"
+							hx-indicator="#bodiody"
+							preload="mouseover"
 							class="flex items-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
 						>
 							<div>

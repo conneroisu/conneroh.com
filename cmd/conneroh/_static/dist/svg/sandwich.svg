@@ -1,5 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
-    <path d="m2.37 11.223 8.372-6.777a2 2 0 0 1 2.516 0l8.371 6.777M21 15a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-5.25M3 15a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h9"/>
-    <path d="m6.67 15 6.13 4.6a2 2 0 0 0 2.8-.4l3.15-4.2"/>
-    <rect width="20" height="4" x="2" y="11" rx="1"/>
-</svg>
+<svg height="18" viewBox="0 0 18 18" width="18" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" transform="scale(.75)"><path d="m2.369792 11.223958 8.369791-6.776041c.734375-.59375 1.786459-.59375 2.520834 0l8.369791 6.776041m-.630208 3.776042c.552083 0 1 .447917 1 1v2c0 .552083-.447917 1-1 1h-5.25m-12.75-4c-.552083 0-1 .447917-1 1v2c0 .552083.447917 1 1 1h9"/><path d="m6.671875 15 6.130208 4.598958c.880209.661459 2.135417.484375 2.796875-.401041l3.151042-4.197917"/><path d="m3 11h18c.552083 0 1 .447917 1 1v2c0 .552083-.447917 1-1 1h-18c-.552083 0-1-.447917-1-1v-2c0-.552083.447917-1 1-1zm0 0"/></g></svg>

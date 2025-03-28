@@ -1,7 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
-    <path d="M22 18H6a2 2 0 0 1-2-2V7a2 2 0 0 0-2-2"/>
-    <path d="M17 14V4a2 2 0 0 0-2-2h-1a2 2 0 0 0-2 2v10"/>
-    <rect width="13" height="8" x="8" y="6" rx="1"/>
-    <circle cx="18" cy="20" r="2"/>
-    <circle cx="9" cy="20" r="2"/>
-</svg>
+<svg height="18" viewBox="0 0 18 18" width="18" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" transform="scale(.75)"><path d="m22 18h-16c-1.104167 0-2-.895833-2-2v-9c0-1.104167-.895833-2-2-2"/><path d="m17 14v-10c0-1.104167-.895833-2-2-2h-1c-1.104167 0-2 .895833-2 2v10"/><path d="m9 6h11c.552083 0 1 .447917 1 1v6c0 .552083-.447917 1-1 1h-11c-.552083 0-1-.447917-1-1v-6c0-.552083.447917-1 1-1zm0 0"/><path d="m20 20c0 1.104167-.895833 2-2 2s-2-.895833-2-2 .895833-2 2-2 2 .895833 2 2zm0 0"/><path d="m11 20c0 1.104167-.895833 2-2 2s-2-.895833-2-2 .895833-2 2-2 2 .895833 2 2zm0 0"/></g></svg>

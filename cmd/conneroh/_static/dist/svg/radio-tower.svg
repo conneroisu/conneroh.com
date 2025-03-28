@@ -1,5 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
-    <path d="M4.9 16.1C1 12.2 1 5.8 4.9 1.9m2.9 2.8a6.14 6.14 0 0 0-.8 7.5"/>
-    <circle cx="12" cy="9" r="2"/>
-    <path d="M16.2 4.8c2 2 2.26 5.11.8 7.47M19.1 1.9a9.96 9.96 0 0 1 0 14.1m-9.6 2h5M8 22l4-11 4 11"/>
-</svg>
+<svg height="18" viewBox="0 0 18 18" width="18" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" transform="scale(.75)"><path d="m4.901042 16.098958c-3.901042-3.901041-3.901042-10.296875 0-14.197916m2.901041 2.796875c-1.953125 2.026041-2.28125 5.114583-.802083 7.5"/><path d="m14 9c0 1.104167-.895833 2-2 2s-2-.895833-2-2 .895833-2 2-2 2 .895833 2 2zm0 0"/><path d="m16.197917 4.802083c2 2 2.260416 5.109375.802083 7.46875m2.098958-10.369791c1.875 1.869791 2.927084 4.40625 2.927084 7.046875 0 2.645833-1.052084 5.182291-2.927084 7.052083m-9.598958 2h5m-6.5 4 4-11 4 11"/></g></svg>

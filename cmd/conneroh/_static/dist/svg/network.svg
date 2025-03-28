@@ -1,6 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
-    <rect width="6" height="6" x="16" y="16" rx="1"/>
-    <rect width="6" height="6" x="2" y="16" rx="1"/>
-    <rect width="6" height="6" x="9" y="2" rx="1"/>
-    <path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3m-7-4V8"/>
-</svg>
+<svg height="18" viewBox="0 0 18 18" width="18" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" transform="scale(.75)"><path d="m17 16h4c.552083 0 1 .447917 1 1v4c0 .552083-.447917 1-1 1h-4c-.552083 0-1-.447917-1-1v-4c0-.552083.447917-1 1-1zm0 0"/><path d="m3 16h4c.552083 0 1 .447917 1 1v4c0 .552083-.447917 1-1 1h-4c-.552083 0-1-.447917-1-1v-4c0-.552083.447917-1 1-1zm0 0"/><path d="m10 2h4c.552083 0 1 .447917 1 1v4c0 .552083-.447917 1-1 1h-4c-.552083 0-1-.447917-1-1v-4c0-.552083.447917-1 1-1zm0 0"/><path d="m5 16v-3c0-.552083.447917-1 1-1h12c.552083 0 1 .447917 1 1v3m-7-4v-4"/></g></svg>

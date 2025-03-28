@@ -66,7 +66,7 @@ templ List(
 					}
 				case routing.PluralTargetProject:
 					for _, project := range *projects {
-						@components.ProjectEmbed(project)
+						@listProjectItem(project)
 					}
 				case routing.PluralTargetTag:
 					for _, tag := range *tags {
@@ -74,5 +74,50 @@ templ List(
 					}
 			}
 		</div>
+	</div>
+}
+
+templ listProjectItem(project *gen.Project) {
+	<div
+		class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 p-6"
+	>
+		<a
+			hx-target="#bodiody"
+			hx-get={ fmt.Sprintf("/hateoas/morphs/project/%s", project.Slug) }
+			hx-swap="outerHTML"
+			hx-trigger="click"
+			hx-push-url={ fmt.Sprintf("/project/%s", project.Slug) }
+			preload="mouseover"
+		>
+			<h2
+				class="text-xl font-semibold text-gray-900 dark:text-white mb-2"
+			>
+				{ project.Title }
+			</h2>
+			<p
+				class="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3"
+			>
+				{ project.Description }
+			</p>
+			<div
+				class="flex flex-wrap gap-2 mb-4"
+			>
+				for _, tag := range project.Tags {
+					@components.TagControl(tag, "#list-project")
+				}
+			</div>
+			<a
+				class="text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center group"
+				hx-target="#bodiody"
+				hx-get={ fmt.Sprintf("/hateoas/morphs/project/%s", project.Slug) }
+				hx-swap="outerHTML"
+				hx-trigger="click"
+				hx-push-url={ fmt.Sprintf("/project/%s", project.Slug) }
+				preload="mouseover"
+			>
+				View Project
+				@components.Icon("arrow-right", templ.Attributes{})
+			</a>
+		</a>
 	</div>
 }

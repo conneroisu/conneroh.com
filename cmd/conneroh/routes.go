@@ -39,7 +39,10 @@ func AddRoutes(
 			&gen.AllTags,
 		))),
 	)
-	h.Handle("GET /dist/", http.FileServer(http.FS(static.Dist)))
+	h.Handle(
+		"GET /dist/",
+		http.FileServer(http.FS(static.Dist)),
+	)
 
 	h.Handle(
 		"GET /posts",

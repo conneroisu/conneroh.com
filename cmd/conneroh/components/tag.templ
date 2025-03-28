@@ -25,14 +25,14 @@ templ TagEmbed(
 				class="flex items-center justify-between mb-3"
 			>
 				<h2
-					class="text-xl font-semibold text-gray-900 dark:text-white"
+					class="tittle"
 				>
 					{ tag.Title }
 				</h2>
 				<div
 					class="bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center h-8 w-8"
 				>
-					@Icon(tag.Icon, templ.Attributes{})
+					@Icon(tag.Icon, templ.Attributes{"class": "stoke-white"})
 				</div>
 			</div>
 			<div
@@ -46,14 +46,24 @@ templ TagEmbed(
 				<span
 					class="text-gray-500 dark:text-gray-400"
 				>
-					{ strconv.FormatInt(int64(len(tag.Posts)), 10) } posts
+					{ strconv.Itoa(len(tag.PostSlugs)) } posts
 				</span>
 				<span
 					class="text-gray-500 dark:text-gray-400"
 				>
-					{ strconv.FormatInt(int64(len(tag.Projects)), 10) } projects
+					{ strconv.Itoa(len(tag.ProjectSlugs)) } projects
 				</span>
 			</div>
 		</div>
 	</a>
+}
+
+templ TagVListItem(
+	tags *gen.Tag,
+) {
+}
+
+templ TagHListItem(
+	tags *gen.Tag,
+) {
 }
