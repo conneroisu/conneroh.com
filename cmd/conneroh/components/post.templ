@@ -45,7 +45,7 @@ templ PostEmbed(
 				</p>
 				<div class="flex flex-wrap gap-2 mb-4">
 					for _, tag := range post.Tags {
-						@TagControl(tag)
+						@TagControl(tag, "#search-posts")
 					}
 				</div>
 				<div
@@ -55,7 +55,7 @@ templ PostEmbed(
 						class="text-blue-600 dark:text-blue-400 hover:underline text-sm font-medium flex items-center group"
 					>
 						Read More
-						@Icon("arrow-right")
+						@Icon("arrow-right", templ.Attributes{})
 					</span>
 				</div>
 			</div>

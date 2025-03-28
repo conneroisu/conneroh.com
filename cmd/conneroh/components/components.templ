@@ -13,10 +13,11 @@ templ Morpher(comp templ.Component) {
 
 templ Icon(
 	id string,
+	attrs templ.Attributes,
 ) {
 	<img
 		src={ fmt.Sprintf("/dist/svg/%s.svg", id) }
-		class="m-0 scale-100"
+		{ attrs... }
 	/>
 }
 
@@ -32,8 +33,10 @@ templ Image(
 	/>
 }
 
+// See conneroh.views.List & conneroh.views.search
 templ TagControl(
 	tag *gen.Tag,
+	updateTarget string,
 ) {
 	<div
 		x-data="{ open: false }"
@@ -41,11 +44,15 @@ templ TagControl(
 		x-on:mouseleave="open = false"
 		class="ctag flex items-center"
 	>
-		<i
-			x-show="open"
-			class={ "nf " + tag.Icon + " mr-2" }
-			x-transition
-		></i>
+		// <i
+		// 	x-show="open"
+		// 	class={ "nf " + tag.Icon + " mr-2" }
+		// 	x-transition
+		// ></i>
+		@Icon(tag.Icon, templ.Attributes{
+			"x-show":       "open",
+			"x-transition": "",
+		})
 		<a
 			x-on:click="open = true"
 			x-show="!open"
@@ -68,13 +75,19 @@ templ TagControl(
 			x-show="open"
 			x-transition
 		>
-			@Icon("circle-plus")
+			@Icon("circle-plus", templ.Attributes{
+				"x-show":       "open",
+				"x-transition": "",
+			})
 		</div>
 		<div
 			x-show="open"
 			x-transition
 		>
-			@Icon("circle-minus")
+			@Icon("circle-minus", templ.Attributes{
+				"x-show":       "open",
+				"x-transition": "",
+			})
 		</div>
 	</div>
 }

@@ -19,7 +19,7 @@ templ header() {
 							@click="isMenuOpen = !isMenuOpen"
 							class="sm:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none mr-2"
 						>
-							@components.Icon("menu")
+							@components.Icon("menu", templ.Attributes{})
 						</button>
 						// Logo - visible on all screens
 						<a

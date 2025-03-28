@@ -33,7 +33,7 @@ templ ProjectEmbed(
 				class="flex flex-wrap gap-2 mb-4"
 			>
 				for _, tag := range project.Tags {
-					@TagControl(tag)
+					@TagControl(tag, "#search-projects")
 				}
 			</div>
 			<a
@@ -46,7 +46,7 @@ templ ProjectEmbed(
 				preload="mouseover"
 			>
 				View Project
-				@Icon("arrow-right")
+				@Icon("arrow-right", templ.Attributes{})
 			</a>
 		</a>
 	</div>

@@ -139,6 +139,7 @@
             export REPO_ROOT=$(git rev-parse --show-toplevel) # needed
 
             go fmt $REPO_ROOT/...
+            ${pkgs.go}/bin/go fmt ./...
 
             git ls-files \
               --others \
@@ -147,7 +148,7 @@
               -- '*.js' '*.ts' '*.css' '*.md' '*.json' \
               | xargs prettier --write
 
-            golines \
+            ${pkgs.golines}/bin/golines \
               -l \
               -w \
               --max-len=80 \
@@ -263,6 +264,10 @@
             ];
           };
           extraCommands = ''
+
+            export REPO_ROOT=$(git rev-parse --show-toplevel) # needed
+            # PRINT A PRINTF STYLE REPO_ROOT
+            echo "REPO_ROOT: $REPO_ROOT"
             echo "$(git rev-parse HEAD)" > REVISION
           '';
         };

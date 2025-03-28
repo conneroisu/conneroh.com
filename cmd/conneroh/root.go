@@ -53,7 +53,7 @@ func NewServer(
 // Run is the entry point for the application.
 func Run(
 	ctx context.Context,
-	getenv func(string) string,
+	_ func(string) string,
 ) error {
 	start := time.Now()
 
