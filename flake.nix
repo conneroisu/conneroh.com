@@ -161,7 +161,7 @@
             ${pkgs.templ}/bin/templ generate &
 
             ${pkgs.bun}/bin/bun build \
-                ./index.js \
+                ./index.ts \
                 --minify \
                 --minify-syntax \
                 --minify-whitespace  \
