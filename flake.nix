@@ -342,7 +342,7 @@
             --format v2s2
 
           echo "Deploying to Fly.io..."
-          fly deploy --remote-only -c ${app-config} -i registry.fly.io/conneroh-com
+          ${pkgs.flyctl}/bin/fly deploy --remote-only -c ${app-config} -i registry.fly.io/conneroh-com
         '';
 
         # Add the bundled JS as a package
