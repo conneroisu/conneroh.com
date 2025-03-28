@@ -56,7 +56,6 @@
       buildGoModule = pkgs.buildGoModule.override {go = pkgs.go_1_24;};
       buildWithSpecificGo = pkg: pkg.override {inherit buildGoModule;};
 
-      # Correctly call the bun.nix file
       bunDeps = pkgs.callPackage ./bun.nix {};
 
       # Create a bundler derivation to bundle index.js
@@ -145,7 +144,6 @@
         generate-js = {
           exec = ''
             export REPO_ROOT=$(git rev-parse --show-toplevel) # needed
-            ln -sf ${bunDeps.nodeModules}/node_modules $REPO_ROOT/node_modules
 
             ${pkgs.bun}/bin/bun build \
                 $REPO_ROOT/index.js \
@@ -162,7 +160,6 @@
           exec = ''
             ${pkgs.templ}/bin/templ generate
 
-            # Link node_modules instead of running bun install
             mkdir -p node_modules
             ln -sf ${bunDeps.nodeModules}/node_modules/* node_modules/ || true
 
