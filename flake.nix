@@ -17,11 +17,6 @@
 
     mk-shell-bin.url = "github:rrbutani/nix-mk-shell-bin";
 
-    sqlcquash = {
-      url = "github:conneroisu/sqlcquash/main";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-utils.follows = "flake-utils";
-    };
     bun2nix.url = "github:baileyluTCD/bun2nix";
 
     systems.url = "github:nix-systems/default";
@@ -248,15 +243,7 @@
             bun
             nodePackages.typescript-language-server
             nodePackages.prettier
-            sqlite-web
             nodePackages.svgo
-
-            # SQL Related
-            sqlc
-            sqls
-            sqldiff
-            inputs.sqlcquash.packages."${pkgs.system}".default
-            sleek
 
             # Infra
             flyctl
