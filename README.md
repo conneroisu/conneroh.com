@@ -40,11 +40,10 @@ It follows a modern server-side rendering approach with HTMX for dynamic content
 │   └── update/          # Content update utility
 ├── internal/            # Private application code
 │   ├── data/            # Data access layer
-│   │   ├── docs/        # Markdown content
-│   │   │   ├── posts/   # Blog posts
-│   │   │   ├── projects/# Project descriptions
-│   │   │   └── tags/    # Tag descriptions
-│   │   └── master/      # Database schema and queries
+│   │   └── docs/        # Markdown content
+│   │       ├── posts/   # Blog posts
+│   │       ├── projects/# Project descriptions
+│   │       └── tags/    # Tag descriptions
 │   └── routing/         # HTTP routing
 └── [various config files]
 ```
