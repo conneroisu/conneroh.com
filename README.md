@@ -8,8 +8,6 @@ This portfolio website is built using Go with templ for generating HTML template
 
 It follows a modern server-side rendering approach with HTMX for dynamic content loading without full page refreshes.
 
-The site organizes content into projects, posts, and tags, all backed by a SQLite database with content managed through Markdown files in the repository.
-
 ## Features
 
 - **Server-side rendered** pages with templ templates
@@ -25,7 +23,6 @@ The site organizes content into projects, posts, and tags, all backed by a SQLit
 
 - **Backend**: Go
 - **Templates**: templ
-- **Database**: SQLite
 - **CSS**: Tailwind CSS
 - **Frontend Interactivity**: Alpine.js
 - **Dynamic Content**: HTMX
