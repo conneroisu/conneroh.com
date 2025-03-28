@@ -13,7 +13,10 @@ templ Layout(title string) {
 			<link rel="stylesheet" href="/dist/style.css"/>
 			<script type="module" src="/dist/index.js"></script>
 		</head>
-		<body class="bg-white dark:bg-gray-900" hx-ext="preload">
+		<body
+			class="bg-white dark:bg-gray-900"
+			hx-ext="preload"
+		>
 			@header()
 			<div id="bodiody">
 				{ children... }

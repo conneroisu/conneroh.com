@@ -136,12 +136,11 @@
         };
         format = {
           exec = ''
-            export REPO_ROOT=$(git rev-parse --show-toplevel) # needed
+            cd $(git rev-parse --show-toplevel)
 
-            go fmt $REPO_ROOT/...
             ${pkgs.go}/bin/go fmt ./...
 
-            git ls-files \
+            ${pkgs.git}/bin/git ls-files \
               --others \
               --exclude-standard \
               --cached \
@@ -154,6 +153,8 @@
               --max-len=80 \
               --shorten-comments \
               --ignored-dirs=.direnv .
+
+            cd -
           '';
           description = "Format code files";
         };
@@ -226,7 +227,6 @@
 
       packages = let
         app-name = "conneroh.com";
-        app-config = ./fly.toml;
       in rec {
         conneroh = buildGoModule {
           pname = app-name;
@@ -235,7 +235,7 @@
           src = ./.;
           subPackages = ["."];
           nativeBuildInputs = [pkgs.bun];
-          vendorHash = "sha256-KeUHn4w8Xc0He/mg6XJoK+0276WiTw5phIquwY7Usaw=";
+          vendorHash = "sha256-ZJVL1+FXM3cKJw2UoZJeue+hWPbD8qGgMxLj5ckg0Vw=";
           preBuild = ''
             # Link node_modules from bunDeps
             mkdir -p node_modules
@@ -264,10 +264,6 @@
             ];
           };
           extraCommands = ''
-
-            export REPO_ROOT=$(git rev-parse --show-toplevel) # needed
-            # PRINT A PRINTF STYLE REPO_ROOT
-            echo "REPO_ROOT: $REPO_ROOT"
             echo "$(git rev-parse HEAD)" > REVISION
           '';
         };
@@ -293,7 +289,7 @@
           echo "Deploying to Fly.io..."
           ${pkgs.flyctl}/bin/fly deploy \
             --remote-only \
-            -c ${app-config} \
+            -c ${./fly.toml} \
             -i registry.fly.io/conneroh-com \
             -t "$FLY_AUTH_TOKEN"
         '';
