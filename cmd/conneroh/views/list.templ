@@ -5,6 +5,7 @@ import (
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
 	"github.com/conneroisu/conneroh.com/internal/routing"
+	"strconv"
 )
 
 templ search(
@@ -84,9 +85,9 @@ templ listProjectItem(project *gen.Project) {
 		<a
 			hx-target="#bodiody"
 			hx-get={ fmt.Sprintf("/hateoas/morphs/project/%s", project.Slug) }
+			hx-push-url={ fmt.Sprintf("/project/%s", project.Slug) }
 			hx-swap="outerHTML"
 			hx-trigger="click"
-			hx-push-url={ fmt.Sprintf("/project/%s", project.Slug) }
 			preload="mouseover"
 		>
 			<h2
@@ -99,11 +100,28 @@ templ listProjectItem(project *gen.Project) {
 			>
 				{ project.Description }
 			</p>
+			<p class="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
+				<span class="font-bold">
+					{ strconv.Itoa(len(project.Tags)) }
+				</span>
+				tags
+			</p>
 			<div
-				class="flex flex-wrap gap-2 mb-4"
+				class="flex flex-wrap gap-2 mb-4 grid grid-cols-2"
+				x-data="{ po_open: false }"
 			>
-				for _, tag := range project.Tags {
-					@components.TagControl(tag, "#list-project")
+				for i, tag := range project.Tags {
+					if i < 8 {
+						@components.TagControl(tag, "#list-project")
+					} else {
+						// TODO: Add a "show more" button
+						@components.Icon("ellipsis", templ.Attributes{
+							"class":           "ctag flex items-center h-8 flex-row justify-between w-full hover:underline",
+							"x-on:mouseover":  "po_open = true",
+							"x-on:mouseleave": "po_open = false",
+							"x-on:click":      "po_open = !po-open",
+						})
+					}
 				}
 			</div>
 			<a

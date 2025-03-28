@@ -43,6 +43,15 @@ func AddRoutes(
 		"GET /dist/",
 		http.FileServer(http.FS(static.Dist)),
 	)
+	h.Handle(
+		"GET /favicon.ico",
+		http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+			_, err := w.Write(static.Favicon)
+			if err != nil {
+				return
+			}
+		}),
+	)
 
 	h.Handle(
 		"GET /posts",
