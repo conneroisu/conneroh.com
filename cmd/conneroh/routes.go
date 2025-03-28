@@ -106,26 +106,51 @@ func AddRoutes(
 		h.Handle(fmt.Sprintf(
 			"GET /hateoas/morphs/post/%s",
 			p.Slug,
-		), templ.Handler(components.Morpher(views.Post(p, &gen.AllPosts, &gen.AllProjects, &gen.AllTags))))
+		), templ.Handler(components.Morpher(views.Post(
+			p,
+			&gen.AllPosts,
+			&gen.AllProjects,
+			&gen.AllTags,
+		))))
 	}
 	for _, p := range gen.AllProjects {
 		h.Handle(
 			fmt.Sprintf("GET /project/%s", p.Slug),
-			templ.Handler(layouts.Page(views.Project(p, &gen.AllPosts, &gen.AllProjects, &gen.AllTags))),
+			templ.Handler(layouts.Page(views.Project(
+				p,
+				&gen.AllPosts,
+				&gen.AllProjects,
+				&gen.AllTags,
+			))),
 		)
 		h.Handle(
 			fmt.Sprintf("GET /hateoas/morphs/project/%s", p.Slug),
-			templ.Handler(components.Morpher(views.Project(p, &gen.AllPosts, &gen.AllProjects, &gen.AllTags))),
+			templ.Handler(components.Morpher(views.Project(
+				p,
+				&gen.AllPosts,
+				&gen.AllProjects,
+				&gen.AllTags,
+			))),
 		)
 	}
 	for _, t := range gen.AllTags {
 		h.Handle(
 			fmt.Sprintf("GET /tag/%s", t.Slug),
-			templ.Handler(layouts.Page(views.Tag(t, &gen.AllPosts, &gen.AllProjects, &gen.AllTags))),
+			templ.Handler(layouts.Page(views.Tag(
+				t,
+				&gen.AllPosts,
+				&gen.AllProjects,
+				&gen.AllTags,
+			))),
 		)
 		h.Handle(
 			fmt.Sprintf("GET /hateoas/morphs/tag/%s", t.Slug),
-			templ.Handler(components.Morpher(views.Tag(t, &gen.AllPosts, &gen.AllProjects, &gen.AllTags))),
+			templ.Handler(components.Morpher(views.Tag(
+				t,
+				&gen.AllPosts,
+				&gen.AllProjects,
+				&gen.AllTags,
+			))),
 		)
 	}
 
