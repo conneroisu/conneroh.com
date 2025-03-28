@@ -160,6 +160,14 @@
           exec = ''
             ${pkgs.templ}/bin/templ generate &
 
+            ${pkgs.bun}/bin/bun build \
+                ./index.js \
+                --minify \
+                --minify-syntax \
+                --minify-whitespace  \
+                --minify-identifiers \
+                --outdir ./cmd/conneroh/_static/dist/ &
+
             ${pkgs.tailwindcss}/bin/tailwindcss \
                 --minify \
                 -i ./input.css \
