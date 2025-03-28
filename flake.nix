@@ -97,9 +97,7 @@
         };
 
         clean = {
-          exec = ''
-            git clean -fdx
-          '';
+          exec = ''git clean -fdx'';
           description = "Clean Project";
         };
 
@@ -126,11 +124,6 @@
         update = {
           exec = ''go run $REPO_ROOT/cmd/update'';
           description = "Update the database.";
-        };
-
-        restart = {
-          exec = ''rm -f $REPO_ROOT/master.db && go run $REPO_ROOT/cmd/update'';
-          description = "Execute restart command with doppler";
         };
 
         generate-reload = {
@@ -344,9 +337,6 @@
             -i registry.fly.io/conneroh-com \
             -t "$FLY_AUTH_TOKEN"
         '';
-
-        # Add the bundled JS as a package
-        bundledJs = bundleJs;
       };
     });
 }
