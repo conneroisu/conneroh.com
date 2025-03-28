@@ -8,10 +8,10 @@ import (
 
 // Individual Post component
 templ Post(
-	post gen.Post,
-	fullPosts *[]gen.Post,
-	fullProjects *[]gen.Project,
-	fullTags *[]gen.Tag,
+	post *gen.Post,
+	fullPosts *[]*gen.Post,
+	fullProjects *[]*gen.Project,
+	fullTags *[]*gen.Tag,
 ) {
 	<article class="container mx-auto px-4 py-8 max-w-3xl">
 		<div class="mb-8">

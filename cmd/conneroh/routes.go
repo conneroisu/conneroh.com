@@ -96,7 +96,12 @@ func AddRoutes(
 	for _, p := range gen.AllPosts {
 		h.Handle(
 			fmt.Sprintf("GET /post/%s", p.Slug),
-			templ.Handler(layouts.Page(views.Post(p, &gen.AllPosts, &gen.AllProjects, &gen.AllTags))),
+			templ.Handler(layouts.Page(views.Post(
+				p,
+				&gen.AllPosts,
+				&gen.AllProjects,
+				&gen.AllTags,
+			))),
 		)
 		h.Handle(fmt.Sprintf(
 			"GET /hateoas/morphs/post/%s",

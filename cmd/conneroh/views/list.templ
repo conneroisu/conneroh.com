@@ -42,9 +42,9 @@ templ search(
 
 templ List(
 	target routing.PluralTarget,
-	posts *[]gen.Post,
-	projects *[]gen.Project,
-	tags *[]gen.Tag,
+	posts *[]*gen.Post,
+	projects *[]*gen.Project,
+	tags *[]*gen.Tag,
 ) {
 	<div
 		class="container mx-auto px-4 py-8"
@@ -62,11 +62,11 @@ templ List(
 			switch target {
 				case routing.PluralTargetPost:
 					for _, post := range *posts {
-						@components.PostEmbed(&post)
+						@components.PostEmbed(post)
 					}
 				case routing.PluralTargetProject:
 					for _, project := range *projects {
-						@components.ProjectEmbed(&project)
+						@components.ProjectEmbed(project)
 					}
 				case routing.PluralTargetTag:
 					for _, tag := range *tags {

@@ -7,9 +7,9 @@ import (
 )
 
 templ Home(
-	fullPosts *[]gen.Post,
-	fullProjects *[]gen.Project,
-	fullTags *[]gen.Tag,
+	fullPosts *[]*gen.Post,
+	fullProjects *[]*gen.Project,
+	fullTags *[]*gen.Tag,
 ) {
 	// Hero Section
 	<section
