@@ -183,7 +183,12 @@ templ Home(
 					Recent Posts
 				</h2>
 				<a
-					href="/posts"
+					hx-get="/hateoas/morph/posts"
+					hx-trigger="click"
+					hx-push-url="/posts"
+					hx-swap="outerHTML"
+					hx-target="#bodiody"
+					preload="mouseover"
 					class="text-blue-600 dark:text-blue-400 hover:underline flex items-center"
 				>
 					View All Posts
@@ -195,6 +200,12 @@ templ Home(
 					if i < 4 {
 						<div
 							class="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-md transition-transform duration-300 hover:scale-105 hover:shadow-lg"
+							hx-get={ fmt.Sprintf("/hateoas/morphs/post/%s", post.Slug) }
+							hx-push-url={ fmt.Sprintf("/post/%s", post.Slug) }
+							hx-trigger="click"
+							hx-swap="outerHTML"
+							hx-target="#bodiody"
+							preload="mouseover"
 						>
 							// Post banner image
 							<div
@@ -251,7 +262,12 @@ templ Home(
 									}
 								</div>
 								<a
-									href={ templ.SafeURL("/post/" + post.Slug) }
+									hx-get={ fmt.Sprintf("/hateoas/morphs/post/%s", post.Slug) }
+									hx-push-url={ fmt.Sprintf("/post/%s", post.Slug) }
+									hx-trigger="click"
+									hx-swap="outerHTML"
+									hx-target="#bodiody"
+									preload="mouseover"
 									class="text-blue-600 dark:text-blue-400 hover:underline text-sm font-medium flex items-center"
 								>
 									Read Post
