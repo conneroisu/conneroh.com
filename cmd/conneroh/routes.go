@@ -40,7 +40,7 @@ func AddRoutes(
 		))),
 	)
 	h.Handle(
-		"GET /dist/",
+		"GET /dist/{path...}",
 		http.FileServer(http.FS(static.Dist)),
 	)
 	h.Handle(

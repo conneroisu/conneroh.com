@@ -74,7 +74,9 @@ templ Project(
 			<div
 				class="prose prose-lg prose-headings:mt-6 prose-headings:mb-4 prose-p:my-4 prose-ul:my-4 prose-li:my-2 prose-pre:my-6 max-w-none text-gray-700 dark:text-gray-300 leading-relaxed"
 			>
-				@templ.Raw(project.Content)
+				<article>
+					@templ.Raw(project.Content)
+				</article>
 			</div>
 		</div>
 		if len(project.Posts) > 0 {
