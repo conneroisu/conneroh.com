@@ -214,8 +214,6 @@
             nodePackages.typescript-language-server
             nodePackages.prettier
             nodePackages.svgo
-            svgcleaner
-            chroma
             # Infra
             flyctl
             wireguard-tools

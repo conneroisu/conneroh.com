@@ -80,7 +80,7 @@ templ List(
 
 templ listProjectItem(project *gen.Project) {
 	<div
-		class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 p-6"
+		class="listIt"
 	>
 		<a
 			hx-target="#bodiody"
@@ -150,7 +150,7 @@ templ listTagItem(
 		hx-get={ fmt.Sprintf("/hateoas/morphs/tag/%s", tag.Slug) }
 		hx-push-url={ fmt.Sprintf("/tag/%s", tag.Slug) }
 		preload="mouseover"
-		class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1"
+		class="listIt"
 	>
 		<div
 			class="p-6"
@@ -196,7 +196,7 @@ templ listPostItem(
 	post *gen.Post,
 ) {
 	<div
-		class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1"
+		class="listIt"
 		x-transition:enter="transition ease-out duration-200"
 		x-transition:enter-start="opacity-0 transform translate-y-4"
 		x-transition:enter-end="opacity-100 transform translate-y-0"
@@ -230,9 +230,22 @@ templ listPostItem(
 				>
 					{ post.Description }
 				</p>
-				<div class="flex flex-wrap gap-2 mb-4">
-					for _, tag := range post.Tags {
-						@components.TagControl(tag, "#search-posts")
+				<div
+					class="flex flex-wrap gap-2 mb-4 grid grid-cols-2"
+					x-data="{ po_open: false }"
+				>
+					for i, tag := range post.Tags {
+						if i < 8 {
+							@components.TagControl(tag, "#list-project")
+						} else {
+							// TODO: Add a "show more" button
+							@components.Icon("ellipsis", templ.Attributes{
+								"class":           "ctag flex items-center h-8 flex-row justify-between w-full hover:underline",
+								"x-on:mouseover":  "po_open = true",
+								"x-on:mouseleave": "po_open = false",
+								"x-on:click":      "po_open = !po-open",
+							})
+						}
 					}
 				</div>
 				<div
