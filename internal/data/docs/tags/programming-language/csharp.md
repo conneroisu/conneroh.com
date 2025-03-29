@@ -8,7 +8,7 @@ created_at: 2025-03-27T14:13:16.000-06:00
 description: C# is a modern, object-oriented programming language developed by Microsoft in the early 2000s as part of the .NET framework, designed to be simple, type-safe, and scalable.
 icon: csharp-plain
 title: C#
-updated_at: 2025-03-27T14:13:16.000-06:00
+updated_at: 2025-03-28T20:07:43.000-06:00
 ---
 
 # C#

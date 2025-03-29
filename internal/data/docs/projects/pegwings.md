@@ -6,7 +6,8 @@ tags: []
 created_at: 2025-03-28T19:22:16.000-06:00
 description: A AI startup that shares similiarities with ChatGPT, Anthropic, and other AI Models with more capable models
 titile: Pegwings
-updated_at: 2025-03-28T19:24:19.000-06:00
+title: Pegwings
+updated_at: 2025-03-28T20:07:30.000-06:00
 ---
 
 # Pegwings

@@ -11,7 +11,7 @@ tags:
 created_at: 2025-03-27T14:13:10.000-06:00
 description: The second Project from CPRE488 at Iowa State University
 title: CPRE488 MP1
-updated_at: 2025-03-28T19:10:05.000-06:00
+updated_at: 2025-03-28T20:07:29.000-06:00
 ---
 # CPRE488 MP1
 

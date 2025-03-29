@@ -7,7 +7,7 @@ tags:
 created_at: 2025-03-28T19:12:39.000-06:00
 description: A Go library for extracting data from HTML tables.
 title: seltabl
-updated_at: 2025-03-28T19:19:02.000-06:00
+updated_at: 2025-03-28T20:07:30.000-06:00
 ---
 
 Embarking on a journey through the intricate world of web data extraction, I often found myself entangled in the complexities of parsing HTML tables. The repetitive tasks, the cumbersome code, and the constant battle to maintain efficiency were challenges I knew many developers faced. Determined to find a solution, I channeled my passion for coding and problem-solving into creating **seltabl**, a Go library designed to transform the way we interact with HTML tables.

@@ -5,13 +5,13 @@ aliases:
 tags:
   - ide/vivado
   - vcs/git
-  - academics/cpre488
+  - edu/iastate/cpre488
 created_at: 2025-03-27T14:13:10.000-06:00
 description: Post on how I made Vivado not suck at Git
 projects:
   - cpre488-mp2
 title: Making Vivado not suck at Git
-updated_at: 2025-03-27T14:13:10.000-06:00
+updated_at: 2025-03-28T20:07:29.000-06:00
 ---
 
 # Making Vivado not suck at Git

@@ -7,7 +7,7 @@ tags:
 created_at: 2025-03-28T19:17:07.000-06:00
 description: A high-performance, cost-effective AI decision-making library written in pure Go.
 title: semantic-router-go
-updated_at: 2025-03-28T19:18:33.000-06:00
+updated_at: 2025-03-28T20:07:30.000-06:00
 ---
 
 # semanticrouter-go

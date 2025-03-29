@@ -9,7 +9,7 @@ tags:
 created_at: 2025-03-28T19:25:22.000-06:00
 description: A veterinary startup that aims to help veterinarians with their documentation needs.
 titile: Kreative DocuVet
-updated_at: 2025-03-28T19:25:59.000-06:00
+updated_at: 2025-03-28T20:07:29.000-06:00
 ---
 
 During my tenure as the Founding Chief AI Officer at [Kreative DocuVet](https://kreativedocuvet.com/) from December 2023 to July 2024, I spearheaded initiatives that significantly advanced the integration of artificial intelligence within veterinary practices.
