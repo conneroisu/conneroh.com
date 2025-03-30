@@ -8,7 +8,6 @@ import (
 
 	"github.com/a-h/templ"
 	static "github.com/conneroisu/conneroh.com/cmd/conneroh/_static"
-	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/layouts"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/views"
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
@@ -55,7 +54,7 @@ func AddRoutes(
 	)
 	h.Handle(
 		"GET /hateoas/morph/home",
-		templ.Handler(components.Morpher(home)),
+		templ.Handler(layouts.Morpher(home)),
 	)
 	h.Handle(
 		"GET /dist/",
@@ -76,19 +75,19 @@ func AddRoutes(
 		templ.Handler(layouts.Page(posts)))
 	h.Handle(
 		"GET /hateoas/morph/posts",
-		templ.Handler(components.Morpher(posts)))
+		templ.Handler(layouts.Morpher(posts)))
 	h.Handle(
 		"GET /projects",
 		templ.Handler(layouts.Page(projects)))
 	h.Handle(
 		"GET /hateoas/morph/projects",
-		templ.Handler(components.Morpher(projects)))
+		templ.Handler(layouts.Morpher(projects)))
 	h.Handle(
 		"GET /tags",
 		templ.Handler(layouts.Page(tags)))
 	h.Handle(
 		"GET /hateoas/morph/tags",
-		templ.Handler(components.Morpher(tags)))
+		templ.Handler(layouts.Morpher(tags)))
 
 	for _, p := range gen.AllPosts {
 		h.Handle(
@@ -103,7 +102,7 @@ func AddRoutes(
 		h.Handle(fmt.Sprintf(
 			"GET /hateoas/morphs/post/%s",
 			p.Slug,
-		), templ.Handler(components.Morpher(views.Post(
+		), templ.Handler(layouts.Morpher(views.Post(
 			p,
 			&gen.AllPosts,
 			&gen.AllProjects,
@@ -122,7 +121,7 @@ func AddRoutes(
 		)
 		h.Handle(
 			fmt.Sprintf("GET /hateoas/morphs/project/%s", p.Slug),
-			templ.Handler(components.Morpher(views.Project(
+			templ.Handler(layouts.Morpher(views.Project(
 				p,
 				&gen.AllPosts,
 				&gen.AllProjects,
@@ -142,7 +141,7 @@ func AddRoutes(
 		)
 		h.Handle(
 			fmt.Sprintf("GET /hateoas/morphs/tag/%s", t.Slug),
-			templ.Handler(components.Morpher(views.Tag(
+			templ.Handler(layouts.Morpher(views.Tag(
 				t,
 				&gen.AllPosts,
 				&gen.AllProjects,

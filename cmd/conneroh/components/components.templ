@@ -5,18 +5,12 @@ import (
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
 )
 
-templ Morpher(comp templ.Component) {
-	<div id="bodiody">
-		@comp
-	</div>
-}
-
 templ Icon(
 	id string,
 	attrs templ.Attributes,
 ) {
 	<img
-		src={ fmt.Sprintf("https://%s.fly.storage.tigris.dev/svg/%s.svg", "conneroh", id) }
+		src={ fmt.Sprintf("https://conneroh.fly.storage.tigris.dev/svg/%s.svg", id) }
 		{ attrs... }
 	/>
 }
