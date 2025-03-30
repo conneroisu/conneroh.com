@@ -94,11 +94,11 @@ func generateProjectionMatrix(inputDim, outputDim int) *mat.Dense {
 	matrix := mat.NewDense(outputDim, inputDim, nil)
 
 	// For each output dimension
-	for i := 0; i < outputDim; i++ {
+	for i := range outputDim {
 		// Calculate a center point for this dimension's projection focus
 		center := (i * inputDim) / outputDim
 
-		for j := 0; j < inputDim; j++ {
+		for j := range inputDim {
 			// Calculate a weight based on distance from the center point
 			// Use a Gaussian-like function for smooth projection
 			dist := float64(j - center)
@@ -110,13 +110,13 @@ func generateProjectionMatrix(inputDim, outputDim int) *mat.Dense {
 
 		// Normalize the row to unit length
 		var rowSum float64
-		for j := 0; j < inputDim; j++ {
+		for j := range inputDim {
 			rowSum += matrix.At(i, j) * matrix.At(i, j)
 		}
 
 		rowSum = math.Sqrt(rowSum)
 		if rowSum > 0 {
-			for j := 0; j < inputDim; j++ {
+			for j := range inputDim {
 				matrix.Set(i, j, matrix.At(i, j)/rowSum)
 			}
 		}
