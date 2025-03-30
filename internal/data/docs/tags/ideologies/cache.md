@@ -5,7 +5,7 @@ tags: []
 created_at: 2025-03-28T20:03:41.000-06:00
 description: Computer Caches
 title: Cache
-updated_at: 2025-03-28T20:20:18.000-06:00
+updated_at: 2025-03-30T17:21:04.000-06:00
 ---
 
 ## FAQ

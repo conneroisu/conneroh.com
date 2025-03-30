@@ -243,7 +243,7 @@
           src = ./.;
           subPackages = ["."];
           nativeBuildInputs = [pkgs.bun];
-          vendorHash = "sha256-XVDOANRZG7FYK8QcKRLMbWnJ35UvGqU2QfFxUZzqnTY=";
+          vendorHash = "sha256-+wVyKFz17ql1LDQgq9HBivKqkcJs6+1LL4FIpFET5Os=";
           preBuild = ''
             # Link node_modules from bunDeps
             mkdir -p node_modules

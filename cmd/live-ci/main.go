@@ -3,7 +3,6 @@ package main
 
 import (
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
-	"github.com/go-rod/rod"
 )
 
 func main() {
@@ -20,6 +19,4 @@ func main() {
 		println(tag.Title)
 		// TODO: Assert that visiting the tag URL returns a 200 OK
 	}
-	page := rod.New().MustConnect().MustPage("https://www.wikipedia.org/")
-	page.MustWaitStable().MustScreenshot("a.png")
 }
