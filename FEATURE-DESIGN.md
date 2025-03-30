@@ -35,3 +35,6 @@ HTMX endpoint for global search: `/search/all`
 ### Autocomplete posts
 - `-post:` should show all posts in an autocomplete list
 - `post:` should show all posts in an autocomplete list
+
+HTMX endpoint for list pages: `/autocomplete/{tag|project|post}`
+HTMX endpoint for global autocomplete: `/autocomplete/all`
