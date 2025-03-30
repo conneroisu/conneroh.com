@@ -7,7 +7,7 @@ tags:
 created_at: 2025-03-28T20:02:34.000-06:00
 description: Locality refers to the proximity of data items in memory.
 title: Locality
-updated_at: 2025-03-28T20:07:43.000-06:00
+updated_at: 2025-03-30T17:03:31.000-06:00
 ---
 
 # Locality in Applications
