@@ -35,8 +35,7 @@ func (a *Asset) Upload(ctx context.Context, client *s3.Client) error {
 // URL returns the url of the asset.
 func (a *Asset) URL() string {
 	return fmt.Sprintf(
-		"https://%s.fly.storage.tigris.dev/%s",
-		os.Getenv("BUCKET_NAME"),
+		"https://conneroh.fly.storage.tigris.dev/%s",
 		a.Path,
 	)
 }
