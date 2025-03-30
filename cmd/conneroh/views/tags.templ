@@ -2,7 +2,6 @@ package views
 
 import (
 	"fmt"
-	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
 )
 
@@ -20,7 +19,7 @@ templ Tag(
 			<div
 				class="inline-block p-4 rounded-full bg-gray-200 dark:bg-gray-200"
 			>
-				@components.Icon(tag.Icon, templ.Attributes{
+				@icon(tag.Icon, templ.Attributes{
 					"style": "width: 4em; height: 4em;",
 				})
 			</div>
@@ -81,7 +80,7 @@ templ Tag(
 								class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
 							>
 								if post.BannerPath != "" {
-									@components.Image(post.BannerPath, post.Title, "w-full h-40 object-cover")
+									@image(post.BannerPath, post.Title, "w-full h-40 object-cover")
 								} else {
 									<div
 										class="w-full h-40 bg-gray-200 dark:bg-gray-700 flex items-center justify-center"

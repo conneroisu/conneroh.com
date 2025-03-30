@@ -2,7 +2,6 @@ package views
 
 import (
 	"fmt"
-	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
 )
 
@@ -40,7 +39,7 @@ templ Post(
 				}
 			</div>
 			if post.BannerPath != "" {
-				@components.Image(post.BannerPath, post.Title, "w-full h-64 md:h-96 object-cover object-center rounded-lg shadow-md mb-8")
+				@image(post.BannerPath, post.Title, "w-full h-64 md:h-96 object-cover object-center rounded-lg shadow-md mb-8")
 			}
 		</div>
 		<div

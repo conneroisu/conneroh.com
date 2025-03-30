@@ -2,7 +2,6 @@ package views
 
 import (
 	"fmt"
-	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
 	"github.com/conneroisu/conneroh.com/internal/routing"
 	"strconv"
@@ -25,7 +24,7 @@ templ search(
 				hx-indicator="#search-indicator"
 			/>
 			<div class="absolute left-3 top-2.5 text-gray-400 dark:text-gray-500">
-				@components.Icon("search", templ.Attributes{})
+				@icon("search", templ.Attributes{})
 			</div>
 			<div
 				id="search-indicator"
@@ -113,10 +112,10 @@ templ listProjectItem(project *gen.Project) {
 			>
 				for i, tag := range project.Tags {
 					if i < 8 {
-						@components.TagControl(tag, "#list-project")
+						@TagControl(tag, "#list-project")
 					} else {
 						// TODO: Add a "show more" button
-						@components.Icon("ellipsis", templ.Attributes{
+						@icon("ellipsis", templ.Attributes{
 							"class":           "ctag flex items-center h-8 flex-row justify-between w-full hover:underline",
 							"x-on:mouseover":  "po_open = true",
 							"x-on:mouseleave": "po_open = false",
@@ -135,7 +134,7 @@ templ listProjectItem(project *gen.Project) {
 				preload="mouseover"
 			>
 				View Project
-				@components.Icon("arrow-right", templ.Attributes{})
+				@icon("arrow-right", templ.Attributes{})
 			</a>
 		</a>
 	</div>
@@ -167,7 +166,7 @@ templ listTagItem(
 				<div
 					class="bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center h-8 w-8"
 				>
-					@components.Icon(tag.Icon, templ.Attributes{"class": "stoke-white"})
+					@icon(tag.Icon, templ.Attributes{"class": "stoke-white"})
 				</div>
 			</div>
 			<div
@@ -210,7 +209,7 @@ templ listPostItem(
 			hx-push-url={ fmt.Sprintf("/post/%s", post.Slug) }
 			class="block cursor-pointer"
 		>
-			@components.Image(
+			@image(
 				post.BannerPath,
 				post.Title,
 				"w-full h-48 object-cover object-center",
@@ -237,10 +236,10 @@ templ listPostItem(
 				>
 					for i, tag := range post.Tags {
 						if i < 8 {
-							@components.TagControl(tag, "#list-project")
+							@TagControl(tag, "#list-project")
 						} else {
 							// TODO: Add a "show more" button
-							@components.Icon("ellipsis", templ.Attributes{
+							@icon("ellipsis", templ.Attributes{
 								"class":           "ctag flex items-center h-8 flex-row justify-between w-full hover:underline",
 								"x-on:mouseover":  "po_open = true",
 								"x-on:mouseleave": "po_open = false",
@@ -256,7 +255,7 @@ templ listPostItem(
 						class="text-blue-600 dark:text-blue-400 hover:underline text-sm font-medium flex items-center group"
 					>
 						Read More
-						@components.Icon("arrow-right", templ.Attributes{})
+						@icon("arrow-right", templ.Attributes{})
 					</span>
 				</div>
 			</div>

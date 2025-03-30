@@ -1,7 +1,5 @@
 package layouts
 
-import "github.com/conneroisu/conneroh.com/cmd/conneroh/components"
-
 templ search() {
 	<div
 		class="relative"
@@ -62,7 +60,7 @@ templ search() {
 				class="p-2 text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
 				:class="{ 'bg-gray-100 dark:bg-gray-700': isSearchOpen }"
 			>
-				@components.Icon("search", templ.Attributes{})
+				@icon("search", templ.Attributes{})
 			</button>
 			// Search dropdown
 			<div

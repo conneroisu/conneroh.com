@@ -1,11 +1,11 @@
-package components
+package views
 
 import (
 	"fmt"
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
 )
 
-templ Icon(
+templ icon(
 	id string,
 	attrs templ.Attributes,
 ) {
@@ -15,13 +15,13 @@ templ Icon(
 	/>
 }
 
-templ Image(
-	src string,
+templ image(
+	id string,
 	alt string,
 	class string,
 ) {
 	<img
-		src={ src }
+		src={ fmt.Sprintf("https://conneroh.fly.storage.tigris.dev/img/%s.png", id) }
 		alt={ alt }
 		class={ class }
 	/>
@@ -39,7 +39,7 @@ templ TagControl(
 		class="ctag flex items-center h-8 flex-row justify-between w-full hover:underline"
 	>
 		<div class="flex items-center">
-			@Icon(tag.Icon, templ.Attributes{"x-show": "open", "x-transition": ""})
+			@icon(tag.Icon, templ.Attributes{"x-show": "open", "x-transition": ""})
 		</div>
 		<div class="flex items-center">
 			<a
@@ -61,8 +61,8 @@ templ TagControl(
 			</a>
 		</div>
 		<div class="flex items-center">
-			@Icon("circle-plus", templ.Attributes{"x-show": "open", "x-transition": ""})
-			@Icon("circle-minus", templ.Attributes{"x-show": "open", "x-transition": ""})
+			@icon("circle-plus", templ.Attributes{"x-show": "open", "x-transition": ""})
+			@icon("circle-minus", templ.Attributes{"x-show": "open", "x-transition": ""})
 		</div>
 	</div>
 }

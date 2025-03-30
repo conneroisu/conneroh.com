@@ -2,7 +2,6 @@ package views
 
 import (
 	"fmt"
-	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
 )
 
@@ -58,7 +57,7 @@ templ Project(
 				<div
 					class="mt-6 flex items-center text-sm text-gray-500 dark:text-gray-400"
 				>
-					@components.Icon("calendar", templ.Attributes{})
+					@icon("calendar", templ.Attributes{})
 					<span>Created: { project.CreatedAt.Format("Jan 2, 2006") }</span>
 				</div>
 			</div>

@@ -1,6 +1,6 @@
 package layouts
 
-import "github.com/conneroisu/conneroh.com/cmd/conneroh/components"
+import "fmt"
 
 templ header() {
 	<header>
@@ -15,12 +15,10 @@ templ header() {
 					// Left side: Logo and navigation links
 					<div class="flex items-center">
 						// Mobile menu button
-						<button
-							@click="isMenuOpen = !isMenuOpen"
-							class="sm:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none mr-2"
-						>
-							@components.Icon("menu", templ.Attributes{})
-						</button>
+						@icon("menu", templ.Attributes{
+							"class":  "sm:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none mr-2",
+							"@click": "isMenuOpen = !isMenuOpen",
+						})
 						// Logo - visible on all screens
 						<a
 							class="text-xl font-bold text-gray-900 dark:text-white cursor-pointer pr-4"
@@ -121,4 +119,14 @@ templ header() {
 			</div>
 		</nav>
 	</header>
+}
+
+templ icon(
+	id string,
+	attrs templ.Attributes,
+) {
+	<img
+		src={ fmt.Sprintf("https://conneroh.fly.storage.tigris.dev/svg/%s.svg", id) }
+		{ attrs... }
+	/>
 }

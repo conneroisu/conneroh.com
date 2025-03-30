@@ -2,7 +2,6 @@ package views
 
 import (
 	"fmt"
-	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
 )
 
@@ -69,7 +68,7 @@ templ Home(
 							class="absolute inset-0 flex items-center justify-center text-white font-bold text-xl"
 						>
 							// Placeholder for profile image, replace with actual image
-							@components.Image(
+							@image(
 								"/dist/hero.jpeg",
 								"me",
 								"bg-blue-500 dark:bg-blue-600 rounded-full relative shadow-lg mx-auto",
@@ -108,7 +107,7 @@ templ Home(
 					class="text-blue-600 dark:text-blue-400 hover:underline flex items-center"
 				>
 					View All Projects
-					@components.Icon("arrow-right", templ.Attributes{})
+					@icon("arrow-right", templ.Attributes{})
 				</a>
 			</div>
 			<div
@@ -159,7 +158,7 @@ templ Home(
 										class="text-blue-600 dark:text-blue-400 hover:underline text-sm font-medium flex items-center"
 									>
 										View Project
-										@components.Icon("arrow-right", templ.Attributes{})
+										@icon("arrow-right", templ.Attributes{})
 									</a>
 								</div>
 							</a>
@@ -192,7 +191,7 @@ templ Home(
 					class="text-blue-600 dark:text-blue-400 hover:underline flex items-center"
 				>
 					View All Posts
-					@components.Icon("arrow-right", templ.Attributes{})
+					@icon("arrow-right", templ.Attributes{})
 				</a>
 			</div>
 			<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -311,7 +310,7 @@ templ Home(
 					class="text-blue-600 dark:text-blue-400 hover:underline flex items-center"
 				>
 					See All Skills/Technologies
-					@components.Icon("arrow-right", templ.Attributes{})
+					@icon("arrow-right", templ.Attributes{})
 				</a>
 			</div>
 			<div
@@ -329,7 +328,7 @@ templ Home(
 						<div
 							class="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-4"
 						>
-							@components.Icon(tag.Icon, templ.Attributes{})
+							@icon(tag.Icon, templ.Attributes{})
 						</div>
 						<h3 class="font-medium text-gray-900 dark:text-white">
 							{ tag.Title }
@@ -364,25 +363,25 @@ templ Home(
 						href="https://www.linkedin.com/in/conner-ohnesorge-b720a4238"
 						class="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-700 dark:text-gray-300 hover:bg-blue-500 hover:text-white dark:hover:bg-blue-500 transition-colors"
 					>
-						@components.Icon("linkedin", templ.Attributes{})
+						@icon("linkedin", templ.Attributes{})
 					</a>
 					<a
 						href="https://github.com/conneroisu"
 						class="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-700 dark:text-gray-300 hover:bg-gray-800 hover:text-white dark:hover:bg-gray-800 transition-colors"
 					>
-						@components.Icon("github", templ.Attributes{})
+						@icon("github", templ.Attributes{})
 					</a>
 					<a
 						href="https://x.com/ConnerOhnesorge"
 						class="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-700 dark:text-gray-300 hover:bg-blue-400 hover:text-white dark:hover:bg-blue-400 transition-colors"
 					>
-						@components.Icon("twitter", templ.Attributes{"class": "stroke-white"})
+						@icon("twitter", templ.Attributes{"class": "stroke-white"})
 					</a>
 					<a
 						href="mailto:conneroisu@outlook.com"
 						class="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-700 dark:text-gray-300 hover:bg-red-500 hover:text-white dark:hover:bg-red-500 transition-colors"
 					>
-						@components.Icon("mail", templ.Attributes{})
+						@icon("mail", templ.Attributes{})
 					</a>
 				</div>
 				<div
