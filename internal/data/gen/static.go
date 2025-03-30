@@ -91,17 +91,20 @@ func New[
 }
 
 func init() {
-	for _, t := range AllTags {
-		for _, p := range AllPosts {
+	var post *Post
+	var project *Project
+	var tag *Tag
+	for _, tag = range AllTags {
+		for _, post = range AllPosts {
 			// for each post that has this tag add it the tag's posts
-			if slices.Contains(p.TagSlugs, t.Slug) {
-				t.Posts = append(t.Posts, p)
+			if slices.Contains(post.TagSlugs, tag.Slug) {
+				tag.Posts = append(tag.Posts, post)
 			}
 		}
-		for _, p := range AllProjects {
+		for _, project = range AllProjects {
 			// for each project that has this tag add it the tag's projects
-			if slices.Contains(p.TagSlugs, t.Slug) {
-				t.Projects = append(t.Projects, p)
+			if slices.Contains(project.TagSlugs, tag.Slug) {
+				tag.Projects = append(tag.Projects, project)
 			}
 		}
 	}

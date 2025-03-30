@@ -19,3 +19,8 @@ var Projects embed.FS
 //
 //go:embed tags/*
 var Tags embed.FS
+
+// Assets contains all media assets.
+//
+//go:embed assets/*
+var Assets embed.FS

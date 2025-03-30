@@ -15,6 +15,32 @@ import (
 	"github.com/conneroisu/conneroh.com/internal/routing"
 )
 
+var (
+	home = views.Home(
+		&gen.AllPosts,
+		&gen.AllProjects,
+		&gen.AllTags,
+	)
+	posts = views.List(
+		routing.PluralTargetPost,
+		&gen.AllPosts,
+		&gen.AllProjects,
+		&gen.AllTags,
+	)
+	projects = views.List(
+		routing.PluralTargetProject,
+		&gen.AllPosts,
+		&gen.AllProjects,
+		&gen.AllTags,
+	)
+	tags = views.List(
+		routing.PluralTargetTag,
+		&gen.AllPosts,
+		&gen.AllProjects,
+		&gen.AllTags,
+	)
+)
+
 // AddRoutes adds all routes to the router.
 func AddRoutes(
 	_ context.Context,
@@ -25,22 +51,14 @@ func AddRoutes(
 
 	h.Handle(
 		"/{$}",
-		templ.Handler(layouts.Page(views.Home(
-			&gen.AllPosts,
-			&gen.AllProjects,
-			&gen.AllTags,
-		))),
+		templ.Handler(layouts.Page(home)),
 	)
 	h.Handle(
 		"GET /hateoas/morph/home",
-		templ.Handler(components.Morpher(views.Home(
-			&gen.AllPosts,
-			&gen.AllProjects,
-			&gen.AllTags,
-		))),
+		templ.Handler(components.Morpher(home)),
 	)
 	h.Handle(
-		"GET /dist/{path...}",
+		"GET /dist/",
 		http.FileServer(http.FS(static.Dist)),
 	)
 	h.Handle(
@@ -55,55 +73,22 @@ func AddRoutes(
 
 	h.Handle(
 		"GET /posts",
-		templ.Handler(layouts.Page(views.List(
-			routing.PluralTargetPost,
-			&gen.AllPosts,
-			&gen.AllProjects,
-			&gen.AllTags,
-		))))
+		templ.Handler(layouts.Page(posts)))
 	h.Handle(
 		"GET /hateoas/morph/posts",
-		templ.Handler(components.Morpher(views.List(
-			routing.PluralTargetPost,
-			&gen.AllPosts,
-			&gen.AllProjects,
-			&gen.AllTags,
-		))))
+		templ.Handler(components.Morpher(posts)))
 	h.Handle(
 		"GET /projects",
-		templ.Handler(layouts.Page(views.List(
-			routing.PluralTargetProject,
-			&gen.AllPosts,
-			&gen.AllProjects,
-			&gen.AllTags,
-		))))
+		templ.Handler(layouts.Page(projects)))
 	h.Handle(
 		"GET /hateoas/morph/projects",
-		templ.Handler(components.Morpher(views.List(
-			routing.PluralTargetProject,
-			&gen.AllPosts,
-			&gen.AllProjects,
-			&gen.AllTags,
-		))),
-	)
+		templ.Handler(components.Morpher(projects)))
 	h.Handle(
 		"GET /tags",
-		templ.Handler(layouts.Page(views.List(
-			routing.PluralTargetTag,
-			&gen.AllPosts,
-			&gen.AllProjects,
-			&gen.AllTags,
-		))),
-	)
+		templ.Handler(layouts.Page(tags)))
 	h.Handle(
 		"GET /hateoas/morph/tags",
-		templ.Handler(components.Morpher(views.List(
-			routing.PluralTargetTag,
-			&gen.AllPosts,
-			&gen.AllProjects,
-			&gen.AllTags,
-		))),
-	)
+		templ.Handler(components.Morpher(tags)))
 
 	for _, p := range gen.AllPosts {
 		h.Handle(

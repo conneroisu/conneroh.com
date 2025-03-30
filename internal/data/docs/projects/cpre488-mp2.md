@@ -15,7 +15,7 @@ tags:
 created_at: 2025-03-27T14:13:10.000-06:00
 description: The third Project from CPRE488 at Iowa State University
 title: CPRE488 MP2
-updated_at: 2025-03-28T20:07:29.000-06:00
+updated_at: 2025-03-30T07:46:57.000-06:00
 ---
 
 # CPRE488 MP2
@@ -26,7 +26,7 @@ The following diagram illustrates the interconnection between the various module
 system, both at the IP core level (i.e. the components in our VIVADO design) as well as the board
 level (i.e. the various chips that work together to connect the output video to the monitor).
 
-![assets/diagram.png](/dist/img/projects/cpre488-mp2/image-pipeline-diagram.png)
+![[/projects/cpre488-mp2/image-pipeline-diagram.png]]
 
 ## Starter Hardware Operation Intentions
 The overall goal of the starter hardware to to provide an interface to FMC device such that a test image sequence can be displayed over the HDMI port on the FMC device. To accomplish this, a Test Pattern Generator IP is instantiated and configured using the AXI bus to produce a video stream that is provided to the VDMA. The VDMA is configured to store this stream to a memory location and forward the stream to an AXI Stream output IP block, which passes the stream to the AVNET HDMI Output IP block. This gives the test pattern stream a direct path to the FMC module so it can be displayed.
@@ -81,7 +81,7 @@ For the TPG change, we referenced the provided datasheet to see what we configur
 
 A picture of the output of this change is shown below:
 
-![TPG Change](dist/img/projects/cpre488-mp2/tpg_change.png)
+![[/projects/cpre488-mp2/tpg_change.png]]
 
 ### Software Only Change (TPG Registers not Modified)
 For the software only change, we decided to read out the pixel colors in the YUV format and halve the luminance.  We believed that knowing the YUV format early on in the lab would be beneficial later when we have to implement SW demosaicing. The code that reads the YUV data, halves the luminance, and then writes it back is shown below:
@@ -109,7 +109,7 @@ The YUV 422 format is described later in this report.
 
 A picture of the output from this change is shown below:
 
-![TPG Change SW](/dist/img/projects/cpre488-mp2/tpg_change_sw.png)
+![[/projects/cpre488-mp2/tpg_change_sw.png]]
 
 Though it is quite hard to see in this image, the luminance has be halved. My phone camera dod not pick this up well.
 ## In the (`.xdc`) constraints file, what does the `_p` and `_n` pairing of signals signify, and what this configuration is typically used for?
@@ -221,16 +221,14 @@ Since the demosaicing software takes a while to run, we take a single snapshot i
 
 For displaying the image, we decided to treat two different read frame buffers as front and back buffers. The demosaicing code updates the back buffer while the read channel of the VDMA streams the front buffer contents to the HDMI interface. Then once the demosaicing software has ran, the buffers are swapped, which displays the latest processed frame. This worked quite well and removed many artifacts in our images. An example of an image that resulted from the software demosaicing is shown below (image quality is a bit poor due to my phone):
 
-![SW Demo](/dist/img/projects/cpre488-mp2/sw_demo.png)
+![[/projects/cpre488-mp2/sw_demo.png]]
    
 ## YCbCr 4:2:2 Format Analysis
 
 ### Note from the Documentation
 4:4:4 to 4:2:2 Conversion Eq from Subsystem Documentation (PG231):
 
-$$
-o_{x,y} = \left[\sum_{k=0}^{N_{\text{taps}}-1} i_{x-k,y}\, \text{COEF}_{k,\text{HPHASEO}}\right]_0^{2^{D_w}-1}
-$$
+$$ o_{x,y} = \left[\sum_{k=0}^{N_{\text{taps}}-1} i_{x-k,y}\, \text{COEF}_{k,\text{HPHASEO}}\right]_0^{2^{D_w}-1} $$
 
 
 Equation 3-11
@@ -298,7 +296,7 @@ For the `camera_loop()` function's conversion pass, this format would need to be
 
 Below is the resulting block diagram after adding the pipeline (we did not have enough time to update our original diagram, we have provided a description of the changes below):
 
-![](/dist/img/projects/cpre488-mp2/HW-BD.png)
+![[/projects/cpre488-mp2/HW-BD.png]]
 
 The pipeline consists of an IP block that does demosaicing to the incoming video stream and two video processing modules. One of the video processing modules converts the RGB output from the demosaicing module to YUV 444 then the other video processing module converts the YUV 444 data to YUV 422, which is what the FMC IMAGEON module expects. The output from the YUV 444 to YUV 422 is then passed through an AXI Stream Converter and is then passed to the VDMA like before. So in summary, three pipeline stages were added:
 
@@ -634,17 +632,17 @@ _HEAP_SIZE = DEFINED(_HEAP_SIZE) ? _HEAP_SIZE : 0x19000000;
 
 The digital zoom was implemented partially through the crop and scale capabilities of the fully fledged Video Processing Subsystem (v2.2) IP core. According to the embedded drivers for the IP, the VPSS has a zoom and scale core that can be used to perform a digital zoom by relaying display information in a user-specified window that can then be scaled to a desired dimension. To do this, I opted to add a separate core in addition to the two used in the original hardware pipeline for colour space conversion and chroma sampling, as I worried the additional operations could cause timing issues during the video processing. The final pipeline was as follows: Demosiac -> Zoom and Scale VPSS -> CSC VPSS -> 444:422 VPSS -> VDMA. Unfortunately, the driver documentation leaves something to be desired and there lacks an accessible example for this design. This resulted in an awfully heuristic design process, which ultimately produced a rather lackluster product. However, a product nonetheless. Although it still suffers from artifacts, a digital zoom of at most 85% of the original resolution was achieved before the video became distorted and corrupted. An example of the corrupted image can be seen below:
 
-![assets/zoom_issue.png](/dist/img/projects/cpre488-mp2/zoom_issue.png)
+![[/projects/cpre488-mp2/zoom_issue.png]]
 
 As the zoom increased past the 85% threshold, only a small segment of the top of the display would repeat. This segment seemed like it would duplicate and shrink as the zoom factor increased. Originally, I had believed that the issue lied in the output resolution of the zoom core being incompatible with the HDMI. For example, when I played around with the picture in picture mode, a similar artifact manifested - as seen below:
 
-![assets/pip_fun.png](/dist/img/projects/cpre488-mp2/pip_fun.png)
+![[/projects/cpre488-mp2/pip_fun.png]]
 
 For that reason, I figured that using the horizontal and vertical scaler cores could help align the output video resolution. However, I was unsure as to how to properly sequence the core configurations as there was a lack of relative documentation. Looking at the AMD forums, it seemed that many people experiencing similar artifacts blamed unaligned VDMA writes or bandwidth bottlenecks. In an attempt to address the VDMA issues, I tried to dynamically reconfigure the VDMA such that it could scale the non-1080p output of the zoom core to 1080p for the HDMI. I also tried allowing for unaligned VDMA reads and writes. Neither of these worked. I also wanted to try increasing the sample rate of the hardware pipeline to 2 or more pixels per clock, but I ran out of time before I could test this hypothesis. 
 
 In the end, I was able to perform a digital zoom in some way, as seen (barely) in the following image:
 
-![assets/embaressing.png](/dist/img/projects/cpre488-mp2/embaressing.png)
+![[/projects/cpre488-mp2/embaressing.png]]
 
 ### Sobel Edge Detector
 
@@ -687,7 +685,7 @@ for (int x = 0; x < 1000; x++) {
 
 The resulting effects can be seen below:
 
-![assets/Sobel_ex.png](/dist/img/projects/cpre488-mp2/Sobel_ex.png)
+![[/projects/cpre488-mp2/Sobel_ex.png]]
 
 It should be noted that a better result could have been achieved should only luminance value be used, but I ran out of time before I could implement it.  
 

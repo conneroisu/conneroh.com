@@ -6,6 +6,7 @@ import intersect from "@alpinejs/intersect";
 declare global {
   interface Window {
     Alpine: typeof Alpine;
+    MathJax: typeof MathJax;
   }
 }
 
@@ -13,3 +14,4 @@ window.Alpine = Alpine;
 
 Alpine.plugin(intersect);
 Alpine.start();
+

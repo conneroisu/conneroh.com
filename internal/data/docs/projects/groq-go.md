@@ -6,8 +6,10 @@ tags: []
 created_at: 2025-03-27T14:13:10.000-06:00
 description: Golang library for interacting with the groq API.
 title: groq-go
-updated_at: 2025-03-28T20:07:29.000-06:00
+updated_at: 2025-03-30T08:12:20.000-06:00
 ---
+
+Github: [https://github.com/conneroisu/groq-go](https://github.com/conneroisu/groq-go)
 
 # groq-go
 As a college student passionate about developing tools that bridge the gap between Go applications and advanced language models, I created **groq-go**—an unofficial Go client library for the Groq API. This project enables seamless integration with various language models hosted on Groq's platform, facilitating efficient and type-safe interactions.
@@ -60,7 +62,7 @@ The repository includes an `examples` directory showcasing various applications 
 
 **Development and Contribution:**
 
-groq-go is developed with a focus on performance and ease of use, aiming to facilitate efficient querying of open-source large language models through Groq's specially designed hardware. The project is open-source and licensed under the MIT License, encouraging community involvement and collaboration.
+`groq-go` is developed with a focus on performance and ease of use, aiming to facilitate efficient querying of open-source large language models through Groq's specially designed hardware. The project is open-source and licensed under the MIT License, encouraging community involvement and collaboration.
 
 For more information, to explore the source code, or to contribute to the project, visit the GitHub repository: [https://github.com/conneroisu/groq-go](https://github.com/conneroisu/groq-go)
 

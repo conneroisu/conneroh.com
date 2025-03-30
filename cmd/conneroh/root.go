@@ -44,6 +44,11 @@ func NewServer(
 			slog.String("method", r.Method),
 			slog.String("url", r.URL.String()),
 		)
+
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
 		mux.ServeHTTP(w, r)
 	})
 	var handler http.Handler = slogLogHandler
@@ -91,7 +96,11 @@ func Run(
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		slog.Info("server starting", slog.String("address", httpServer.Addr), slog.String("setup-time", time.Since(start).String()))
+		slog.Info(
+			"server starting",
+			slog.String("address", httpServer.Addr),
+			slog.String("setup-time", time.Since(start).String()),
+		)
 		err := httpServer.ListenAndServe()
 		if err != nil && !errors.Is(err, http.ErrServerClosed) {
 			serverErrors <- fmt.Errorf("server error: %w", err)

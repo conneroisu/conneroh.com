@@ -5,8 +5,6 @@ package views
 
 import (
 	"fmt"
-
-	"github.com/conneroisu/conneroh.com/internal/data/gen"
 )
 
 func readTime(content string) string {
@@ -18,27 +16,4 @@ func readTime(content string) string {
 		return "1"
 	}
 	return fmt.Sprintf("%d", minutes)
-}
-
-// Helper function to check if two tags have common posts or projects
-func haveCommonItems(tag1 *gen.Tag, tag2 *gen.Tag) bool {
-	// Check for common posts
-	for _, post := range tag1.Posts {
-		for _, relatedPost := range tag2.Posts {
-			if post.Slug == relatedPost.Slug {
-				return true
-			}
-		}
-	}
-
-	// Check for common projects
-	for _, project := range tag1.Projects {
-		for _, relatedProject := range tag2.Projects {
-			if project.Slug == relatedProject.Slug {
-				return true
-			}
-		}
-	}
-
-	return false
 }

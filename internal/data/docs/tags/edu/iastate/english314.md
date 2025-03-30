@@ -5,8 +5,8 @@ aliases:
 tags: []
 created_at: 2025-03-28T19:54:01.000-06:00
 description: "ENGL 314: Technical Communication"
-title: "ENGL 314: Technical Communication"
-updated_at: 2025-03-28T20:08:07.000-06:00
+title: ENGL314
+updated_at: 2025-03-30T10:06:16.000-06:00
 ---
 
 

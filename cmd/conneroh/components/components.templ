@@ -16,7 +16,7 @@ templ Icon(
 	attrs templ.Attributes,
 ) {
 	<img
-		src={ fmt.Sprintf("/dist/svg/%s.svg", id) }
+		src={ fmt.Sprintf("https://%s.fly.storage.tigris.dev/svg/%s.svg", "conneroh", id) }
 		{ attrs... }
 	/>
 }

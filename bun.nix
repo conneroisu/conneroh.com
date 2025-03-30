@@ -61,6 +61,16 @@
         hash = "sha256-O01ctlMKEB5nmokJir6UwrPEPWaW9zhiqS0YkwPVX9Y=";
       };
     };
+    "@types/mathjax" = {
+      out_path = "@types/mathjax";
+      binaries = {
+      };
+      pkg = fetchurl {
+        name = "@types/mathjax@0.0.40";
+        url = "https://registry.npmjs.org/@types/mathjax/-/mathjax-0.0.40.tgz";
+        hash = "sha256-ZtfHomPxt+iAvfb8RnstCbWqWBggE6jEwGUtCZ3PEYU=";
+      };
+    };
     "@types/node" = {
       out_path = "@types/node";
       binaries = {
@@ -119,6 +129,16 @@
         name = "bun-types@1.2.4";
         url = "https://registry.npmjs.org/bun-types/-/bun-types-1.2.4.tgz";
         hash = "sha256-lXqzNu+EFE1bzON4rLGrSdws76vuyStC1Ehxa3n/6/0=";
+      };
+    };
+    "caniuse-lite" = {
+      out_path = "caniuse-lite";
+      binaries = {
+      };
+      pkg = fetchurl {
+        name = "caniuse-lite@1.0.30001707";
+        url = "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001707.tgz";
+        hash = "sha256-YbWMwCx687HRkZ2BxVLbZ+Bicktz6YM1qrdFUNHfp6s=";
       };
     };
     "htmx-ext-preload" = {

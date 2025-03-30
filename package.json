@@ -15,7 +15,9 @@
   "dependencies": {
     "@alpinejs/intersect": "^3.14.9",
     "@types/alpinejs__intersect": "^3.13.4",
+    "@types/mathjax": "^0.0.40",
     "alpinejs": "^3.14.8",
+    "caniuse-lite": "^1.0.30001707",
     "htmx-ext-preload": "^2.1.1",
     "htmx.org": "2.0.4",
     "preline": "^2.7.0",

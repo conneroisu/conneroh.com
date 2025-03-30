@@ -85,7 +85,7 @@
         };
 
         update = {
-          exec = ''go run $REPO_ROOT/cmd/update'';
+          exec = ''doppler run -- go run $REPO_ROOT/cmd/update'';
           description = "Update the database.";
         };
 
@@ -97,7 +97,7 @@
           description = "Generate templ files and wait for completion";
         };
 
-        generate-js = {
+        generate-all = {
           exec = ''
             export REPO_ROOT=$(git rev-parse --show-toplevel) # needed
 
@@ -108,6 +108,14 @@
                 --minify-whitespace  \
                 --minify-identifiers \
                 --outdir $REPO_ROOT/cmd/conneroh/_static/dist/ &
+
+            ${pkgs.tailwindcss}/bin/tailwindcss \
+                --minify \
+                -i $REPO_ROOT/input.css \
+                -o $REPO_ROOT/cmd/conneroh/_static/dist/style.css \
+                --cwd $REPO_ROOT &
+
+            wait
           '';
           description = "Generate js files";
         };
@@ -206,6 +214,7 @@
             (buildWithSpecificGo gotests)
             (buildWithSpecificGo gotools)
             (buildWithSpecificGo reftools)
+            graphviz
 
             # Web
             tailwindcss
@@ -214,6 +223,7 @@
             nodePackages.typescript-language-server
             nodePackages.prettier
             nodePackages.svgo
+
             # Infra
             flyctl
             wireguard-tools
@@ -234,7 +244,7 @@
           src = ./.;
           subPackages = ["."];
           nativeBuildInputs = [pkgs.bun];
-          vendorHash = "sha256-ZJVL1+FXM3cKJw2UoZJeue+hWPbD8qGgMxLj5ckg0Vw=";
+          vendorHash = "sha256-hl89UAMRO9Cl9Tyrp7k4MrXA4ir06sNcN+szRqjpwkc=";
           preBuild = ''
             # Link node_modules from bunDeps
             mkdir -p node_modules
