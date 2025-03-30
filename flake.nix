@@ -46,7 +46,7 @@
       "aarch64-linux"
       "aarch64-darwin"
     ] (system: let
-      overlays = [(final: prev: {go = prev.go_1_24;})];
+      overlays = [(final: prev: {final.go = prev.go_1_24;})];
       pkgs = import inputs.nixpkgs {inherit system overlays;};
       buildGoModule = pkgs.buildGoModule.override {go = pkgs.go_1_24;};
       buildWithSpecificGo = pkg: pkg.override {inherit buildGoModule;};
@@ -56,42 +56,44 @@
       scripts = {
         dx = {
           exec = ''$EDITOR $REPO_ROOT/flake.nix'';
-          description = "Edit the flake.nix";
+          description = "Edit flake.nix";
         };
-
         clean = {
-          exec = ''git clean -fdx'';
+          exec = ''${pkgs.git}/bin/git clean -fdx'';
           description = "Clean Project";
         };
-
         tests = {
-          exec = ''go test -v -short ./...'';
-          description = "Run go tests with short flag";
-        };
-
-        unit-tests = {
-          exec = ''go test -v ./...'';
+          exec = ''${pkgs.go}/bin/go test -v ./...'';
           description = "Run all go tests";
         };
-
         lint = {
-          exec = ''golangci-lint run'';
+          exec = ''
+            ${pkgs.golangci-lint}/bin/golangci-lint run
+            ${pkgs.statix}/bin/statix check .
+            ${pkgs.deadnix}/bin/deadnix .
+          '';
           description = "Run golangci-lint";
         };
-
         build = {
-          exec = ''nix build --accept-flake-config .#packages.x86_64-linux.conneroh'';
+          exec = ''
+            nix build --accept-flake-config .#packages.x86_64-linux.conneroh
+          '';
           description = "Build the package";
         };
-
         update = {
-          exec = ''doppler run -- go run $REPO_ROOT/cmd/update'';
-          description = "Update the database.";
+          exec = ''
+            ${pkgs.doppler}/bin/doppler run -- ${pkgs.go}/bin/go run $REPO_ROOT/cmd/update
+          '';
+          description = "Update the generated go files.";
         };
-
         generate-reload = {
           exec = ''
-            templ generate $REPO_ROOT &
+            ${pkgs.templ}/bin/templ generate &
+            ${pkgs.tailwindcss}/bin/tailwindcss \
+                --minify \
+                -i ./input.css \
+                -o ./cmd/conneroh/_static/dist/style.css \
+                --cwd $REPO_ROOT &
             wait
           '';
           description = "Generate templ files and wait for completion";
@@ -197,6 +199,8 @@
             # Nix
             alejandra
             nixd
+            statix
+            deadnix
             inputs.bun2nix.defaultPackage.${pkgs.system}.bin
 
             # Go Tools
@@ -245,10 +249,8 @@
           nativeBuildInputs = [pkgs.bun];
           vendorHash = "sha256-+wVyKFz17ql1LDQgq9HBivKqkcJs6+1LL4FIpFET5Os=";
           preBuild = ''
-            # Link node_modules from bunDeps
             mkdir -p node_modules
             ln -sf ${bunDeps.nodeModules}/node_modules/* node_modules/ || true
-
             ${scripts.nix-generate-all.exec}
           '';
         };
@@ -279,7 +281,6 @@
           set -e
 
           echo "Copying image to Fly.io registry..."
-
           # Check if FLY_AUTH_TOKEN is set
           if [ -z "$FLY_AUTH_TOKEN" ]; then
             echo "FLY_AUTH_TOKEN is not set. Getting it from doppler..."
