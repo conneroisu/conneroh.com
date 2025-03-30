@@ -222,7 +222,6 @@
             bun
             nodePackages.typescript-language-server
             nodePackages.prettier
-            nodePackages.svgo
 
             # Infra
             flyctl
