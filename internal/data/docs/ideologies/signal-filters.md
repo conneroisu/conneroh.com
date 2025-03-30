@@ -1,50 +1,19 @@
 ---
-name: Ideology Request
-about: An additional ideology/idea must be added to the internal/docs/ideologies folder
-title: "[IDEA]"
-labels: ''
-assignees: conneroisu
-
----
-
-## Ideology Name
-<!-- Enter the name of the ideology -->
-
-## Description
-<!-- Provide a brief description of what this ideology is -->
-
-## Key Figures
-<!-- List important thinkers, authors, or figures associated with this ideology -->
-
-## Tags
-<!-- List related tags that should be associated with this ideology file -->
-
-## Resources
-<!-- Add any helpful links, books, or references to learn more about this ideology -->
-
-## File Structure
-The file should be created at: `internal/data/docs/ideologies/[ideology-slug].md`
-
-With the following frontmatter:
-```yaml
----
-title: [Ideology Name]
-slug: [ideology-slug]
-description: [Brief description for metadata]
-created_at: [Current date]
-updated_at: [Current date]
-icon: [Relevant icon - e.g., "philosophy", "politics", "book"]
+title: Signal Filters
+slug: signal-filters
+description: Brief description of signal filters in analog and digital systems
+created_at: 2023-09-30
+updated_at: 2023-09-30
+icon: electronics
 tags:
-  - [related-tag-1] 
-  - [related-tag-2]
+  - analog
+  - digital
 projects:
-  - [related-project-slug]  # Optional
+  - dsp-project
 ---
-```
 
-## New Ideology: Signal Filters
+## Signal Filters in Analog Systems
 
-### Description
 Signal filters in analog systems are used to process signals by allowing certain frequencies to pass while attenuating others. Here are the key points about analog signal filters:
 
 * **Types of filters**: Common types of analog filters include low-pass, high-pass, band-pass, and band-stop filters.
@@ -53,7 +22,8 @@ Signal filters in analog systems are used to process signals by allowing certain
 * **Design**: The design of analog filters involves selecting the appropriate components to achieve the desired frequency response.
 * **Implementation**: Analog filters can be implemented using passive components (resistors, capacitors, inductors) or active components (operational amplifiers).
 
-### Key Differences Between Analog and Digital Signal Filters
+## Key Differences Between Analog and Digital Signal Filters
+
 The key differences between analog and digital signal filters are as follows:
 
 * **Nature of signals**: Analog filters process continuous signals, while digital filters process discrete signals.
@@ -64,7 +34,8 @@ The key differences between analog and digital signal filters are as follows:
 * **Implementation**: Analog filters are implemented using physical components, while digital filters are implemented using digital signal processors (DSPs) or microcontrollers.
 * **Applications**: Analog filters are commonly used in audio processing, radio communications, and instrumentation. Digital filters are used in a wide range of applications, including audio and video processing, telecommunications, and data analysis.
 
-### Digital Signal Processing (DSP)
+## Digital Signal Processing (DSP)
+
 Digital signal processing (DSP) is a method used to analyze, modify, and synthesize signals using digital techniques. Here are the key points about DSP:
 
 * **Nature of signals**: DSP processes discrete signals, which are represented as sequences of numbers.

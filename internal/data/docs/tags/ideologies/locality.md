@@ -1,13 +1,13 @@
 ---
-id: locality
-aliases:
-  - Locality in Applications
+title: Locality
+slug: locality
+description: Locality refers to the proximity of data items in memory.
+created_at: 2025-03-28
+updated_at: 2025-03-30
+icon: memory
 tags:
   - ideologies/cache
-created_at: 2025-03-28T20:02:34.000-06:00
-description: Locality refers to the proximity of data items in memory.
-title: Locality
-updated_at: 2025-03-30T17:03:31.000-06:00
+projects: []
 ---
 
 # Locality in Applications

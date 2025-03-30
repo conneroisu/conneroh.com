@@ -1,11 +1,14 @@
 ---
-id: cache
-aliases: []
-tags: []
-created_at: 2025-03-28T20:03:41.000-06:00
-description: Computer Caches
 title: Cache
-updated_at: 2025-03-28T20:20:18.000-06:00
+slug: cache
+description: Computer Caches
+created_at: 2025-03-28
+updated_at: 2025-03-28
+icon: memory
+tags:
+  - computer-architecture
+projects:
+  - cache-optimization
 ---
 
 ## FAQ
