@@ -281,7 +281,6 @@
           set -e
 
           echo "Copying image to Fly.io registry..."
-          # Check if FLY_AUTH_TOKEN is set
           if [ -z "$FLY_AUTH_TOKEN" ]; then
             echo "FLY_AUTH_TOKEN is not set. Getting it from doppler..."
             FLY_AUTH_TOKEN=$(doppler secrets get --plain FLY_AUTH_TOKEN)

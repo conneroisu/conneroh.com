@@ -470,7 +470,7 @@ function saveSearchToHistory(query) {
 
 ## Progressive Enhancement
 
-The search will work without JavaScript, but will be enhanced when available:
+The search will work without JavaScript, but will be enhanced where possible.
 
 1. **Basic functionality**: Form submission for non-JS browsers
 2. **HTMX enhancement**: Real-time results with HTMX and forced keyboard interaction
