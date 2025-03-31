@@ -52,9 +52,9 @@ const (
 )
 
 var (
-	uploadJobs = flag.Int("jobs", 10, "number of parallel uploads")
-	cwd        = flag.String("cwd", "", "current working directory")
-	logger     = log.NewWithOptions(os.Stderr, log.Options{
+	workers = flag.Int("jobs", 10, "number of parallel uploads")
+	cwd     = flag.String("cwd", "", "current working directory")
+	logger  = log.NewWithOptions(os.Stderr, log.Options{
 		ReportCaller:    true,
 		ReportTimestamp: false,
 		Level:           log.DebugLevel,
@@ -63,8 +63,14 @@ var (
 
 // Cache is the configuration for the updater.
 type Cache struct {
-	AssetsHash string `json:"hash"`
-	AssetsMap  map[string]string
+	AssetsHash   string `json:"hash"`
+	AssetsMap    map[string]string
+	PostsHash    string `json:"postsHash"`
+	PostsMap     map[string]string
+	TagsHash     string `json:"tagsHash"`
+	TagsMap      map[string]string
+	ProjectsHash string `json:"projectsHash"`
+	ProjectsMap  map[string]string
 }
 
 // Close writes the config to disk and closes the file.
@@ -132,6 +138,8 @@ func Run(
 	client *s3.Client,
 	llama *ollama.Client,
 ) error {
+	eg := errgroup.Group{}
+	eg.SetLimit(*workers)
 	cache, err := loadConfig()
 	if err != nil {
 		return err
@@ -146,13 +154,22 @@ func Run(
 		return err
 	}
 	if cache.AssetsHash != assetHash || !cache.CompareMap(hashMap) {
+		for _, asset := range assets {
+			if hashMap[asset.Path] == cache.AssetsMap[asset.Path] {
+				continue
+			}
+			eg.Go(func() error {
+				return uploadAsset(ctx, client, asset)
+			})
+		}
 		cache.AssetsHash = assetHash
 		cache.AssetsMap = hashMap
-		err = uploadAssets(ctx, client, assets, *uploadJobs)
-		if err != nil {
-			return err
-		}
 	}
+	err = eg.Wait()
+	if err != nil {
+		return err
+	}
+
 	logger.Info("assets are up to date")
 	logger.Info("parsing tags")
 	parsedTags, err := pathParse[gen.Tag](ctx, &assets, tagsLoc, llama)
@@ -184,25 +201,18 @@ func Run(
 	return postGen.Generate()
 }
 
-func uploadAssets(
+func uploadAsset(
 	ctx context.Context,
 	client *s3.Client,
-	assets []Asset,
-	uploadJobs int,
+	asset Asset,
 ) error {
-	eg := errgroup.Group{}
-	eg.SetLimit(uploadJobs)
-	for _, asset := range assets {
-		eg.Go(func() error {
-			_, err := client.PutObject(ctx, &s3.PutObjectInput{
-				Bucket: aws.String("conneroh.com"),
-				Key:    aws.String(asset.Path),
-				Body:   bytes.NewReader(asset.Data),
-			})
-			return err
-		})
-	}
-	return eg.Wait()
+	_, err := client.PutObject(ctx, &s3.PutObjectInput{
+		Bucket: aws.String("conneroh.com"),
+		Key:    aws.String(asset.Path),
+		Body:   bytes.NewReader(asset.Data),
+	})
+
+	return err
 }
 
 // pathParse parses the markdown files in the given path.
@@ -362,7 +372,6 @@ func Parse[T gen.Post | gen.Project | gen.Tag](
 	path = strings.Replace(path, projectsLoc, "", 1)
 	path = strings.Replace(path, tagsLoc, "", 1)
 	path = strings.TrimSuffix(path, filepath.Ext(path))
-	logger.Debugf("path: %s", path)
 	fm.Slug = path
 	fm.Content = buf.String()
 	if fm.Description == "" {
@@ -576,28 +585,8 @@ func (b *CredHandler) Retrieve(
 	}, nil
 }
 
-// CustomResolver is a wikilink.Resolver that uses the default wikilink
-// resolver but also resolves the "custom" wikilink type.
-//
-// A Resolver resolves pages referenced by wikilinks to their destinations.
-//
-// It implements the wikilink.Resolver interface.
-//
-//	type Resolver interface {
-//		// ResolveWikilink returns the address of the page that the provided
-//		// wikilink points to. The destination will be URL-escaped before
-//		// being placed into a link.
-//		//
-//		// If ResolveWikilink returns a non-nil error, rendering will be
-//		// halted.
-//		//
-//		// If ResolveWikilink returns a nil destination and error, the
-//		// Renderer will omit the link and render its contents as a regular
-//		// string.
-//		ResolveWikilink(*Node) (destination []byte, err error)
-//	}
-//
-// ```
+// CustomResolver is a wikilink.Resolver that resolves pages referenced by
+// wikilinks to their destinations.
 type CustomResolver struct {
 	Assets *[]Asset
 }
@@ -610,13 +599,6 @@ func NewCustomResolver(assets *[]Asset) *CustomResolver {
 // ResolveWikilink returns the address of the page that the provided
 // wikilink points to. The destination will be URL-escaped before
 // being placed into a link.
-//
-// If ResolveWikilink returns a non-nil error, rendering will be
-// halted.
-//
-// If ResolveWikilink returns a nil destination and error, the
-// Renderer will omit the link and render its contents as a regular
-// string.
 func (c *CustomResolver) ResolveWikilink(n *wikilink.Node) (destination []byte, err error) {
 	targetStr := string(n.Target)
 	for _, asset := range *c.Assets {
