@@ -185,6 +185,22 @@
           export REPO_ROOT=$(git rev-parse --show-toplevel)
           export CGO_CFLAGS="-O2"
 
+          export PLAYWRIGHT_BROWSERS_PATH=${pkgs.playwright-driver.browsers}
+          export PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
+          export PLAYWRIGHT_NODEJS_PATH=${pkgs.nodejs_20}/bin/node
+
+          # Browser executable paths
+          export PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=${"${pkgs.playwright-driver.browsers}/chromium-1155"}
+          export PLAYWRIGHT_FIREFOX_EXECUTABLE_PATH=${"${pkgs.playwright-driver.browsers}/firefox-1471"}
+          export PLAYWRIGHT_WEBKIT_EXECUTABLE_PATH=${"${pkgs.playwright-driver.browsers}/webkit-2123"}
+
+          echo "Playwright configured with:"
+          echo "  - Browsers directory: $PLAYWRIGHT_BROWSERS_PATH"
+          echo "  - Node.js path: $PLAYWRIGHT_NODEJS_PATH"
+          echo "  - Chromium path: $PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH"
+          echo "  - Firefox path: $PLAYWRIGHT_FIREFOX_EXECUTABLE_PATH"
+          echo "  - WebKit path: $PLAYWRIGHT_WEBKIT_EXECUTABLE_PATH"
+
           # Print available commands
           echo "Available commands:"
           ${pkgs.lib.concatStringsSep "\n" (
@@ -232,6 +248,41 @@
             wireguard-tools
             openssl.dev
             skopeo
+
+            # Playwright
+
+            playwright-driver # Provides browser archives and driver scripts
+            chromium # Chromium browser
+            firefox # Firefox browser
+            (
+              if pkgs.stdenv.isDarwin
+              then pkgs.darwin.apple_sdk.frameworks.WebKit
+              else pkgs.webkitgtk
+            ) # WebKit browser
+            nodejs_20 # Required for Playwright driver
+            pkg-config # Needed for some browser dependencies
+            xorg.libXcomposite # X11 Composite extension - needed by browsers
+            xorg.libXdamage # X11 Damage extension - needed by browsers
+            xorg.libXfixes # X11 Fixes extension - needed by browsers
+            xorg.libXrandr # X11 RandR extension - needed by browsers
+            xorg.libX11 # X11 client-side library
+            xorg.libxcb # X11 C Bindings library
+            alsa-lib # Audio library
+            at-spi2-core # Accessibility support
+            cairo # 2D graphics library
+            cups # Printing system
+            dbus # Message bus system
+            expat # XML parser
+            ffmpeg # Media processing
+            fontconfig # Font configuration and customization
+            freetype # Font rendering engine
+            gdk-pixbuf # Image loading library
+            glib # Low-level core library
+            gtk3 # GUI toolkit
+            mesa # OpenGL implementation
+            nss # Network Security Services
+            nspr # NetScape Portable Runtime
+            pango # Text layout and rendering
           ]
           # Add the generated script packages
           ++ scriptPackages;
