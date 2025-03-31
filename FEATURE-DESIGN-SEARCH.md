@@ -11,11 +11,11 @@
 - `tag:programming-language/go` will show posts with `programming-language/go` tag
 
 ### Search by projects
-- `-project:github` will not show posts with `github` project
-- `project:github` will show posts with `github` project  
+- `-project:conneroh.com` will not show posts related to the `conneroh.com` project
+- `project:conneroh.com` will show posts with `github` project  
 
 ### Search by posts
-- `-post:hello-world` will not show posts with `hello-world` post
+- `-post:hello-world` will not show results related to the `hello-world` post
 - `post:hello-world` will show posts with `hello-world` post
 
 HTMX endpoint for list pages: `/search/{tag|project|post}`
