@@ -10,7 +10,7 @@ import (
 templ search(
 	target routing.PluralTarget,
 ) {
-	<div class="p-3 border-b border-gray-200 dark:border-gray-700">
+	<div class="p-3 border-b border-gray-700">
 		<div class="relative">
 			<input
 				id={ fmt.Sprintf("search-%s", target) }
@@ -23,7 +23,7 @@ templ search(
 				hx-target={ fmt.Sprintf("#list-%s", target) }
 				hx-indicator="#search-indicator"
 			/>
-			<div class="absolute left-3 top-2.5 text-gray-400 dark:text-gray-500">
+			<div class="absolute left-3 top-2.5 text-gray-500">
 				@icon("search", templ.Attributes{})
 			</div>
 			<div
@@ -50,7 +50,7 @@ templ List(
 	<div
 		class="container mx-auto px-4 py-8"
 	>
-		<h1 class="text-3xl font-bold mb-6 text-gray-900 dark:text-white">
+		<h1 class="text-3xl font-bold mb-6 text-white">
 			Search { target }
 		</h1>
 		@search(
@@ -91,16 +91,16 @@ templ listProjectItem(project *gen.Project) {
 			preload="mouseover"
 		>
 			<h2
-				class="text-xl font-semibold text-gray-900 dark:text-white mb-2"
+				class="text-xl font-semibold text-white mb-2"
 			>
 				{ project.Title }
 			</h2>
 			<p
-				class="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3"
+				class="text-gray-300 mb-4 line-clamp-3"
 			>
 				{ project.Description }
 			</p>
-			<p class="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
+			<p class="text-gray-300 mb-4 line-clamp-3">
 				<span class="font-bold">
 					{ strconv.Itoa(len(project.Tags)) }
 				</span>
@@ -125,7 +125,7 @@ templ listProjectItem(project *gen.Project) {
 				}
 			</div>
 			<a
-				class="text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center group"
+				class="text-blue-400 hover:underline inline-flex items-center group"
 				hx-target="#bodiody"
 				hx-get={ fmt.Sprintf("/hateoas/morphs/project/%s", project.Slug) }
 				hx-swap="outerHTML"
@@ -164,13 +164,13 @@ templ listTagItem(
 					{ tag.Title }
 				</h2>
 				<div
-					class="bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center h-8 w-8"
+					class="bg-gray-700 rounded-full flex items-center justify-center h-8 w-8"
 				>
 					@icon(tag.Icon, templ.Attributes{"class": "stoke-white"})
 				</div>
 			</div>
 			<div
-				class="text-gray-600 dark:text-gray-300 mb-4 line-clamp-2"
+				class="text-gray-300 mb-4 line-clamp-2"
 			>
 				{ tag.Description }
 			</div>
@@ -178,12 +178,12 @@ templ listTagItem(
 				class="flex items-center justify-between text-sm"
 			>
 				<span
-					class="text-gray-500 dark:text-gray-400"
+					class="text-gray-400"
 				>
 					{ strconv.Itoa(len(tag.PostSlugs)) } posts
 				</span>
 				<span
-					class="text-gray-500 dark:text-gray-400"
+					class="text-gray-400"
 				>
 					{ strconv.Itoa(len(tag.ProjectSlugs)) } projects
 				</span>
@@ -221,12 +221,12 @@ templ listPostItem(
 			</div>
 			<div class="p-6">
 				<h2
-					class="text-xl font-semibold text-gray-900 dark:text-white mb-3 line-clamp-2 hover:underline"
+					class="text-xl font-semibold text-white mb-3 line-clamp-2 hover:underline"
 				>
 					{ post.Title }
 				</h2>
 				<p
-					class="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3"
+					class="text-gray-300 mb-4 line-clamp-3"
 				>
 					{ post.Description }
 				</p>

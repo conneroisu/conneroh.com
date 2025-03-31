@@ -12,7 +12,7 @@ templ Home(
 ) {
 	// Hero Section
 	<section
-		class="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800"
+		class="py-20 bg-gradient-to-b from-gray-900 to-gray-800"
 	>
 		<div
 			class="container px-4 mx-auto"
@@ -24,17 +24,17 @@ templ Home(
 					class="lg:w-1/2 mb-10 lg:mb-0"
 				>
 					<h1
-						class="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-4 text-gray-900 dark:text-white"
+						class="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-4 text-white"
 					>
 						Conner Ohnesorge
 					</h1>
 					<p
-						class="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-md"
+						class="text-xl text-gray-300 mb-8 max-w-md"
 					>
 						Electrical Engineer & Software Developer specialized in creating robust, scalable, and elegant solutions.
 					</p>
 					<p
-						class="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-md"
+						class="text-xl text-gray-300 mb-8 max-w-md"
 					>
 						Electrical Engineering Bachelors Degree and Minor in Computer Science from
 						<a
@@ -49,13 +49,13 @@ templ Home(
 					>
 						<a
 							href="#projects"
-							class="px-6 py-3 bg-gray-900 text-white dark:bg-white dark:text-gray-900 rounded-md font-medium hover:opacity-90 transition-opacity"
+							class="px-6 py-3 bg-gray-900 bg-white text-gray-900 rounded-md font-medium hover:opacity-90 transition-opacity"
 						>
 							View Projects
 						</a>
 						<a
 							href="#contact"
-							class="px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-md font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+							class="px-6 py-3 border border-gray-600 rounded-md font-medium text-gray-300 hover:bg-gray-800 transition-colors"
 						>
 							Contact Me
 						</a>
@@ -65,24 +65,23 @@ templ Home(
 					class="lg:w-1/2 relative"
 				>
 					<div
-						class="w-64 h-64 md:w-80 md:h-80 bg-blue-500 dark:bg-blue-600 rounded-full relative shadow-lg mx-auto"
+						class="w-64 h-64 md:w-80 md:h-80 bg-blue-600 rounded-full relative shadow-lg mx-auto"
 					>
 						<div
 							class="absolute inset-0 flex items-center justify-center text-white font-bold text-xl"
 						>
-							// Placeholder for profile image, replace with actual image
-							@image(
-								"/dist/hero.jpeg",
-								"me",
-								"bg-blue-500 dark:bg-blue-600 rounded-full relative shadow-lg mx-auto",
-							)
+							<img
+								src="/dist/hero.jpeg"
+								alt="me"
+								class="bg-blue-600 rounded-full relative shadow-lg mx-auto"
+							/>
 						</div>
 						// Decorative elements
 						<div
-							class="absolute -bottom-4 -right-4 w-24 h-24 bg-purple-500 dark:bg-purple-600 rounded-full z-0"
+							class="absolute -bottom-4 -right-4 w-24 h-24 bg-purple-600 rounded-full z-0"
 						></div>
 						<div
-							class="absolute -top-4 -left-4 w-16 h-16 bg-pink-500 dark:bg-pink-600 rounded-full z-0"
+							class="absolute -top-4 -left-4 w-16 h-16 bg-pink-600 rounded-full z-0"
 						></div>
 					</div>
 				</div>
@@ -92,7 +91,7 @@ templ Home(
 	// Featured Projects Section
 	<section
 		id="projects"
-		class="py-16 bg-white dark:bg-gray-800"
+		class="py-16 bg-gray-800"
 	>
 		<div
 			class="container px-4 mx-auto"
@@ -101,13 +100,13 @@ templ Home(
 				class="flex flex-col md:flex-row justify-between items-center mb-12"
 			>
 				<h2
-					class="text-3xl font-bold text-gray-900 dark:text-white mb-4 md:mb-0"
+					class="text-3xl font-bold text-white mb-4 md:mb-0"
 				>
 					Featured Projects
 				</h2>
 				<a
 					href="/projects"
-					class="text-blue-600 dark:text-blue-400 hover:underline flex items-center"
+					class="text-blue-400 hover:underline flex items-center"
 				>
 					View All Projects
 					@icon("arrow-right", templ.Attributes{})
@@ -120,27 +119,27 @@ templ Home(
 				for i, project := range *fullProjects {
 					if i < 6 {
 						<div
-							class="bg-gray-50 dark:bg-gray-900 rounded-lg overflow-hidden shadow-md transition-transform duration-300 hover:scale-105 hover:shadow-lg"
+							class="bg-gray-900 rounded-lg overflow-hidden shadow-md transition-transform duration-300 hover:scale-105 hover:shadow-lg"
 						>
 							<a
 								href={ templ.SafeURL("/project/" + project.Slug) }
 							>
 								<div
-									class="h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center"
+									class="h-48 bg-gray-700 flex items-center justify-center"
 								>
 									// Project image placeholder
-									<svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									<svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path>
 									</svg>
 								</div>
 								<div class="p-6">
 									<h3
-										class="text-xl font-bold text-gray-900 dark:text-white mb-2"
+										class="text-xl font-bold text-white mb-2"
 									>
 										{ project.Title }
 									</h3>
 									<p
-										class="text-gray-600 dark:text-gray-300 mb-4 line-clamp-2"
+										class="text-gray-300 mb-4 line-clamp-2"
 									>
 										{ project.Description }
 									</p>
@@ -172,7 +171,7 @@ templ Home(
 		</div>
 	</section>
 	// Recent Posts Section
-	<section class="py-16 bg-gray-50 dark:bg-gray-900">
+	<section class="py-16 bg-gray-900">
 		<div
 			class="container px-4 mx-auto"
 		>
@@ -180,7 +179,7 @@ templ Home(
 				class="flex flex-col md:flex-row justify-between items-center mb-12"
 			>
 				<h2
-					class="text-3xl font-bold text-gray-900 dark:text-white mb-4 md:mb-0"
+					class="text-3xl font-bold text-white mb-4 md:mb-0"
 				>
 					Recent Posts
 				</h2>
@@ -191,7 +190,7 @@ templ Home(
 					hx-swap="outerHTML"
 					hx-target="#bodiody"
 					preload="mouseover"
-					class="text-blue-600 dark:text-blue-400 hover:underline flex items-center"
+					class="text-blue-400 hover:underline flex items-center"
 				>
 					View All Posts
 					@icon("arrow-right", templ.Attributes{})
@@ -201,7 +200,7 @@ templ Home(
 				for i, post := range *fullPosts {
 					if i < 4 {
 						<div
-							class="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-md transition-transform duration-300 hover:scale-105 hover:shadow-lg"
+							class="bg-gray-800 rounded-lg overflow-hidden shadow-md transition-transform duration-300 hover:scale-105 hover:shadow-lg"
 							hx-get={ fmt.Sprintf("/hateoas/morphs/post/%s", post.Slug) }
 							hx-push-url={ fmt.Sprintf("/post/%s", post.Slug) }
 							hx-trigger="click"
@@ -211,7 +210,7 @@ templ Home(
 						>
 							// Post banner image
 							<div
-								class="h-48 bg-gray-200 dark:bg-gray-700 overflow-hidden"
+								class="h-48 bg-gray-700 overflow-hidden"
 							>
 								if post.BannerPath != "" {
 									<img
@@ -225,7 +224,7 @@ templ Home(
 									>
 										<svg
 											xmlns="http://www.w3.org/2000/svg"
-											class="h-12 w-12 text-gray-400 dark:text-gray-500"
+											class="h-12 w-12 text-gray-500"
 											fill="none"
 											viewBox="0 0 24 24"
 											stroke="currentColor"
@@ -242,12 +241,12 @@ templ Home(
 							</div>
 							<div class="p-6">
 								<h3
-									class="text-xl font-bold text-gray-900 dark:text-white mb-2"
+									class="text-xl font-bold text-white mb-2"
 								>
 									{ post.Title }
 								</h3>
 								<p
-									class="text-gray-600 dark:text-gray-300 mb-4 line-clamp-2"
+									class="text-gray-300 mb-4 line-clamp-2"
 								>
 									{ post.Description }
 								</p>
@@ -257,7 +256,7 @@ templ Home(
 									for _, tag := range post.Tags {
 										<a
 											href={ templ.SafeURL("/tag/" + tag.Slug) }
-											class="px-2 py-1 dark:bg-green-900 text-green-800 dark:text-green-200 text-xs rounded-md hover:bg-green-200 dark:hover:bg-green-800 transition-colors"
+											class="px-2 py-1 bg-green-900 text-green-200 text-xs rounded-md hover:bg-green-800 transition-colors"
 										>
 											{ tag.Slug }
 										</a>
@@ -295,7 +294,7 @@ templ Home(
 	</section>
 	// Skills/Tags Section
 	<section
-		class="py-16 bg-white dark:bg-gray-800"
+		class="py-16 bg-gray-800"
 	>
 		<div
 			class="container px-4 mx-auto"
@@ -304,13 +303,13 @@ templ Home(
 				class="flex flex-col md:flex-row justify-between items-center mb-12"
 			>
 				<h2
-					class="text-3xl font-bold text-gray-900 dark:text-white mb-4 md:mb-0"
+					class="text-3xl font-bold text-white mb-4 md:mb-0"
 				>
 					Skills & Technologies
 				</h2>
 				<a
 					href="/tags"
-					class="text-blue-600 dark:text-blue-400 hover:underline flex items-center"
+					class="text-blue-400 hover:underline flex items-center"
 				>
 					See All Skills/Technologies
 					@icon("arrow-right", templ.Attributes{})
@@ -326,14 +325,14 @@ templ Home(
 						hx-trigger="click"
 						hx-push-url={ fmt.Sprintf("/tag/%s", tag.Slug) }
 						hx-get={ fmt.Sprintf("/hateoas/morphs/tag/%s", tag.Slug) }
-						class="block bg-gray-50 dark:bg-gray-900 rounded-lg p-6 text-center hover:shadow-md transition-shadow"
+						class="block bg-gray-900 rounded-lg p-6 text-center hover:shadow-md transition-shadow"
 					>
 						<div
-							class="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-4"
+							class="w-12 h-12 bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-4"
 						>
 							@icon(tag.Icon, templ.Attributes{})
 						</div>
-						<h3 class="font-medium text-gray-900 dark:text-white">
+						<h3 class="font-medium text-white">
 							{ tag.Title }
 						</h3>
 					</a>
@@ -344,17 +343,17 @@ templ Home(
 	// Contact Section
 	<section
 		id="contact"
-		class="py-16 bg-gray-50 dark:bg-gray-900"
+		class="py-16 bg-gray-900"
 	>
 		<div class="container px-4 mx-auto">
 			<div class="max-w-2xl mx-auto text-center">
 				<h2
-					class="text-3xl font-bold text-gray-900 dark:text-white mb-4"
+					class="text-3xl font-bold text-white mb-4"
 				>
 					Get In Touch
 				</h2>
 				<p
-					class="text-gray-600 dark:text-gray-300 mb-8"
+					class="text-gray-300 mb-8"
 				>
 					Interested in working together? Feel free to reach out through any of the channels below.
 				</p>
@@ -364,31 +363,31 @@ templ Home(
 					// Social links
 					<a
 						href="https://www.linkedin.com/in/conner-ohnesorge-b720a4238"
-						class="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-700 dark:text-gray-300 hover:bg-blue-500 hover:text-white dark:hover:bg-blue-500 transition-colors"
+						class="w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center text-gray-300 hover:bg-blue-500 hover:bg-blue-500 transition-colors"
 					>
 						@icon("linkedin", templ.Attributes{})
 					</a>
 					<a
 						href="https://github.com/conneroisu"
-						class="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-700 dark:text-gray-300 hover:bg-gray-800 hover:text-white dark:hover:bg-gray-800 transition-colors"
+						class="w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center text-gray-300 hover:bg-gray-800 hover:bg-gray-800 transition-colors"
 					>
 						@icon("github", templ.Attributes{})
 					</a>
 					<a
 						href="https://x.com/ConnerOhnesorge"
-						class="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-700 dark:text-gray-300 hover:bg-blue-400 hover:text-white dark:hover:bg-blue-400 transition-colors"
+						class="w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center text-gray-300 hover:bg-blue-400 hover:bg-blue-400 transition-colors"
 					>
 						@icon("twitter", templ.Attributes{"class": "stroke-white"})
 					</a>
 					<a
 						href="mailto:conneroisu@outlook.com"
-						class="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-700 dark:text-gray-300 hover:bg-red-500 hover:text-white dark:hover:bg-red-500 transition-colors"
+						class="w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center text-gray-300 hover:bg-red-500 hover:bg-red-500 transition-colors"
 					>
 						@icon("mail", templ.Attributes{})
 					</a>
 				</div>
 				<div
-					class="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md"
+					class="bg-gray-800 p-8 rounded-lg shadow-md"
 				>
 					<form
 						class="space-y-6"
@@ -399,7 +398,7 @@ templ Home(
 							<div>
 								<label
 									for="name"
-									class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+									class="block text-sm font-medium text-gray-300 mb-1"
 								>
 									Name
 								</label>
@@ -407,14 +406,14 @@ templ Home(
 									type="text"
 									id="name"
 									name="name"
-									class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+									class="w-full px-4 py-2 border border-gray-600 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
 									required
 								/>
 							</div>
 							<div>
 								<label
 									for="email"
-									class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+									class="block text-sm font-medium text-gray-300 mb-1"
 								>
 									Email
 								</label>
@@ -422,7 +421,7 @@ templ Home(
 									type="email"
 									id="email"
 									name="email"
-									class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+									class="w-full px-4 py-2 border border-gray-600 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
 									required
 								/>
 							</div>
@@ -430,7 +429,7 @@ templ Home(
 						<div>
 							<label
 								for="subject"
-								class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+								class="block text-sm font-medium text-gray-300 mb-1"
 							>
 								Subject
 							</label>
@@ -438,14 +437,14 @@ templ Home(
 								type="text"
 								id="subject"
 								name="subject"
-								class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+								class="w-full px-4 py-2 border border-gray-600 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
 								required
 							/>
 						</div>
 						<div>
 							<label
 								for="message"
-								class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+								class="block text-sm font-medium text-gray-300 mb-1"
 							>
 								Message
 							</label>
@@ -453,7 +452,7 @@ templ Home(
 								id="message"
 								name="message"
 								rows="4"
-								class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+								class="w-full px-4 py-2 border border-gray-600 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
 								required
 							></textarea>
 						</div>

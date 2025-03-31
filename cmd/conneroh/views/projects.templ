@@ -14,7 +14,7 @@ templ Project(
 	<div class="container mx-auto px-4 py-8 max-w-4xl">
 		<header class="mb-8">
 			<h1
-				class="text-4xl font-bold text-gray-900 dark:text-white mb-4"
+				class="text-4xl font-bold text-white mb-4"
 			>
 				{ project.Title }
 			</h1>
@@ -23,7 +23,7 @@ templ Project(
 					for _, tag := range project.Tags {
 						<a
 							href={ templ.SafeURL(fmt.Sprintf("/tag/%s", tag.Slug)) }
-							class="inline-block px-3 py-1 text-sm font-medium rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors"
+							class="inline-block px-3 py-1 text-sm font-medium rounded-full bg-blue-100 bg-blue-900 text-blue-200 hover:bg-blue-800 transition-colors"
 						>
 							{ tag.Slug }
 						</a>
@@ -32,13 +32,13 @@ templ Project(
 			}
 		</header>
 		<div
-			class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden p-6 mb-8"
+			class="bg-gray-800 rounded-lg shadow-lg overflow-hidden p-6 mb-8"
 		>
 			<div
-				class="border-b border-gray-200 dark:border-gray-700 pb-4 mb-4"
+				class="border-b border-gray-700 pb-4 mb-4"
 			>
 				<h2
-					class="text-2xl font-semibold text-gray-900 dark:text-white"
+					class="text-2xl font-semibold text-white"
 				>
 					About this project
 				</h2>
@@ -47,15 +47,15 @@ templ Project(
 				></div>
 			</div>
 			<div
-				class="prose prose-xl dark:prose-invert max-w-none"
+				class="prose prose-xl prose-invert max-w-none"
 			>
 				<p
-					class="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line"
+					class="text-gray-300 leading-relaxed whitespace-pre-line"
 				>
 					{ project.Description }
 				</p>
 				<div
-					class="mt-6 flex items-center text-sm text-gray-500 dark:text-gray-400"
+					class="mt-6 flex items-center text-sm text-gray-400"
 				>
 					@icon("calendar", templ.Attributes{})
 					<span>Created: { project.CreatedAt.Format("Jan 2, 2006") }</span>
@@ -63,15 +63,15 @@ templ Project(
 			</div>
 		</div>
 		<div
-			class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden p-6 mb-8"
+			class="bg-gray-800 rounded-lg shadow-lg overflow-hidden p-6 mb-8"
 		>
 			<h2
-				class="text-2xl font-semibold text-gray-900 dark:text-white mb-4"
+				class="text-2xl font-semibold text-white mb-4"
 			>
 				Content
 			</h2>
 			<div
-				class="prose prose-lg prose-headings:mt-6 prose-headings:mb-4 prose-p:my-4 prose-ul:my-4 prose-li:my-2 prose-pre:my-6 max-w-none text-gray-700 dark:text-gray-300 leading-relaxed"
+				class="prose prose-lg prose-headings:mt-6 prose-headings:mb-4 prose-p:my-4 prose-ul:my-4 prose-li:my-2 prose-pre:my-6 max-w-none text-gray-300 leading-relaxed"
 			>
 				<article>
 					@templ.Raw(project.Content)
@@ -83,7 +83,7 @@ templ Project(
 				class="mt-12"
 			>
 				<h2
-					class="text-2xl font-bold text-gray-900 dark:text-white mb-4"
+					class="text-2xl font-bold text-white mb-4"
 				>
 					Related Posts
 				</h2>
@@ -92,21 +92,21 @@ templ Project(
 				>
 					for _, post := range project.Posts {
 						<div
-							class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden p-6"
+							class="bg-gray-800 rounded-lg shadow-md overflow-hidden p-6"
 						>
 							<h3
-								class="text-xl font-semibold text-gray-900 dark:text-white mb-2"
+								class="text-xl font-semibold text-white mb-2"
 							>
 								{ post.Title }
 							</h3>
 							<p
-								class="text-gray-600 dark:text-gray-300 mb-4 line-clamp-2"
+								class="text-gray-300 mb-4 line-clamp-2"
 							>
 								{ post.Description }
 							</p>
 							<a
 								href={ templ.SafeURL("/post/" + post.Slug) }
-								class="text-blue-600 dark:text-blue-400 hover:underline flex items-center"
+								class="text-blue-400 hover:underline flex items-center"
 							>
 								Read Post
 								<svg

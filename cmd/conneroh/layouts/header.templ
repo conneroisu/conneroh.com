@@ -5,7 +5,7 @@ import "fmt"
 templ header() {
 	<header>
 		<nav
-			class="border-b border-gray-200 dark:border-gray-800"
+			class="border-b border-gray-800"
 		>
 			<div
 				class="container mx-auto px-4 sm:px-6 lg:px-8"
@@ -16,12 +16,12 @@ templ header() {
 					<div class="flex items-center">
 						// Mobile menu button
 						@icon("menu", templ.Attributes{
-							"class":  "sm:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none mr-2",
+							"class":  "sm:hidden p-2 rounded-md hover:text-gray-200 text-gray-300 hover:text-white hover:bg-gray-700 focus:outline-none mr-2",
 							"@click": "isMenuOpen = !isMenuOpen",
 						})
 						// Logo - visible on all screens
 						<a
-							class="text-xl font-bold text-gray-900 dark:text-white cursor-pointer pr-4"
+							class="text-xl font-bold text-white cursor-pointer pr-4"
 							hx-get="/hateoas/morph/home"
 							hx-swap="outerHTML"
 							hx-trigger="click"

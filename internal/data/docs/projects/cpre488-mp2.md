@@ -15,7 +15,7 @@ tags:
 created_at: 2025-03-27T14:13:10.000-06:00
 description: The third Project from CPRE488 at Iowa State University
 title: CPRE488 MP2
-updated_at: 2025-03-30T07:46:57.000-06:00
+updated_at: 2025-03-31T08:49:48.000-06:00
 ---
 
 # CPRE488 MP2
@@ -226,10 +226,12 @@ For displaying the image, we decided to treat two different read frame buffers a
 ## YCbCr 4:2:2 Format Analysis
 
 ### Note from the Documentation
+
 4:4:4 to 4:2:2 Conversion Eq from Subsystem Documentation (PG231):
 
-$$ o_{x,y} = \left[\sum_{k=0}^{N_{\text{taps}}-1} i_{x-k,y}\, \text{COEF}_{k,\text{HPHASEO}}\right]_0^{2^{D_w}-1} $$
-
+$$
+o_{x,y} = \left[\sum_{k=0}^{N_{\text{taps}}-1} i_{x-k,y}\, \text{COEF}_{k,\text{HPHASEO}}\right]_0^{2^{D_w}-1}
+$$
 
 Equation 3-11
 

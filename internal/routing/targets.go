@@ -33,16 +33,16 @@ const (
 )
 
 // GetPostURL returns the URL for a post.
-func GetPostURL(post *gen.Post) string {
-	return fmt.Sprintf("/post/%s", post.Slug)
+func GetPostURL(base string, post *gen.Post) string {
+	return fmt.Sprintf("%s/post/%s", base, post.Slug)
 }
 
 // GetProjectURL returns the URL for a project.
-func GetProjectURL(project *gen.Project) string {
-	return fmt.Sprintf("/project/%s", project.Slug)
+func GetProjectURL(base string, project *gen.Project) string {
+	return fmt.Sprintf("%s/project/%s", base, project.Slug)
 }
 
 // GetTagURL returns the URL for a tag.
-func GetTagURL(tag *gen.Tag) string {
-	return fmt.Sprintf("/tag/%s", tag.Slug)
+func GetTagURL(base string, tag *gen.Tag) string {
+	return fmt.Sprintf("%s/tag/%s", base, tag.Slug)
 }

@@ -69,8 +69,8 @@
         lint = {
           exec = ''
             ${pkgs.golangci-lint}/bin/golangci-lint run
-            ${pkgs.statix}/bin/statix check .
-            ${pkgs.deadnix}/bin/deadnix .
+            ${pkgs.statix}/bin/statix check $REPO_ROOT/flake.nix
+            ${pkgs.deadnix}/bin/deadnix $REPO_ROOT/flake.nix
           '';
           description = "Run golangci-lint";
         };
@@ -82,7 +82,7 @@
         };
         update = {
           exec = ''
-            ${pkgs.doppler}/bin/doppler run -- ${pkgs.go}/bin/go run $REPO_ROOT/cmd/update
+            ${pkgs.doppler}/bin/doppler run -- ${pkgs.go}/bin/go run $REPO_ROOT/cmd/update --cwd $REPO_ROOT
           '';
           description = "Update the generated go files.";
         };

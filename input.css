@@ -6,67 +6,67 @@
 
 @layer components {
   .ctag {
-    @apply inline-block px-3 py-1 text-sm font-medium rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors;
+    @apply inline-block px-3 py-1 text-sm font-medium rounded-full bg-blue-900 text-blue-200 hover:bg-blue-200 hover:bg-blue-800 transition-colors;
   }
 
   .deskheaditem {
-    @apply text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white cursor-pointer;
+    @apply text-gray-300 hover:text-white cursor-pointer;
   }
 
   .mobileheaditem {
-    @apply block pl-3 pr-4 py-2 text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700;
+    @apply block pl-3 pr-4 py-2 text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700;
   }
 
   article .anchor.permalink {
-    @apply text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white cursor-pointer hover:underline;
+    @apply text-gray-300 hover:text-white cursor-pointer hover:underline;
   }
 
   article h1 {
-    @apply text-3xl font-bold text-gray-900 dark:text-white py-4;
+    @apply text-3xl font-bold text-white py-4;
   }
 
   article h2 {
-    @apply text-2xl font-bold text-gray-900 dark:text-white py-4;
+    @apply text-2xl font-bold text-white py-4;
   }
 
   article h3 {
-    @apply text-xl font-bold text-gray-900 dark:text-white py-4;
+    @apply text-xl font-bold text-white py-4;
   }
 
   article h4 {
-    @apply text-lg font-bold text-gray-900 dark:text-white py-4;
+    @apply text-lg font-bold text-white py-4;
   }
 
   article h5 {
-    @apply text-base font-bold text-gray-900 dark:text-white py-4;
+    @apply text-base font-bold text-white py-4;
   }
 
   article h6 {
-    @apply text-sm font-bold text-gray-900 dark:text-white py-4;
+    @apply text-sm font-bold text-white py-4;
   }
 
   article p {
-    @apply text-gray-700 dark:text-gray-400 py-4;
+    @apply text-gray-400 py-4;
   }
 
   article ul {
-    @apply text-gray-700 dark:text-gray-400 py-5;
+    @apply text-gray-400 py-5;
   }
 
   .sinput {
-    @apply w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white
+    @apply w-full pl-10 pr-4 py-2 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700 text-gray-900 text-white
   }
 
   .tittle {
-    @apply text-xl font-semibold text-gray-900 dark:text-white
+    @apply text-xl font-semibold text-white
   }
 
   .listIt {
-    @apply bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 p-6
+    @apply bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 p-6
   }
 
   .seemere {
-    @apply text-blue-600 dark:text-blue-400 hover:underline text-sm font-medium flex items-center
+    @apply text-blue-400 hover:underline text-sm font-medium flex items-center
   }
 }
 
@@ -99,25 +99,25 @@
 }
 
 :root {
-  --background: hsl(0 0% 100%);
-  --foreground: hsl(240 10% 3.9%);
-  --muted: hsl(240 4.8% 95.9%);
-  --muted-foreground: hsl(240 3.8% 46.1%);
-  --popover: hsl(0 0% 100%);
-  --popover-foreground: hsl(240 10% 3.9%);
-  --card: hsl(0 0% 100%);
-  --card-foreground: hsl(240 10% 3.9%);
-  --border: hsl(240 5.9% 90%);
-  --input: hsl(240 5.9% 90%);
-  --primary: hsl(240 5.9% 10%);
-  --primary-foreground: hsl(0 0% 98%);
-  --secondary: hsl(240 4.8% 95.9%);
-  --secondary-foreground: hsl(240 5.9% 10%);
-  --accent: hsl(240 4.8% 95.9%);
-  --accent-foreground: hsl(240 5.9% 10%);
-  --destructive: hsl(0 84.2% 60.2%);
+  --background: hsl(240 10% 3.9%);
+  --foreground: hsl(0 0% 98%);
+  --muted: hsl(240 3.7% 15.9%);
+  --muted-foreground: hsl(240 5% 64.9%);
+  --popover: hsl(240 10% 3.9%);
+  --popover-foreground: hsl(0 0% 98%);
+  --card: hsl(240 10% 3.9%);
+  --card-foreground: hsl(0 0% 98%);
+  --border: hsl(240 3.7% 15.9%);
+  --input: hsl(240 3.7% 15.9%);
+  --primary: hsl(0 0% 98%);
+  --primary-foreground: hsl(240 5.9% 10%);
+  --secondary: hsl(240 3.7% 15.9%);
+  --secondary-foreground: hsl(0 0% 98%);
+  --accent: hsl(240 3.7% 15.9%);
+  --accent-foreground: hsl(0 0% 98%);
+  --destructive: hsl(0 62.8% 30.6%);
   --destructive-foreground: hsl(0 0% 98%);
-  --ring: hsl(240 5.9% 10%);
+  --ring: hsl(240 4.9% 83.9%);
   --radius: 0.5rem;
 }
 
