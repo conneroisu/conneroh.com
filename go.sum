@@ -99,8 +99,6 @@ github.com/prathyushnallamothu/ollamago v1.0.0 h1:eJGomYOjz8uJ7Bm6EoiJ7J4PHgV0u0
 github.com/prathyushnallamothu/ollamago v1.0.0/go.mod h1:sICFRT/XlSNqTBY015Dkp+6pijLVS7trn7ocXiF9FNY=
 github.com/quail-ink/goldmark-enclave v0.1.5 h1:tLwSiF/7lQyKjTsPVMMjDL2q+XBSIkpe6NbFd2VcFk4=
 github.com/quail-ink/goldmark-enclave v0.1.5/go.mod h1:IZO65hEJWbxmwl5Krrc9XDLVGhlumpD/1t1EyW9QPfo=
-github.com/rivo/uniseg v0.2.0 h1:S1pD9weZBuJdFmowNwbpi7BJ8TNftyUImj/0WQi72jY=
-github.com/rivo/uniseg v0.2.0/go.mod h1:J6wj4VEh+S6ZtnVlnTBMWIodfgj8LQOQFoIToxlJtxc=
 github.com/rivo/uniseg v0.4.7 h1:WUdvkW8uEhrYfLC4ZzdpI2ztxP1I582+49Oc5Mq64VQ=
 github.com/rivo/uniseg v0.4.7/go.mod h1:FN3SvrM+Zdj16jyLfmOkMNblXMcoc8DfTHruCPUcx88=
 github.com/rogpeppe/go-internal v1.11.0 h1:cWPaGQEPrBb5/AsnsZesgZZ9yb1OQ+GOISoDNXVBh4M=
