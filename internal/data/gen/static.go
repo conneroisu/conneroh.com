@@ -2,7 +2,6 @@ package gen
 
 import (
 	"fmt"
-	"slices"
 	"time"
 
 	"gopkg.in/yaml.v3"
@@ -87,25 +86,5 @@ func New[
 ](emb Embedded) *T {
 	return &T{
 		Embedded: emb,
-	}
-}
-
-func init() {
-	var post *Post
-	var project *Project
-	var tag *Tag
-	for _, tag = range AllTags {
-		for _, post = range AllPosts {
-			// for each post that has this tag add it the tag's posts
-			if slices.Contains(post.TagSlugs, tag.Slug) {
-				tag.Posts = append(tag.Posts, post)
-			}
-		}
-		for _, project = range AllProjects {
-			// for each project that has this tag add it the tag's projects
-			if slices.Contains(project.TagSlugs, tag.Slug) {
-				tag.Projects = append(tag.Projects, project)
-			}
-		}
 	}
 }

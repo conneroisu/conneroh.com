@@ -32,7 +32,7 @@ templ Project(
 			}
 		</header>
 		<div
-			class="bg-gray-800 rounded-lg shadow-lg overflow-hidden p-6 mb-8"
+			class="cdo-contbor"
 		>
 			<div
 				class="border-b border-gray-700 pb-4 mb-4"
@@ -63,7 +63,7 @@ templ Project(
 			</div>
 		</div>
 		<div
-			class="bg-gray-800 rounded-lg shadow-lg overflow-hidden p-6 mb-8"
+			class="cdo-contbor"
 		>
 			<h2
 				class="text-2xl font-semibold text-white mb-4"
@@ -71,7 +71,7 @@ templ Project(
 				Content
 			</h2>
 			<div
-				class="prose prose-lg prose-headings:mt-6 prose-headings:mb-4 prose-p:my-4 prose-ul:my-4 prose-li:my-2 prose-pre:my-6 max-w-none text-gray-300 leading-relaxed"
+				class="cdo-content"
 			>
 				<article>
 					@templ.Raw(project.Content)
@@ -88,25 +88,25 @@ templ Project(
 					Related Posts
 				</h2>
 				<div
-					class="grid grid-cols-1 md:grid-cols-2 gap-6"
+					class="cdo-grid"
 				>
 					for _, post := range project.Posts {
 						<div
 							class="bg-gray-800 rounded-lg shadow-md overflow-hidden p-6"
 						>
 							<h3
-								class="text-xl font-semibold text-white mb-2"
+								class="cdo-ctitle"
 							>
 								{ post.Title }
 							</h3>
 							<p
-								class="text-gray-300 mb-4 line-clamp-2"
+								class="cdo-stitle"
 							>
 								{ post.Description }
 							</p>
 							<a
 								href={ templ.SafeURL("/post/" + post.Slug) }
-								class="text-blue-400 hover:underline flex items-center"
+								class="seemere"
 							>
 								Read Post
 								<svg
@@ -128,4 +128,6 @@ templ Project(
 			</div>
 		}
 	</div>
+	<script src="https://utteranc.es/client.js" repo="conneroisu/conneroh.com" issue-term="pathname" label="project" theme="github-dark" crossorigin="anonymous" async>
+  </script>
 }

@@ -91,16 +91,16 @@ templ listProjectItem(project *gen.Project) {
 			preload="mouseover"
 		>
 			<h2
-				class="text-xl font-semibold text-white mb-2"
+				class="cdo-ctitle"
 			>
 				{ project.Title }
 			</h2>
 			<p
-				class="text-gray-300 mb-4 line-clamp-3"
+				class="cdo-stitle"
 			>
 				{ project.Description }
 			</p>
-			<p class="text-gray-300 mb-4 line-clamp-3">
+			<p class="cdo-stitle">
 				<span class="font-bold">
 					{ strconv.Itoa(len(project.Tags)) }
 				</span>
@@ -170,7 +170,7 @@ templ listTagItem(
 				</div>
 			</div>
 			<div
-				class="text-gray-300 mb-4 line-clamp-2"
+				class="cdo-stitle"
 			>
 				{ tag.Description }
 			</div>
@@ -226,7 +226,7 @@ templ listPostItem(
 					{ post.Title }
 				</h2>
 				<p
-					class="text-gray-300 mb-4 line-clamp-3"
+					class="cdo-stitle"
 				>
 					{ post.Description }
 				</p>

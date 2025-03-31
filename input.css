@@ -68,6 +68,70 @@
   .seemere {
     @apply text-blue-400 hover:underline text-sm font-medium flex items-center
   }
+
+  .contactable {
+    @apply w-full px-4 py-2 border border-gray-600 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500
+  }
+
+  .cdo-linkr {
+    @apply w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center text-gray-300 transition-colors
+  }
+
+  .cdo-ctitle {
+    @apply text-xl font-semibold text-white mb-2
+  }
+
+  .cdo-stitle {
+    @apply text-gray-300 mb-4 line-clamp-2
+  }
+
+  .cdo-content {
+    @apply mt-6 mb-4 my-4 my-4 my-2 my-6 max-w-none text-gray-300 leading-relaxed
+  }
+
+  .cdo-tab {
+    @apply py-4 px-1 border-b-2 font-medium text-sm sm:text-base
+  }
+
+  .cdo-itab {
+    @apply border-transparent text-gray-500 text-gray-400 hover:text-gray-300
+  }
+
+  .cdo-atab {
+    @apply border-blue-500 text-blue-500
+  }
+
+  .cdo-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 gap-6
+  }
+
+  .cdo-feat {
+    @apply flex flex-col md:flex-row justify-between items-center mb-12 pr-4;
+
+    h2 {
+      @apply text-3xl font-bold text-white mb-4 md:mb-0
+    }
+
+    a {
+      @apply text-blue-400 hover:underline text-lg font-medium flex items-center
+    }
+  }
+
+  .cdo-contlabel {
+    @apply block text-sm font-medium text-gray-300 mb-1
+  }
+
+  .cdo-ingrad {
+    @apply container px-4 mx-auto
+  }
+
+  .cdo-contbor {
+    @apply bg-gray-800 rounded-lg shadow-lg overflow-hidden p-6 mb-8
+  }
+
+  .cdo-btn {
+    @apply w-full px-6 py-3 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors
+  }
 }
 
 @theme inline {
