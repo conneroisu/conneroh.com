@@ -298,7 +298,7 @@
           src = ./.;
           subPackages = ["."];
           nativeBuildInputs = [pkgs.bun];
-          vendorHash = "sha256-+wVyKFz17ql1LDQgq9HBivKqkcJs6+1LL4FIpFET5Os=";
+          vendorHash = "sha256-bsJiWpI/pr9FjsDopl7sE7gQDtl/E7YoM6wlt9wWPT8=";
           preBuild = ''
             mkdir -p node_modules
             ln -sf ${bunDeps.nodeModules}/node_modules/* node_modules/ || true
