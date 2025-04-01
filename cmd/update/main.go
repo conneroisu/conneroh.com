@@ -5,10 +5,10 @@ import (
 	"bytes"
 	"context"
 	"crypto/md5"
+	"encoding/hex"
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io"
 	"io/fs"
 	"math"
 	"mime"
@@ -61,7 +61,6 @@ var (
 		ReportTimestamp: false,
 		Level:           log.DebugLevel,
 	})
-
 	client = s3.NewFromConfig(aws.Config{
 		Region:       "auto",
 		BaseEndpoint: aws.String("https://fly.storage.tigris.dev"),
@@ -80,13 +79,16 @@ type Cache struct {
 }
 
 // Close writes the config to disk and closes the file.
-func (c *Cache) Close() error {
-	// write the config to disk
+func (c *Cache) Close() (err error) {
 	body, err := json.Marshal(c)
 	if err != nil {
-		return err
+		return
 	}
-	return os.WriteFile(hashFile, body, 0644)
+	err = os.WriteFile(hashFile, body, 0644)
+	if err != nil {
+		return
+	}
+	return
 }
 
 func main() {
@@ -117,7 +119,8 @@ func loadConfig() (Cache, error) {
 	if err != nil {
 		return cache, err
 	}
-	if err := json.Unmarshal(data, &cache); err != nil {
+	err = json.Unmarshal(data, &cache)
+	if err != nil {
 		return cache, err
 	}
 	if cache.Hashes == nil {
@@ -131,9 +134,9 @@ func Run(
 	ctx context.Context,
 ) error {
 	var (
-		parsedTags     []gen.Tag
-		parsedProjects []gen.Project
-		parsedPosts    []gen.Post
+		parsedTags     []*gen.Tag
+		parsedProjects []*gen.Project
+		parsedPosts    []*gen.Post
 	)
 	eg := errgroup.Group{}
 	eg.SetLimit(*workers)
@@ -141,7 +144,12 @@ func Run(
 	if err != nil {
 		return err
 	}
-	defer cache.Close()
+	defer func() {
+		err = cache.Close()
+		if err != nil {
+			panic(err)
+		}
+	}()
 
 	logger.Info("parsing assets", "loc", assetsLoc)
 	assets, ignored, err := parse(cache, assetsLoc)
@@ -160,21 +168,21 @@ func Run(
 	mdParser := NewMDParser(actualized)
 
 	logger.Info("actualizing posts", "dest", postsLoc)
-	parsedPosts, err = actualize[gen.Post](ctx, cache, mdParser, postsLoc)
+	parsedPosts, err = actualize[gen.Post](ctx, &eg, cache, mdParser, postsLoc)
 	if err != nil {
 		return err
 	}
 	logger.Info("actualized posts", "len", len(parsedPosts))
 
 	logger.Info("actualizing projects", "dest", projectsLoc)
-	parsedProjects, err = actualize[gen.Project](ctx, cache, mdParser, projectsLoc)
+	parsedProjects, err = actualize[gen.Project](ctx, &eg, cache, mdParser, projectsLoc)
 	if err != nil {
 		return err
 	}
 	logger.Info("actualized projects", "len", len(parsedProjects))
 
 	logger.Info("actualizing tags", "dest", tagsLoc)
-	parsedTags, err = actualize[gen.Tag](ctx, cache, mdParser, tagsLoc)
+	parsedTags, err = actualize[gen.Tag](ctx, &eg, cache, mdParser, tagsLoc)
 	if err != nil {
 		return err
 	}
@@ -193,19 +201,21 @@ func Run(
 
 func actualize[T gen.Post | gen.Tag | gen.Project](
 	ctx context.Context,
+	eg *errgroup.Group,
 	cache Cache,
 	mdParser goldmark.Markdown,
 	loc string,
-) ([]T, error) {
+) ([]*T, error) {
 	// Create a channel to safely collect results from goroutines
 	type result struct {
-		item T
+		item *T
 		err  error
 	}
-	resultCh := make(chan result)
-
-	eg := errgroup.Group{}
-	eg.SetLimit(*workers)
+	var (
+		resultCh = make(chan *result)
+		parsed   []*T
+		parseWg  sync.WaitGroup
+	)
 
 	// Get files to process
 	assets, ignored, err := parse(cache, loc)
@@ -214,12 +224,11 @@ func actualize[T gen.Post | gen.Tag | gen.Project](
 	}
 
 	// Start a goroutine to collect results
-	var parsed []T
-	var parseWg sync.WaitGroup
 	parseWg.Add(1)
 	go func() {
 		defer parseWg.Done()
-		for res := range resultCh {
+		var res *result
+		for res = range resultCh {
 			if res.err == nil {
 				parsed = append(parsed, res.item)
 			}
@@ -229,10 +238,10 @@ func actualize[T gen.Post | gen.Tag | gen.Project](
 	// Process each asset concurrently
 	for _, asset := range assets {
 		assetCopy := asset // Create a copy for the goroutine
-		eg.Go(func() error {
-			realized, err := realizeMD[T](ctx, mdParser, assetCopy)
-			if err == nil && realized != nil {
-				resultCh <- result{item: *realized, err: nil}
+		eg.Go(func() (workErr error) {
+			realized, workErr := realizeMD[T](ctx, mdParser, assetCopy)
+			if workErr == nil && realized != nil {
+				resultCh <- &result{item: realized, err: nil}
 			}
 			return err
 		})
@@ -249,69 +258,47 @@ func actualize[T gen.Post | gen.Tag | gen.Project](
 	remembered := rememberMD[T](ignored)
 	parsed = append(parsed, remembered...)
 
-	logger.Debugf("Parsed %d assets. Ignored %d", len(parsed), len(ignored))
 	return parsed, err
 }
 
-func uploadAsset(
-	ctx context.Context,
-	client *s3.Client,
-	asset Asset,
-) error {
-	logger.Debugf("Uploading asset %s", asset.Path)
-	_, err := client.PutObject(ctx, &s3.PutObjectInput{
-		Bucket: aws.String("conneroh"),
-		Key:    aws.String(asset.Path),
-		Body:   bytes.NewReader(asset.Data),
-	})
-	return err
+func hashFileContent(content []byte) string {
+	sum := md5.Sum(content)
+	return hex.EncodeToString(sum[:])
 }
-
-func hashFileContent(content string) (string, error) {
-	hash := md5.New()
-	_, err := io.WriteString(hash, content)
-	if err != nil {
-		return "", err
+func rememberMD[T gen.Post | gen.Project | gen.Tag](ignored []string) []*T {
+	ignoredMap := make(map[string]struct{}, len(ignored))
+	for _, slug := range ignored {
+		ignoredMap[slug] = struct{}{}
 	}
-	return fmt.Sprintf("%x", hash.Sum(nil)), nil
-}
 
-func rememberMD[T gen.Post | gen.Project | gen.Tag](ignored []string) []T {
-	// Use type assertions with a type variable to determine what we're working with
 	var typeExample T
 	switch any(typeExample).(type) {
 	case gen.Post:
-		var posts []gen.Post
+		var posts []*gen.Post
 		for _, post := range gen.AllPosts {
-			for _, ignored := range ignored {
-				if post.Slug == ignored {
-					posts = append(posts, *post)
-				}
+			if _, ok := ignoredMap[post.Slug]; ok {
+				posts = append(posts, post)
 			}
 		}
-		return any(posts).([]T) // Type assertion to convert the concrete type to []T
+		return any(posts).([]*T)
 	case gen.Project:
-		var projects []gen.Project
+		var projects []*gen.Project
 		for _, project := range gen.AllProjects {
-			for _, ignored := range ignored {
-				if project.Slug == ignored {
-					projects = append(projects, *project)
-				}
+			if _, ok := ignoredMap[project.Slug]; ok {
+				projects = append(projects, project)
 			}
 		}
-		return any(projects).([]T) // Type assertion to convert the concrete type to []T
+		return any(projects).([]*T)
 	case gen.Tag:
-		var tags []gen.Tag
+		var tags []*gen.Tag
 		for _, tag := range gen.AllTags {
-			for _, ignored := range ignored {
-				if tag.Slug == ignored {
-					tags = append(tags, *tag)
-				}
+			if _, ok := ignoredMap[tag.Slug]; ok {
+				tags = append(tags, tag)
 			}
 		}
-		return any(tags).([]T) // Type assertion to convert the concrete type to []T
+		return any(tags).([]*T)
 	default:
-		panic("unknown type")
+		return nil
 	}
 }
 
@@ -323,9 +310,9 @@ func realizeMD[T gen.Post | gen.Project | gen.Tag](
 ) (*T, error) {
 	var (
 		fm       gen.Embedded
+		buf      = bytes.NewBufferString("")
 		pCtx     = parser.NewContext()
 		metadata = frontmatter.Get(pCtx)
-		buf      = bytes.NewBufferString("")
 		err      error
 	)
 	err = md.Convert(parsed.Data, buf, parser.WithContext(pCtx))
@@ -355,15 +342,16 @@ func realizeMD[T gen.Post | gen.Project | gen.Tag](
 	if fm.Content == "" {
 		return nil, fmt.Errorf("content is empty for %s", parsed.Path)
 	}
-	fm.Vec, fm.X, fm.Y, fm.Z, err = TextEmbeddingCreate(
-		ctx,
-		llama,
-		fm.RawContent,
-	)
+	resp, err := llama.Embeddings(ctx, &api.EmbeddingRequest{
+		Model:  embeddingModel,
+		Prompt: fm.RawContent,
+	})
 	if err != nil {
 		return nil, err
 	}
-
+	proj := projectionMatrixCreate(gen.EmbedLength, 3)
+	fm.X, fm.Y, fm.Z = projectTo3D(resp.Embedding, proj)
+	fm.Vec = any(resp.Embedding).([gen.EmbedLength]float64)
 	return gen.New[T](fm), nil
 }
 
@@ -385,11 +373,11 @@ func actualizeAssets(
 					Data: data,
 				})
 			}
-			return
 		}
 		return
 	})
-	for _, asset := range assets {
+	var asset Asset
+	for _, asset = range assets {
 		eg.Go(func() (err error) {
 			_, err = client.PutObject(ctx, &s3.PutObjectInput{
 				Bucket: aws.String("conneroh"),
@@ -403,28 +391,6 @@ func actualizeAssets(
 		return nil, err
 	}
 	return fulAssets, nil
-}
-
-// TextEmbeddingCreate creates an embedding for the given text.
-func TextEmbeddingCreate(
-	ctx context.Context,
-	client *api.Client,
-	input string,
-) ([gen.EmbedLength]float64, float64, float64, float64, error) {
-	resp, err := client.Embeddings(ctx, &api.EmbeddingRequest{
-		Model:  embeddingModel,
-		Prompt: input,
-	})
-	if err != nil {
-		return [gen.EmbedLength]float64{}, 0, 0, 0, err
-	}
-	proj := projectionMatrixCreate(gen.EmbedLength, 3)
-	x, y, z := projectTo3D(resp.Embedding, proj)
-	embs := [gen.EmbedLength]float64{}
-	for i := range embs {
-		embs[i] = resp.Embedding[i]
-	}
-	return embs, x, y, z, nil
 }
 
 // Generate a deterministic projection matrix for dimensionality reduction
@@ -482,57 +448,63 @@ func projectTo3D(embedding []float64, projectionMatrix *mat.Dense) (x, y, z floa
 	return
 }
 
+var exts = []goldmark.Option{
+
+	goldmark.WithExtensions(
+		extension.GFM, extension.Footnote,
+		extension.Strikethrough, extension.Table,
+		extension.TaskList, extension.DefinitionList,
+		mathjax.MathJax,
+		extension.NewTypographer(
+			extension.WithTypographicSubstitutions(
+				extension.TypographicSubstitutions{
+					extension.Apostrophe: []byte("'"),
+				}),
+		),
+		enclave.New(&core.Config{DefaultImageAltPrefix: "caption: "}),
+		extension.NewFootnote(
+			extension.WithFootnoteIDPrefix("fn"),
+		),
+		&anchor.Extender{
+			Position: anchor.Before,
+			Texter:   anchor.Text("#"),
+			Attributer: anchor.Attributes{
+				"class": "anchor permalink p-4",
+			},
+		},
+		&mermaid.Extender{
+			RenderMode: mermaid.RenderModeClient,
+		},
+		&frontmatter.Extender{
+			Formats: []frontmatter.Format{frontmatter.YAML},
+		},
+		&hashtag.Extender{
+			Variant: hashtag.ObsidianVariant,
+		},
+		highlighting.NewHighlighting(highlighting.WithStyle("monokai")),
+	),
+
+	goldmark.WithParserOptions(
+		parser.WithAutoHeadingID(),
+		parser.WithAttribute(),
+	),
+	goldmark.WithRendererOptions(
+		html.WithHardWraps(),
+		extension.WithFootnoteBacklinkClass("footnote-backref"),
+		extension.WithFootnoteLinkClass("footnote-ref"),
+	),
+}
+
 // NewMDParser creates a new markdown parser.
 func NewMDParser(
 	assets []Asset,
 ) goldmark.Markdown {
-	return goldmark.New(
-		goldmark.WithExtensions(
-			extension.GFM, extension.Footnote,
-			extension.Strikethrough, extension.Table,
-			extension.TaskList, extension.DefinitionList,
-			mathjax.MathJax,
-			&wikilink.Extender{
-				Resolver: NewCustomResolver(assets),
-			},
-			extension.NewTypographer(
-				extension.WithTypographicSubstitutions(
-					extension.TypographicSubstitutions{
-						extension.Apostrophe: []byte("'"),
-					}),
-			),
-			enclave.New(&core.Config{DefaultImageAltPrefix: "caption: "}),
-			extension.NewFootnote(
-				extension.WithFootnoteIDPrefix("fn"),
-			),
-			&anchor.Extender{
-				Position: anchor.Before,
-				Texter:   anchor.Text("#"),
-				Attributer: anchor.Attributes{
-					"class": "anchor permalink p-4",
-				},
-			},
-			&mermaid.Extender{
-				RenderMode: mermaid.RenderModeClient,
-			},
-			&frontmatter.Extender{
-				Formats: []frontmatter.Format{frontmatter.YAML},
-			},
-			&hashtag.Extender{
-				Variant: hashtag.ObsidianVariant,
-			},
-			highlighting.NewHighlighting(highlighting.WithStyle("monokai")),
-		),
-		goldmark.WithParserOptions(
-			parser.WithAutoHeadingID(),
-			parser.WithAttribute(),
-		),
-		goldmark.WithRendererOptions(
-			html.WithHardWraps(),
-			extension.WithFootnoteBacklinkClass("footnote-backref"),
-			extension.WithFootnoteLinkClass("footnote-ref"),
-		),
-	)
+	exts = append(exts, goldmark.WithExtensions(
+		&wikilink.Extender{
+			Resolver: NewCustomResolver(assets),
+		},
+	))
+	return goldmark.New(exts...)
 }
 
 // Asset is a struct for embedding assets.
@@ -616,11 +588,7 @@ func parse(
 		loc,
 		func(fPath string, d fs.DirEntry, err error) error {
 			if err != nil {
-				return fmt.Errorf(
-					"failed to walk fsPath (%s): %w",
-					"assets",
-					err,
-				)
+				return err
 			}
 			if d.IsDir() {
 				return nil
@@ -629,10 +597,7 @@ func parse(
 			if err != nil {
 				return err
 			}
-			hash, err := hashFileContent(string(asset))
-			if err != nil {
-				return err
-			}
+			hash := hashFileContent(asset)
 			path := pathify(fPath)
 			slug := slugify(fPath)
 			if cache.Hashes[fPath] == hash {

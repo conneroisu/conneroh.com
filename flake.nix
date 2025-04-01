@@ -289,16 +289,16 @@
       };
 
       packages = let
-        app-name = "conneroh.com";
+        name = "conneroh.com";
+        vendorHash = "sha256-odzUj5rCGmmVxGWj6ppUO/M1Wf2vWXIA5rjW+6Nn2L0=";
       in rec {
         conneroh = buildGoModule {
-          pname = app-name;
-          name = app-name;
+          pname = name;
+          inherit vendorHash name;
           version = "0.0.1";
           src = ./.;
           subPackages = ["."];
           nativeBuildInputs = [pkgs.bun];
-          vendorHash = "sha256-CnE4KrZTgnUqKoB7NRPp/L+lEePlKRIx7Y/m24YzMFQ=";
           preBuild = ''
             mkdir -p node_modules
             ln -sf ${bunDeps.nodeModules}/node_modules/* node_modules/ || true
@@ -317,7 +317,7 @@
           '';
         };
         C-conneroh = pkgs.dockerTools.buildLayeredImage {
-          name = app-name;
+          inherit name;
           tag = "latest";
           created = "now";
           contents = [
