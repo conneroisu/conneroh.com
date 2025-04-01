@@ -13,29 +13,29 @@ templ Home(
 ) {
 	// Hero Section
 	<section
-		class={ twerge.Merge("py-20 bg-gradient-to-b from-gray-900 to-gray-800") }
+		class={ twerge.Generate("py-20 bg-gradient-to-b from-gray-900 to-gray-800") }
 	>
 		<div
 			class="cdo-ingrad"
 		>
 			<div
-				class={ twerge.Merge("flex flex-col lg:flex-row items-center justify-between") }
+				class={ twerge.Generate("flex flex-col lg:flex-row items-center justify-between") }
 			>
 				<div
-					class={ twerge.Merge("lg:w-1/2 mb-10 lg:mb-0") }
+					class={ twerge.Generate("lg:w-1/2 mb-10 lg:mb-0") }
 				>
 					<h1
-						class={ twerge.Merge("text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-4 text-white") }
+						class={ twerge.Generate("text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-4 text-white") }
 					>
 						Conner Ohnesorge
 					</h1>
 					<p
-						class={ twerge.Merge("text-xl text-gray-300 mb-8 max-w-md") }
+						class={ twerge.Generate("text-xl text-gray-300 mb-8 max-w-md") }
 					>
 						Electrical Engineer & Software Developer specialized in creating robust, scalable, and elegant solutions.
 					</p>
 					<p
-						class={ twerge.Merge("text-xl text-gray-300 mb-8 max-w-md") }
+						class={ twerge.Generate("text-xl text-gray-300 mb-8 max-w-md") }
 					>
 						Electrical Engineering Bachelors Degree and Minor in Computer Science from
 						<a
@@ -50,13 +50,13 @@ templ Home(
 					>
 						<a
 							href="#projects"
-							class={ twerge.Merge("px-6 py-3 bg-gray-900 bg-white text-gray-900 rounded-md font-medium hover:opacity-90 transition-opacity") }
+							class={ twerge.Generate("px-6 py-3 bg-gray-900 bg-white text-gray-900 rounded-md font-medium hover:opacity-90 transition-opacity") }
 						>
 							View Projects
 						</a>
 						<a
 							href="#contact"
-							class={ twerge.Merge("px-6 py-3 border border-gray-600 rounded-md font-medium text-gray-300 hover:bg-gray-800 transition-colors") }
+							class={ twerge.Generate("px-6 py-3 border border-gray-600 rounded-md font-medium text-gray-300 hover:bg-gray-800 transition-colors") }
 						>
 							Contact Me
 						</a>
@@ -66,23 +66,23 @@ templ Home(
 					class="lg:w-1/2 relative"
 				>
 					<div
-						class={ twerge.Merge("w-64 h-64 md:w-80 md:h-80 bg-blue-600 rounded-full relative shadow-lg mx-auto") }
+						class={ twerge.Generate("w-64 h-64 md:w-80 md:h-80 bg-blue-600 rounded-full relative shadow-lg mx-auto") }
 					>
 						<div
-							class={ twerge.Merge("absolute inset-0 flex items-center justify-center text-white font-bold text-xl") }
+							class={ twerge.Generate("absolute inset-0 flex items-center justify-center text-white font-bold text-xl") }
 						>
 							<img
 								src="/dist/hero.jpeg"
 								alt="me"
-								class={ twerge.Merge("bg-blue-600 rounded-full relative shadow-lg mx-auto") }
+								class={ twerge.Generate("bg-blue-600 rounded-full relative shadow-lg mx-auto") }
 							/>
 						</div>
 						// Decorative elements
 						<div
-							class={ twerge.Merge("absolute -bottom-4 -right-4 w-24 h-24 bg-purple-600 rounded-full z-0") }
+							class={ twerge.Generate("absolute -bottom-4 -right-4 w-24 h-24 bg-purple-600 rounded-full z-0") }
 						></div>
 						<div
-							class={ twerge.Merge("absolute -top-4 -left-4 w-16 h-16 bg-pink-600 rounded-full z-0") }
+							class={ twerge.Generate("absolute -top-4 -left-4 w-16 h-16 bg-pink-600 rounded-full z-0") }
 						></div>
 					</div>
 				</div>
@@ -368,31 +368,31 @@ templ Home(
 					// Social links
 					<a
 						href="https://www.linkedin.com/in/conner-ohnesorge-b720a4238"
-						class={ twerge.Merge("w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center text-gray-300 transition-colors hover:bg-blue-400") }
+						class={ twerge.Generate("w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center text-gray-300 transition-colors hover:bg-blue-400") }
 					>
 						@icon("linkedin", templ.Attributes{})
 					</a>
 					<a
 						href="https://github.com/conneroisu"
-						class={ twerge.Merge("w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center text-gray-300 transition-colors hover:bg-gray-800") }
+						class={ twerge.Generate("w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center text-gray-300 transition-colors hover:bg-gray-800") }
 					>
 						@icon("github", templ.Attributes{})
 					</a>
 					<a
 						href="https://x.com/ConnerOhnesorge"
-						class={ twerge.Merge("w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center text-gray-300 transition-colors hover:bg-blue-400") }
+						class={ twerge.Generate("w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center text-gray-300 transition-colors hover:bg-blue-400") }
 					>
 						@icon("twitter", templ.Attributes{"class": "stroke-white"})
 					</a>
 					<a
 						href="mailto:conneroisu@outlook.com"
-						class={ twerge.Merge("w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center text-gray-300 transition-colors hover:bg-red-500") }
+						class={ twerge.Generate("w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center text-gray-300 transition-colors hover:bg-red-500") }
 					>
 						@icon("mail", templ.Attributes{})
 					</a>
 				</div>
 				<div
-					class={ twerge.Merge("bg-gray-800 p-8 rounded-lg shadow-md") }
+					class={ twerge.Generate("bg-gray-800 p-8 rounded-lg shadow-md") }
 				>
 					<form
 						class="space-y-6"

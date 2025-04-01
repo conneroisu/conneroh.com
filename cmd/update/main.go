@@ -322,7 +322,9 @@ func realizeMD[T gen.Post | gen.Project | gen.Tag](
 	}
 	proj := projectionMatrixCreate(gen.EmbedLength, 3)
 	fm.X, fm.Y, fm.Z = projectTo3D(resp.Embedding, proj)
-	fm.Vec = any(resp.Embedding).([gen.EmbedLength]float64)
+	var fixedArray [768]float64
+	copy(fixedArray[:], resp.Embedding[:gen.EmbedLength])
+	fm.Vec = fixedArray
 	return gen.New[T](fm), nil
 }
 
@@ -654,6 +656,10 @@ func genCSS(ctx context.Context) error {
 	}
 	defer f.Close()
 	_, err = f.WriteString(content)
+	if err != nil {
+		return err
+	}
+	err = twerge.GenerateTailwind("input.css", "input.css", twerge.ClassMapStr)
 	if err != nil {
 		return err
 	}
