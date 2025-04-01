@@ -6,7 +6,6 @@ import (
 	"context"
 	"crypto/md5"
 	"encoding/hex"
-	"encoding/json"
 	"flag"
 	"fmt"
 	"io/fs"
@@ -28,6 +27,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/conneroisu/conneroh.com/internal/cache"
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
 	"github.com/conneroisu/genstruct"
 	"github.com/yuin/goldmark"
@@ -73,24 +73,6 @@ var (
 	llama = &api.Client{}
 )
 
-// Cache is the storage of previous hashes.
-type Cache struct {
-	Hashes map[string]string
-}
-
-// Close writes the config to disk and closes the file.
-func (c *Cache) Close() (err error) {
-	body, err := json.Marshal(c)
-	if err != nil {
-		return
-	}
-	err = os.WriteFile(hashFile, body, 0644)
-	if err != nil {
-		return
-	}
-	return
-}
-
 func main() {
 	flag.Parse()
 	llamaURL, err := url.Parse(os.Getenv("OLLAMA_URL"))
@@ -113,22 +95,6 @@ func main() {
 	}
 }
 
-func loadConfig() (Cache, error) {
-	var cache Cache
-	data, err := os.ReadFile(hashFile)
-	if err != nil {
-		return cache, err
-	}
-	err = json.Unmarshal(data, &cache)
-	if err != nil {
-		return cache, err
-	}
-	if cache.Hashes == nil {
-		cache.Hashes = make(map[string]string)
-	}
-	return cache, nil
-}
-
 // Run parses all markdown files in the database.
 func Run(
 	ctx context.Context,
@@ -140,7 +106,7 @@ func Run(
 	)
 	eg := errgroup.Group{}
 	eg.SetLimit(*workers)
-	cache, err := loadConfig()
+	cache, err := cache.LoadCache(hashFile)
 	if err != nil {
 		return err
 	}
@@ -202,7 +168,7 @@ func Run(
 func actualize[T gen.Post | gen.Tag | gen.Project](
 	ctx context.Context,
 	eg *errgroup.Group,
-	cache Cache,
+	cache *cache.Cache,
 	mdParser goldmark.Markdown,
 	loc string,
 ) ([]*T, error) {
@@ -569,7 +535,8 @@ func NewCustomResolver(assets []Asset) *CustomResolver {
 func (c *CustomResolver) ResolveWikilink(n *wikilink.Node) (destination []byte, err error) {
 	targetStr := string(n.Target)
 	for _, asset := range c.Assets {
-		if targetStr == asset.Path || strings.HasSuffix(targetStr, asset.Path[strings.LastIndex(asset.Path, "/")+1:]) {
+		if targetStr == asset.Path ||
+			strings.HasSuffix(targetStr, asset.Path[strings.LastIndex(asset.Path, "/")+1:]) {
 			return []byte(asset.URL()), nil
 		}
 	}
@@ -581,7 +548,7 @@ func (c *CustomResolver) ResolveWikilink(n *wikilink.Node) (destination []byte, 
 //
 // ignored is a list of slugs that were ignored as they did not change.
 func parse(
-	cache Cache,
+	cache *cache.Cache,
 	loc string,
 ) (parseds []Asset, ignored []string, err error) {
 	err = filepath.WalkDir(

@@ -119,7 +119,12 @@ templ Home(
 							class="bg-gray-900 rounded-lg overflow-hidden shadow-md transition-transform duration-300 hover:scale-105 hover:shadow-lg"
 						>
 							<a
-								href={ templ.SafeURL("/project/" + project.Slug) }
+								hx-get={ fmt.Sprintf("/morph/project/%s", project.Slug) }
+								hx-push-url={ fmt.Sprintf("/project/%s", project.Slug) }
+								hx-trigger="click"
+								hx-swap="outerHTML"
+								hx-target="#bodiody"
+								preload="mouseover"
 							>
 								<div
 									class="h-48 bg-gray-700 flex items-center justify-center"
@@ -249,7 +254,12 @@ templ Home(
 								>
 									for _, tag := range post.Tags {
 										<a
-											href={ templ.SafeURL("/tag/" + tag.Slug) }
+											hx-get={ fmt.Sprintf("/morph/tag/%s", tag.Slug) }
+											hx-push-url={ fmt.Sprintf("/tag/%s", tag.Slug) }
+											hx-trigger="click"
+											hx-swap="outerHTML"
+											hx-target="#bodiody"
+											preload="mouseover"
 											class="px-2 py-1 bg-green-900 text-green-200 text-xs rounded-md hover:bg-green-800 transition-colors"
 										>
 											{ tag.Slug }

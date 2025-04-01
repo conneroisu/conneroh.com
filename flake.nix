@@ -88,13 +88,16 @@
         };
         generate-reload = {
           exec = ''
-            ${pkgs.templ}/bin/templ generate &
-            ${pkgs.tailwindcss}/bin/tailwindcss \
-                --minify \
-                -i ./input.css \
-                -o ./cmd/conneroh/_static/dist/style.css \
-                --cwd $REPO_ROOT &
+            if go run $REPO_ROOT/cmd/hash/main.go -dir "$REPO_ROOT/internal/data/docs" -exclude "*.tmp,*.bak"; then
+              echo ""
+            else
+              echo "Changes detected in templates, running update script..."
+              doppler run -- go run $REPO_ROOT/cmd/update --cwd $REPO_ROOT &
+            fi
+
+            ${pkgs.tailwindcss}/bin/tailwindcss --minify -i ./input.css -o ./cmd/conneroh/_static/dist/style.css --cwd $REPO_ROOT &
             wait
+            ${pkgs.templ}/bin/templ generate
           '';
           description = "Generate templ files and wait for completion";
         };
@@ -179,7 +182,7 @@
         pkgs.lib.mapAttrsToList
         (name: script: pkgs.writeShellScriptBin name script.exec)
         scripts;
-    in {
+    in rec {
       devShells.default = pkgs.mkShell {
         shellHook = ''
           export REPO_ROOT=$(git rev-parse --show-toplevel)
@@ -306,12 +309,12 @@
           '';
         };
         updater = buildGoModule {
+          inherit vendorHash;
           pname = "updater";
           name = "update";
           version = "0.0.1";
           src = ./.;
           subPackages = ["./cmd/update"];
-          vendorHash = "sha256-CnE4KrZTgnUqKoB7NRPp/L+lEePlKRIx7Y/m24YzMFQ=";
           preBuild = ''
             ${scripts.nix-generate-all.exec}
           '';
