@@ -186,7 +186,7 @@ The site uses HTMX for navigation and content loading:
 ```html
 <!-- Example of HTMX usage for navigation -->
 <a 
-  hx-get="/hateoas/morph/projects" 
+  hx-get="/morph/projects" 
   hx-target="#bodiody" 
   hx-swap="outerHTML" 
   hx-push-url="/projects"

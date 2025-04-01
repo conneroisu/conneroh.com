@@ -61,7 +61,7 @@ templ Post(
 				>
 					for _, project := range post.Projects {
 						<a
-							hx-get={ fmt.Sprintf("/hateoas/morphs/project/%s", project.Slug) }
+							hx-get={ fmt.Sprintf("/morphs/project/%s", project.Slug) }
 							hx-push-url={ fmt.Sprintf("/project/%s", project.Slug) }
 							hx-target="#bodiody"
 							hx-swap="outerHTML"
