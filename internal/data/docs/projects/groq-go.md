@@ -2,11 +2,14 @@
 id: groq-go
 aliases:
   - groq-go
-tags: []
+tags:
+  - programming-language/go
+  - ideologies/open-source
+  - ideologies/api
 created_at: 2025-03-27T14:13:10.000-06:00
 description: Golang library for interacting with the groq API.
 title: groq-go
-updated_at: 2025-03-30T08:12:20.000-06:00
+updated_at: 2025-04-01T05:55:55.000-06:00
 ---
 
 Github: [https://github.com/conneroisu/groq-go](https://github.com/conneroisu/groq-go)

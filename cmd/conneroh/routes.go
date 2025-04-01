@@ -100,7 +100,7 @@ func AddRoutes(
 			))),
 		)
 		h.Handle(fmt.Sprintf(
-			"GET /morphs/post/%s",
+			"GET /morph/post/%s",
 			p.Slug,
 		), templ.Handler(layouts.Morpher(views.Post(
 			p,
@@ -120,7 +120,7 @@ func AddRoutes(
 			))),
 		)
 		h.Handle(
-			fmt.Sprintf("GET /morphs/project/%s", p.Slug),
+			fmt.Sprintf("GET /morph/project/%s", p.Slug),
 			templ.Handler(layouts.Morpher(views.Project(
 				p,
 				&gen.AllPosts,
@@ -140,7 +140,7 @@ func AddRoutes(
 			))),
 		)
 		h.Handle(
-			fmt.Sprintf("GET /morphs/tag/%s", t.Slug),
+			fmt.Sprintf("GET /morph/tag/%s", t.Slug),
 			templ.Handler(layouts.Morpher(views.Tag(
 				t,
 				&gen.AllPosts,

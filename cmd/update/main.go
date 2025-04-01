@@ -12,15 +12,17 @@ import (
 	"io/fs"
 	"math"
 	"mime"
+	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
+	"sync"
 
 	"github.com/charmbracelet/log"
 
 	mathjax "github.com/litao91/goldmark-mathjax"
-	ollama "github.com/prathyushnallamothu/ollamago"
+	"github.com/ollama/ollama/api"
 	enclave "github.com/quail-ink/goldmark-enclave"
 	"github.com/quail-ink/goldmark-enclave/core"
 
@@ -59,18 +61,22 @@ var (
 		ReportTimestamp: false,
 		Level:           log.DebugLevel,
 	})
+
+	client = s3.NewFromConfig(aws.Config{
+		Region:       "auto",
+		BaseEndpoint: aws.String("https://fly.storage.tigris.dev"),
+		Credentials: &CredHandler{
+			Name: "conneroh",
+			ID:   os.Getenv("AWS_ACCESS_KEY_ID"),
+			Key:  os.Getenv("AWS_SECRET_ACCESS_KEY"),
+		},
+	})
+	llama = &api.Client{}
 )
 
-// Cache is the configuration for the updater.
+// Cache is the storage of previous hashes.
 type Cache struct {
-	AssetsHash   string `json:"hash"`
-	AssetsMap    map[string]string
-	PostsHash    string `json:"postsHash"`
-	PostsMap     map[string]string
-	TagsHash     string `json:"tagsHash"`
-	TagsMap      map[string]string
-	ProjectsHash string `json:"projectsHash"`
-	ProjectsMap  map[string]string
+	Hashes map[string]string
 }
 
 // Close writes the config to disk and closes the file.
@@ -83,18 +89,13 @@ func (c *Cache) Close() error {
 	return os.WriteFile(hashFile, body, 0644)
 }
 
-// CompareMap returns true if the two maps are equal.
-func (c *Cache) CompareMap(m map[string]string) bool {
-	for k, v := range c.AssetsMap {
-		if m[k] != v {
-			return false
-		}
-	}
-	return true
-}
-
 func main() {
 	flag.Parse()
+	llamaURL, err := url.Parse(os.Getenv("OLLAMA_URL"))
+	if err != nil {
+		panic(err)
+	}
+	llama = api.NewClient(llamaURL, http.DefaultClient)
 
 	if *cwd != "" {
 		err := os.Chdir(*cwd)
@@ -102,18 +103,13 @@ func main() {
 			panic(err)
 		}
 	}
+	pos, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+	logger.Info("Starting at (PWD=%s)", pos)
 	if err := Run(
 		context.Background(),
-		s3.NewFromConfig(aws.Config{
-			Region:       "auto",
-			BaseEndpoint: aws.String("https://fly.storage.tigris.dev"),
-			Credentials: &CredHandler{
-				Name: "conneroh",
-				ID:   os.Getenv("AWS_ACCESS_KEY_ID"),
-				Key:  os.Getenv("AWS_SECRET_ACCESS_KEY"),
-			},
-		}),
-		ollama.NewClient(ollama.WithTimeout(time.Minute*5)),
 	); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
@@ -129,15 +125,21 @@ func loadConfig() (Cache, error) {
 	if err := json.Unmarshal(data, &cache); err != nil {
 		return cache, err
 	}
+	if cache.Hashes == nil {
+		cache.Hashes = make(map[string]string)
+	}
 	return cache, nil
 }
 
 // Run parses all markdown files in the database.
 func Run(
 	ctx context.Context,
-	client *s3.Client,
-	llama *ollama.Client,
 ) error {
+	var (
+		parsedTags     []gen.Tag
+		parsedProjects []gen.Project
+		parsedPosts    []gen.Post
+	)
 	eg := errgroup.Group{}
 	eg.SetLimit(*workers)
 	cache, err := loadConfig()
@@ -145,50 +147,44 @@ func Run(
 		return err
 	}
 	defer cache.Close()
-	assetHash, err := hashDir(assetsLoc)
-	if err != nil {
-		return err
-	}
-	assets, hashMap, err := assetsParse(cache, assetsLoc)
-	if err != nil {
-		return err
-	}
-	if cache.AssetsHash != assetHash || !cache.CompareMap(hashMap) {
-		for _, asset := range assets {
-			if hashMap[asset.Path] == cache.AssetsMap[asset.Path] {
-				continue
-			}
-			eg.Go(func() error {
-				return uploadAsset(ctx, client, asset)
-			})
-		}
-		cache.AssetsHash = assetHash
-		cache.AssetsMap = hashMap
-	}
-	err = eg.Wait()
-	if err != nil {
-		return err
-	}
 
+	logger.Info("parsing assets")
+	assets, _, err := parse(cache, assetsLoc)
+	if err != nil {
+		return err
+	}
+	for _, asset := range assets {
+		eg.Go(func() error {
+			return uploadAsset(ctx, client, asset)
+		})
+	}
+	if eg.Wait() != nil {
+		return err
+	}
 	logger.Info("assets are up to date")
-	logger.Info("parsing tags")
-	parsedTags, err := pathParse[gen.Tag](ctx, &assets, tagsLoc, llama)
+
+	mdParser := NewMDParser(assets)
+
+	logger.Info("actualizing posts", "dest", postsLoc)
+	parsedPosts, err = actualize[gen.Post](ctx, cache, mdParser, postsLoc)
 	if err != nil {
 		return err
 	}
-	logger.Info("parsed tags")
-	logger.Info("parsing posts")
-	parsedPosts, err := pathParse[gen.Post](ctx, &assets, postsLoc, llama)
+	logger.Info("actualized posts", "len", len(parsedPosts))
+
+	logger.Info("actualizing projects", "dest", projectsLoc)
+	parsedProjects, err = actualize[gen.Project](ctx, cache, mdParser, projectsLoc)
 	if err != nil {
 		return err
 	}
-	logger.Info("parsed posts")
-	logger.Info("parsing projects")
-	parsedProjects, err := pathParse[gen.Project](ctx, &assets, projectsLoc, llama)
+	logger.Info("actualized projects", "len", len(parsedProjects))
+
+	logger.Info("actualizing tags", "dest", tagsLoc)
+	parsedTags, err = actualize[gen.Tag](ctx, cache, mdParser, tagsLoc)
 	if err != nil {
-		return fmt.Errorf("failed to parse projects: %v", err)
+		return err
 	}
-	logger.Info("parsed projects")
+	logger.Info("actualized tags", "len", len(parsedTags))
 
 	postGen, err := genstruct.NewGenerator(genstruct.Config{
 		PackageName: "gen",
@@ -201,131 +197,80 @@ func Run(
 	return postGen.Generate()
 }
 
+func actualize[T gen.Post | gen.Tag | gen.Project](
+	ctx context.Context,
+	cache Cache,
+	mdParser goldmark.Markdown,
+	loc string,
+) ([]T, error) {
+	// Create a channel to safely collect results from goroutines
+	type result struct {
+		item T
+		err  error
+	}
+	resultCh := make(chan result)
+
+	eg := errgroup.Group{}
+	eg.SetLimit(*workers)
+
+	// Get files to process
+	assets, ignored, err := parse(cache, loc)
+	if err != nil {
+		return nil, err
+	}
+
+	// Start a goroutine to collect results
+	var parsed []T
+	var parseWg sync.WaitGroup
+	parseWg.Add(1)
+	go func() {
+		defer parseWg.Done()
+		for res := range resultCh {
+			if res.err == nil {
+				parsed = append(parsed, res.item)
+			}
+		}
+	}()
+
+	// Process each asset concurrently
+	for _, asset := range assets {
+		assetCopy := asset // Create a copy for the goroutine
+		eg.Go(func() error {
+			realized, err := realizeMD[T](ctx, mdParser, assetCopy)
+			if err == nil && realized != nil {
+				resultCh <- result{item: *realized, err: nil}
+			}
+			return err
+		})
+	}
+
+	// Wait for all processing to complete
+	err = eg.Wait()
+	close(resultCh) // Close channel after all goroutines are done
+
+	// Wait for collection goroutine to finish
+	parseWg.Wait()
+
+	// Include previously parsed items that were ignored this time
+	remembered := rememberMD[T](ignored)
+	parsed = append(parsed, remembered...)
+
+	logger.Debugf("Parsed %d assets. Ignored %d", len(parsed), len(ignored))
+	return parsed, err
+}
+
 func uploadAsset(
 	ctx context.Context,
 	client *s3.Client,
 	asset Asset,
 ) error {
+	logger.Debugf("Uploading asset %s", asset.Path)
 	_, err := client.PutObject(ctx, &s3.PutObjectInput{
-		Bucket: aws.String("conneroh.com"),
+		Bucket: aws.String("conneroh"),
 		Key:    aws.String(asset.Path),
 		Body:   bytes.NewReader(asset.Data),
 	})
-
 	return err
-}
-
-// pathParse parses the markdown files in the given path.
-func pathParse[T gen.Post | gen.Project | gen.Tag](
-	ctx context.Context,
-	assets *[]Asset,
-	fsPath string,
-	llama *ollama.Client,
-) ([]T, error) {
-	var parseds []T
-	err := filepath.WalkDir(
-		fsPath,
-		func(path string, d fs.DirEntry, err error) error {
-			if err != nil {
-				return fmt.Errorf(
-					"failed to walk fsPath (%s): %w",
-					fsPath,
-					err,
-				)
-			}
-			if d.IsDir() || !strings.HasSuffix(path, ".md") {
-				return nil
-			}
-			parsed, err := Parse[T](
-				ctx,
-				parser.NewContext(),
-				path,
-				NewParser(assets),
-				llama,
-			)
-			if err != nil {
-				return err
-			}
-			if parsed == nil {
-				return nil
-			}
-			parseds = append(parseds, *parsed)
-			return nil
-		},
-	)
-	if err != nil {
-		return nil, fmt.Errorf("failed to walk fsPath (%s): %w", fsPath, err)
-	}
-	return parseds, nil
-}
-
-func assetsParse(
-	cfg Cache,
-	assetsLoc string,
-) ([]Asset, map[string]string, error) {
-	var assets []Asset
-	var contentsMap = make(map[string]string)
-	err := filepath.WalkDir(
-		assetsLoc,
-		func(path string, d fs.DirEntry, err error) error {
-			if err != nil {
-				return fmt.Errorf(
-					"failed to walk fsPath (%s): %w",
-					"assets",
-					err,
-				)
-			}
-			if d.IsDir() {
-				return nil
-			}
-			asset, err := os.ReadFile(path)
-			if err != nil {
-				return err
-			}
-			hash, err := hashFileContent(string(asset))
-			if err != nil {
-				return err
-			}
-			realPath := strings.TrimPrefix(path, "assets/")
-			if cfg.AssetsMap[realPath] == hash {
-				return nil
-			}
-			assets = append(assets, Asset{
-				Path: realPath,
-				Data: asset,
-			})
-			contentsMap[realPath] = hash
-			return nil
-		},
-	)
-	if err != nil {
-		return nil, nil, err
-	}
-	return assets, contentsMap, nil
-}
-
-func hashDir(dir string) (string, error) {
-	hash := md5.New()
-	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		if !info.IsDir() {
-			file, err := os.Open(path)
-			if err != nil {
-				return err
-			}
-			defer file.Close()
-			if _, err := io.Copy(hash, file); err != nil {
-				return err
-			}
-		}
-		return nil
-	})
-	if err != nil {
-		return "", err
-	}
-	return fmt.Sprintf("%x", hash.Sum(nil)), nil
 }
 
 func hashFileContent(content string) (string, error) {
@@ -337,54 +282,84 @@ func hashFileContent(content string) (string, error) {
 	return fmt.Sprintf("%x", hash.Sum(nil)), nil
 }
 
-// Parse parses the markdown file at the given path.
-func Parse[T gen.Post | gen.Project | gen.Tag](
+func rememberMD[T gen.Post | gen.Project | gen.Tag](ignored []string) []T {
+	// Use type assertions with a type variable to determine what we're working with
+	var typeExample T
+	switch any(typeExample).(type) {
+	case gen.Post:
+		var posts []gen.Post
+		for _, post := range gen.AllPosts {
+			for _, ignored := range ignored {
+				if post.Slug == ignored {
+					posts = append(posts, *post)
+				}
+			}
+		}
+		return any(posts).([]T) // Type assertion to convert the concrete type to []T
+	case gen.Project:
+		var projects []gen.Project
+		for _, project := range gen.AllProjects {
+			for _, ignored := range ignored {
+				if project.Slug == ignored {
+					projects = append(projects, *project)
+				}
+			}
+		}
+		return any(projects).([]T) // Type assertion to convert the concrete type to []T
+	case gen.Tag:
+		var tags []gen.Tag
+		for _, tag := range gen.AllTags {
+			for _, ignored := range ignored {
+				if tag.Slug == ignored {
+					tags = append(tags, *tag)
+				}
+			}
+		}
+		return any(tags).([]T) // Type assertion to convert the concrete type to []T
+	default:
+		panic("unknown type")
+	}
+}
+
+// realizeMD parses the markdown file at the given path.
+func realizeMD[T gen.Post | gen.Project | gen.Tag](
 	ctx context.Context,
-	pCtx parser.Context,
-	path string,
 	md goldmark.Markdown,
-	llama *ollama.Client,
+	parsed Asset,
 ) (*T, error) {
 	var (
 		fm       gen.Embedded
+		pCtx     = parser.NewContext()
 		metadata = frontmatter.Get(pCtx)
 		buf      = bytes.NewBufferString("")
 		err      error
 	)
-	content, err := os.ReadFile(path)
-	if err != nil {
-		return nil, err
-	}
-	err = md.Convert(content, buf, parser.WithContext(pCtx))
+	err = md.Convert(parsed.Data, buf, parser.WithContext(pCtx))
 	if err != nil {
 		return nil, err
 	}
 	metadata = frontmatter.Get(pCtx)
 	if metadata == nil {
-		return nil, fmt.Errorf("frontmatter is nil for %s", path)
+		return nil, fmt.Errorf("frontmatter is nil for %s", parsed.Path)
 	}
 	err = metadata.Decode(&fm)
 	if err != nil {
 		return nil, fmt.Errorf("failed to decode frontmatter: %w", err)
 	}
 
-	path = strings.Replace(path, postsLoc, "", 1)
-	path = strings.Replace(path, projectsLoc, "", 1)
-	path = strings.Replace(path, tagsLoc, "", 1)
-	path = strings.TrimSuffix(path, filepath.Ext(path))
-	fm.Slug = path
+	fm.Slug = parsed.Slug
 	fm.Content = buf.String()
 	if fm.Description == "" {
-		return nil, fmt.Errorf("description is empty for %s", path)
+		return nil, fmt.Errorf("description is empty for %s", parsed.Path)
 	}
-	fm.RawContent = string(content)
+	fm.RawContent = string(parsed.Data)
 
 	if fm.Icon == "" {
 		fm.Icon = "tag"
 	}
 
 	if fm.Content == "" {
-		return nil, fmt.Errorf("content is empty for %s", path)
+		return nil, fmt.Errorf("content is empty for %s", parsed.Path)
 	}
 	fm.Vec, fm.X, fm.Y, fm.Z, err = TextEmbeddingCreate(
 		ctx,
@@ -401,10 +376,10 @@ func Parse[T gen.Post | gen.Project | gen.Tag](
 // TextEmbeddingCreate creates an embedding for the given text.
 func TextEmbeddingCreate(
 	ctx context.Context,
-	client *ollama.Client,
+	client *api.Client,
 	input string,
 ) ([gen.EmbedLength]float64, float64, float64, float64, error) {
-	resp, err := client.Embeddings(ctx, ollama.EmbeddingsRequest{
+	resp, err := client.Embeddings(ctx, &api.EmbeddingRequest{
 		Model:  embeddingModel,
 		Prompt: input,
 	})
@@ -475,9 +450,9 @@ func projectTo3D(embedding []float64, projectionMatrix *mat.Dense) (x, y, z floa
 	return
 }
 
-// NewParser creates a new markdown parser.
-func NewParser(
-	assets *[]Asset,
+// NewMDParser creates a new markdown parser.
+func NewMDParser(
+	assets []Asset,
 ) goldmark.Markdown {
 	return goldmark.New(
 		goldmark.WithExtensions(
@@ -530,18 +505,18 @@ func NewParser(
 
 // Asset is a struct for embedding assets.
 type Asset struct {
+	Slug string
 	Path string
 	Data []byte
 }
 
 // Upload uploads the asset to the s3 bucket.
 func (a *Asset) Upload(ctx context.Context, client *s3.Client) error {
-	mimeType := mime.TypeByExtension(filepath.Ext(a.Path))
 	_, err := client.PutObject(ctx, &s3.PutObjectInput{
 		Bucket:      aws.String(os.Getenv("BUCKET_NAME")),
 		Key:         aws.String(a.Path),
 		Body:        bytes.NewReader(a.Data),
-		ContentType: aws.String(mimeType),
+		ContentType: aws.String(mime.TypeByExtension(filepath.Ext(a.Path))),
 	})
 
 	return err
@@ -553,18 +528,6 @@ func (a *Asset) URL() string {
 		"https://conneroh.fly.storage.tigris.dev/%s",
 		a.Path,
 	)
-}
-
-// Filename returns the filename of the asset.
-func (a *Asset) Filename() string {
-	str := a.Path
-	str = str[strings.LastIndex(str, "/")+1:]
-	return str
-}
-
-// Resolvable returns true if the asset is resolvable.
-func (a *Asset) Resolvable(path string) bool {
-	return strings.HasPrefix(path, a.Path)
 }
 
 // CredHandler is the bucket for the api security.
@@ -588,11 +551,11 @@ func (b *CredHandler) Retrieve(
 // CustomResolver is a wikilink.Resolver that resolves pages referenced by
 // wikilinks to their destinations.
 type CustomResolver struct {
-	Assets *[]Asset
+	Assets []Asset
 }
 
 // NewCustomResolver creates a new wikilink resolver.
-func NewCustomResolver(assets *[]Asset) *CustomResolver {
+func NewCustomResolver(assets []Asset) *CustomResolver {
 	return &CustomResolver{Assets: assets}
 }
 
@@ -601,11 +564,90 @@ func NewCustomResolver(assets *[]Asset) *CustomResolver {
 // being placed into a link.
 func (c *CustomResolver) ResolveWikilink(n *wikilink.Node) (destination []byte, err error) {
 	targetStr := string(n.Target)
-	for _, asset := range *c.Assets {
-		if targetStr == asset.Path || strings.HasSuffix(targetStr, asset.Filename()) {
+	for _, asset := range c.Assets {
+		if targetStr == asset.Path || strings.HasSuffix(targetStr, asset.Path[strings.LastIndex(asset.Path, "/")+1:]) {
 			return []byte(asset.URL()), nil
 		}
 	}
 
 	return nil, nil
+}
+
+// parse parses the markdown files in the given path.
+//
+// ignored is a list of slugs that were ignored as they did not change.
+func parse(
+	cache Cache,
+	loc string,
+) (parseds []Asset, ignored []string, err error) {
+	err = filepath.WalkDir(
+		loc,
+		func(fPath string, d fs.DirEntry, err error) error {
+			if err != nil {
+				return fmt.Errorf(
+					"failed to walk fsPath (%s): %w",
+					"assets",
+					err,
+				)
+			}
+			if d.IsDir() {
+				return nil
+			}
+			asset, err := os.ReadFile(fPath)
+			if err != nil {
+				return err
+			}
+			hash, err := hashFileContent(string(asset))
+			if err != nil {
+				return err
+			}
+			path := pathify(fPath)
+			slug := slugify(fPath)
+			if cache.Hashes[fPath] == hash {
+				cache.Hashes[fPath] = hash
+				ignored = append(ignored, slug)
+				return nil
+			}
+			cache.Hashes[fPath] = hash
+			parseds = append(parseds, Asset{
+				Path: path,
+				Data: asset,
+				Slug: slug,
+			})
+			return nil
+		},
+	)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to walk fsPath (%s): %w", loc, err)
+	}
+	return
+}
+
+func slugify(s string) string {
+	path := strings.Replace(s, postsLoc, "", 1)
+	path = strings.Replace(path, projectsLoc, "", 1)
+	path = strings.Replace(path, tagsLoc, "", 1)
+	path = strings.TrimSuffix(path, filepath.Ext(path))
+	return path
+}
+func pathify(s string) string {
+	var path string
+	var ok bool
+	path, ok = strings.CutPrefix(s, postsLoc)
+	if ok {
+		return path
+	}
+	path, ok = strings.CutPrefix(s, projectsLoc)
+	if ok {
+		return path
+	}
+	path, ok = strings.CutPrefix(s, tagsLoc)
+	if ok {
+		return path
+	}
+	path, ok = strings.CutPrefix(s, assetsLoc)
+	if ok {
+		return path
+	}
+	panic("unknown path")
 }

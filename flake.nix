@@ -305,6 +305,17 @@
             ${scripts.nix-generate-all.exec}
           '';
         };
+        updater = buildGoModule {
+          pname = "updater";
+          name = "update";
+          version = "0.0.1";
+          src = ./.;
+          subPackages = ["./cmd/update"];
+          vendorHash = "sha256-CnE4KrZTgnUqKoB7NRPp/L+lEePlKRIx7Y/m24YzMFQ=";
+          preBuild = ''
+            ${scripts.nix-generate-all.exec}
+          '';
+        };
         C-conneroh = pkgs.dockerTools.buildLayeredImage {
           name = app-name;
           tag = "latest";

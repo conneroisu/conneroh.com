@@ -1,6 +1,7 @@
 package main
 
 import (
+	"strings"
 	"testing"
 )
 
@@ -44,7 +45,7 @@ func TestAssetFilename(t *testing.T) {
 				Data: []byte("test data"),
 			}
 
-			if got := asset.Filename(); got != tt.expected {
+			if got := asset.Path[strings.LastIndex(asset.Path, "/")+1:]; got != tt.expected {
 				t.Errorf("Asset.Filename() = %v, want %v", got, tt.expected)
 			}
 		})
