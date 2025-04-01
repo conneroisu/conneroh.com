@@ -103,11 +103,6 @@ func main() {
 			panic(err)
 		}
 	}
-	pos, err := os.Getwd()
-	if err != nil {
-		panic(err)
-	}
-	logger.Info("Starting at (PWD=%s)", pos)
 	if err := Run(
 		context.Background(),
 	); err != nil {
@@ -148,22 +143,21 @@ func Run(
 	}
 	defer cache.Close()
 
-	logger.Info("parsing assets")
-	assets, _, err := parse(cache, assetsLoc)
+	logger.Info("parsing assets", "loc", assetsLoc)
+	assets, ignored, err := parse(cache, assetsLoc)
 	if err != nil {
 		return err
 	}
-	for _, asset := range assets {
-		eg.Go(func() error {
-			return uploadAsset(ctx, client, asset)
-		})
-	}
-	if eg.Wait() != nil {
+	logger.Info("assets parsed", "len", len(assets))
+
+	logger.Info("actualizing assets", "dest", assetsLoc)
+	actualized, err := actualizeAssets(ctx, client, ignored, assets)
+	if err != nil {
 		return err
 	}
 	logger.Info("assets are up to date")
 
-	mdParser := NewMDParser(assets)
+	mdParser := NewMDParser(actualized)
 
 	logger.Info("actualizing posts", "dest", postsLoc)
 	parsedPosts, err = actualize[gen.Post](ctx, cache, mdParser, postsLoc)
@@ -371,6 +365,44 @@ func realizeMD[T gen.Post | gen.Project | gen.Tag](
 	}
 
 	return gen.New[T](fm), nil
+}
+
+func actualizeAssets(
+	ctx context.Context,
+	client *s3.Client,
+	ignore []string,
+	assets []Asset,
+) (fulAssets []Asset, err error) {
+	eg := errgroup.Group{}
+	eg.SetLimit(*workers)
+	eg.Go(func() (err error) {
+		for _, ignored := range ignore {
+			var data []byte
+			data, err = os.ReadFile(ignored)
+			if err == nil {
+				fulAssets = append(assets, Asset{
+					Path: ignored,
+					Data: data,
+				})
+			}
+			return
+		}
+		return
+	})
+	for _, asset := range assets {
+		eg.Go(func() (err error) {
+			_, err = client.PutObject(ctx, &s3.PutObjectInput{
+				Bucket: aws.String("conneroh"),
+				Key:    aws.String(asset.Path),
+				Body:   bytes.NewReader(asset.Data),
+			})
+			return
+		})
+	}
+	if eg.Wait() != nil {
+		return nil, err
+	}
+	return fulAssets, nil
 }
 
 // TextEmbeddingCreate creates an embedding for the given text.
