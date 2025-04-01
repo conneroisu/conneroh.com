@@ -8,6 +8,7 @@ import (
 	"encoding/hex"
 	"flag"
 	"fmt"
+	"io"
 	"io/fs"
 	"math"
 	"mime"
@@ -27,9 +28,12 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/conneroisu/conneroh.com/cmd/conneroh/views"
 	"github.com/conneroisu/conneroh.com/internal/cache"
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
+	"github.com/conneroisu/conneroh.com/internal/routing"
 	"github.com/conneroisu/genstruct"
+	"github.com/conneroisu/twerge"
 	"github.com/yuin/goldmark"
 	highlighting "github.com/yuin/goldmark-highlighting/v2"
 	"github.com/yuin/goldmark/extension"
@@ -95,7 +99,7 @@ func main() {
 	}
 }
 
-// Run parses all markdown files in the database.
+// Run parses all markdown files in the database and updates css hashes.
 func Run(
 	ctx context.Context,
 ) error {
@@ -110,6 +114,7 @@ func Run(
 	if err != nil {
 		return err
 	}
+	eg.Go(func() (err error) { return genCSS(ctx) })
 	defer func() {
 		err = cache.Close()
 		if err != nil {
@@ -614,4 +619,44 @@ func pathify(s string) string {
 		return path
 	}
 	panic("unknown path")
+}
+
+func genCSS(ctx context.Context) error {
+	var (
+		_ = views.Home(
+			&[]*gen.Post{},
+			&[]*gen.Project{},
+			&[]*gen.Tag{},
+		).Render(ctx, io.Discard)
+		_ = views.List(
+			routing.PluralTargetPost,
+			&[]*gen.Post{},
+			&[]*gen.Project{},
+			&[]*gen.Tag{},
+		).Render(ctx, io.Discard)
+		_ = views.List(
+			routing.PluralTargetProject,
+			&[]*gen.Post{},
+			&[]*gen.Project{},
+			&[]*gen.Tag{},
+		).Render(ctx, io.Discard)
+		_ = views.List(
+			routing.PluralTargetTag,
+			&[]*gen.Post{},
+			&[]*gen.Project{},
+			&[]*gen.Tag{},
+		).Render(ctx, io.Discard)
+	)
+	content := twerge.GenerateClassMapCode("css")
+	f, err := os.Create("internal/data/css/classes.go")
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	_, err = f.WriteString(content)
+	if err != nil {
+		return err
+	}
+	println("Generated classes.go.")
+	return nil
 }
