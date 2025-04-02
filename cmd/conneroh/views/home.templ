@@ -13,76 +13,76 @@ templ Home(
 ) {
 	// Hero Section
 	<section
-		class={ twerge.Generate("py-20 bg-gradient-to-b from-gray-900 to-gray-800") }
+		class={ twerge.It("py-20 bg-gradient-to-b from-gray-900 to-gray-800") }
 	>
 		<div
-			class={ twerge.Generate("container px-4 mx-auto") }
+			class={ twerge.It("container px-4 mx-auto") }
 		>
 			<div
-				class={ twerge.Generate("flex flex-col lg:flex-row items-center justify-between") }
+				class={ twerge.It("flex flex-col lg:flex-row items-center justify-between") }
 			>
 				<div
-					class={ twerge.Generate("lg:w-1/2 mb-10 lg:mb-0") }
+					class={ twerge.It("lg:w-1/2 mb-10 lg:mb-0") }
 				>
 					<h1
-						class={ twerge.Generate("text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-4 text-white") }
+						class={ twerge.It("text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-4 text-white") }
 					>
 						Conner Ohnesorge
 					</h1>
 					<p
-						class={ twerge.Generate("text-xl text-gray-300 mb-8 max-w-md") }
+						class={ twerge.It("text-xl text-gray-300 mb-8 max-w-md") }
 					>
 						Electrical Engineer & Software Developer specialized in creating robust, scalable, and elegant solutions.
 					</p>
 					<p
-						class={ twerge.Generate("text-xl text-gray-300 mb-8 max-w-md") }
+						class={ twerge.It("text-xl text-gray-300 mb-8 max-w-md") }
 					>
 						Electrical Engineering Bachelors Degree and Minor in Computer Science from
 						<a
 							href="https://iastate.edu/"
-							class={ twerge.Generate("hover:underline") }
+							class={ twerge.It("hover:underline") }
 						>
 							Iowa State University
 						</a>
 					</p>
 					<div
-						class={ twerge.Generate("flex flex-wrap gap-4") }
+						class={ twerge.It("flex flex-wrap gap-4") }
 					>
 						<a
 							href="#projects"
-							class={ twerge.Generate("px-6 py-3 bg-gray-900 bg-white text-gray-900 rounded-md font-medium hover:opacity-90 transition-opacity") }
+							class={ twerge.It("px-6 py-3 bg-gray-900 bg-white text-gray-900 rounded-md font-medium hover:opacity-90 transition-opacity") }
 						>
 							View Projects
 						</a>
 						<a
 							href="#contact"
-							class={ twerge.Generate("px-6 py-3 border border-gray-600 rounded-md font-medium text-gray-300 hover:bg-gray-800 transition-colors") }
+							class={ twerge.It("px-6 py-3 border border-gray-600 rounded-md font-medium text-gray-300 hover:bg-gray-800 transition-colors") }
 						>
 							Contact Me
 						</a>
 					</div>
 				</div>
 				<div
-					class={ twerge.Generate("lg:w-1/2 relative") }
+					class={ twerge.It("lg:w-1/2 relative") }
 				>
 					<div
-						class={ twerge.Generate("w-64 h-64 md:w-80 md:h-80 bg-blue-600 rounded-full relative shadow-lg mx-auto") }
+						class={ twerge.It("w-64 h-64 md:w-80 md:h-80 bg-blue-600 rounded-full relative shadow-lg mx-auto") }
 					>
 						<div
-							class={ twerge.Generate("absolute inset-0 flex items-center justify-center text-white font-bold text-xl") }
+							class={ twerge.It("absolute inset-0 flex items-center justify-center text-white font-bold text-xl") }
 						>
 							<img
 								src="/dist/hero.jpeg"
 								alt="me"
-								class={ twerge.Generate("bg-blue-600 rounded-full relative shadow-lg mx-auto") }
+								class={ twerge.It("bg-blue-600 rounded-full relative shadow-lg mx-auto") }
 							/>
 						</div>
 						// Decorative elements
 						<div
-							class={ twerge.Generate("absolute -bottom-4 -right-4 w-24 h-24 bg-purple-600 rounded-full z-0") }
+							class={ twerge.It("absolute -bottom-4 -right-4 w-24 h-24 bg-purple-600 rounded-full z-0") }
 						></div>
 						<div
-							class={ twerge.Generate("absolute -top-4 -left-4 w-16 h-16 bg-pink-600 rounded-full z-0") }
+							class={ twerge.It("absolute -top-4 -left-4 w-16 h-16 bg-pink-600 rounded-full z-0") }
 						></div>
 					</div>
 				</div>
@@ -92,16 +92,16 @@ templ Home(
 	// Featured Projects Section
 	<section
 		id="projects"
-		class={ twerge.Generate("py-16 bg-gray-800") }
+		class={ twerge.It("py-16 bg-gray-800") }
 	>
 		<div
-			class={ twerge.Generate("container px-4 mx-auto") }
+			class={ twerge.It("container px-4 mx-auto") }
 		>
 			<div
-				class={ twerge.Generate("flex flex-col md:flex-row justify-between items-center mb-12 pr-4") }
+				class={ twerge.It("flex flex-col md:flex-row justify-between items-center mb-12 pr-4") }
 			>
 				<h2
-					class={ twerge.Generate("text-3xl font-bold text-white mb-4 md:mb-0") }
+					class={ twerge.It("text-3xl font-bold text-white mb-4 md:mb-0") }
 				>
 					Featured Projects
 				</h2>
@@ -112,19 +112,19 @@ templ Home(
 					hx-swap="outerHTML"
 					hx-target="#bodiody"
 					preload="mouseover"
-					class={ twerge.Generate("text-blue-400 hover:underline text-lg font-medium flex items-center") }
+					class={ twerge.It("text-blue-400 hover:underline text-lg font-medium flex items-center") }
 				>
 					View All Projects
 					@icon("arrow-right", templ.Attributes{})
 				</a>
 			</div>
 			<div
-				class={ twerge.Generate("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8") }
+				class={ twerge.It("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8") }
 			>
 				for i, project := range *fullProjects {
 					if i < 6 {
 						<div
-							class={ twerge.Generate("bg-gray-900 rounded-lg overflow-hidden shadow-md transition-transform duration-300 hover:scale-105 hover:shadow-lg") }
+							class={ twerge.It("bg-gray-900 rounded-lg overflow-hidden shadow-md transition-transform duration-300 hover:scale-105 hover:shadow-lg") }
 						>
 							<a
 								hx-get={ fmt.Sprintf("/morph/project/%s", project.Slug) }
@@ -133,22 +133,22 @@ templ Home(
 								hx-swap="outerHTML"
 								hx-target="#bodiody"
 								preload="mouseover"
-								class={ twerge.Generate("block cursor-pointer") }
+								class={ twerge.It("block cursor-pointer") }
 							>
 								<div
-									class={ twerge.Generate("h-48 bg-gray-700 flex items-center justify-center overflow-hidden") }
+									class={ twerge.It("h-48 bg-gray-700 flex items-center justify-center overflow-hidden") }
 								>
 									if project.BannerPath != "" {
 										@image(
 											project.BannerPath,
 											fmt.Sprintf("banner-%s", project.Slug),
-											twerge.Generate("w-full h-full object-cover"),
+											twerge.It("w-full h-full object-cover"),
 										)
 									} else {
 										// Project image placeholder
 										<svg
 											xmlns="http://www.w3.org/2000/svg"
-											class={ twerge.Generate("h-12 w-12 text-gray-500") }
+											class={ twerge.It("h-12 w-12 text-gray-500") }
 											fill="none"
 											viewBox="0 0 24 24"
 											stroke="currentColor"
@@ -158,25 +158,25 @@ templ Home(
 									}
 								</div>
 								<div
-									class={ twerge.Generate("p-6") }
+									class={ twerge.It("p-6") }
 								>
 									<h3
-										class={ twerge.Generate("text-xl font-bold text-white mb-2") }
+										class={ twerge.It("text-xl font-bold text-white mb-2") }
 									>
 										{ project.Title }
 									</h3>
 									<p
-										class={ twerge.Generate("text-gray-300 mb-4 line-clamp-2") }
+										class={ twerge.It("text-gray-300 mb-4 line-clamp-2") }
 									>
 										{ project.Description }
 									</p>
 									<div
-										class={ twerge.Generate("flex flex-wrap gap-2 mb-4") }
+										class={ twerge.It("flex flex-wrap gap-2 mb-4") }
 									>
 										for _, tag := range project.Tags {
 											<a
 												href={ templ.SafeURL("/tag/" + tag.Slug) }
-												class={ twerge.Generate("inline-block px-3 py-1 text-sm font-medium rounded-full bg-blue-900 text-blue-200 hover:bg-blue-200 hover:bg-blue-800 transition-colors") }
+												class={ twerge.It("inline-block px-3 py-1 text-sm font-medium rounded-full bg-blue-900 text-blue-200 hover:bg-blue-200 hover:bg-blue-800 transition-colors") }
 											>
 												{ tag.Slug }
 											</a>
@@ -189,7 +189,7 @@ templ Home(
 										hx-swap="outerHTML"
 										hx-target="#bodiody"
 										preload="mouseover"
-										class={ twerge.Generate("text-blue-400 hover:underline text-sm font-medium flex items-center") }
+										class={ twerge.It("text-blue-400 hover:underline text-sm font-medium flex items-center") }
 									>
 										View Project
 										@icon("arrow-right", templ.Attributes{})
@@ -204,16 +204,16 @@ templ Home(
 	</section>
 	// Recent Posts Section
 	<section
-		class={ twerge.Generate("py-16 bg-gray-900") }
+		class={ twerge.It("py-16 bg-gray-900") }
 	>
 		<div
-			class={ twerge.Generate("container px-4 mx-auto") }
+			class={ twerge.It("container px-4 mx-auto") }
 		>
 			<div
-				class={ twerge.Generate("flex flex-col md:flex-row justify-between items-center mb-12 pr-4") }
+				class={ twerge.It("flex flex-col md:flex-row justify-between items-center mb-12 pr-4") }
 			>
 				<h2
-					class={ twerge.Generate("text-3xl font-bold text-white mb-4 md:mb-0") }
+					class={ twerge.It("text-3xl font-bold text-white mb-4 md:mb-0") }
 				>
 					Recent Posts
 				</h2>
@@ -223,7 +223,7 @@ templ Home(
 					hx-push-url="/posts"
 					hx-swap="outerHTML"
 					hx-target="#bodiody"
-					class={ twerge.Generate("text-blue-400 hover:underline text-lg font-medium flex items-center") }
+					class={ twerge.It("text-blue-400 hover:underline text-lg font-medium flex items-center") }
 					preload="mouseover"
 				>
 					View All Posts
@@ -231,12 +231,12 @@ templ Home(
 				</a>
 			</div>
 			<div
-				class={ twerge.Generate("grid grid-cols-1 lg:grid-cols-2 gap-8") }
+				class={ twerge.It("grid grid-cols-1 lg:grid-cols-2 gap-8") }
 			>
 				for i, post := range *fullPosts {
 					if i < 4 {
 						<div
-							class={ twerge.Generate("bg-gray-800 rounded-lg overflow-hidden shadow-md transition-transform duration-300 hover:scale-105 hover:shadow-lg") }
+							class={ twerge.It("bg-gray-800 rounded-lg overflow-hidden shadow-md transition-transform duration-300 hover:scale-105 hover:shadow-lg") }
 						>
 							<a
 								hx-get={ fmt.Sprintf("/morph/post/%s", post.Slug) }
@@ -245,11 +245,11 @@ templ Home(
 								hx-swap="outerHTML"
 								hx-target="#bodiody"
 								preload="mouseover"
-								class={ twerge.Generate("block cursor-pointer") }
+								class={ twerge.It("block cursor-pointer") }
 							>
 								// Post banner image
 								<div
-									class={ twerge.Generate("h-48 bg-gray-700 overflow-hidden") }
+									class={ twerge.It("h-48 bg-gray-700 overflow-hidden") }
 								>
 									if post.BannerPath != "" {
 										@image(
@@ -259,11 +259,11 @@ templ Home(
 										)
 									} else {
 										<div
-											class={ twerge.Generate("w-full h-full flex items-center justify-center") }
+											class={ twerge.It("w-full h-full flex items-center justify-center") }
 										>
 											<svg
 												xmlns="http://www.w3.org/2000/svg"
-												class={ twerge.Generate("h-12 w-12 text-gray-500") }
+												class={ twerge.It("h-12 w-12 text-gray-500") }
 												fill="none"
 												viewBox="0 0 24 24"
 												stroke="currentColor"
@@ -279,20 +279,20 @@ templ Home(
 									}
 								</div>
 								<div
-									class={ twerge.Generate("p-6") }
+									class={ twerge.It("p-6") }
 								>
 									<h3
-										class={ twerge.Generate("text-xl font-bold text-white mb-2") }
+										class={ twerge.It("text-xl font-bold text-white mb-2") }
 									>
 										{ post.Title }
 									</h3>
 									<p
-										class={ twerge.Generate("text-gray-300 mb-4 line-clamp-2") }
+										class={ twerge.It("text-gray-300 mb-4 line-clamp-2") }
 									>
 										{ post.Description }
 									</p>
 									<div
-										class={ twerge.Generate("flex flex-wrap gap-2 mb-4") }
+										class={ twerge.It("flex flex-wrap gap-2 mb-4") }
 									>
 										for _, tag := range post.Tags {
 											<a
@@ -302,7 +302,7 @@ templ Home(
 												hx-swap="outerHTML"
 												hx-target="#bodiody"
 												preload="mouseover"
-												class={ twerge.Generate("px-2 py-1 bg-green-900 text-green-200 text-xs rounded-md hover:bg-green-800 transition-colors") }
+												class={ twerge.It("px-2 py-1 bg-green-900 text-green-200 text-xs rounded-md hover:bg-green-800 transition-colors") }
 											>
 												{ tag.Slug }
 											</a>
@@ -315,12 +315,12 @@ templ Home(
 										hx-swap="outerHTML"
 										hx-target="#bodiody"
 										preload="mouseover"
-										class={ twerge.Generate("text-blue-400 hover:underline text-sm font-medium flex items-center") }
+										class={ twerge.It("text-blue-400 hover:underline text-sm font-medium flex items-center") }
 									>
 										Read Post
 										<svg
 											xmlns="http://www.w3.org/2000/svg"
-											class={ twerge.Generate("h-4 w-4 ml-1") }
+											class={ twerge.It("h-4 w-4 ml-1") }
 											viewBox="0 0 20 20"
 											fill="currentColor"
 										>
@@ -341,16 +341,16 @@ templ Home(
 	</section>
 	// Skills/Tags Section
 	<section
-		class={ twerge.Generate("py-16 bg-gray-800") }
+		class={ twerge.It("py-16 bg-gray-800") }
 	>
 		<div
-			class={ twerge.Generate("container px-4 mx-auto") }
+			class={ twerge.It("container px-4 mx-auto") }
 		>
 			<div
-				class={ twerge.Generate("flex flex-col md:flex-row justify-between items-center mb-12 pr-4") }
+				class={ twerge.It("flex flex-col md:flex-row justify-between items-center mb-12 pr-4") }
 			>
 				<h2
-					class={ twerge.Generate("text-3xl font-bold text-white mb-4 md:mb-0") }
+					class={ twerge.It("text-3xl font-bold text-white mb-4 md:mb-0") }
 				>
 					Skills & Technologies
 				</h2>
@@ -360,14 +360,14 @@ templ Home(
 					hx-trigger="click"
 					hx-push-url="/tags"
 					preload="mouseover"
-					class={ twerge.Generate("text-blue-400 hover:underline text-lg font-medium flex items-center") }
+					class={ twerge.It("text-blue-400 hover:underline text-lg font-medium flex items-center") }
 				>
 					See All Skills/Technologies
 					@icon("arrow-right", templ.Attributes{})
 				</a>
 			</div>
 			<div
-				class={ twerge.Generate("grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8") }
+				class={ twerge.It("grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8") }
 			>
 				for _, tag := range *fullTags {
 					<a
@@ -377,15 +377,15 @@ templ Home(
 						hx-push-url={ fmt.Sprintf("/tag/%s", tag.Slug) }
 						hx-get={ fmt.Sprintf("/morph/tag/%s", tag.Slug) }
 						preload="mouseover"
-						class={ twerge.Generate("block bg-gray-900 rounded-lg p-6 text-center hover:shadow-md transition-shadow") }
+						class={ twerge.It("block bg-gray-900 rounded-lg p-6 text-center hover:shadow-md transition-shadow") }
 					>
 						<div
-							class={ twerge.Generate("w-12 h-12 bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-4") }
+							class={ twerge.It("w-12 h-12 bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-4") }
 						>
 							@icon(tag.Icon, templ.Attributes{})
 						</div>
 						<h3
-							class={ twerge.Generate("font-medium text-white") }
+							class={ twerge.It("font-medium text-white") }
 						>
 							{ tag.Title }
 						</h3>
@@ -397,66 +397,66 @@ templ Home(
 	// Contact Section
 	<section
 		id="contact"
-		class={ twerge.Generate("py-16 bg-gray-900") }
+		class={ twerge.It("py-16 bg-gray-900") }
 	>
 		<div
-			class={ twerge.Generate("container px-4 mx-auto") }
+			class={ twerge.It("container px-4 mx-auto") }
 		>
 			<div
-				class={ twerge.Generate("max-w-2xl mx-auto text-center") }
+				class={ twerge.It("max-w-2xl mx-auto text-center") }
 			>
 				<h2
-					class={ twerge.Generate("text-3xl font-bold text-white mb-4") }
+					class={ twerge.It("text-3xl font-bold text-white mb-4") }
 				>
 					Get In Touch
 				</h2>
 				<p
-					class={ twerge.Generate("text-gray-300 mb-8") }
+					class={ twerge.It("text-gray-300 mb-8") }
 				>
 					Interested in working together? Feel free to reach out through any of the channels below.
 				</p>
 				<div
-					class={ twerge.Generate("flex flex-wrap justify-center gap-4 mb-8") }
+					class={ twerge.It("flex flex-wrap justify-center gap-4 mb-8") }
 				>
 					// Social links
 					<a
 						href="https://www.linkedin.com/in/conner-ohnesorge-b720a4238"
-						class={ twerge.Generate("w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center text-gray-300 transition-colors hover:bg-blue-400") }
+						class={ twerge.It("w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center text-gray-300 transition-colors hover:bg-blue-400") }
 					>
 						@icon("linkedin", templ.Attributes{})
 					</a>
 					<a
 						href="https://github.com/conneroisu"
-						class={ twerge.Generate("w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center text-gray-300 transition-colors hover:bg-gray-800") }
+						class={ twerge.It("w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center text-gray-300 transition-colors hover:bg-gray-800") }
 					>
 						@icon("github", templ.Attributes{})
 					</a>
 					<a
 						href="https://x.com/ConnerOhnesorge"
-						class={ twerge.Generate("w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center text-gray-300 transition-colors hover:bg-blue-400") }
+						class={ twerge.It("w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center text-gray-300 transition-colors hover:bg-blue-400") }
 					>
 						@icon("twitter", templ.Attributes{})
 					</a>
 					<a
 						href="mailto:conneroisu@outlook.com"
-						class={ twerge.Generate("w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center text-gray-300 transition-colors hover:bg-red-500") }
+						class={ twerge.It("w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center text-gray-300 transition-colors hover:bg-red-500") }
 					>
 						@icon("mail", templ.Attributes{})
 					</a>
 				</div>
 				<div
-					class={ twerge.Generate("bg-gray-800 p-8 rounded-lg shadow-md") }
+					class={ twerge.It("bg-gray-800 p-8 rounded-lg shadow-md") }
 				>
 					<form
-						class={ twerge.Generate("space-y-6") }
+						class={ twerge.It("space-y-6") }
 					>
 						<div
-							class={ twerge.Generate("grid grid-cols-1 md:grid-cols-2 gap-6") }
+							class={ twerge.It("grid grid-cols-1 md:grid-cols-2 gap-6") }
 						>
 							<div>
 								<label
 									for="name"
-									class={ twerge.Generate("block text-sm font-medium text-gray-300 mb-1") }
+									class={ twerge.It("block text-sm font-medium text-gray-300 mb-1") }
 								>
 									Name
 								</label>
@@ -464,14 +464,14 @@ templ Home(
 									type="text"
 									id="name"
 									name="name"
-									class={ twerge.Generate("w-full px-4 py-2 border border-gray-600 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500") }
+									class={ twerge.It("w-full px-4 py-2 border border-gray-600 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500") }
 									required
 								/>
 							</div>
 							<div>
 								<label
 									for="email"
-									class={ twerge.Generate("block text-sm font-medium text-gray-300 mb-1") }
+									class={ twerge.It("block text-sm font-medium text-gray-300 mb-1") }
 								>
 									Email
 								</label>
@@ -479,7 +479,7 @@ templ Home(
 									type="email"
 									id="email"
 									name="email"
-									class={ twerge.Generate("w-full px-4 py-2 border border-gray-600 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500") }
+									class={ twerge.It("w-full px-4 py-2 border border-gray-600 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500") }
 									required
 								/>
 							</div>
@@ -487,7 +487,7 @@ templ Home(
 						<div>
 							<label
 								for="subject"
-								class={ twerge.Generate("block text-sm font-medium text-gray-300 mb-1") }
+								class={ twerge.It("block text-sm font-medium text-gray-300 mb-1") }
 							>
 								Subject
 							</label>
@@ -495,14 +495,14 @@ templ Home(
 								type="text"
 								id="subject"
 								name="subject"
-								class={ twerge.Generate("w-full px-4 py-2 border border-gray-600 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500") }
+								class={ twerge.It("w-full px-4 py-2 border border-gray-600 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500") }
 								required
 							/>
 						</div>
 						<div>
 							<label
 								for="message"
-								class={ twerge.Generate("block text-sm font-medium text-gray-300 mb-1") }
+								class={ twerge.It("block text-sm font-medium text-gray-300 mb-1") }
 							>
 								Message
 							</label>
@@ -510,13 +510,13 @@ templ Home(
 								id="message"
 								name="message"
 								rows="4"
-								class={ twerge.Generate("w-full px-4 py-2 border border-gray-600 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500") }
+								class={ twerge.It("w-full px-4 py-2 border border-gray-600 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500") }
 								required
 							></textarea>
 						</div>
 						<button
 							type="submit"
-							class={ twerge.Generate("w-full px-6 py-3 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors") }
+							class={ twerge.It("w-full px-6 py-3 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors") }
 						>
 							Send Message
 						</button>

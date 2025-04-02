@@ -14,36 +14,36 @@ templ Post(
 	fullTags *[]*gen.Tag,
 ) {
 	<article
-		class={ twerge.Generate("container mx-auto px-4 py-8 max-w-3xl") }
+		class={ twerge.It("container mx-auto px-4 py-8 max-w-3xl") }
 	>
 		<div
-			class={ twerge.Generate("mb-8") }
+			class={ twerge.It("mb-8") }
 		>
 			<h1
-				class={ twerge.Generate("text-4xl font-bold text-white mb-4") }
+				class={ twerge.It("text-4xl font-bold text-white mb-4") }
 			>
 				{ post.Title }
 			</h1>
 			<div
-				class={ twerge.Generate("flex items-center text-gray-400 mb-6") }
+				class={ twerge.It("flex items-center text-gray-400 mb-6") }
 			>
 				<time>
 					{ post.CreatedAt.Format("Jan 2, 2006") }
 				</time>
 				<span
-					class={ twerge.Generate("mx-2") }
+					class={ twerge.It("mx-2") }
 				>
 					•
 				</span>
 				<span>{ readTime(post.Content) } min read</span>
 			</div>
 			<div
-				class={ twerge.Generate("flex flex-wrap gap-2 mb-8") }
+				class={ twerge.It("flex flex-wrap gap-2 mb-8") }
 			>
 				for _, tag := range post.Tags {
 					<a
 						href={ templ.SafeURL(fmt.Sprintf("/tag/%s", tag.Slug)) }
-						class={ twerge.Generate("inline-block px-3 py-1 text-sm font-medium rounded-full bg-blue-900 text-blue-200 hover:bg-blue-200 hover:bg-blue-800 transition-colors") }
+						class={ twerge.It("inline-block px-3 py-1 text-sm font-medium rounded-full bg-blue-900 text-blue-200 hover:bg-blue-200 hover:bg-blue-800 transition-colors") }
 					>
 						{ tag.Slug }
 					</a>
@@ -53,30 +53,30 @@ templ Post(
 				@image(
 					post.BannerPath,
 					post.Title,
-					twerge.Generate("w-full h-64 md:h-96 object-cover object-center rounded-lg shadow-md mb-8"),
+					twerge.It("w-full h-64 md:h-96 object-cover object-center rounded-lg shadow-md mb-8"),
 				)
 			}
 		</div>
 		<div
-			class={ twerge.Generate("bg-gray-800 rounded-lg shadow-lg overflow-hidden p-6 mb-8") }
+			class={ twerge.It("bg-gray-800 rounded-lg shadow-lg overflow-hidden p-6 mb-8") }
 		>
 			<div
-				class={ twerge.Generate("mt-6 mb-4 my-4 my-4 my-2 my-6 max-w-none text-gray-300 leading-relaxed") }
+				class={ twerge.It("mt-6 mb-4 my-4 my-4 my-2 my-6 max-w-none text-gray-300 leading-relaxed") }
 			>
 				@templ.Raw(post.Content)
 			</div>
 		</div>
 		if len(post.Projects) > 0 {
 			<div
-				class={ twerge.Generate("mt-12 border-t border-gray-700 pt-8") }
+				class={ twerge.It("mt-12 border-t border-gray-700 pt-8") }
 			>
 				<h2
-					class={ twerge.Generate("text-2xl font-bold text-white mb-4") }
+					class={ twerge.It("text-2xl font-bold text-white mb-4") }
 				>
 					Related Projects
 				</h2>
 				<div
-					class={ twerge.Generate("grid grid-cols-1 md:grid-cols-2 gap-4") }
+					class={ twerge.It("grid grid-cols-1 md:grid-cols-2 gap-4") }
 				>
 					for _, project := range post.Projects {
 						<a
@@ -87,16 +87,16 @@ templ Post(
 							hx-trigger="click"
 							hx-indicator="#bodiody"
 							preload="mouseover"
-							class={ twerge.Generate("flex items-center p-4 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors") }
+							class={ twerge.It("flex items-center p-4 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors") }
 						>
 							<div>
 								<h3
-									class={ twerge.Generate("font-medium text-white") }
+									class={ twerge.It("font-medium text-white") }
 								>
 									{ project.Slug }
 								</h3>
 								<p
-									class={ twerge.Generate("text-gray-400 text-sm line-clamp-2") }
+									class={ twerge.It("text-gray-400 text-sm line-clamp-2") }
 								>
 									{ project.Description }
 								</p>

@@ -15,55 +15,55 @@ templ Tag(
 	fullTags *[]*gen.Tag,
 ) {
 	<div
-		class={ twerge.Generate("container mx-auto px-4 py-8 max-w-5xl") }
+		class={ twerge.It("container mx-auto px-4 py-8 max-w-5xl") }
 	>
 		<header
-			class={ twerge.Generate("text-center mb-12") }
+			class={ twerge.It("text-center mb-12") }
 		>
 			@icon(tag.Icon, templ.Attributes{
 				"style": "width: 4em; height: 4em;",
-				"class": twerge.Generate("inline-block p-4"),
+				"class": twerge.It("inline-block p-4"),
 			})
 			<h1
-				class={ twerge.Generate("text-4xl font-bold text-white mb-4") }
+				class={ twerge.It("text-4xl font-bold text-white mb-4") }
 			>
 				{ tag.Title }
 			</h1>
 			<div
-				class={ twerge.Generate("text-xl text-gray-300 max-w-2xl mx-auto") }
+				class={ twerge.It("text-xl text-gray-300 max-w-2xl mx-auto") }
 			>
 				{ tag.Description }
 			</div>
 		</header>
 		<div
 			x-data="{ activeTab: 'posts' }"
-			class={ twerge.Generate("mb-8") }
+			class={ twerge.It("mb-8") }
 		>
 			// Tabs
 			<div
-				class={ twerge.Generate("border-b border-gray-700 mb-6") }
+				class={ twerge.It("border-b border-gray-700 mb-6") }
 			>
 				<nav
-					class={ twerge.Generate("flex space-x-8") }
+					class={ twerge.It("flex space-x-8") }
 				>
 					<button
 						@click="activeTab = 'posts'"
-						:class={ fmt.Sprintf("{'%s': activeTab === 'posts', '%s': activeTab !== 'posts'}", twerge.Generate("border-blue-500 text-blue-500"), twerge.Generate("border-transparent text-gray-500 text-gray-400 hover:text-gray-300")) }
-						class={ twerge.Generate("py-4 px-1 border-b-2 font-medium text-sm sm:text-base border-blue-500 text-blue-500") }
+						:class={ fmt.Sprintf("{'%s': activeTab === 'posts', '%s': activeTab !== 'posts'}", twerge.It("border-blue-500 text-blue-500"), twerge.It("border-transparent text-gray-500 text-gray-400 hover:text-gray-300")) }
+						class={ twerge.It("py-4 px-1 border-b-2 font-medium text-sm sm:text-base border-blue-500 text-blue-500") }
 					>
 						Posts ({ fmt.Sprintf("%d", len(tag.Posts)) })
 					</button>
 					<button
 						@click="activeTab = 'projects'"
-						:class={ fmt.Sprintf("{'%s': activeTab === 'projects', '%s': activeTab !== 'projects'}", twerge.Generate("border-blue-500 text-blue-500"), twerge.Generate("border-transparent text-gray-500 text-gray-400 hover:text-gray-300")) }
-						class={ twerge.Generate("py-4 px-1 border-b-2 font-medium text-sm sm:text-base border-transparent text-gray-500 text-gray-400 hover:text-gray-300") }
+						:class={ fmt.Sprintf("{'%s': activeTab === 'projects', '%s': activeTab !== 'projects'}", twerge.It("border-blue-500 text-blue-500"), twerge.It("border-transparent text-gray-500 text-gray-400 hover:text-gray-300")) }
+						class={ twerge.It("py-4 px-1 border-b-2 font-medium text-sm sm:text-base border-transparent text-gray-500 text-gray-400 hover:text-gray-300") }
 					>
 						Projects ({ fmt.Sprintf("%d", len(tag.Projects)) })
 					</button>
 					<button
 						@click="activeTab = 'related'"
-						:class={ fmt.Sprintf("{'%s': activeTab === 'related', '%s': activeTab !== 'related'}", twerge.Generate("border-blue-500 text-blue-500"), twerge.Generate("border-transparent text-gray-500 text-gray-400 hover:text-gray-300")) }
-						class={ twerge.Generate("py-4 px-1 border-b-2 font-medium text-sm sm:text-base") }
+						:class={ fmt.Sprintf("{'%s': activeTab === 'related', '%s': activeTab !== 'related'}", twerge.It("border-blue-500 text-blue-500"), twerge.It("border-transparent text-gray-500 text-gray-400 hover:text-gray-300")) }
+						class={ twerge.It("py-4 px-1 border-b-2 font-medium text-sm sm:text-base") }
 					>
 						Related Tags ({ fmt.Sprintf("%d", len(tag.Tags)) })
 					</button>
@@ -75,11 +75,11 @@ templ Tag(
 					@List(routing.PluralTargetPost, &tag.Posts, fullProjects, fullTags)
 				} else {
 					<div
-						class={ twerge.Generate("text-center py-12 text-gray-400") }
+						class={ twerge.It("text-center py-12 text-gray-400") }
 					>
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
-							class={ twerge.Generate("h-12 w-12 mx-auto mb-4") }
+							class={ twerge.It("h-12 w-12 mx-auto mb-4") }
 							fill="none"
 							viewBox="0 0 24 24"
 							stroke="currentColor"
@@ -94,33 +94,33 @@ templ Tag(
 			<div x-show="activeTab === 'projects'" x-cloak>
 				if len(tag.Projects) > 0 {
 					<div
-						class={ twerge.Generate("grid grid-cols-1 md:grid-cols-2 gap-6") }
+						class={ twerge.It("grid grid-cols-1 md:grid-cols-2 gap-6") }
 					>
 						for _, project := range tag.Projects {
 							<a
 								href={ templ.SafeURL(fmt.Sprintf("/project/%s", project.Slug)) }
-								class={ twerge.Generate("bg-gray-800 rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-300") }
+								class={ twerge.It("bg-gray-800 rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-300") }
 							>
 								<h2
-									class={ twerge.Generate("text-xl font-semibold text-white mb-2") }
+									class={ twerge.It("text-xl font-semibold text-white mb-2") }
 								>
 									{ project.Title }
 								</h2>
 								<p
-									class={ twerge.Generate("text-gray-300 mb-4 line-clamp-2") }
+									class={ twerge.It("text-gray-300 mb-4 line-clamp-2") }
 								>
 									{ project.Description }
 								</p>
 								<div
-									class={ twerge.Generate("flex justify-between items-center") }
+									class={ twerge.It("flex justify-between items-center") }
 								>
 									<span
-										class={ twerge.Generate("text-blue-400 hover:underline text-sm font-medium") }
+										class={ twerge.It("text-blue-400 hover:underline text-sm font-medium") }
 									>
 										View project
 									</span>
 									<span
-										class={ twerge.Generate("text-sm text-gray-400") }
+										class={ twerge.It("text-sm text-gray-400") }
 									>
 										{ project.CreatedAt.Format("Jan 2, 2006") }
 									</span>
@@ -130,11 +130,11 @@ templ Tag(
 					</div>
 				} else {
 					<div
-						class={ twerge.Generate("text-center py-12 text-gray-400") }
+						class={ twerge.It("text-center py-12 text-gray-400") }
 					>
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
-							class={ twerge.Generate("h-12 w-12 mx-auto mb-4") }
+							class={ twerge.It("h-12 w-12 mx-auto mb-4") }
 							fill="none"
 							viewBox="0 0 24 24"
 							stroke="currentColor"
@@ -151,19 +151,19 @@ templ Tag(
 				x-cloak
 			>
 				<div
-					class={ twerge.Generate("grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4") }
+					class={ twerge.It("grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4") }
 				>
 					for _, relatedTag := range tag.Tags {
 						<a
 							href={ templ.SafeURL(fmt.Sprintf("/tag/%s", relatedTag.Slug)) }
-							class={ twerge.Generate("bg-gray-800 rounded-lg p-4 hover:shadow-md transition-shadow duration-300 flex items-center") }
+							class={ twerge.It("bg-gray-800 rounded-lg p-4 hover:shadow-md transition-shadow duration-300 flex items-center") }
 						>
 							<div
-								class={ twerge.Generate("text-gray-500 mr-3") }
+								class={ twerge.It("text-gray-500 mr-3") }
 							>
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
-									class={ twerge.Generate("h-5 w-5") }
+									class={ twerge.It("h-5 w-5") }
 									fill="none"
 									viewBox="0 0 24 24"
 									stroke="currentColor"
@@ -173,12 +173,12 @@ templ Tag(
 							</div>
 							<div>
 								<h3
-									class={ twerge.Generate("font-medium text-white") }
+									class={ twerge.It("font-medium text-white") }
 								>
 									{ relatedTag.Title }
 								</h3>
 								<p
-									class={ twerge.Generate("text-xs text-gray-400 line-clamp-1") }
+									class={ twerge.It("text-xs text-gray-400 line-clamp-1") }
 								>
 									{ fmt.Sprintf("%d posts, %d projects", len(relatedTag.Posts), len(relatedTag.Projects)) }
 								</p>

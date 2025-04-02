@@ -8,7 +8,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.78.2
 	github.com/charmbracelet/log v0.4.1
 	github.com/conneroisu/genstruct v0.1.1
-	github.com/conneroisu/twerge v0.1.7
+	github.com/conneroisu/twerge v0.1.8
 	github.com/litao91/goldmark-mathjax v0.0.0-20210217064022-a43cf739a50f
 	github.com/ollama/ollama v0.6.3
 	github.com/playwright-community/playwright-go v0.5001.0

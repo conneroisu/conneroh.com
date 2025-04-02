@@ -108,8 +108,8 @@
               go run $REPO_ROOT/cmd/update-css --cwd $REPO_ROOT &
               wait
             fi
+            ${pkgs.templ}/bin/templ generate
             ${pkgs.tailwindcss}/bin/tailwindcss --minify -i ./input.css -o ./cmd/conneroh/_static/dist/style.css --cwd $REPO_ROOT &
-            wait
             ${pkgs.templ}/bin/templ generate
           '';
           description = "Generate templ files and wait for completion";
