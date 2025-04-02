@@ -103,7 +103,7 @@ func run(ctx context.Context) error {
 	}
 
 	// Calculate the hash of the directory
-	currentHash, err := calculateDirectoryHash(ctx, dirPathValue, excludes, *verbose)
+	currentHash, err := calculateDirectoryHash(ctx, dirPathValue, excludes)
 	if err != nil {
 		if err == context.Canceled {
 			return err
@@ -155,7 +155,7 @@ func run(ctx context.Context) error {
 }
 
 // calculateDirectoryHash computes a hash of all files in the directory using MD5
-func calculateDirectoryHash(ctx context.Context, dirPath string, excludes []string, verbose bool) (string, error) {
+func calculateDirectoryHash(ctx context.Context, dirPath string, excludes []string) (string, error) {
 	var fileInfos []string
 	walkErr := filepath.WalkDir(dirPath, func(path string, d fs.DirEntry, err error) error {
 		// Check for context cancellation periodically
@@ -191,22 +191,14 @@ func calculateDirectoryHash(ctx context.Context, dirPath string, excludes []stri
 				return nil
 			}
 		}
-		// Get file info
-		info, err := d.Info()
-		if err != nil {
-			return err
-		}
 		// Calculate file hash
 		fileHash, err := calculateFileHash(ctx, path)
 		if err != nil {
 			return err
 		}
 		// Store relative path, mode, size, modification time and hash
-		fileData := fmt.Sprintf("%s %s %d %s %s",
+		fileData := fmt.Sprintf("%s %s",
 			relPath,
-			info.Mode().String(),
-			info.Size(),
-			info.ModTime().String(),
 			fileHash)
 		fileInfos = append(fileInfos, fileData)
 		return nil
