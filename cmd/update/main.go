@@ -346,9 +346,10 @@ func actualizeAssets(
 	for _, asset = range assets {
 		eg.Go(func() (err error) {
 			_, err = client.PutObject(ctx, &s3.PutObjectInput{
-				Bucket: aws.String("conneroh"),
-				Key:    aws.String(asset.Path),
-				Body:   bytes.NewReader(asset.Data),
+				Bucket:      aws.String("conneroh"),
+				Key:         aws.String(asset.Path),
+				Body:        bytes.NewReader(asset.Data),
+				ContentType: aws.String(mime.TypeByExtension(filepath.Ext(asset.Path))),
 			})
 			return
 		})

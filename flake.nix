@@ -255,7 +255,6 @@
             # Playwright
 
             playwright-driver # Provides browser archives and driver scripts
-            chromium # Chromium browser
             firefox # Firefox browser
             (
               if pkgs.stdenv.isDarwin
@@ -264,13 +263,6 @@
             ) # WebKit browser
             nodejs_20 # Required for Playwright driver
             pkg-config # Needed for some browser dependencies
-            xorg.libXcomposite # X11 Composite extension - needed by browsers
-            xorg.libXdamage # X11 Damage extension - needed by browsers
-            xorg.libXfixes # X11 Fixes extension - needed by browsers
-            xorg.libXrandr # X11 RandR extension - needed by browsers
-            xorg.libX11 # X11 client-side library
-            xorg.libxcb # X11 C Bindings library
-            alsa-lib # Audio library
             at-spi2-core # Accessibility support
             cairo # 2D graphics library
             cups # Printing system
@@ -282,7 +274,22 @@
             gdk-pixbuf # Image loading library
             glib # Low-level core library
             gtk3 # GUI toolkit
+          ]
+          ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [
+            # macOS-specific dependencies
+            libiconv
+          ]
+          ++ pkgs.lib.optionals pkgs.stdenv.isLinux [
+            # Linux-specific dependencies
+            chromium # Chromium browser
+            xorg.libXcomposite # X11 Composite extension - needed by browsers
+            xorg.libXdamage # X11 Damage extension - needed by browsers
+            xorg.libXfixes # X11 Fixes extension - needed by browsers
+            xorg.libXrandr # X11 RandR extension - needed by browsers
+            xorg.libX11 # X11 client-side library
+            xorg.libxcb # X11 C Bindings library
             mesa # OpenGL implementation
+            alsa-lib # Audio library
             nss # Network Security Services
             nspr # NetScape Portable Runtime
             pango # Text layout and rendering
