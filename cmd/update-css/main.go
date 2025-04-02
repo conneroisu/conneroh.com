@@ -74,6 +74,31 @@ func genCSS(ctx context.Context) error {
 		))
 		_ = layouts.Layout("hello")
 	)
+	for _, p := range gen.AllPosts {
+		_ = layouts.Page(views.Post(
+			p,
+			&gen.AllPosts,
+			&gen.AllProjects,
+			&gen.AllTags,
+		)).Render(ctx, io.Discard)
+	}
+	for _, p := range gen.AllProjects {
+		_ = layouts.Page(views.Project(
+			p,
+			&gen.AllPosts,
+			&gen.AllProjects,
+			&gen.AllTags,
+		)).Render(ctx, io.Discard)
+	}
+	for _, p := range gen.AllTags {
+		_ = layouts.Page(views.Tag(
+			p,
+			&gen.AllPosts,
+			&gen.AllProjects,
+			&gen.AllTags,
+		)).Render(ctx, io.Discard)
+	}
+
 	content := twerge.GenerateClassMapCode("css")
 	f, err := os.Create("internal/data/css/classes.go")
 	if err != nil {
