@@ -9,6 +9,7 @@ import (
 	"flag"
 	"fmt"
 	"io/fs"
+	logger "log/slog"
 	"math"
 	"mime"
 	"net/http"
@@ -17,8 +18,6 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
-
-	"github.com/charmbracelet/log"
 
 	mathjax "github.com/litao91/goldmark-mathjax"
 	"github.com/ollama/ollama/api"
@@ -57,12 +56,7 @@ const (
 var (
 	workers = flag.Int("jobs", 10, "number of parallel uploads")
 	cwd     = flag.String("cwd", "", "current working directory")
-	logger  = log.NewWithOptions(os.Stderr, log.Options{
-		ReportCaller:    true,
-		ReportTimestamp: false,
-		Level:           log.DebugLevel,
-	})
-	client = s3.NewFromConfig(aws.Config{
+	client  = s3.NewFromConfig(aws.Config{
 		Region:       "auto",
 		BaseEndpoint: aws.String("https://fly.storage.tigris.dev"),
 		Credentials: &CredHandler{
