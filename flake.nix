@@ -92,6 +92,7 @@
         };
         generate-reload = {
           exec = ''
+            ${pkgs.templ}/bin/templ generate
             if go run $REPO_ROOT/cmd/hash/main.go -dir "$REPO_ROOT/cmd/conneroh/views" -v -exclude "*_templ.go"; then
               echo ""
               if go run $REPO_ROOT/cmd/hash/main.go -dir "$REPO_ROOT/internal/data/docs" -v -exclude "*_templ.go"; then
