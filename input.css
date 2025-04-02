@@ -209,53 +209,53 @@
 }
 
 /* twerge:begin */
-.tw-IogKNg6 { 
-	@apply w-24 -bottom-4 h-24 rounded-full bg-purple-600 z-0 absolute -right-4; 
+.tw-AlEhe38 { 
+	@apply z-0 absolute -bottom-4 w-24 -right-4 h-24 bg-purple-600 rounded-full; 
 }
-.tw-xj3o_B0 { 
-	@apply bg-pink-600 z-0 absolute -left-4 w-16 rounded-full -top-4 h-16; 
+.tw-kvKdxTX { 
+	@apply -top-4 -left-4 bg-pink-600 absolute rounded-full h-16 w-16 z-0; 
 }
-.tw-hxdgI1m { 
-	@apply flex text-white font-bold inset-0 items-center text-xl justify-center absolute; 
+.tw-E3BWtUX { 
+	@apply text-white font-bold inset-0 flex justify-center text-xl absolute items-center; 
 }
 .tw-rcG5G6W { 
 	@apply relative mx-auto shadow-lg bg-blue-600 rounded-full; 
 }
-.tw-MViln-c { 
-	@apply p-8 rounded-lg shadow-md bg-gray-800; 
+.tw-hUCrXai { 
+	@apply p-8 shadow-md rounded-lg bg-gray-800; 
 }
 .tw-FZWY660 { 
 	@apply flex flex-col lg:flex-row items-center justify-between; 
 }
-.tw-BVJp-dS { 
-	@apply lg:w-1/2 mb-10 lg:mb-0; 
+.tw-oFujxJl { 
+	@apply lg:mb-0 lg:w-1/2 mb-10; 
 }
-.tw-bX4TqQM { 
-	@apply hover:opacity-90 text-gray-900 px-6 py-3 rounded-md font-medium transition-opacity bg-white; 
+.tw-9POzD-8 { 
+	@apply transition-opacity font-medium px-6 rounded-md bg-white text-gray-900 py-3 hover:opacity-90; 
 }
-.tw-bCaNq_W { 
-	@apply hover:bg-gray-800 text-gray-300 transition-colors border-gray-600 rounded-md px-6 font-medium py-3 border; 
+.tw-YlkVZ57 { 
+	@apply py-3 rounded-md px-6 border-gray-600 text-gray-300 font-medium hover:bg-gray-800 transition-colors border; 
 }
-.tw--2cn_Gx { 
-	@apply to-gray-800 py-20 bg-gradient-to-b from-gray-900; 
+.tw-5Q4929G { 
+	@apply bg-gradient-to-b from-gray-900 to-gray-800 py-20; 
 }
-.tw-CB-6E5_ { 
-	@apply text-4xl leading-tight md:text-5xl lg:text-6xl font-bold mb-4 text-white; 
+.tw-mXb6Rlc { 
+	@apply leading-tight mb-4 text-white md:text-5xl lg:text-6xl font-bold text-4xl; 
 }
-.tw-U7yptOe { 
-	@apply text-gray-300 mb-8 max-w-md text-xl; 
+.tw-ipxGp_J { 
+	@apply text-xl text-gray-300 mb-8 max-w-md; 
 }
-.tw-5D44mK5 { 
-	@apply flex justify-center rounded-full text-gray-300 h-12 bg-gray-700 items-center transition-colors hover:bg-blue-400 w-12; 
+.tw-fvPZ_P5 { 
+	@apply bg-gray-700 text-gray-300 transition-colors hover:bg-blue-400 rounded-full items-center w-12 flex justify-center h-12; 
 }
-.tw-CRjDEu2 { 
-	@apply bg-gray-700 flex items-center justify-center rounded-full text-gray-300 transition-colors hover:bg-gray-800 h-12 w-12; 
+.tw-kceESSr { 
+	@apply w-12 flex items-center h-12 transition-colors rounded-full bg-gray-700 hover:bg-gray-800 justify-center text-gray-300; 
 }
-.tw-Bv879fa { 
-	@apply h-12 rounded-full justify-center bg-gray-700 text-gray-300 transition-colors hover:bg-red-500 w-12 flex items-center; 
+.tw-3VsBcGR { 
+	@apply text-gray-300 w-12 bg-gray-700 items-center rounded-full flex transition-colors justify-center hover:bg-red-500 h-12; 
 }
-.tw-1044Ba6 { 
-	@apply md:w-80 rounded-full md:h-80 bg-blue-600 shadow-lg mx-auto w-64 h-64 relative; 
+.tw-Br2AWjV { 
+	@apply relative shadow-lg mx-auto md:h-80 bg-blue-600 w-64 h-64 md:w-80 rounded-full; 
 }
 
 /* twerge:end */
