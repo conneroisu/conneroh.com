@@ -304,7 +304,7 @@
 
       packages = let
         name = "conneroh.com";
-        vendorHash = "sha256-anGs7eHnSMFXeVTEhwZLK/AlvnMOfaBazCeiGM0t5vs=";
+        vendorHash = "sha256-NlPu2WXhwqpGWZ8UFzcrpo7h91gDa8/0+UuxWvvPvYQ=";
       in rec {
         conneroh = buildGoModule {
           pname = name;
