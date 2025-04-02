@@ -208,8 +208,12 @@ templ Home(
 		<div
 			class={ twerge.Generate("container px-4 mx-auto") }
 		>
-			<div>
-				<h2>
+			<div
+				class={ twerge.Generate("flex flex-col md:flex-row justify-between items-center mb-12 pr-4") }
+			>
+				<h2
+					class={ twerge.Generate("text-3xl font-bold text-white mb-4 md:mb-0") }
+				>
 					Recent Posts
 				</h2>
 				<a
@@ -218,6 +222,7 @@ templ Home(
 					hx-push-url="/posts"
 					hx-swap="outerHTML"
 					hx-target="#bodiody"
+					class={ twerge.Generate("text-blue-400 hover:underline text-lg font-medium flex items-center") }
 					preload="mouseover"
 				>
 					View All Posts

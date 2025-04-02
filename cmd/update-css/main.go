@@ -22,28 +22,57 @@ func genCSS(ctx context.Context) error {
 			&gen.AllProjects,
 			&gen.AllTags,
 		)).Render(ctx, io.Discard)
-		_ = views.List(
+		_ = layouts.Page(views.List(
 			routing.PluralTargetPost,
 			&gen.AllPosts,
 			&gen.AllProjects,
 			&gen.AllTags,
-		).Render(ctx, io.Discard)
-		_ = views.List(
+		)).Render(ctx, io.Discard)
+		_ = layouts.Page(views.List(
 			routing.PluralTargetProject,
 			&gen.AllPosts,
 			&gen.AllProjects,
 			&gen.AllTags,
-		).Render(ctx, io.Discard)
-		_ = views.List(
+		)).Render(ctx, io.Discard)
+		_ = layouts.Page(views.List(
 			routing.PluralTargetTag,
 			&gen.AllPosts,
 			&gen.AllProjects,
 			&gen.AllTags,
-		).Render(ctx, io.Discard)
+		)).Render(ctx, io.Discard)
 		_ = views.TagControl(
 			&gen.Tag{},
 			"#list-project",
 		).Render(ctx, io.Discard)
+		_ = layouts.Page(views.Post(
+			gen.AllPosts[0],
+			&gen.AllPosts,
+			&gen.AllProjects,
+			&gen.AllTags,
+		))
+		_ = layouts.Page(views.Project(
+			gen.AllProjects[0],
+			&gen.AllPosts,
+			&gen.AllProjects,
+			&gen.AllTags,
+		))
+		_ = layouts.Page(views.Tag(
+			gen.AllTags[0],
+			&gen.AllPosts,
+			&gen.AllProjects,
+			&gen.AllTags,
+		))
+		_ = views.TagControl(
+			&gen.Tag{},
+			"#list-project",
+		).Render(ctx, io.Discard)
+		_ = layouts.Morpher(views.Post(
+			gen.AllPosts[0],
+			&gen.AllPosts,
+			&gen.AllProjects,
+			&gen.AllTags,
+		))
+		_ = layouts.Layout("hello")
 	)
 	content := twerge.GenerateClassMapCode("css")
 	f, err := os.Create("internal/data/css/classes.go")

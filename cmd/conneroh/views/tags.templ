@@ -48,21 +48,21 @@ templ Tag(
 				>
 					<button
 						@click="activeTab = 'posts'"
-						:class="{ 'border-blue-500 text-blue-500': activeTab === 'posts', 'border-transparent text-gray-500 text-gray-400 hover:text-gray-300': activeTab !== 'posts' }"
+						:class={ fmt.Sprintf("'%s': activeTab === 'posts', '%s': activeTab !== 'posts'", twerge.Generate("border-blue-500 text-blue-500"), twerge.Generate("border-transparent text-gray-500 text-gray-400 hover:text-gray-300")) }
 						class={ twerge.Generate("py-4 px-1 border-b-2 font-medium text-sm sm:text-base border-blue-500 text-blue-500") }
 					>
 						Posts ({ fmt.Sprintf("%d", len(tag.Posts)) })
 					</button>
 					<button
 						@click="activeTab = 'projects'"
-						:class="{ 'border-blue-500 text-blue-500': activeTab === 'projects', 'border-transparent text-gray-500 text-gray-400 hover:text-gray-300': activeTab !== 'projects' }"
+						:class={ fmt.Sprintf("'%s': activeTab === 'projects', '%s': activeTab !== 'projects'", twerge.Generate("border-blue-500 text-blue-500"), twerge.Generate("border-transparent text-gray-500 text-gray-400 hover:text-gray-300")) }
 						class={ twerge.Generate("py-4 px-1 border-b-2 font-medium text-sm sm:text-base border-transparent text-gray-500 text-gray-400 hover:text-gray-300") }
 					>
 						Projects ({ fmt.Sprintf("%d", len(tag.Projects)) })
 					</button>
 					<button
 						@click="activeTab = 'related'"
-						:class="{ 'border-blue-500 text-blue-500': activeTab === 'related', 'border-transparent text-gray-500 text-gray-400 hover:text-gray-300': activeTab !== 'related' }"
+						:class={ fmt.Sprintf("'%s': activeTab === 'related', '%s': activeTab !== 'related'", twerge.Generate("border-blue-500 text-blue-500"), twerge.Generate("border-transparent text-gray-500 text-gray-400 hover:text-gray-300")) }
 						class={ twerge.Generate("py-4 px-1 border-b-2 font-medium text-sm sm:text-base") }
 					>
 						Related Tags ({ fmt.Sprintf("%d", len(tag.Tags)) })
