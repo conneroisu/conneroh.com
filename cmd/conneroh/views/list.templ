@@ -106,6 +106,7 @@ templ List(
 	</div>
 }
 
+// TODO: Make Sure all see-more -> Are aligned at the bottom of each list item
 templ listProjectItem(project *gen.Project) {
 	<div
 		class={ twerge.Generate("bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 p-6") }
@@ -156,7 +157,6 @@ templ listProjectItem(project *gen.Project) {
 						if i < 8 {
 							@TagControl(tag, "#list-project")
 						} else {
-							// TODO: Add a "show more" button
 							@icon("ellipsis", templ.Attributes{
 								"class":           twerge.Generate("inline-block px-3 py-1 text-sm font-medium rounded-full bg-blue-900 text-blue-200 hover:bg-blue-200 hover:bg-blue-800 transition-colors flex items-center h-8 flex-row justify-between w-full hover:underline"),
 								"x-on:mouseover":  "po_open = true",

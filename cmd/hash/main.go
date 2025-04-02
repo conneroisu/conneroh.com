@@ -1,3 +1,4 @@
+// Package main is the main package for the hash command.
 package main
 
 import (
@@ -58,6 +59,8 @@ func main() {
 		}
 		log.Fatalf("Error: %v", err)
 	}
+	// Exit with code 0 to indicate no changes
+	os.Exit(0)
 }
 
 func run(ctx context.Context) error {
@@ -66,11 +69,7 @@ func run(ctx context.Context) error {
 	// Get directory path from flag or positional argument
 	dirPathValue := *dirPath
 	if dirPathValue == "" {
-		if flag.NArg() > 0 {
-			dirPathValue = flag.Arg(0)
-		} else {
-			return fmt.Errorf("directory path is required. Use -dir flag or provide as positional argument")
-		}
+		return fmt.Errorf("directory path is required. Use -dir flag or provide as positional argument")
 	}
 
 	// Process exclude patterns
@@ -91,13 +90,6 @@ func run(ctx context.Context) error {
 		return fmt.Errorf("%s is not a directory", dirPathValue)
 	}
 
-	// Check for context cancellation
-	select {
-	case <-ctx.Done():
-		return ctx.Err()
-	default:
-	}
-
 	// Use default hash file path if not specified
 	hashFilePathValue := *hashFilePath
 	if hashFilePathValue == "" {
@@ -108,16 +100,6 @@ func run(ctx context.Context) error {
 	cache, err := cache.LoadCache(hashFilePathValue)
 	if err != nil {
 		return fmt.Errorf("error loading cache: %w", err)
-	}
-
-	// Set hash file in cache if it's a new cache
-	cache.HashFile = hashFilePathValue
-
-	// Check for context cancellation
-	select {
-	case <-ctx.Done():
-		return ctx.Err()
-	default:
 	}
 
 	// Calculate the hash of the directory
@@ -134,14 +116,14 @@ func run(ctx context.Context) error {
 	}
 
 	// Get the previous hash for this directory
-	previousHash := cache.DirHash
+	previousHash := cache.Hashes[dirPathValue]
 
 	if previousHash == "" {
 		if *verbose {
 			fmt.Println("No previous hash found")
 		}
 		// First run, update the cache and exit with code 0
-		cache.DirHash = currentHash
+		cache.Hashes[dirPathValue] = currentHash
 		if err := cache.Close(); err != nil {
 			return fmt.Errorf("error writing cache: %w", err)
 		}
@@ -160,19 +142,15 @@ func run(ctx context.Context) error {
 		}
 
 		// Update the cache
-		cache.DirHash = currentHash
+		cache.Hashes[dirPathValue] = currentHash
 		if err := cache.Close(); err != nil {
 			return fmt.Errorf("error writing cache: %w", err)
 		}
 
 		// Exit with code 1 to indicate changes were detected
 		os.Exit(1)
-	} else {
-		fmt.Printf("No changes detected in %s\n", dirPathValue)
-		// Exit with code 0 to indicate no changes
-		os.Exit(0)
 	}
-
+	fmt.Printf("No changes detected in %s\n", dirPathValue)
 	return nil
 }
 
@@ -210,9 +188,6 @@ func calculateDirectoryHash(ctx context.Context, dirPath string, excludes []stri
 				return err
 			}
 			if matched {
-				if verbose {
-					fmt.Printf("Excluding: %s\n", relPath)
-				}
 				return nil
 			}
 		}
@@ -257,9 +232,6 @@ func calculateDirectoryHash(ctx context.Context, dirPath string, excludes []stri
 	// Combine and hash all file information
 	hasher := md5.New()
 	for _, fileInfo := range fileInfos {
-		if verbose {
-			fmt.Println(fileInfo)
-		}
 		_, err := io.WriteString(hasher, fileInfo+"\n")
 		if err != nil {
 			return "", err
@@ -283,7 +255,12 @@ func calculateFileHash(ctx context.Context, filePath string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer file.Close()
+	defer func() {
+		err = file.Close()
+		if err != nil {
+			log.Printf("Error closing file: %s", err)
+		}
+	}()
 
 	hasher := md5.New()
 

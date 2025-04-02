@@ -92,15 +92,22 @@
         };
         generate-reload = {
           exec = ''
-            if go run $REPO_ROOT/cmd/hash/main.go -dir "$REPO_ROOT/internal/data/docs" -exclude "*.tmp,*.bak"; then
+            if go run $REPO_ROOT/cmd/hash/main.go -dir "$REPO_ROOT/cmd/conneroh/views" -v -exclude "*_templ.go"; then
               echo ""
+              if go run $REPO_ROOT/cmd/hash/main.go -dir "$REPO_ROOT/internal/data/docs" -v -exclude "*_templ.go"; then
+                echo ""
+              else
+                echo "Changes detected in templates, running update script..."
+                doppler run -- go run $REPO_ROOT/cmd/update --cwd $REPO_ROOT &
+                go run $REPO_ROOT/cmd/update-css --cwd $REPO_ROOT &
+                wait
+              fi
             else
               echo "Changes detected in templates, running update script..."
               doppler run -- go run $REPO_ROOT/cmd/update --cwd $REPO_ROOT &
               go run $REPO_ROOT/cmd/update-css --cwd $REPO_ROOT &
               wait
             fi
-
             ${pkgs.tailwindcss}/bin/tailwindcss --minify -i ./input.css -o ./cmd/conneroh/_static/dist/style.css --cwd $REPO_ROOT &
             wait
             ${pkgs.templ}/bin/templ generate

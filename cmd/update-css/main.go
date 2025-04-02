@@ -1,3 +1,4 @@
+// Package main updates the CSS.
 package main
 
 import (
@@ -104,7 +105,12 @@ func genCSS(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	defer f.Close()
+	defer func() {
+		err = f.Close()
+		if err != nil {
+			panic(err)
+		}
+	}()
 	_, err = f.WriteString(content)
 	if err != nil {
 		return err
