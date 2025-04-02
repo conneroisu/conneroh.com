@@ -97,6 +97,8 @@
             else
               echo "Changes detected in templates, running update script..."
               doppler run -- go run $REPO_ROOT/cmd/update --cwd $REPO_ROOT &
+              go run $REPO_ROOT/cmd/update-css --cwd $REPO_ROOT &
+              wait
             fi
 
             ${pkgs.tailwindcss}/bin/tailwindcss --minify -i ./input.css -o ./cmd/conneroh/_static/dist/style.css --cwd $REPO_ROOT &
