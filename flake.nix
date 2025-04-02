@@ -402,7 +402,6 @@
         deployPackage = pkgs.writeShellScriptBin "deploy" ''
           set -e
 
-          echo "Copying image to Fly.io registry..."
           if [ -z "$FLY_AUTH_TOKEN" ]; then
             echo "FLY_AUTH_TOKEN is not set. Getting it from doppler..."
             FLY_AUTH_TOKEN=$(doppler secrets get --plain FLY_AUTH_TOKEN)
@@ -427,13 +426,12 @@
         deployPackageDev = pkgs.writeShellScriptBin "deploy-package-dev" ''
           set -e
 
-          echo "Copying image to Fly.io registry..."
           if [ -z "$FLY_AUTH_TOKEN" ]; then
             echo "FLY_AUTH_TOKEN is not set. Getting it from doppler..."
             FLY_AUTH_TOKEN=$(doppler secrets get --plain FLY_AUTH_TOKEN)
           fi
 
-          echo "Copying image to Fly.io registry..."
+          echo "Copying dev image to Fly.io registry..."
           ${pkgs.skopeo}/bin/skopeo copy \
             --insecure-policy \
             docker-archive:"${C-conneroh-dev}" \
