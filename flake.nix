@@ -58,6 +58,10 @@
           exec = ''$EDITOR $REPO_ROOT/flake.nix'';
           description = "Edit flake.nix";
         };
+        gx = {
+          exec = ''$EDITOR $REPO_ROOT/go.mod'';
+          description = "Edit go.mod";
+        };
         clean = {
           exec = ''${pkgs.git}/bin/git clean -fdx'';
           description = "Clean Project";

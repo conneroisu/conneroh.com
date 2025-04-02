@@ -1,13 +1,14 @@
 module github.com/conneroisu/conneroh.com
 
-go 1.24.0
+go 1.24.1
 
 require (
-	github.com/a-h/templ v0.3.833
+	github.com/a-h/templ v0.3.857
 	github.com/aws/aws-sdk-go-v2 v1.36.3
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.78.2
 	github.com/charmbracelet/log v0.4.1
 	github.com/conneroisu/genstruct v0.0.9
+	github.com/conneroisu/twerge v0.0.5
 	github.com/litao91/goldmark-mathjax v0.0.0-20210217064022-a43cf739a50f
 	github.com/ollama/ollama v0.6.3
 	github.com/playwright-community/playwright-go v0.5001.0
@@ -51,5 +52,5 @@ require (
 	github.com/muesli/termenv v0.16.0 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	golang.org/x/exp v0.0.0-20250218142911-aa4b98e5adaa // indirect
-	golang.org/x/sys v0.30.0 // indirect
+	golang.org/x/sys v0.31.0 // indirect
 )

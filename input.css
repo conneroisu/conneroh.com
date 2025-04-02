@@ -207,3 +207,55 @@
   --ring: hsl(240 4.9% 83.9%);
   --radius: 0.5rem;
 }
+
+/* twerge:begin */
+.tw-ctpuy-R { 
+	@apply -bottom-4 z-0 absolute -right-4 bg-purple-600 rounded-full w-24 h-24; 
+}
+.tw-9NS0ykY { 
+	@apply absolute z-0 w-16 -top-4 -left-4 h-16 bg-pink-600 rounded-full; 
+}
+.tw-64_EUhl { 
+	@apply flex font-bold absolute justify-center text-white items-center inset-0 text-xl; 
+}
+.tw-Qq2WMzp { 
+	@apply relative mx-auto bg-blue-600 rounded-full shadow-lg; 
+}
+.tw-CCwqqGc { 
+	@apply rounded-lg bg-gray-800 p-8 shadow-md; 
+}
+.tw-FZWY660 { 
+	@apply flex flex-col lg:flex-row items-center justify-between; 
+}
+.tw-tI60-Bu { 
+	@apply mb-10 lg:mb-0 lg:w-1/2; 
+}
+.tw-2Vwzwtm { 
+	@apply px-6 bg-white text-gray-900 rounded-md font-medium transition-opacity py-3 hover:opacity-90; 
+}
+.tw-MtbgPgC { 
+	@apply border font-medium px-6 rounded-md hover:bg-gray-800 py-3 border-gray-600 text-gray-300 transition-colors; 
+}
+.tw-7yppCqa { 
+	@apply py-20 bg-gradient-to-b from-gray-900 to-gray-800; 
+}
+.tw-KIFBiGe { 
+	@apply lg:text-6xl font-bold mb-4 text-4xl leading-tight md:text-5xl text-white; 
+}
+.tw-ipxGp_J { 
+	@apply text-xl text-gray-300 mb-8 max-w-md; 
+}
+.tw-hc4133d { 
+	@apply items-center text-gray-300 bg-gray-700 flex transition-colors w-12 rounded-full justify-center hover:bg-blue-400 h-12; 
+}
+.tw-J9NRuCH { 
+	@apply bg-gray-700 items-center justify-center w-12 hover:bg-gray-800 h-12 rounded-full flex text-gray-300 transition-colors; 
+}
+.tw-Vtuvr8j { 
+	@apply bg-gray-700 justify-center flex text-gray-300 h-12 transition-colors hover:bg-red-500 w-12 items-center rounded-full; 
+}
+.tw-dpmuE2f { 
+	@apply w-64 h-64 bg-blue-600 shadow-lg md:h-80 md:w-80 mx-auto rounded-full relative; 
+}
+
+/* twerge:end */

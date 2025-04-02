@@ -13,6 +13,9 @@ import (
 	"sync"
 	"syscall"
 	"time"
+
+	"github.com/conneroisu/conneroh.com/internal/data/css"
+	"github.com/conneroisu/twerge"
 )
 
 const (
@@ -29,6 +32,7 @@ const (
 func NewServer(
 	ctx context.Context,
 ) http.Handler {
+	twerge.ClassMapStr = css.ClassMapStr
 	mux := http.NewServeMux()
 	err := AddRoutes(
 		ctx,
