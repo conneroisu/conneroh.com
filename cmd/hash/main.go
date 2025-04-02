@@ -7,15 +7,13 @@ import (
 	"encoding/hex"
 	"flag"
 	"fmt"
+	"hash"
 	"io"
 	"io/fs"
 	"log"
 	"os"
-	"os/signal"
 	"path/filepath"
-	"sort"
 	"strings"
-	"syscall"
 
 	"github.com/conneroisu/conneroh.com/internal/cache"
 )
@@ -31,28 +29,7 @@ var (
 const defaultHashFileName = "config.json"
 
 func main() {
-	// Setup signal handling
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
-	// Create a channel to listen for signals
-	sigChan := make(chan os.Signal, 1)
-	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
-
-	// Handle signals in a separate goroutine
-	go func() {
-		sig := <-sigChan
-		log.Printf("Received signal: %v, shutting down...", sig)
-		cancel()
-		// Give a short grace period for cleanup and then force exit
-		go func() {
-			<-sigChan
-			log.Println("Received second signal, forcing exit")
-			os.Exit(1)
-		}()
-	}()
-
-	if err := run(ctx); err != nil {
+	if err := run(); err != nil {
 		if err == context.Canceled {
 			log.Println("Operation was canceled")
 			os.Exit(1)
@@ -63,7 +40,7 @@ func main() {
 	os.Exit(0)
 }
 
-func run(ctx context.Context) error {
+func run() error {
 	flag.Parse()
 
 	// Get directory path from flag or positional argument
@@ -103,7 +80,7 @@ func run(ctx context.Context) error {
 	}
 
 	// Calculate the hash of the directory
-	currentHash, err := calculateDirectoryHash(ctx, dirPathValue, excludes)
+	currentHash, err := calculateDirectoryHash(dirPathValue, excludes)
 	if err != nil {
 		if err == context.Canceled {
 			return err
@@ -155,16 +132,17 @@ func run(ctx context.Context) error {
 }
 
 // calculateDirectoryHash computes a hash of all files in the directory using MD5
-func calculateDirectoryHash(ctx context.Context, dirPath string, excludes []string) (string, error) {
-	var fileInfos []string
+func calculateDirectoryHash(dirPath string, excludes []string) (string, error) {
+	var (
+		pattern    string
+		matched    bool
+		relPath    string
+		fileHash   string
+		hasher     = md5.New()
+		file       *os.File
+		fileHasher = md5.New()
+	)
 	walkErr := filepath.WalkDir(dirPath, func(path string, d fs.DirEntry, err error) error {
-		// Check for context cancellation periodically
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-		default:
-		}
-
 		if err != nil {
 			return err
 		}
@@ -172,17 +150,16 @@ func calculateDirectoryHash(ctx context.Context, dirPath string, excludes []stri
 		if d.Name() == defaultHashFileName {
 			return nil
 		}
-		// Skip directories themselves
+		// Skip directories themselves (we'll recurse into them)
 		if d.IsDir() {
 			return nil
 		}
 		// Check if this path should be excluded
-		relPath, err := filepath.Rel(dirPath, path)
+		relPath, err = filepath.Rel(dirPath, path)
 		if err != nil {
 			return err
 		}
-		var matched bool
-		for _, pattern := range excludes {
+		for _, pattern = range excludes {
 			matched, err = filepath.Match(pattern, relPath)
 			if err != nil {
 				return err
@@ -192,18 +169,17 @@ func calculateDirectoryHash(ctx context.Context, dirPath string, excludes []stri
 			}
 		}
 		// Calculate file hash
-		fileHash, err := calculateFileHash(ctx, path)
+		defer fileHasher.Reset()
+		fileHash, err = calculateFileHash(fileHasher, file, path)
 		if err != nil {
 			return err
 		}
-		// Store relative path, mode, size, modification time and hash
-		fileData := fmt.Sprintf("%s %s",
-			relPath,
-			fileHash)
-		fileInfos = append(fileInfos, fileData)
+		_, err = io.WriteString(hasher, fileHash+"\n")
+		if err != nil {
+			return err
+		}
 		return nil
 	})
-
 	if walkErr != nil {
 		if walkErr == context.Canceled {
 			return "", walkErr
@@ -211,39 +187,14 @@ func calculateDirectoryHash(ctx context.Context, dirPath string, excludes []stri
 		return "", walkErr
 	}
 
-	// Check context after the walk but before sorting
-	select {
-	case <-ctx.Done():
-		return "", ctx.Err()
-	default:
-	}
-
-	// Sort file infos to ensure consistent ordering
-	sort.Strings(fileInfos)
-
-	// Combine and hash all file information
-	hasher := md5.New()
-	for _, fileInfo := range fileInfos {
-		_, err := io.WriteString(hasher, fileInfo+"\n")
-		if err != nil {
-			return "", err
-		}
-	}
-
 	hash := hasher.Sum(nil)
 	return hex.EncodeToString(hash), nil
 }
 
 // calculateFileHash computes the MD5 hash of a single file
-func calculateFileHash(ctx context.Context, filePath string) (string, error) {
-	// Check context before opening file
-	select {
-	case <-ctx.Done():
-		return "", ctx.Err()
-	default:
-	}
-
-	file, err := os.Open(filePath)
+func calculateFileHash(hasher hash.Hash, file *os.File, filePath string) (string, error) {
+	var err error
+	file, err = os.Open(filePath)
 	if err != nil {
 		return "", err
 	}
@@ -254,29 +205,9 @@ func calculateFileHash(ctx context.Context, filePath string) (string, error) {
 		}
 	}()
 
-	hasher := md5.New()
-
-	// Create a buffer for reading
-	buffer := make([]byte, 32*1024)
-
-	for {
-		// Check context before reading
-		select {
-		case <-ctx.Done():
-			return "", ctx.Err()
-		default:
-		}
-
-		n, err := file.Read(buffer)
-		if n > 0 {
-			hasher.Write(buffer[:n])
-		}
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			return "", err
-		}
+	// Use io.Copy to efficiently copy file content to hasher
+	if _, err := io.Copy(hasher, file); err != nil {
+		return "", err
 	}
 
 	hash := hasher.Sum(nil)

@@ -4,8 +4,10 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"io"
 	"os"
+	"time"
 
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/layouts"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/views"
@@ -103,6 +105,11 @@ func genCSS(ctx context.Context) error {
 }
 
 func main() {
+	start := time.Now()
+	defer func() {
+		elapsed := time.Since(start)
+		fmt.Printf("(update-css) Done in %s.\n", elapsed)
+	}()
 	flag.Parse()
 	if *cwd != "" {
 		err := os.Chdir(*cwd)

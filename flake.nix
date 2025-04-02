@@ -103,10 +103,7 @@
               fi
             else
               echo "Changes detected in templates, running update script..."
-              ${pkgs.templ}/bin/templ generate --log-level error
-              go run $REPO_ROOT/cmd/update-css --cwd $REPO_ROOT &
-              ${pkgs.templ}/bin/templ generate --log-level error
-              ${pkgs.tailwindcss}/bin/tailwindcss --minify -i ./input.css -o ./cmd/conneroh/_static/dist/style.css --cwd $REPO_ROOT
+              ${pkgs.templ}/bin/templ generate --log-level error && go run $REPO_ROOT/cmd/update-css --cwd $REPO_ROOT && ${pkgs.templ}/bin/templ generate --log-level error && ${pkgs.tailwindcss}/bin/tailwindcss -m -i ./input.css -o ./cmd/conneroh/_static/dist/style.css --cwd $REPO_ROOT
             fi
           '';
           description = "Generate templ files and wait for completion";
