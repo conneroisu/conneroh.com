@@ -67,6 +67,9 @@ func Run(
 		context.Background(), // Use a fresh context instead of the parent ctx
 		os.Interrupt,
 		syscall.SIGTERM,
+		syscall.SIGINT,
+		syscall.SIGHUP,
+		syscall.SIGQUIT,
 	)
 	defer cancel()
 
