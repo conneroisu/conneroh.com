@@ -442,7 +442,7 @@
           echo "Deploying to Fly.io..."
           ${pkgs.flyctl}/bin/fly deploy \
             --remote-only \
-            -c ${./fly.toml} \
+            -c ${./fly.dev.toml} \
             -i registry.fly.io/conneroh-com-dev \
             -t "$FLY_AUTH_TOKEN"
         '';
