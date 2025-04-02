@@ -32,7 +32,7 @@ templ Post(
 				for _, tag := range post.Tags {
 					<a
 						href={ templ.SafeURL(fmt.Sprintf("/tag/%s", tag.Slug)) }
-						class="ctag"
+						class="inline-block px-3 py-1 text-sm font-medium rounded-full bg-blue-900 text-blue-200 hover:bg-blue-200 hover:bg-blue-800 transition-colors"
 					>
 						{ tag.Slug }
 					</a>

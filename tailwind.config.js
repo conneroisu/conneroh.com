@@ -1,8 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
-    "./cmd/conneroh/views/*.templ",
-    "./cmd/conneroh/layouts/*.templ",
+    "./internal/data/css/classes.templ",
   ],
   theme: {
     extend: {},

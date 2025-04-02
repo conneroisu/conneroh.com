@@ -4,17 +4,22 @@ import (
 	"fmt"
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
 	"github.com/conneroisu/conneroh.com/internal/routing"
+	"github.com/conneroisu/twerge"
 	"strconv"
 )
 
 templ search(
 	target routing.PluralTarget,
 ) {
-	<div class="p-3 border-b border-gray-700">
-		<div class="relative">
+	<div
+		class={ twerge.Generate("p-3 border-b border-gray-700") }
+	>
+		<div
+			class={ twerge.Generate("relative") }
+		>
 			<input
 				id={ fmt.Sprintf("search-%s", target) }
-				class="sinput"
+				class={ twerge.Generate("w-full pl-10 pr-4 py-2 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700 text-gray-900 text-white") }
 				type="search"
 				name="search"
 				placeholder={ fmt.Sprintf("Search %s...", target) }
@@ -23,20 +28,41 @@ templ search(
 				hx-target={ fmt.Sprintf("#list-%s", target) }
 				hx-indicator="#search-indicator"
 			/>
-			<div class="absolute left-3 top-2.5 text-gray-500">
+			<div
+				class={ twerge.Generate("absolute left-3 top-2.5 text-gray-500") }
+			>
 				@icon("search", templ.Attributes{})
 			</div>
 			<div
 				id="search-indicator"
-				class="absolute right-3 top-2.5 text-blue-500 htmx-indicator"
+				class={ twerge.Generate("absolute right-3 top-2.5 text-blue-500 htmx-indicator") }
 			>
-				<svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-					<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-					<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+				<svg
+					class={ twerge.Generate("animate-spin h-5 w-5") }
+					xmlns="http://www.w3.org/2000/svg"
+					fill="none"
+					viewBox="0 0 24 24"
+				>
+					<circle
+						class={ twerge.Generate("opacity-25") }
+						cx="12"
+						cy="12"
+						r="10"
+						stroke="currentColor"
+						stroke-width="4"
+					></circle>
+					<path
+						class={ twerge.Generate("opacity-75") }
+						fill="currentColor"
+						d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+					></path>
 				</svg>
 			</div>
 		</div>
-		<div id={ fmt.Sprintf("list-suggest-%s", target) } class="mt-2"></div>
+		<div
+			id={ fmt.Sprintf("list-suggest-%s", target) }
+			class={ twerge.Generate("mt-2") }
+		></div>
 	</div>
 }
 
@@ -48,9 +74,11 @@ templ List(
 	tags *[]*gen.Tag,
 ) {
 	<div
-		class="container mx-auto px-4 py-8"
+		class={ twerge.Generate("container mx-auto px-4 py-8") }
 	>
-		<h1 class="text-3xl font-bold mb-6 text-white">
+		<h1
+			class={ twerge.Generate("text-3xl font-bold mb-6 text-white") }
+		>
 			Search { target }
 		</h1>
 		@search(
@@ -58,7 +86,7 @@ templ List(
 		)
 		<div
 			id={ fmt.Sprintf("list-%s", target) }
-			class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+			class={ twerge.Generate("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6") }
 		>
 			switch target {
 				case routing.PluralTargetPost:
@@ -91,23 +119,27 @@ templ listProjectItem(project *gen.Project) {
 			preload="mouseover"
 		>
 			<h2
-				class="cdo-ctitle"
+				class={ twerge.Generate("text-xl font-semibold text-white mb-2") }
 			>
 				{ project.Title }
 			</h2>
 			<p
-				class="cdo-stitle"
+				class={ twerge.Generate("text-gray-300 mb-4 line-clamp-2") }
 			>
 				{ project.Description }
 			</p>
-			<p class="cdo-stitle">
-				<span class="font-bold">
+			<p
+				class={ twerge.Generate("text-gray-300 mb-4 line-clamp-2") }
+			>
+				<span
+					class={ twerge.Generate("font-bold") }
+				>
 					{ strconv.Itoa(len(project.Tags)) }
 				</span>
 				tags
 			</p>
 			<div
-				class="flex flex-wrap gap-2 mb-4 grid grid-cols-2"
+				class={ twerge.Generate("flex flex-wrap gap-2 mb-4 grid grid-cols-2") }
 				x-data="{ po_open: false }"
 			>
 				for i, tag := range project.Tags {
@@ -116,7 +148,7 @@ templ listProjectItem(project *gen.Project) {
 					} else {
 						// TODO: Add a "show more" button
 						@icon("ellipsis", templ.Attributes{
-							"class":           "ctag flex items-center h-8 flex-row justify-between w-full hover:underline",
+							"class":           twerge.Generate("inline-block px-3 py-1 text-sm font-medium rounded-full bg-blue-900 text-blue-200 hover:bg-blue-200 hover:bg-blue-800 transition-colors flex items-center h-8 flex-row justify-between w-full hover:underline"),
 							"x-on:mouseover":  "po_open = true",
 							"x-on:mouseleave": "po_open = false",
 							"x-on:click":      "po_open = !po_open",
@@ -125,7 +157,7 @@ templ listProjectItem(project *gen.Project) {
 				}
 			</div>
 			<a
-				class="text-blue-400 hover:underline inline-flex items-center group"
+				class={ twerge.Generate("text-blue-400 hover:underline inline-flex items-center group") }
 				hx-target="#bodiody"
 				hx-get={ fmt.Sprintf("/morph/project/%s", project.Slug) }
 				hx-swap="outerHTML"
@@ -153,10 +185,10 @@ templ listTagItem(
 		class="listIt"
 	>
 		<div
-			class="p-6"
+			class={ twerge.Generate("p-6") }
 		>
 			<div
-				class="flex items-center justify-between mb-3"
+				class={ twerge.Generate("flex items-center justify-between mb-3") }
 			>
 				<h2
 					class="tittle"
@@ -164,26 +196,26 @@ templ listTagItem(
 					{ tag.Title }
 				</h2>
 				<div
-					class="bg-gray-700 rounded-full flex items-center justify-center h-8 w-8"
+					class={ twerge.Generate("bg-gray-700 rounded-full flex items-center justify-center h-8 w-8") }
 				>
 					@icon(tag.Icon, templ.Attributes{"class": "stoke-white"})
 				</div>
 			</div>
 			<div
-				class="cdo-stitle"
+				class={ twerge.Generate("text-gray-300 mb-4 line-clamp-2") }
 			>
 				{ tag.Description }
 			</div>
 			<div
-				class="flex items-center justify-between text-sm"
+				class={ twerge.Generate("flex items-center justify-between text-sm") }
 			>
 				<span
-					class="text-gray-400"
+					class={ twerge.Generate("text-gray-400") }
 				>
 					{ strconv.Itoa(len(tag.PostSlugs)) } posts
 				</span>
 				<span
-					class="text-gray-400"
+					class={ twerge.Generate("text-gray-400") }
 				>
 					{ strconv.Itoa(len(tag.ProjectSlugs)) } projects
 				</span>
@@ -207,7 +239,7 @@ templ listPostItem(
 			hx-trigger="click"
 			hx-get={ fmt.Sprintf("/morph/post/%s", post.Slug) }
 			hx-push-url={ fmt.Sprintf("/post/%s", post.Slug) }
-			class="block cursor-pointer"
+			class={ twerge.Generate("block cursor-pointer") }
 		>
 			@image(
 				post.BannerPath,
@@ -215,23 +247,25 @@ templ listPostItem(
 				"w-full h-48 object-cover object-center",
 			)
 			<div
-				class="absolute bottom-0 right-0 bg-blue-500 text-white text-xs px-2 py-1 rounded-tl-md"
+				class={ twerge.Generate("absolute bottom-0 right-0 bg-blue-500 text-white text-xs px-2 py-1 rounded-tl-md") }
 			>
 				{ post.CreatedAt.Format("Jan 02, 2006") }
 			</div>
-			<div class="p-6">
+			<div
+				class={ twerge.Generate("p-6") }
+			>
 				<h2
-					class="text-xl font-semibold text-white mb-3 line-clamp-2 hover:underline"
+					class={ twerge.Generate("text-xl font-semibold text-white mb-3 line-clamp-2 hover:underline") }
 				>
 					{ post.Title }
 				</h2>
 				<p
-					class="cdo-stitle"
+					class={ twerge.Generate("text-gray-300 mb-4 line-clamp-2") }
 				>
 					{ post.Description }
 				</p>
 				<div
-					class="flex flex-wrap gap-2 mb-4 grid grid-cols-2"
+					class={ twerge.Generate("flex flex-wrap gap-2 mb-4 grid grid-cols-2") }
 					x-data="{ po_open: false }"
 				>
 					for i, tag := range post.Tags {
@@ -240,7 +274,7 @@ templ listPostItem(
 						} else {
 							// TODO: Add a "show more" button
 							@icon("ellipsis", templ.Attributes{
-								"class":           "ctag flex items-center h-8 flex-row justify-between w-full hover:underline",
+								"class":           twerge.Generate("inline-block px-3 py-1 text-sm font-medium rounded-full bg-blue-900 text-blue-200 hover:bg-blue-200 hover:bg-blue-800 transition-colors flex items-center h-8 flex-row justify-between w-full hover:underline"),
 								"x-on:mouseover":  "po_open = true",
 								"x-on:mouseleave": "po_open = false",
 								"x-on:click":      "po_open = !po-open",
@@ -249,10 +283,10 @@ templ listPostItem(
 					}
 				</div>
 				<div
-					class="flex justify-between items-center"
+					class={ twerge.Generate("flex justify-between items-center") }
 				>
 					<a
-						class="seemere"
+						class={ twerge.Generate("text-blue-400 hover:underline text-sm font-medium flex items-center") }
 					>
 						Read More
 						@icon("arrow-right", templ.Attributes{})

@@ -109,6 +109,8 @@
         generate-all = {
           exec = ''
             export REPO_ROOT=$(git rev-parse --show-toplevel) # needed
+            ${pkgs.go}/bin/go run $REPO_ROOT/cmd/update-css --cwd $REPO_ROOT
+            ${pkgs.templ}/bin/templ generate
 
             ${pkgs.bun}/bin/bun build \
                 $REPO_ROOT/index.js \
@@ -131,7 +133,7 @@
 
         nix-generate-all = {
           exec = ''
-            ${pkgs.templ}/bin/templ generate &
+            ${pkgs.templ}/bin/templ generate
 
             ${pkgs.bun}/bin/bun build \
                 ./index.ts \

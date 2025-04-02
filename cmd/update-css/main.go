@@ -2,39 +2,47 @@ package main
 
 import (
 	"context"
+	"flag"
 	"io"
 	"os"
 
+	"github.com/conneroisu/conneroh.com/cmd/conneroh/layouts"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/views"
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
 	"github.com/conneroisu/conneroh.com/internal/routing"
 	"github.com/conneroisu/twerge"
 )
 
+var cwd = flag.String("cwd", "", "current working directory")
+
 func genCSS(ctx context.Context) error {
 	var (
-		_ = views.Home(
-			&[]*gen.Post{},
-			&[]*gen.Project{},
-			&[]*gen.Tag{},
-		).Render(ctx, io.Discard)
+		_ = layouts.Page(views.Home(
+			&gen.AllPosts,
+			&gen.AllProjects,
+			&gen.AllTags,
+		)).Render(ctx, io.Discard)
 		_ = views.List(
 			routing.PluralTargetPost,
-			&[]*gen.Post{},
-			&[]*gen.Project{},
-			&[]*gen.Tag{},
+			&gen.AllPosts,
+			&gen.AllProjects,
+			&gen.AllTags,
 		).Render(ctx, io.Discard)
 		_ = views.List(
 			routing.PluralTargetProject,
-			&[]*gen.Post{},
-			&[]*gen.Project{},
-			&[]*gen.Tag{},
+			&gen.AllPosts,
+			&gen.AllProjects,
+			&gen.AllTags,
 		).Render(ctx, io.Discard)
 		_ = views.List(
 			routing.PluralTargetTag,
-			&[]*gen.Post{},
-			&[]*gen.Project{},
-			&[]*gen.Tag{},
+			&gen.AllPosts,
+			&gen.AllProjects,
+			&gen.AllTags,
+		).Render(ctx, io.Discard)
+		_ = views.TagControl(
+			&gen.Tag{},
+			"#list-project",
 		).Render(ctx, io.Discard)
 	)
 	content := twerge.GenerateClassMapCode("css")
@@ -47,7 +55,11 @@ func genCSS(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	err = twerge.GenerateTailwind("input.css", "input.css", twerge.ClassMapStr)
+	err = twerge.GenerateTailwind("input.css")
+	if err != nil {
+		return err
+	}
+	err = twerge.GenerateTempl("internal/data/css/classes.templ")
 	if err != nil {
 		return err
 	}
@@ -56,6 +68,13 @@ func genCSS(ctx context.Context) error {
 }
 
 func main() {
+	flag.Parse()
+	if *cwd != "" {
+		err := os.Chdir(*cwd)
+		if err != nil {
+			panic(err)
+		}
+	}
 	if err := genCSS(context.Background()); err != nil {
 		panic(err)
 	}
