@@ -326,6 +326,19 @@
             ${scripts.nix-generate-all.exec}
           '';
         };
+        conneroh-dev = buildGoModule {
+          pname = name;
+          inherit vendorHash name;
+          version = "0.0.1";
+          src = ./.;
+          subPackages = ["."];
+          nativeBuildInputs = [pkgs.bun];
+          preBuild = ''
+            mkdir -p node_modules
+            ln -sf ${bunDeps.nodeModules}/node_modules/* node_modules/ || true
+            ${scripts.nix-generate-all.exec}
+          '';
+        };
         hasher = buildGoModule {
           pname = name;
           vendorHash = "sha256-ydsyTe8xeXFWN26i7YJGB/oGmF932+gvGQPr+9re/LU=";
@@ -346,6 +359,29 @@
           created = "now";
           contents = [
             conneroh
+            pkgs.cacert
+          ];
+          config = {
+            WorkingDir = "/root";
+            Cmd = ["/bin/conneroh.com"];
+            ExposedPorts = {
+              "8080/tcp" = {};
+            };
+            Env = [
+              "SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
+              "NIX_SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
+            ];
+          };
+          extraCommands = ''
+            echo "$(git rev-parse HEAD)" > REVISION
+          '';
+        };
+        C-conneroh-dev = pkgs.dockerTools.buildLayeredImage {
+          name = "conneroh-com-dev";
+          tag = "dev";
+          created = "now";
+          contents = [
+            conneroh-dev
             pkgs.cacert
           ];
           config = {
@@ -385,6 +421,31 @@
             --remote-only \
             -c ${./fly.toml} \
             -i registry.fly.io/conneroh-com \
+            -t "$FLY_AUTH_TOKEN"
+        '';
+
+        deployPackageDev = pkgs.writeShellScriptBin "deploy-package-dev" ''
+          set -e
+
+          echo "Copying image to Fly.io registry..."
+          if [ -z "$FLY_AUTH_TOKEN" ]; then
+            echo "FLY_AUTH_TOKEN is not set. Getting it from doppler..."
+            FLY_AUTH_TOKEN=$(doppler secrets get --plain FLY_AUTH_TOKEN)
+          fi
+
+          echo "Copying image to Fly.io registry..."
+          ${pkgs.skopeo}/bin/skopeo copy \
+            --insecure-policy \
+            docker-archive:"${C-conneroh-dev}" \
+            docker://registry.fly.io/conneroh-com-dev:latest \
+            --dest-creds x:"$FLY_AUTH_TOKEN" \
+            --format v2s2
+
+          echo "Deploying to Fly.io..."
+          ${pkgs.flyctl}/bin/fly deploy \
+            --remote-only \
+            -c ${./fly.toml} \
+            -i registry.fly.io/conneroh-com-dev \
             -t "$FLY_AUTH_TOKEN"
         '';
       };
