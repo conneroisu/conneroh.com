@@ -56,9 +56,9 @@
       binaries = {
       };
       pkg = fetchurl {
-        name = "@types/bun@1.2.4";
-        url = "https://registry.npmjs.org/@types/bun/-/bun-1.2.4.tgz";
-        hash = "sha256-O01ctlMKEB5nmokJir6UwrPEPWaW9zhiqS0YkwPVX9Y=";
+        name = "@types/bun@1.2.8";
+        url = "https://registry.npmjs.org/@types/bun/-/bun-1.2.8.tgz";
+        hash = "sha256-vz372Hy5vT+siYOMbNIMBkGanVsKiWdYCmJn3lh+ylg=";
       };
     };
     "@types/mathjax" = {
@@ -116,9 +116,9 @@
       binaries = {
       };
       pkg = fetchurl {
-        name = "alpinejs@3.14.8";
-        url = "https://registry.npmjs.org/alpinejs/-/alpinejs-3.14.8.tgz";
-        hash = "sha256-9V2GjDhUUkVLF+v3LUhzpGNXkSCdgu+wfCPCqYw4ofw=";
+        name = "alpinejs@3.14.9";
+        url = "https://registry.npmjs.org/alpinejs/-/alpinejs-3.14.9.tgz";
+        hash = "sha256-l9rXwMgeZZz8jncABV2pdw+Bhhh8uainbvtX4A1c5So=";
       };
     };
     "bun-types" = {
@@ -126,9 +126,9 @@
       binaries = {
       };
       pkg = fetchurl {
-        name = "bun-types@1.2.4";
-        url = "https://registry.npmjs.org/bun-types/-/bun-types-1.2.4.tgz";
-        hash = "sha256-lXqzNu+EFE1bzON4rLGrSdws76vuyStC1Ehxa3n/6/0=";
+        name = "bun-types@1.2.7";
+        url = "https://registry.npmjs.org/bun-types/-/bun-types-1.2.7.tgz";
+        hash = "sha256-kYHniRENsAWG2lQG7Tj6xPPaiS6Bsa87uRwRvwsSDCY=";
       };
     };
     "caniuse-lite" = {
@@ -176,9 +176,9 @@
       binaries = {
       };
       pkg = fetchurl {
-        name = "tailwindcss@4.0.9";
-        url = "https://registry.npmjs.org/tailwindcss/-/tailwindcss-4.0.9.tgz";
-        hash = "sha256-kw0dfQQ5MRjcvU8Vrs5nTIsOWIsqqNx9tPFvk+xxSvQ=";
+        name = "tailwindcss@4.1.1";
+        url = "https://registry.npmjs.org/tailwindcss/-/tailwindcss-4.1.1.tgz";
+        hash = "sha256-1QWvAm1zLIA7DkMp5HJaT/gjdUqQKkouDesLk9POu2s=";
       };
     };
     "typescript" = {
