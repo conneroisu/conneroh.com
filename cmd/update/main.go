@@ -9,7 +9,7 @@ import (
 	"flag"
 	"fmt"
 	"io/fs"
-	logger "log/slog"
+	"log/slog"
 	"math"
 	"mime"
 	"net/http"
@@ -106,48 +106,59 @@ func Run(
 		return err
 	}
 	defer func() {
-		err = cache.Close()
-		if err != nil {
+		if err = cache.Close(); err != nil {
 			panic(err)
 		}
 	}()
 
-	logger.Info("parsing assets", "loc", assetsLoc)
+	slog.Info("parsing assets", "loc", assetsLoc)
 	assets, ignored, err := parse(cache, assetsLoc)
 	if err != nil {
 		return err
 	}
-	logger.Info("assets parsed", "len", len(assets))
+	slog.Info("assets parsed", "len", len(assets), "ignored", len(ignored))
 
-	logger.Info("actualizing assets", "dest", assetsLoc)
+	slog.Info("actualizing assets", "dest", assetsLoc)
 	actualized, err := actualizeAssets(ctx, client, ignored, assets)
 	if err != nil {
 		return err
 	}
-	logger.Info("assets are up to date")
+	slog.Info("assets are up to date", "len", len(actualized), "ignored", len(ignored))
 
 	mdParser := NewMDParser(actualized)
 
-	logger.Info("actualizing posts", "dest", postsLoc)
-	parsedPosts, err = actualize[gen.Post](ctx, &eg, cache, mdParser, postsLoc)
+	slog.Info("actualizing posts", "dest", postsLoc)
+	parsedPosts, err = actualize[gen.Post](
+		ctx,
+		&eg,
+		cache,
+		mdParser,
+		postsLoc,
+	)
 	if err != nil {
 		return err
 	}
-	logger.Info("actualized posts", "len", len(parsedPosts))
+	slog.Info("actualized posts", "len", len(parsedPosts), "ignored", len(ignored))
 
-	logger.Info("actualizing projects", "dest", projectsLoc)
-	parsedProjects, err = actualize[gen.Project](ctx, &eg, cache, mdParser, projectsLoc)
+	slog.Info("actualizing projects", "dest", projectsLoc)
+	parsedProjects, err = actualize[gen.Project](
+		ctx,
+		&eg,
+		cache,
+		mdParser,
+		projectsLoc,
+	)
 	if err != nil {
 		return err
 	}
-	logger.Info("actualized projects", "len", len(parsedProjects))
+	slog.Info("actualized projects", "len", len(parsedProjects))
 
-	logger.Info("actualizing tags", "dest", tagsLoc)
+	slog.Info("actualizing tags", "dest", tagsLoc)
 	parsedTags, err = actualize[gen.Tag](ctx, &eg, cache, mdParser, tagsLoc)
 	if err != nil {
 		return err
 	}
-	logger.Info("actualized tags", "len", len(parsedTags))
+	slog.Info("actualized tags", "len", len(parsedTags), "ignored", len(ignored))
 
 	postGen, err := genstruct.NewGenerator(genstruct.Config{
 		PackageName: "gen",
@@ -167,26 +178,21 @@ func actualize[T gen.Post | gen.Tag | gen.Project](
 	mdParser goldmark.Markdown,
 	loc string,
 ) ([]*T, error) {
-	// Create a channel to safely collect results from goroutines
 	type result struct {
 		item *T
 		err  error
 	}
 	var (
-		resultCh = make(chan *result)
+		resultCh = make(chan *result) // safely collect results from goroutines
 		parsed   []*T
 		parseWg  sync.WaitGroup
 	)
-
-	// Get files to process
 	assets, ignored, err := parse(cache, loc)
 	if err != nil {
 		return nil, err
 	}
-
-	// Start a goroutine to collect results
 	parseWg.Add(1)
-	go func() {
+	go func() { // collect results
 		defer parseWg.Done()
 		var res *result
 		for res = range resultCh {
@@ -195,7 +201,6 @@ func actualize[T gen.Post | gen.Tag | gen.Project](
 			}
 		}
 	}()
-
 	// Process each asset concurrently
 	for _, asset := range assets {
 		assetCopy := asset // Create a copy for the goroutine
@@ -207,7 +212,6 @@ func actualize[T gen.Post | gen.Tag | gen.Project](
 			return err
 		})
 	}
-
 	// Wait for all processing to complete
 	err = eg.Wait()
 	close(resultCh) // Close channel after all goroutines are done
@@ -221,7 +225,6 @@ func actualize[T gen.Post | gen.Tag | gen.Project](
 
 	return parsed, err
 }
-
 func hashFileContent(content []byte) string {
 	sum := md5.Sum(content)
 	return hex.EncodeToString(sum[:])
@@ -262,8 +265,6 @@ func rememberMD[T gen.Post | gen.Project | gen.Tag](ignored []string) []*T {
 		return nil
 	}
 }
-
-// realizeMD parses the markdown file at the given path.
 func realizeMD[T gen.Post | gen.Project | gen.Tag](
 	ctx context.Context,
 	md goldmark.Markdown,
@@ -310,40 +311,29 @@ func realizeMD[T gen.Post | gen.Project | gen.Tag](
 	if err != nil {
 		return nil, err
 	}
-	proj := projectionMatrixCreate(gen.EmbedLength, 3)
-	fm.X, fm.Y, fm.Z = projectTo3D(resp.Embedding, proj)
-	var fixedArray [768]float64
-	copy(fixedArray[:], resp.Embedding[:gen.EmbedLength])
-	fm.Vec = fixedArray
+	fm.X, fm.Y, fm.Z = projectTo3D(
+		resp.Embedding,
+		projectionMatrixCreate(gen.EmbedLength, 3),
+	)
+	// var fixedArray [768]float64
+	copy(fm.Vec[:], resp.Embedding[:gen.EmbedLength])
+	// fm.Vec = fixedArray
 	return gen.New[T](fm), nil
 }
-
 func actualizeAssets(
 	ctx context.Context,
 	client *s3.Client,
 	ignore []string,
 	assets []Asset,
-) (fulAssets []Asset, err error) {
+) (fullAssets []Asset, err error) {
 	eg := errgroup.Group{}
 	eg.SetLimit(*workers)
-	eg.Go(func() (err error) {
-		for _, ignored := range ignore {
-			var data []byte
-			data, err = os.ReadFile(ignored)
-			if err == nil {
-				fulAssets = append(assets, Asset{
-					Path: ignored,
-					Data: data,
-				})
-			}
-		}
-		return
-	})
 	var asset Asset
+	copy(fullAssets, assets)
 	for _, asset = range assets {
 		eg.Go(func() (err error) {
 			contentType := mime.TypeByExtension(filepath.Ext(asset.Path))
-			logger.Info("uploading", "path", asset.Path, "contentType", contentType)
+			slog.Info("uploading", "path", asset.Path, "contentType", contentType)
 			_, err = client.PutObject(ctx, &s3.PutObjectInput{
 				Bucket:      aws.String("conneroh"),
 				Key:         aws.String(asset.Path),
@@ -356,7 +346,17 @@ func actualizeAssets(
 	if eg.Wait() != nil {
 		return nil, err
 	}
-	return fulAssets, nil
+	for _, ignoredPath := range ignore {
+		var data []byte
+		data, err = os.ReadFile(ignoredPath)
+		if err == nil {
+			fullAssets = append(assets, Asset{
+				Path: ignoredPath,
+				Data: data,
+			})
+		}
+	}
+	return fullAssets, nil
 }
 
 // Generate a deterministic projection matrix for dimensionality reduction
@@ -365,9 +365,8 @@ func projectionMatrixCreate(inputDim, outputDim int) *mat.Dense {
 	// This will multiply directly with the input vector without transposition
 	matrix := mat.NewDense(outputDim, inputDim, nil)
 
-	// For each output dimension
-	for i := range outputDim {
-		// Calculate a center point for this dimension's projection focus
+	for i := range outputDim { // For each output dimension
+		// center point for this dimension's projection focus
 		center := (i * inputDim) / outputDim
 
 		for j := range inputDim {
@@ -385,7 +384,6 @@ func projectionMatrixCreate(inputDim, outputDim int) *mat.Dense {
 		for j := range inputDim {
 			rowSum += matrix.At(i, j) * matrix.At(i, j)
 		}
-
 		rowSum = math.Sqrt(rowSum)
 		if rowSum > 0 {
 			for j := range inputDim {
@@ -415,7 +413,6 @@ func projectTo3D(embedding []float64, projectionMatrix *mat.Dense) (x, y, z floa
 }
 
 var exts = []goldmark.Option{
-
 	goldmark.WithExtensions(
 		extension.GFM, extension.Footnote,
 		extension.Strikethrough, extension.Table,
@@ -466,9 +463,7 @@ func NewMDParser(
 	assets []Asset,
 ) goldmark.Markdown {
 	exts = append(exts, goldmark.WithExtensions(
-		&wikilink.Extender{
-			Resolver: NewCustomResolver(assets),
-		},
+		&wikilink.Extender{Resolver: NewCustomResolver(assets)},
 	))
 	return goldmark.New(exts...)
 }
@@ -478,18 +473,6 @@ type Asset struct {
 	Slug string
 	Path string
 	Data []byte
-}
-
-// Upload uploads the asset to the s3 bucket.
-func (a *Asset) Upload(ctx context.Context, client *s3.Client) error {
-	_, err := client.PutObject(ctx, &s3.PutObjectInput{
-		Bucket:      aws.String(os.Getenv("BUCKET_NAME")),
-		Key:         aws.String(a.Path),
-		Body:        bytes.NewReader(a.Data),
-		ContentType: aws.String(mime.TypeByExtension(filepath.Ext(a.Path))),
-	})
-
-	return err
 }
 
 // URL returns the url of the asset.
@@ -512,10 +495,7 @@ type CredHandler struct {
 func (b *CredHandler) Retrieve(
 	_ context.Context,
 ) (aws.Credentials, error) {
-	return aws.Credentials{
-		AccessKeyID:     b.ID,
-		SecretAccessKey: b.Key,
-	}, nil
+	return aws.Credentials{AccessKeyID: b.ID, SecretAccessKey: b.Key}, nil
 }
 
 // CustomResolver is a wikilink.Resolver that resolves pages referenced by
@@ -536,21 +516,19 @@ func (c *CustomResolver) ResolveWikilink(n *wikilink.Node) (destination []byte, 
 	targetStr := string(n.Target)
 	for _, asset := range c.Assets {
 		if targetStr == asset.Path ||
-			strings.HasSuffix(targetStr, asset.Path[strings.LastIndex(asset.Path, "/")+1:]) {
+			strings.HasSuffix(
+				targetStr,
+				asset.Path[strings.LastIndex(asset.Path, "/")+1:],
+			) {
 			return []byte(asset.URL()), nil
 		}
 	}
-
-	return nil, nil
+	panic(fmt.Sprintf("unknown path: %s\n%v", targetStr, c.Assets))
 }
-
-// parse parses the markdown files in the given path.
-//
-// ignored is a list of slugs that were ignored as they did not change.
 func parse(
 	cache *cache.Cache,
 	loc string,
-) (parseds []Asset, ignored []string, err error) {
+) (parsedAssets []Asset, ignoredSlugs []string, err error) {
 	err = filepath.WalkDir(
 		loc,
 		func(fPath string, d fs.DirEntry, err error) error {
@@ -567,13 +545,12 @@ func parse(
 			hash := hashFileContent(asset)
 			path := pathify(fPath)
 			slug := slugify(fPath)
+			cache.Hashes[fPath] = hash
 			if cache.Hashes[fPath] == hash {
-				cache.Hashes[fPath] = hash
-				ignored = append(ignored, slug)
+				ignoredSlugs = append(ignoredSlugs, slug)
 				return nil
 			}
-			cache.Hashes[fPath] = hash
-			parseds = append(parseds, Asset{
+			parsedAssets = append(parsedAssets, Asset{
 				Path: path,
 				Data: asset,
 				Slug: slug,
@@ -586,13 +563,14 @@ func parse(
 	}
 	return
 }
-
 func slugify(s string) string {
-	path := strings.Replace(s, postsLoc, "", 1)
-	path = strings.Replace(path, projectsLoc, "", 1)
-	path = strings.Replace(path, tagsLoc, "", 1)
-	path = strings.TrimSuffix(path, filepath.Ext(path))
-	return path
+	var path string
+	var ok bool
+	path, ok = strings.CutPrefix(s, assetsLoc)
+	if ok {
+		return path
+	}
+	return strings.TrimSuffix(pathify(s), filepath.Ext(path))
 }
 func pathify(s string) string {
 	var path string

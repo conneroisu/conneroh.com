@@ -93,13 +93,13 @@
         generate-reload = {
           exec = ''
             export REPO_ROOT=$(git rev-parse --show-toplevel) # needed
-            if go run $REPO_ROOT/cmd/hash/main.go -dir "$REPO_ROOT/cmd/conneroh/views" -v -exclude "*_templ.go"; then
+            if hasher -dir "$REPO_ROOT/cmd/conneroh/views" -v -exclude "*_templ.go"; then
               echo ""
-              if go run $REPO_ROOT/cmd/hash/main.go -dir "$REPO_ROOT/internal/data/docs" -v -exclude "*_templ.go"; then
+              if hasher -dir "$REPO_ROOT/internal/data/docs" -v -exclude "*_templ.go"; then
                 echo ""
               else
                 echo "Changes detected in docs, running update script..."
-                doppler run -- go run $REPO_ROOT/cmd/update --cwd $REPO_ROOT &
+                ${pkgs.doppler}/bin/doppler run -- ${pkgs.go}/bin/go run $REPO_ROOT/cmd/update --cwd $REPO_ROOT
               fi
             else
               echo "Changes detected in templates, running update script..."
@@ -193,7 +193,7 @@
         pkgs.lib.mapAttrsToList
         (name: script: pkgs.writeShellScriptBin name script.exec)
         scripts;
-    in {
+    in rec {
       devShells.default = pkgs.mkShell {
         shellHook = ''
           export REPO_ROOT=$(git rev-parse --show-toplevel)
@@ -262,6 +262,7 @@
             wireguard-tools
             openssl.dev
             skopeo
+            packages.hasher
 
             # Playwright
 
@@ -318,6 +319,20 @@
           version = "0.0.1";
           src = ./.;
           subPackages = ["."];
+          nativeBuildInputs = [pkgs.bun];
+          preBuild = ''
+            mkdir -p node_modules
+            ln -sf ${bunDeps.nodeModules}/node_modules/* node_modules/ || true
+            ${scripts.nix-generate-all.exec}
+          '';
+        };
+        hasher = buildGoModule {
+          pname = name;
+          vendorHash = "sha256-ydsyTe8xeXFWN26i7YJGB/oGmF932+gvGQPr+9re/LU=";
+          name = "hasher";
+          version = "0.0.1";
+          src = ./.;
+          subPackages = ["./cmd/hasher"];
           nativeBuildInputs = [pkgs.bun];
           preBuild = ''
             mkdir -p node_modules
