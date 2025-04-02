@@ -151,6 +151,8 @@
                 -o ./cmd/conneroh/_static/dist/style.css \
                 --cwd . &
 
+            ${pkgs.go}/bin/go run $REPO_ROOT/cmd/update-css --cwd $REPO_ROOT &
+
             wait
           '';
           description = "Generate all files in parallel";
@@ -190,7 +192,7 @@
         pkgs.lib.mapAttrsToList
         (name: script: pkgs.writeShellScriptBin name script.exec)
         scripts;
-    in rec {
+    in {
       devShells.default = pkgs.mkShell {
         shellHook = ''
           export REPO_ROOT=$(git rev-parse --show-toplevel)
@@ -320,17 +322,6 @@
           preBuild = ''
             mkdir -p node_modules
             ln -sf ${bunDeps.nodeModules}/node_modules/* node_modules/ || true
-            ${scripts.nix-generate-all.exec}
-          '';
-        };
-        updater = buildGoModule {
-          inherit vendorHash;
-          pname = "updater";
-          name = "update";
-          version = "0.0.1";
-          src = ./.;
-          subPackages = ["./cmd/update"];
-          preBuild = ''
             ${scripts.nix-generate-all.exec}
           '';
         };
