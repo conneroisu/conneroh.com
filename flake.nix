@@ -98,7 +98,7 @@
               if go run $REPO_ROOT/cmd/hash/main.go -dir "$REPO_ROOT/internal/data/docs" -v -exclude "*_templ.go"; then
                 echo ""
               else
-                echo "Changes detected in templates, running update script..."
+                echo "Changes detected in docs, running update script..."
                 doppler run -- go run $REPO_ROOT/cmd/update --cwd $REPO_ROOT &
               fi
             else
