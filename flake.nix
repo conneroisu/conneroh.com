@@ -265,7 +265,6 @@
             # Playwright
 
             playwright-driver # Provides browser archives and driver scripts
-            firefox # Firefox browser
             (
               if pkgs.stdenv.isDarwin
               then pkgs.darwin.apple_sdk.frameworks.WebKit
