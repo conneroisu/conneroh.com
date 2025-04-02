@@ -99,22 +99,15 @@
                 echo ""
               else
                 echo "Changes detected in templates, running update script..."
-                ${pkgs.templ}/bin/templ generate --log-level error
                 doppler run -- go run $REPO_ROOT/cmd/update --cwd $REPO_ROOT &
-                go run $REPO_ROOT/cmd/update-css --cwd $REPO_ROOT &
-                wait
-                ${pkgs.templ}/bin/templ generate --log-level error
               fi
             else
               echo "Changes detected in templates, running update script..."
               ${pkgs.templ}/bin/templ generate --log-level error
-              doppler run -- go run $REPO_ROOT/cmd/update --cwd $REPO_ROOT &
               go run $REPO_ROOT/cmd/update-css --cwd $REPO_ROOT &
-              wait
               ${pkgs.templ}/bin/templ generate --log-level error
+              ${pkgs.tailwindcss}/bin/tailwindcss --minify -i ./input.css -o ./cmd/conneroh/_static/dist/style.css --cwd $REPO_ROOT
             fi
-            ${pkgs.tailwindcss}/bin/tailwindcss --minify -i ./input.css -o ./cmd/conneroh/_static/dist/style.css --cwd $REPO_ROOT &
-            ${pkgs.templ}/bin/templ generate --log-level error
           '';
           description = "Generate templ files and wait for completion";
         };
