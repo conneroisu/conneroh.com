@@ -5,6 +5,7 @@
 - plus and minus tags/projects/posts
 - search by tags/projects/posts
 - raw text search using embeddings
+- enable recommendations toggle?
 
 ### Search by tags
 - `-tag:programming-language/go` will not show posts with `programming-language/go` tag

@@ -8,8 +8,7 @@ import (
 
 // Cache is the storage of previous hashes.
 type Cache struct {
-	HashFile string
-	DirHash  string
+	HashFile string `json:"-"`
 	Hashes   map[string]string
 }
 
@@ -34,7 +33,6 @@ func LoadCache(hashFilePath string) (*Cache, error) {
 			// Create a new cache if the file doesn't exist
 			return &Cache{
 				HashFile: hashFilePath,
-				DirHash:  "",
 				Hashes:   make(map[string]string),
 			}, nil
 		}
@@ -45,6 +43,7 @@ func LoadCache(hashFilePath string) (*Cache, error) {
 	if err := json.Unmarshal(data, &cache); err != nil {
 		return nil, err
 	}
+	cache.HashFile = hashFilePath
 
 	return &cache, nil
 }

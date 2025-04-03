@@ -1,5 +1,7 @@
 package layouts
 
+import "github.com/conneroisu/twerge"
+
 templ Layout(title string) {
 	<!DOCTYPE html>
 	<html lang="en">
@@ -15,7 +17,7 @@ templ Layout(title string) {
 			<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 		</head>
 		<body
-			class="bg-gray-900"
+			class={ twerge.It("bg-gray-900") }
 			hx-ext="preload"
 		>
 			@header()

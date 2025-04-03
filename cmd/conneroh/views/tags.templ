@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
 	"github.com/conneroisu/conneroh.com/internal/routing"
+	"github.com/conneroisu/twerge"
 )
 
 // Tag component for displaying a single tag and its associated content
@@ -13,54 +14,56 @@ templ Tag(
 	fullProjects *[]*gen.Project,
 	fullTags *[]*gen.Tag,
 ) {
-	<div class="container mx-auto px-4 py-8 max-w-5xl">
+	<div
+		class={ twerge.It("container mx-auto px-4 py-8 max-w-5xl") }
+	>
 		<header
-			class="text-center mb-12"
+			class={ twerge.It("text-center mb-12") }
 		>
 			@icon(tag.Icon, templ.Attributes{
 				"style": "width: 4em; height: 4em;",
-				"class": "inline-block p-4",
+				"class": twerge.It("inline-block p-4"),
 			})
 			<h1
-				class="text-4xl font-bold text-white mb-4"
+				class={ twerge.It("text-4xl font-bold text-white mb-4") }
 			>
 				{ tag.Title }
 			</h1>
 			<div
-				class="text-xl text-gray-300 max-w-2xl mx-auto"
+				class={ twerge.It("text-xl text-gray-300 max-w-2xl mx-auto") }
 			>
 				{ tag.Description }
 			</div>
 		</header>
 		<div
 			x-data="{ activeTab: 'posts' }"
-			class="mb-8"
+			class={ twerge.It("mb-8") }
 		>
 			// Tabs
 			<div
-				class="border-b border-gray-700 mb-6"
+				class={ twerge.It("border-b border-gray-700 mb-6") }
 			>
 				<nav
-					class="flex space-x-8"
+					class={ twerge.It("flex space-x-8") }
 				>
 					<button
 						@click="activeTab = 'posts'"
-						:class="{ 'cdo-atab': activeTab === 'posts', 'cdo-itab': activeTab !== 'posts' }"
-						class="cdo-tab cdo-atab"
+						:class={ fmt.Sprintf("{'%s': activeTab === 'posts', '%s': activeTab !== 'posts'}", twerge.It("border-blue-500 text-blue-500"), twerge.It("border-transparent text-gray-500 text-gray-400 hover:text-gray-300")) }
+						class={ twerge.It("py-4 px-1 border-b-2 font-medium text-sm sm:text-base border-blue-500 text-blue-500") }
 					>
 						Posts ({ fmt.Sprintf("%d", len(tag.Posts)) })
 					</button>
 					<button
 						@click="activeTab = 'projects'"
-						:class="{ 'cdo-atab': activeTab === 'projects', 'cdo-itab': activeTab !== 'projects' }"
-						class="cdo-tab cdo-itab"
+						:class={ fmt.Sprintf("{'%s': activeTab === 'projects', '%s': activeTab !== 'projects'}", twerge.It("border-blue-500 text-blue-500"), twerge.It("border-transparent text-gray-500 text-gray-400 hover:text-gray-300")) }
+						class={ twerge.It("py-4 px-1 border-b-2 font-medium text-sm sm:text-base border-transparent text-gray-500 text-gray-400 hover:text-gray-300") }
 					>
 						Projects ({ fmt.Sprintf("%d", len(tag.Projects)) })
 					</button>
 					<button
 						@click="activeTab = 'related'"
-						:class="{ 'cdo-atab': activeTab === 'related', 'cdo-itab': activeTab !== 'related' }"
-						class="cdo-tab "
+						:class={ fmt.Sprintf("{'%s': activeTab === 'related', '%s': activeTab !== 'related'}", twerge.It("border-blue-500 text-blue-500"), twerge.It("border-transparent text-gray-500 text-gray-400 hover:text-gray-300")) }
+						class={ twerge.It("py-4 px-1 border-b-2 font-medium text-sm sm:text-base") }
 					>
 						Related Tags ({ fmt.Sprintf("%d", len(tag.Tags)) })
 					</button>
@@ -72,9 +75,15 @@ templ Tag(
 					@List(routing.PluralTargetPost, &tag.Posts, fullProjects, fullTags)
 				} else {
 					<div
-						class="text-center py-12 text-gray-400"
+						class={ twerge.It("text-center py-12 text-gray-400") }
 					>
-						<svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class={ twerge.It("h-12 w-12 mx-auto mb-4") }
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+						>
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
 						</svg>
 						<p>No posts found with this tag</p>
@@ -84,25 +93,35 @@ templ Tag(
 			// Projects Tab
 			<div x-show="activeTab === 'projects'" x-cloak>
 				if len(tag.Projects) > 0 {
-					<div class="cdo-grid">
+					<div
+						class={ twerge.It("grid grid-cols-1 md:grid-cols-2 gap-6") }
+					>
 						for _, project := range tag.Projects {
 							<a
 								href={ templ.SafeURL(fmt.Sprintf("/project/%s", project.Slug)) }
-								class="bg-gray-800 rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-300"
+								class={ twerge.It("bg-gray-800 rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-300") }
 							>
 								<h2
-									class="cdo-ctitle"
+									class={ twerge.It("text-xl font-semibold text-white mb-2") }
 								>
 									{ project.Title }
 								</h2>
-								<p class="cdo-stitle">
+								<p
+									class={ twerge.It("text-gray-300 mb-4 line-clamp-2") }
+								>
 									{ project.Description }
 								</p>
-								<div class="flex justify-between items-center">
-									<span class="text-blue-400 hover:underline text-sm font-medium">
+								<div
+									class={ twerge.It("flex justify-between items-center") }
+								>
+									<span
+										class={ twerge.It("text-blue-400 hover:underline text-sm font-medium") }
+									>
 										View project
 									</span>
-									<span class="text-sm text-gray-400">
+									<span
+										class={ twerge.It("text-sm text-gray-400") }
+									>
 										{ project.CreatedAt.Format("Jan 2, 2006") }
 									</span>
 								</div>
@@ -111,9 +130,15 @@ templ Tag(
 					</div>
 				} else {
 					<div
-						class="text-center py-12 text-gray-400"
+						class={ twerge.It("text-center py-12 text-gray-400") }
 					>
-						<svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class={ twerge.It("h-12 w-12 mx-auto mb-4") }
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+						>
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
 						</svg>
 						<p>No projects found with this tag</p>
@@ -126,28 +151,34 @@ templ Tag(
 				x-cloak
 			>
 				<div
-					class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
+					class={ twerge.It("grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4") }
 				>
 					for _, relatedTag := range tag.Tags {
 						<a
 							href={ templ.SafeURL(fmt.Sprintf("/tag/%s", relatedTag.Slug)) }
-							class="bg-gray-800 rounded-lg p-4 hover:shadow-md transition-shadow duration-300 flex items-center"
+							class={ twerge.It("bg-gray-800 rounded-lg p-4 hover:shadow-md transition-shadow duration-300 flex items-center") }
 						>
 							<div
-								class="text-gray-500 mr-3"
+								class={ twerge.It("text-gray-500 mr-3") }
 							>
-								<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									class={ twerge.It("h-5 w-5") }
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+								>
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
 								</svg>
 							</div>
 							<div>
 								<h3
-									class="font-medium text-white"
+									class={ twerge.It("font-medium text-white") }
 								>
 									{ relatedTag.Title }
 								</h3>
 								<p
-									class="text-xs text-gray-400 line-clamp-1"
+									class={ twerge.It("text-xs text-gray-400 line-clamp-1") }
 								>
 									{ fmt.Sprintf("%d posts, %d projects", len(relatedTag.Posts), len(relatedTag.Projects)) }
 								</p>

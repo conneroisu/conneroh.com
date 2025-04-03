@@ -15,6 +15,12 @@
       inputs.flake-utils.follows = "flake-utils";
     };
 
+    twerge = {
+      url = "github:conneroisu/twerge?tag=v0.2.3";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.follows = "flake-utils";
+    };
+
     mk-shell-bin.url = "github:rrbutani/nix-mk-shell-bin";
 
     bun2nix.url = "github:baileyluTCD/bun2nix";
@@ -38,7 +44,11 @@
     extra-experimental-features = "nix-command flakes";
   };
 
-  outputs = inputs @ {flake-utils, ...}:
+  outputs = inputs @ {
+    self,
+    flake-utils,
+    ...
+  }:
     flake-utils.lib.eachSystem [
       "x86_64-linux"
       "i686-linux"
@@ -46,8 +56,14 @@
       "aarch64-linux"
       "aarch64-darwin"
     ] (system: let
-      overlays = [(final: prev: {final.go = prev.go_1_24;})];
-      pkgs = import inputs.nixpkgs {inherit system overlays;};
+      overlay = final: prev: {final.go = prev.go_1_24;};
+      pkgs = import inputs.nixpkgs {
+        inherit system;
+        overlays = [
+          overlay
+          inputs.twerge.overlays."${system}".default
+        ];
+      };
       buildGoModule = pkgs.buildGoModule.override {go = pkgs.go_1_24;};
       buildWithSpecificGo = pkg: pkg.override {inherit buildGoModule;};
 
@@ -92,46 +108,30 @@
         };
         generate-reload = {
           exec = ''
-            if go run $REPO_ROOT/cmd/hash/main.go -dir "$REPO_ROOT/internal/data/docs" -exclude "*.tmp,*.bak"; then
+            export REPO_ROOT=$(git rev-parse --show-toplevel) # needed
+            cd $REPO_ROOT
+            if ${pkgs.hasher}/bin/hasher -dir "$REPO_ROOT/cmd/conneroh/views" -v -exclude "*_templ.go"; then
               echo ""
+              if ${pkgs.hasher}/bin/hasher -dir "$REPO_ROOT/internal/data/docs" -v -exclude "*_templ.go"; then
+                echo ""
+              else
+                echo "Changes detected in docs, running update script..."
+                ${pkgs.doppler}/bin/doppler run -- ${pkgs.go}/bin/go run $REPO_ROOT/cmd/update --cwd $REPO_ROOT
+              fi
             else
               echo "Changes detected in templates, running update script..."
-              doppler run -- go run $REPO_ROOT/cmd/update --cwd $REPO_ROOT &
+              ${pkgs.templ}/bin/templ generate --log-level error
+              go run $REPO_ROOT/cmd/update-css --cwd $REPO_ROOT
+              ${pkgs.templ}/bin/templ generate --log-level error
+              ${pkgs.tailwindcss}/bin/tailwindcss -m -i ./input.css -o ./cmd/conneroh/_static/dist/style.css --cwd $REPO_ROOT
             fi
-
-            ${pkgs.tailwindcss}/bin/tailwindcss --minify -i ./input.css -o ./cmd/conneroh/_static/dist/style.css --cwd $REPO_ROOT &
-            wait
-            ${pkgs.templ}/bin/templ generate
+            cd -
           '';
           description = "Generate templ files and wait for completion";
         };
-
-        generate-all = {
-          exec = ''
-            export REPO_ROOT=$(git rev-parse --show-toplevel) # needed
-
-            ${pkgs.bun}/bin/bun build \
-                $REPO_ROOT/index.js \
-                --minify \
-                --minify-syntax \
-                --minify-whitespace  \
-                --minify-identifiers \
-                --outdir $REPO_ROOT/cmd/conneroh/_static/dist/ &
-
-            ${pkgs.tailwindcss}/bin/tailwindcss \
-                --minify \
-                -i $REPO_ROOT/input.css \
-                -o $REPO_ROOT/cmd/conneroh/_static/dist/style.css \
-                --cwd $REPO_ROOT &
-
-            wait
-          '';
-          description = "Generate js files";
-        };
-
         nix-generate-all = {
           exec = ''
-            ${pkgs.templ}/bin/templ generate &
+            ${pkgs.templ}/bin/templ generate
 
             ${pkgs.bun}/bin/bun build \
                 ./index.ts \
@@ -146,6 +146,8 @@
                 -i ./input.css \
                 -o ./cmd/conneroh/_static/dist/style.css \
                 --cwd . &
+
+            ${pkgs.go}/bin/go run $REPO_ROOT/cmd/update-css --cwd $REPO_ROOT &
 
             wait
           '';
@@ -255,11 +257,11 @@
             wireguard-tools
             openssl.dev
             skopeo
+            inputs.twerge.packages."${pkgs.system}".hasher
 
             # Playwright
 
             playwright-driver # Provides browser archives and driver scripts
-            firefox # Firefox browser
             (
               if pkgs.stdenv.isDarwin
               then pkgs.darwin.apple_sdk.frameworks.WebKit
@@ -303,52 +305,53 @@
       };
 
       packages = let
+        src = ./.;
         name = "conneroh.com";
-        vendorHash = "sha256-NlPu2WXhwqpGWZ8UFzcrpo7h91gDa8/0+UuxWvvPvYQ=";
+        fly-name = "conneroh-com";
+        fly-name-dev = "conneroh-com-dev";
+        vendorHash = "sha256-K52okJQZ/y1VQb8ob4zcbuNC8hjhgUTPDBeVA1FJCKA=";
+        created = "now";
+        tag = "latest";
+        version = self.shortRev or "dirty";
+        nativeBuildInputs = [pkgs.bun];
+        preBuild = ''
+          mkdir -p node_modules
+          ln -sf ${bunDeps.nodeModules}/node_modules/* node_modules/ || true
+          ${scripts.nix-generate-all.exec}
+        '';
+
+        config = {
+          WorkingDir = "/root";
+          Cmd = ["/bin/conneroh.com"];
+          ExposedPorts = {
+            "8080/tcp" = {};
+          };
+          Env = [
+            "SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
+            "NIX_SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
+          ];
+        };
       in rec {
         conneroh = buildGoModule {
-          pname = name;
-          inherit vendorHash name;
-          version = "0.0.1";
-          src = ./.;
+          inherit vendorHash name src preBuild nativeBuildInputs version;
           subPackages = ["."];
-          nativeBuildInputs = [pkgs.bun];
-          preBuild = ''
-            mkdir -p node_modules
-            ln -sf ${bunDeps.nodeModules}/node_modules/* node_modules/ || true
-            ${scripts.nix-generate-all.exec}
-          '';
-        };
-        updater = buildGoModule {
-          inherit vendorHash;
-          pname = "updater";
-          name = "update";
-          version = "0.0.1";
-          src = ./.;
-          subPackages = ["./cmd/update"];
-          preBuild = ''
-            ${scripts.nix-generate-all.exec}
-          '';
         };
         C-conneroh = pkgs.dockerTools.buildLayeredImage {
-          inherit name;
-          tag = "latest";
-          created = "now";
+          inherit name config tag created version;
           contents = [
             conneroh
             pkgs.cacert
           ];
-          config = {
-            WorkingDir = "/root";
-            Cmd = ["/bin/conneroh.com"];
-            ExposedPorts = {
-              "8080/tcp" = {};
-            };
-            Env = [
-              "SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
-              "NIX_SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
-            ];
-          };
+          extraCommands = ''
+            echo "$(git rev-parse HEAD)" > REVISION
+          '';
+        };
+        C-conneroh-dev = pkgs.dockerTools.buildLayeredImage {
+          inherit name config tag created;
+          contents = [
+            conneroh
+            pkgs.cacert
+          ];
           extraCommands = ''
             echo "$(git rev-parse HEAD)" > REVISION
           '';
@@ -356,7 +359,6 @@
         deployPackage = pkgs.writeShellScriptBin "deploy" ''
           set -e
 
-          echo "Copying image to Fly.io registry..."
           if [ -z "$FLY_AUTH_TOKEN" ]; then
             echo "FLY_AUTH_TOKEN is not set. Getting it from doppler..."
             FLY_AUTH_TOKEN=$(doppler secrets get --plain FLY_AUTH_TOKEN)
@@ -366,7 +368,7 @@
           ${pkgs.skopeo}/bin/skopeo copy \
             --insecure-policy \
             docker-archive:"${C-conneroh}" \
-            docker://registry.fly.io/conneroh-com:latest \
+            docker://registry.fly.io/${fly-name}:latest \
             --dest-creds x:"$FLY_AUTH_TOKEN" \
             --format v2s2
 
@@ -374,8 +376,32 @@
           ${pkgs.flyctl}/bin/fly deploy \
             --remote-only \
             -c ${./fly.toml} \
-            -i registry.fly.io/conneroh-com \
+            -i registry.fly.io/${fly-name} \
             -t "$FLY_AUTH_TOKEN"
+        '';
+
+        deployPackageDev = pkgs.writeShellScriptBin "deploy-package-dev" ''
+          set -e
+
+          if [ -z "$FLY_DEV_AUTH_TOKEN" ]; then
+            echo "FLY_AUTH_TOKEN is not set. Getting it from doppler..."
+            FLY_DEV_AUTH_TOKEN=$(doppler secrets get --plain FLY_DEV_AUTH_TOKEN)
+          fi
+
+          echo "Copying dev image to Fly.io registry..."
+          ${pkgs.skopeo}/bin/skopeo copy \
+            --insecure-policy \
+            docker-archive:"${C-conneroh-dev}" \
+            docker://registry.fly.io/${fly-name-dev}:latest \
+            --dest-creds x:"$FLY_DEV_AUTH_TOKEN" \
+            --format v2s2
+
+          echo "Deploying to Fly.io..."
+          ${pkgs.flyctl}/bin/fly deploy \
+            --remote-only \
+            -c ${./fly.dev.toml} \
+            -i registry.fly.io/${fly-name-dev}:latest \
+            -t "$FLY_DEV_AUTH_TOKEN"
         '';
       };
     });

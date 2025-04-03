@@ -67,20 +67,35 @@ func run(
 	if err != nil {
 		log.Fatalf("could not launch browser: %v", err)
 	}
-	defer browser.Close()
+	defer func() {
+		err = browser.Close()
+		if err != nil {
+			log.Fatalf("could not close browser: %v", err)
+		}
+	}()
 
 	// Create a new browser context
 	bCtx, err := browser.NewContext()
 	if err != nil {
 		log.Fatalf("could not create context: %v", err)
 	}
-	defer bCtx.Close()
+	defer func() {
+		err = bCtx.Close()
+		if err != nil {
+			log.Fatalf("could not close browser context: %v", err)
+		}
+	}()
 
 	p, err := bCtx.NewPage()
 	if err != nil {
 		log.Fatalf("could not create page: %v", err)
 	}
-	defer p.Close()
+	defer func() {
+		err = p.Close()
+		if err != nil {
+			log.Fatalf("could not close page: %v", err)
+		}
+	}()
 
 	for _, post := range gen.AllPosts {
 		eg.Go(func() error {
@@ -89,7 +104,12 @@ func run(
 			if pErr != nil {
 				return pErr
 			}
-			defer page.Close()
+			defer func() {
+				err = page.Close()
+				if err != nil {
+					log.Fatalf("could not close page: %v", err)
+				}
+			}()
 			if _, pErr = page.Goto(url, playwright.PageGotoOptions{}); pErr != nil {
 				return pErr
 			}
@@ -106,11 +126,16 @@ func run(
 	for _, project := range gen.AllProjects {
 		eg.Go(func() error {
 			url := routing.GetProjectURL(base, project)
-			page, err := bCtx.NewPage()
-			if err != nil {
-				return err
+			page, nPErr := bCtx.NewPage()
+			if nPErr != nil {
+				return nPErr
 			}
-			defer page.Close()
+			defer func() {
+				err = page.Close()
+				if err != nil {
+					log.Fatalf("could not close page: %v", err)
+				}
+			}()
 			if _, err = page.Goto(url, playwright.PageGotoOptions{}); err != nil {
 				return err
 			}
@@ -126,11 +151,16 @@ func run(
 	for _, tag := range gen.AllTags {
 		eg.Go(func() error {
 			url := routing.GetTagURL(base, tag)
-			page, err := bCtx.NewPage()
-			if err != nil {
-				return err
+			page, nPErr := bCtx.NewPage()
+			if nPErr != nil {
+				return nPErr
 			}
-			defer page.Close()
+			defer func() {
+				err = page.Close()
+				if err != nil {
+					log.Fatalf("could not close page: %v", err)
+				}
+			}()
 			if _, err = page.Goto(url, playwright.PageGotoOptions{
 				WaitUntil: playwright.WaitUntilStateNetworkidle,
 			}); err != nil {
