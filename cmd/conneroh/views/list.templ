@@ -106,13 +106,9 @@ templ List(
 	</div>
 }
 
-// TODO: Make Sure all see-more -> Are aligned at the bottom of each list item
 templ listProjectItem(project *gen.Project) {
 	<div
-		class={ twerge.It("bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 p-6") }
-		x-transition:enter={ twerge.It("transition ease-out duration-200") }
-		x-transition:enter-start={ twerge.It("opacity-0 transform translate-y-4") }
-		x-transition:enter-end={ twerge.It("opacity-100 transform translate-y-0") }
+		class={ twerge.It("bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-3 p-6 flex flex-col h-full") }
 	>
 		<a
 			hx-target="#bodiody"
@@ -120,24 +116,15 @@ templ listProjectItem(project *gen.Project) {
 			hx-trigger="click"
 			hx-get={ fmt.Sprintf("/morph/project/%s", project.Slug) }
 			hx-push-url={ fmt.Sprintf("/project/%s", project.Slug) }
-			class={ twerge.It("block cursor-pointer") }
+			class={ twerge.It("cursor-pointer h-full") }
 		>
 			@image(
 				project.BannerPath,
 				project.Title,
-				twerge.It("w-full h-48 object-cover object-center"),
+				twerge.It("w-full h-48 object-cover"),
 			)
 			<div
-				class={ twerge.It("absolute bottom-0 right-0 bg-blue-500 text-white text-xs px-2 py-1 rounded-tl-md") }
-			>
-				<span
-					class={ twerge.It("text-gray-400") }
-				>
-					{ strconv.Itoa(len(project.PostSlugs)) } tags
-				</span>
-			</div>
-			<div
-				class={ twerge.It("p-6") }
+				class={ twerge.It("p-6 flex flex-col flex-grow") }
 			>
 				<h2
 					class={ twerge.It("text-xl font-semibold text-white mb-3 line-clamp-2 hover:underline") }
@@ -166,17 +153,23 @@ templ listProjectItem(project *gen.Project) {
 						}
 					}
 				</div>
-				<div
-					class={ twerge.It("flex justify-between items-center") }
-				>
-					<a
-						class={ twerge.It("text-blue-400 hover:underline text-sm font-medium flex items-center") }
-					>
-						Read More
-						@icon("arrow-right", templ.Attributes{})
-					</a>
-				</div>
 			</div>
+			<a
+				class={ twerge.It("text-blue-400 hover:underline text-sm font-medium flex items-center absolute bottom-5 left-0 right-0 justify-center") }
+			>
+				Read More
+				@icon("arrow-right", templ.Attributes{})
+			</a>
+			<span
+				class={ twerge.It("absolute bottom-0 left-0 bg-red-500 text-white text-xs px-2 py-1 rounded-tr-md text-gray-400") }
+			>
+				{ strconv.Itoa(len(project.Posts)) } posts
+			</span>
+			<span
+				class={ twerge.It("absolute bottom-0 right-0 bg-blue-500 text-white text-xs px-2 py-1 rounded-tl-md text-gray-400") }
+			>
+				{ strconv.Itoa(len(project.Tags)) } tags
+			</span>
 		</a>
 	</div>
 }

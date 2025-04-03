@@ -12,7 +12,6 @@ test.db
 *.log
 .DS_Store
 .vscode
-*_templ.go
 *.db-journal
 result
 servers
