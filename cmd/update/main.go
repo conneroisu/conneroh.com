@@ -69,83 +69,45 @@ var (
 
 func main() {
 	flag.Parse()
+	ctx := context.Background()
 	llamaURL, err := url.Parse(os.Getenv("OLLAMA_URL"))
-	if err != nil {
-		panic(err)
-	}
+	noError(err)
 	llama = api.NewClient(llamaURL, http.DefaultClient)
 
 	if *cwd != "" {
-		err := os.Chdir(*cwd)
-		if err != nil {
-			panic(err)
-		}
+		noError(os.Chdir(*cwd))
 	}
-	if err := Run(
-		context.Background(),
-	); err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
-	}
-}
-
-// Run parses all markdown files in the database and updates css hashes.
-func Run(
-	ctx context.Context,
-) error {
-	var (
-		parsedTags     []*gen.Tag
-		parsedProjects []*gen.Project
-		parsedPosts    []*gen.Post
-	)
 	eg := errgroup.Group{}
 	eg.SetLimit(*workers)
 	cache, err := cache.LoadCache(hashFile)
-	if err != nil {
-		return err
-	}
-	defer func() {
-		if err = cache.Close(); err != nil {
-			panic(err)
-		}
-	}()
+	noError(err)
+
+	defer noError(cache.Close())
 
 	assets, ignored, err := parse(cache, assetsLoc)
-	if err != nil {
-		return err
-	}
+	noError(err)
 
 	actualized, err := actualizeAssets(ctx, client, ignored, assets)
-	if err != nil {
-		return err
-	}
+	noError(err)
 
 	mdParser := NewMDParser(actualized)
 
-	parsedPosts, err = actualize[gen.Post](ctx, &eg, cache, mdParser, postsLoc)
-	if err != nil {
-		return err
-	}
+	parsedPosts, err := actualize[gen.Post](ctx, &eg, cache, mdParser, postsLoc)
+	noError(err)
 
-	parsedProjects, err = actualize[gen.Project](ctx, &eg, cache, mdParser, projectsLoc)
-	if err != nil {
-		return err
-	}
+	parsedProjects, err := actualize[gen.Project](ctx, &eg, cache, mdParser, projectsLoc)
+	noError(err)
 
-	parsedTags, err = actualize[gen.Tag](ctx, &eg, cache, mdParser, tagsLoc)
-	if err != nil {
-		return err
-	}
+	parsedTags, err := actualize[gen.Tag](ctx, &eg, cache, mdParser, tagsLoc)
+	noError(err)
 
 	postGen, err := genstruct.NewGenerator(genstruct.Config{
 		PackageName: "gen",
 		OutputFile:  "internal/data/gen/generated_data.go",
 	}, parsedPosts, parsedTags, parsedProjects)
-	if err != nil {
-		return err
-	}
+	noError(err)
 
-	return postGen.Generate()
+	noError(postGen.Generate())
 }
 
 func actualize[T gen.Post | gen.Tag | gen.Project](
@@ -326,18 +288,14 @@ func actualizeAssets(
 			return
 		})
 	}
-	if eg.Wait() != nil {
-		return nil, err
-	}
+	noError(eg.Wait())
 	for _, ignoredPath := range ignore {
-		var data []byte
-		data, err = os.ReadFile(ignoredPath)
-		if err == nil {
-			fullAssets = append(assets, Asset{
-				Path: ignoredPath,
-				Data: data,
-			})
-		}
+		data, err := os.ReadFile(filepath.Join(assetsLoc, ignoredPath))
+		noError(err)
+		fullAssets = append(assets, Asset{
+			Path: ignoredPath,
+			Data: data,
+		})
 	}
 	return fullAssets, nil
 }
@@ -572,4 +530,9 @@ func pathify(s string) string {
 		return path
 	}
 	panic("unknown path")
+}
+func noError(err error) {
+	if err != nil {
+		panic(err)
+	}
 }
