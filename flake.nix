@@ -183,15 +183,11 @@
 
             # Browser executable paths
             export PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=${"${pkgs.playwright-driver.browsers}/chromium-1155"}
-            export PLAYWRIGHT_FIREFOX_EXECUTABLE_PATH=${"${pkgs.playwright-driver.browsers}/firefox-1471"}
-            export PLAYWRIGHT_WEBKIT_EXECUTABLE_PATH=${"${pkgs.playwright-driver.browsers}/webkit-2123"}
 
             echo "Playwright configured with:"
             echo "  - Browsers directory: $PLAYWRIGHT_BROWSERS_PATH"
             echo "  - Node.js path: $PLAYWRIGHT_NODEJS_PATH"
             echo "  - Chromium path: $PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH"
-            echo "  - Firefox path: $PLAYWRIGHT_FIREFOX_EXECUTABLE_PATH"
-            echo "  - WebKit path: $PLAYWRIGHT_WEBKIT_EXECUTABLE_PATH"
 
             # Print available commands
             echo "Available commands:"
@@ -215,7 +211,6 @@
               go_1_24
               air
               templ
-              pprof
               revive
               golangci-lint
               (buildWithSpecificGo gopls)
@@ -226,6 +221,7 @@
               (buildWithSpecificGo gotests)
               (buildWithSpecificGo gotools)
               (buildWithSpecificGo reftools)
+              pprof
               graphviz
 
               # Web
@@ -237,12 +233,10 @@
 
               # Infra
               flyctl
-              wireguard-tools
               openssl.dev
               skopeo
 
               # Playwright
-
               playwright-driver # Provides browser archives and driver scripts
               (
                 if pkgs.stdenv.isDarwin
@@ -296,14 +290,6 @@
         tag = "latest";
         version = self.shortRev or "dirty";
         nativeBuildInputs = [];
-        preBuild = ''
-          ${pkgs.templ}/bin/templ generate
-          ${pkgs.tailwindcss}/bin/tailwindcss \
-              --minify \
-              -i ./input.css \
-              -o ./cmd/conneroh/_static/dist/style.css \
-              --cwd .
-        '';
         config = {
           WorkingDir = "/root";
           Cmd = ["/bin/conneroh.com"];
@@ -317,7 +303,15 @@
         };
       in rec {
         conneroh = buildGoModule {
-          inherit vendorHash name src preBuild nativeBuildInputs version;
+          inherit vendorHash name src nativeBuildInputs version;
+          preBuild = ''
+            ${pkgs.templ}/bin/templ generate
+            ${pkgs.tailwindcss}/bin/tailwindcss \
+                --minify \
+                -i ./input.css \
+                -o ./cmd/conneroh/_static/dist/style.css \
+                --cwd .
+          '';
           subPackages = ["."];
         };
         C-conneroh = pkgs.dockerTools.buildLayeredImage {
