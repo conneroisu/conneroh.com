@@ -66,229 +66,230 @@
       };
       buildGoModule = pkgs.buildGoModule.override {go = pkgs.go_1_24;};
       buildWithSpecificGo = pkg: pkg.override {inherit buildGoModule;};
-
-      scripts = {
-        dx = {
-          exec = ''$EDITOR $REPO_ROOT/flake.nix'';
-          description = "Edit flake.nix";
-        };
-        gx = {
-          exec = ''$EDITOR $REPO_ROOT/go.mod'';
-          description = "Edit go.mod";
-        };
-        clean = {
-          exec = ''${pkgs.git}/bin/git clean -fdx'';
-          description = "Clean Project";
-        };
-        tests = {
-          exec = ''${pkgs.go}/bin/go test -v ./...'';
-          description = "Run all go tests";
-        };
-        lint = {
-          exec = ''
-            ${pkgs.golangci-lint}/bin/golangci-lint run
-            ${pkgs.statix}/bin/statix check $REPO_ROOT/flake.nix
-            ${pkgs.deadnix}/bin/deadnix $REPO_ROOT/flake.nix
-          '';
-          description = "Run Linting Steps.";
-        };
-        build = {
-          exec = ''
-            nix build --accept-flake-config .#packages.x86_64-linux.conneroh
-          '';
-          description = "Build the package";
-        };
-        update = {
-          exec = ''
-            ${pkgs.doppler}/bin/doppler run -- ${pkgs.go}/bin/go run $REPO_ROOT/cmd/update --cwd $REPO_ROOT
-          '';
-          description = "Update the generated go files.";
-        };
-        generate-reload = {
-          exec = ''
-            export REPO_ROOT=$(git rev-parse --show-toplevel) # needed
-            cd $REPO_ROOT
-            if ${pkgs.hasher}/bin/hasher -dir "$REPO_ROOT/cmd/conneroh/views" -v -exclude "*_templ.go"; then
-              echo ""
-              if ${pkgs.hasher}/bin/hasher -dir "$REPO_ROOT/internal/data/docs" -v -exclude "*_templ.go"; then
-                echo ""
-              else
-                echo "Changes detected in docs, running update script..."
-                ${pkgs.doppler}/bin/doppler run -- ${pkgs.go}/bin/go run $REPO_ROOT/cmd/update --cwd $REPO_ROOT
-              fi
-            else
-              echo "Changes detected in templates, running update script..."
-              ${pkgs.templ}/bin/templ generate --log-level error
-              go run $REPO_ROOT/cmd/update-css --cwd $REPO_ROOT
-              ${pkgs.templ}/bin/templ generate --log-level error
-              ${pkgs.tailwindcss}/bin/tailwindcss -m -i ./input.css -o ./cmd/conneroh/_static/dist/style.css --cwd $REPO_ROOT
-            fi
-            cd -
-          '';
-          description = "Code Generation Steps for specific directory changes.";
-        };
-        generate-all = {
-          exec = ''
-            ${pkgs.templ}/bin/templ generate
-            ${pkgs.go}/bin/go run $REPO_ROOT/cmd/update-css --cwd $REPO_ROOT
-            ${pkgs.tailwindcss}/bin/tailwindcss \
-                --minify \
-                -i ./input.css \
-                -o ./cmd/conneroh/_static/dist/style.css \
-                --cwd .
-          '';
-          description = "Generate all files in parallel";
-        };
-        format = {
-          exec = ''
-            cd $(git rev-parse --show-toplevel)
-
-            ${pkgs.go}/bin/go fmt ./...
-
-            ${pkgs.git}/bin/git ls-files \
-              --others \
-              --exclude-standard \
-              --cached \
-              -- '*.js' '*.ts' '*.css' '*.md' '*.json' \
-              | xargs prettier --write
-
-            ${pkgs.golines}/bin/golines \
-              -l \
-              -w \
-              --max-len=80 \
-              --shorten-comments \
-              --ignored-dirs=.direnv .
-
-            cd -
-          '';
-          description = "Format code files";
-        };
-        run = {
-          exec = ''cd $REPO_ROOT && air'';
-          description = "Run the application with air for hot reloading";
-        };
-      };
-
-      # Convert scripts to packages
-      scriptPackages =
-        pkgs.lib.mapAttrsToList
-        (name: script: pkgs.writeShellScriptBin name script.exec)
-        scripts;
     in rec {
-      devShells.default = pkgs.mkShell {
-        shellHook = ''
-          export REPO_ROOT=$(git rev-parse --show-toplevel)
-          export CGO_CFLAGS="-O2"
+      devShells.default = let
+        scripts = {
+          dx = {
+            exec = ''$EDITOR $REPO_ROOT/flake.nix'';
+            description = "Edit flake.nix";
+          };
+          gx = {
+            exec = ''$EDITOR $REPO_ROOT/go.mod'';
+            description = "Edit go.mod";
+          };
+          clean = {
+            exec = ''${pkgs.git}/bin/git clean -fdx'';
+            description = "Clean Project";
+          };
+          tests = {
+            exec = ''${pkgs.go}/bin/go test -v ./...'';
+            description = "Run all go tests";
+          };
+          lint = {
+            exec = ''
+              ${pkgs.golangci-lint}/bin/golangci-lint run
+              ${pkgs.statix}/bin/statix check $REPO_ROOT/flake.nix
+              ${pkgs.deadnix}/bin/deadnix $REPO_ROOT/flake.nix
+            '';
+            description = "Run Linting Steps.";
+          };
+          build = {
+            exec = ''
+              nix build --accept-flake-config .#packages.x86_64-linux.conneroh
+            '';
+            description = "Build the package";
+          };
+          update = {
+            exec = ''
+              ${pkgs.doppler}/bin/doppler run -- ${pkgs.go}/bin/go run $REPO_ROOT/cmd/update --cwd $REPO_ROOT
+            '';
+            description = "Update the generated go files.";
+          };
+          generate-reload = {
+            exec = ''
+              export REPO_ROOT=$(git rev-parse --show-toplevel) # needed
+              cd $REPO_ROOT
+              if ${pkgs.hasher}/bin/hasher -dir "$REPO_ROOT/cmd/conneroh/views" -v -exclude "*_templ.go"; then
+                echo ""
+                if ${pkgs.hasher}/bin/hasher -dir "$REPO_ROOT/internal/data/docs" -v -exclude "*_templ.go"; then
+                  echo ""
+                else
+                  echo "Changes detected in docs, running update script..."
+                  ${pkgs.doppler}/bin/doppler run -- ${pkgs.go}/bin/go run $REPO_ROOT/cmd/update --cwd $REPO_ROOT
+                fi
+              else
+                echo "Changes detected in templates, running update script..."
+                ${pkgs.templ}/bin/templ generate --log-level error
+                go run $REPO_ROOT/cmd/update-css --cwd $REPO_ROOT
+                ${pkgs.templ}/bin/templ generate --log-level error
+                ${pkgs.tailwindcss}/bin/tailwindcss -m -i ./input.css -o ./cmd/conneroh/_static/dist/style.css --cwd $REPO_ROOT
+              fi
+              cd -
+            '';
+            description = "Code Generation Steps for specific directory changes.";
+          };
+          generate-all = {
+            exec = ''
+              ${pkgs.templ}/bin/templ generate
+              ${pkgs.go}/bin/go run $REPO_ROOT/cmd/update-css --cwd $REPO_ROOT
+              ${pkgs.tailwindcss}/bin/tailwindcss \
+                  --minify \
+                  -i ./input.css \
+                  -o ./cmd/conneroh/_static/dist/style.css \
+                  --cwd .
+            '';
+            description = "Generate all files in parallel";
+          };
+          format = {
+            exec = ''
+              cd $(git rev-parse --show-toplevel)
 
-          export PLAYWRIGHT_BROWSERS_PATH=${pkgs.playwright-driver.browsers}
-          export PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
-          export PLAYWRIGHT_NODEJS_PATH=${pkgs.nodejs_20}/bin/node
+              ${pkgs.go}/bin/go fmt ./...
 
-          # Browser executable paths
-          export PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=${"${pkgs.playwright-driver.browsers}/chromium-1155"}
-          export PLAYWRIGHT_FIREFOX_EXECUTABLE_PATH=${"${pkgs.playwright-driver.browsers}/firefox-1471"}
-          export PLAYWRIGHT_WEBKIT_EXECUTABLE_PATH=${"${pkgs.playwright-driver.browsers}/webkit-2123"}
+              ${pkgs.git}/bin/git ls-files \
+                --others \
+                --exclude-standard \
+                --cached \
+                -- '*.js' '*.ts' '*.css' '*.md' '*.json' \
+                | xargs prettier --write
 
-          echo "Playwright configured with:"
-          echo "  - Browsers directory: $PLAYWRIGHT_BROWSERS_PATH"
-          echo "  - Node.js path: $PLAYWRIGHT_NODEJS_PATH"
-          echo "  - Chromium path: $PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH"
-          echo "  - Firefox path: $PLAYWRIGHT_FIREFOX_EXECUTABLE_PATH"
-          echo "  - WebKit path: $PLAYWRIGHT_WEBKIT_EXECUTABLE_PATH"
+              ${pkgs.golines}/bin/golines \
+                -l \
+                -w \
+                --max-len=80 \
+                --shorten-comments \
+                --ignored-dirs=.direnv .
 
-          # Print available commands
-          echo "Available commands:"
-          ${pkgs.lib.concatStringsSep "\n" (
-            pkgs.lib.mapAttrsToList (
-              name: script: ''echo "  ${name} - ${script.description}"''
-            )
-            scripts
-          )}
-        '';
-        packages = with pkgs;
-          [
-            # Nix
-            alejandra
-            nixd
-            statix
-            deadnix
-            inputs.bun2nix.defaultPackage.${pkgs.system}.bin
+              cd -
+            '';
+            description = "Format code files";
+          };
+          run = {
+            exec = ''cd $REPO_ROOT && air'';
+            description = "Run the application with air for hot reloading";
+          };
+        };
 
-            # Go Tools
-            go_1_24
-            air
-            templ
-            pprof
-            revive
-            golangci-lint
-            (buildWithSpecificGo gopls)
-            (buildWithSpecificGo templ)
-            (buildWithSpecificGo golines)
-            (buildWithSpecificGo golangci-lint-langserver)
-            (buildWithSpecificGo gomarkdoc)
-            (buildWithSpecificGo gotests)
-            (buildWithSpecificGo gotools)
-            (buildWithSpecificGo reftools)
-            graphviz
+        # Convert scripts to packages
+        scriptPackages =
+          pkgs.lib.mapAttrsToList
+          (name: script: pkgs.writeShellScriptBin name script.exec)
+          scripts;
+      in
+        pkgs.mkShell {
+          shellHook = ''
+            export REPO_ROOT=$(git rev-parse --show-toplevel)
+            export CGO_CFLAGS="-O2"
 
-            # Web
-            tailwindcss
-            tailwindcss-language-server
-            bun
-            nodePackages.typescript-language-server
-            nodePackages.prettier
+            export PLAYWRIGHT_BROWSERS_PATH=${pkgs.playwright-driver.browsers}
+            export PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
+            export PLAYWRIGHT_NODEJS_PATH=${pkgs.nodejs_20}/bin/node
 
-            # Infra
-            flyctl
-            wireguard-tools
-            openssl.dev
-            skopeo
-            inputs.twerge.packages."${pkgs.system}".hasher
+            # Browser executable paths
+            export PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=${"${pkgs.playwright-driver.browsers}/chromium-1155"}
+            export PLAYWRIGHT_FIREFOX_EXECUTABLE_PATH=${"${pkgs.playwright-driver.browsers}/firefox-1471"}
+            export PLAYWRIGHT_WEBKIT_EXECUTABLE_PATH=${"${pkgs.playwright-driver.browsers}/webkit-2123"}
 
-            # Playwright
+            echo "Playwright configured with:"
+            echo "  - Browsers directory: $PLAYWRIGHT_BROWSERS_PATH"
+            echo "  - Node.js path: $PLAYWRIGHT_NODEJS_PATH"
+            echo "  - Chromium path: $PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH"
+            echo "  - Firefox path: $PLAYWRIGHT_FIREFOX_EXECUTABLE_PATH"
+            echo "  - WebKit path: $PLAYWRIGHT_WEBKIT_EXECUTABLE_PATH"
 
-            playwright-driver # Provides browser archives and driver scripts
-            (
-              if pkgs.stdenv.isDarwin
-              then pkgs.darwin.apple_sdk.frameworks.WebKit
-              else pkgs.webkitgtk
-            ) # WebKit browser
-            nodejs_20 # Required for Playwright driver
-            pkg-config # Needed for some browser dependencies
-            at-spi2-core # Accessibility support
-            cairo # 2D graphics library
-            cups # Printing system
-            dbus # Message bus system
-            expat # XML parser
-            ffmpeg # Media processing
-            fontconfig # Font configuration and customization
-            freetype # Font rendering engine
-            gdk-pixbuf # Image loading library
-            glib # Low-level core library
-            gtk3 # GUI toolkit
-          ]
-          ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [
-            # macOS-specific dependencies
-            libiconv
-          ]
-          ++ pkgs.lib.optionals pkgs.stdenv.isLinux [
-            # Linux-specific dependencies
-            chromium # Chromium browser
-            xorg.libXcomposite # X11 Composite extension - needed by browsers
-            xorg.libXdamage # X11 Damage extension - needed by browsers
-            xorg.libXfixes # X11 Fixes extension - needed by browsers
-            xorg.libXrandr # X11 RandR extension - needed by browsers
-            xorg.libX11 # X11 client-side library
-            xorg.libxcb # X11 C Bindings library
-            mesa # OpenGL implementation
-            alsa-lib # Audio library
-            nss # Network Security Services
-            nspr # NetScape Portable Runtime
-            pango # Text layout and rendering
-          ]
-          # Add the generated script packages
-          ++ scriptPackages;
-      };
+            # Print available commands
+            echo "Available commands:"
+            ${pkgs.lib.concatStringsSep "\n" (
+              pkgs.lib.mapAttrsToList (
+                name: script: ''echo "  ${name} - ${script.description}"''
+              )
+              scripts
+            )}
+          '';
+          packages = with pkgs;
+            [
+              # Nix
+              alejandra
+              nixd
+              statix
+              deadnix
+              inputs.bun2nix.defaultPackage.${pkgs.system}.bin
+              nix-fast-build
+
+              # Go Tools
+              go_1_24
+              air
+              templ
+              pprof
+              revive
+              golangci-lint
+              (buildWithSpecificGo gopls)
+              (buildWithSpecificGo templ)
+              (buildWithSpecificGo golines)
+              (buildWithSpecificGo golangci-lint-langserver)
+              (buildWithSpecificGo gomarkdoc)
+              (buildWithSpecificGo gotests)
+              (buildWithSpecificGo gotools)
+              (buildWithSpecificGo reftools)
+              graphviz
+
+              # Web
+              tailwindcss
+              tailwindcss-language-server
+              bun
+              nodePackages.typescript-language-server
+              nodePackages.prettier
+
+              # Infra
+              flyctl
+              wireguard-tools
+              openssl.dev
+              skopeo
+
+              # Playwright
+
+              playwright-driver # Provides browser archives and driver scripts
+              (
+                if pkgs.stdenv.isDarwin
+                then pkgs.darwin.apple_sdk.frameworks.WebKit
+                else pkgs.webkitgtk
+              ) # WebKit browser
+              nodejs_20 # Required for Playwright driver
+              pkg-config # Needed for some browser dependencies
+              at-spi2-core # Accessibility support
+              cairo # 2D graphics library
+              cups # Printing system
+              dbus # Message bus system
+              expat # XML parser
+              ffmpeg # Media processing
+              fontconfig # Font configuration and customization
+              freetype # Font rendering engine
+              gdk-pixbuf # Image loading library
+              glib # Low-level core library
+              gtk3 # GUI toolkit
+            ]
+            ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [
+              # macOS-specific dependencies
+              libiconv
+            ]
+            ++ pkgs.lib.optionals pkgs.stdenv.isLinux [
+              # Linux-specific dependencies
+              chromium # Chromium browser
+              xorg.libXcomposite # X11 Composite extension - needed by browsers
+              xorg.libXdamage # X11 Damage extension - needed by browsers
+              xorg.libXfixes # X11 Fixes extension - needed by browsers
+              xorg.libXrandr # X11 RandR extension - needed by browsers
+              xorg.libX11 # X11 client-side library
+              xorg.libxcb # X11 C Bindings library
+              mesa # OpenGL implementation
+              alsa-lib # Audio library
+              nss # Network Security Services
+              nspr # NetScape Portable Runtime
+              pango # Text layout and rendering
+            ]
+            # Add the generated script packages
+            ++ scriptPackages;
+        };
 
       packages = let
         src = ./.;
