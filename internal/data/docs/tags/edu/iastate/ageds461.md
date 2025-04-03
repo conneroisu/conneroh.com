@@ -6,7 +6,9 @@ tags: []
 created_at: 2025-03-27T14:13:11.000-06:00
 description: This is a class taken at Iowa State University.
 title: AGEDS461
-updated_at: 2025-04-03T10:43:16.000-06:00
+updated_at: 2025-04-03T17:57:40.000-06:00
 ---
 
 # AGEDS 461
+
+Technology Transfer and the Role of Agricultural and Extension Education

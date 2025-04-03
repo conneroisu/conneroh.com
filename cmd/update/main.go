@@ -128,7 +128,7 @@ func actualize[T gen.Post | gen.Tag | gen.Project](
 	)
 
 	// Get files to process
-	assets, ignored, err := parse(cache, loc)
+	contents, ignored, err := parse(cache, loc)
 	noError(err)
 	slog.Info("actualizing", slog.String("loc", loc))
 	defer slog.Info("actualization complete", slog.String("loc", loc), slog.Int("count", len(parsed)), slog.Int("ignored", len(ignored)))
@@ -146,9 +146,10 @@ func actualize[T gen.Post | gen.Tag | gen.Project](
 	}()
 
 	// Process each asset concurrently
-	for _, asset := range assets {
-		assetCopy := asset // Create a copy for the goroutine
+	for _, content := range contents {
+		assetCopy := content // Create a copy for the goroutine
 		eg.Go(func() (workErr error) {
+			slog.Info("processing", "path", assetCopy.Path)
 			realized, workErr := realizeMD[T](ctx, mdParser, assetCopy)
 			if workErr == nil && realized != nil {
 				resultCh <- &result{item: realized, err: nil}
