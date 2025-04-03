@@ -337,7 +337,7 @@
           subPackages = ["."];
         };
         C-conneroh = pkgs.dockerTools.buildLayeredImage {
-          inherit name config tag created version;
+          inherit name config tag created;
           contents = [
             conneroh
             pkgs.cacert
