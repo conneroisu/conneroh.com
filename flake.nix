@@ -133,14 +133,6 @@
           exec = ''
             ${pkgs.templ}/bin/templ generate
 
-            ${pkgs.bun}/bin/bun build \
-                ./index.ts \
-                --minify \
-                --minify-syntax \
-                --minify-whitespace  \
-                --minify-identifiers \
-                --outdir ./cmd/conneroh/_static/dist/ &
-
             ${pkgs.tailwindcss}/bin/tailwindcss \
                 --minify \
                 -i ./input.css \
@@ -313,12 +305,8 @@
         created = "now";
         tag = "latest";
         version = self.shortRev or "dirty";
-        nativeBuildInputs = [pkgs.bun];
-        preBuild = ''
-          mkdir -p node_modules
-          ln -sf ${bunDeps.nodeModules}/node_modules/* node_modules/ || true
-          ${scripts.nix-generate-all.exec}
-        '';
+        nativeBuildInputs = [];
+        preBuild = ''${scripts.nix-generate-all.exec}'';
 
         config = {
           WorkingDir = "/root";
