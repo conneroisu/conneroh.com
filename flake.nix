@@ -16,7 +16,7 @@
     };
 
     twerge = {
-      url = "github:conneroisu/twerge?tag=v0.2.6";
+      url = "github:conneroisu/twerge?tag=v0.2.7";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "flake-utils";
     };
