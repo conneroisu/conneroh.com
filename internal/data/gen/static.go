@@ -83,8 +83,8 @@ type (
 // New creates a new instance of the given type.
 func New[
 	T Post | Project | Tag,
-](emb Embedded) *T {
+](emb *Embedded) *T {
 	return &T{
-		Embedded: emb,
+		Embedded: *emb,
 	}
 }

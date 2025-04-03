@@ -129,9 +129,7 @@ func actualize[T gen.Post | gen.Tag | gen.Project](
 
 	// Get files to process
 	assets, ignored, err := parse(cache, loc)
-	if err != nil {
-		return nil, err
-	}
+	noError(err)
 	slog.Info("actualizing", slog.String("loc", loc))
 	defer slog.Info("actualization complete", slog.String("loc", loc), slog.Int("count", len(parsed)), slog.Int("ignored", len(ignored)))
 
@@ -160,7 +158,7 @@ func actualize[T gen.Post | gen.Tag | gen.Project](
 	}
 
 	// Wait for all processing to complete
-	err = eg.Wait()
+	noError(eg.Wait())
 	close(resultCh) // Close channel after all goroutines are done
 
 	// Wait for collection goroutine to finish
@@ -263,7 +261,7 @@ func realizeMD[T gen.Post | gen.Project | gen.Tag](
 		projectionMatrixCreate(gen.EmbedLength, 3),
 	)
 	copy(fm.Vec[:], resp.Embedding[:gen.EmbedLength])
-	return gen.New[T](fm), nil
+	return gen.New[T](&fm), nil
 }
 
 func actualizeAssets(
