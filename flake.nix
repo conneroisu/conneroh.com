@@ -311,7 +311,7 @@
 
       packages = let
         name = "conneroh.com";
-        vendorHash = "sha256-lRoAYcgJujmbKW31Dp164wGRt+98uLWROLqSPqG+4j4=";
+        vendorHash = "sha256-ydsyTe8xeXFWN26i7YJGB/oGmF932+gvGQPr+9re/LU=";
       in rec {
         conneroh = buildGoModule {
           pname = name;
@@ -341,7 +341,7 @@
         };
         hasher = buildGoModule {
           pname = name;
-          vendorHash = "sha256-ydsyTe8xeXFWN26i7YJGB/oGmF932+gvGQPr+9re/LU=";
+          inherit vendorHash;
           name = "hasher";
           version = "0.0.1";
           src = ./.;
@@ -378,7 +378,7 @@
         };
         C-conneroh-dev = pkgs.dockerTools.buildLayeredImage {
           name = "conneroh-com-dev";
-          tag = "dev";
+          tag = "latest";
           created = "now";
           contents = [
             conneroh-dev
@@ -426,9 +426,9 @@
         deployPackageDev = pkgs.writeShellScriptBin "deploy-package-dev" ''
           set -e
 
-          if [ -z "$FLY_AUTH_TOKEN" ]; then
+          if [ -z "$FLY_DEV_AUTH_TOKEN" ]; then
             echo "FLY_AUTH_TOKEN is not set. Getting it from doppler..."
-            FLY_AUTH_TOKEN=$(doppler secrets get --plain FLY_AUTH_TOKEN)
+            FLY_DEV_AUTH_TOKEN=$(doppler secrets get --plain FLY_DEV_AUTH_TOKEN)
           fi
 
           echo "Copying dev image to Fly.io registry..."
@@ -436,15 +436,11 @@
             --insecure-policy \
             docker-archive:"${C-conneroh-dev}" \
             docker://registry.fly.io/conneroh-com-dev:latest \
-            --dest-creds x:"$FLY_AUTH_TOKEN" \
+            --dest-creds x:"$FLY_DEV_AUTH_TOKEN" \
             --format v2s2
 
           echo "Deploying to Fly.io..."
-          ${pkgs.flyctl}/bin/fly deploy \
-            --remote-only \
-            -c ${./fly.dev.toml} \
-            -i registry.fly.io/conneroh-com-dev \
-            -t "$FLY_AUTH_TOKEN"
+          fly deploy --remote-only -c ${./fly.dev.toml} -i registry.fly.io/conneroh-com-dev:latest -t "$FLY_DEV_AUTH_TOKEN"
         '';
       };
     });

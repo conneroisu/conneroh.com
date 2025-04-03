@@ -91,4 +91,4 @@ jobs:
           echo "Deploying to Development environment on Fly.io..."
           nix run --accept-flake-config .#deployPackageDev
         env:
-          FLY_AUTH_TOKEN: ${{ secrets.FLY_AUTH_TOKEN }}
+          FLY_DEV_AUTH_TOKEN: ${{ secrets.FLY_DEV_AUTH_TOKEN }}
