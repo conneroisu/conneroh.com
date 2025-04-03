@@ -60,9 +60,8 @@ var (
 		Region:       "auto",
 		BaseEndpoint: aws.String("https://fly.storage.tigris.dev"),
 		Credentials: &CredHandler{
-			Name: "conneroh",
-			ID:   os.Getenv("AWS_ACCESS_KEY_ID"),
-			Key:  os.Getenv("AWS_SECRET_ACCESS_KEY"),
+			ID:  os.Getenv("AWS_ACCESS_KEY_ID"),
+			Key: os.Getenv("AWS_SECRET_ACCESS_KEY"),
 		},
 	})
 	llama = &api.Client{}
@@ -472,9 +471,8 @@ func (a *Asset) URL() string {
 // CredHandler is the bucket for the api security.
 // It implements the aws.Authenitcator
 type CredHandler struct {
-	Name string
-	ID   string
-	Key  string
+	ID  string
+	Key string
 }
 
 // Retrieve returns the credentials for the bucket.
@@ -486,9 +484,7 @@ func (b *CredHandler) Retrieve(
 
 // CustomResolver is a wikilink.Resolver that resolves pages and media referenced by
 // wikilinks to their destinations.
-type CustomResolver struct {
-	Assets []Asset
-}
+type CustomResolver struct{ Assets []Asset }
 
 // NewCustomResolver creates a new wikilink resolver.
 func NewCustomResolver(assets []Asset) *CustomResolver {
