@@ -92,7 +92,7 @@
             ${pkgs.statix}/bin/statix check $REPO_ROOT/flake.nix
             ${pkgs.deadnix}/bin/deadnix $REPO_ROOT/flake.nix
           '';
-          description = "Run golangci-lint";
+          description = "Run Linting Steps.";
         };
         build = {
           exec = ''
@@ -127,7 +127,7 @@
             fi
             cd -
           '';
-          description = "Generate templ files and wait for completion";
+          description = "Code Generation Steps for specific directory changes.";
         };
         nix-generate-all = {
           exec = ''
@@ -349,7 +349,7 @@
 
           if [ -z "$FLY_AUTH_TOKEN" ]; then
             echo "FLY_AUTH_TOKEN is not set. Getting it from doppler..."
-            FLY_AUTH_TOKEN=$(doppler secrets get --plain FLY_AUTH_TOKEN)
+            FLY_AUTH_TOKEN=$(${pkgs.doppler}/bin/doppler secrets get --plain FLY_AUTH_TOKEN)
           fi
 
           echo "Copying image to Fly.io registry..."
@@ -373,7 +373,7 @@
 
           if [ -z "$FLY_DEV_AUTH_TOKEN" ]; then
             echo "FLY_AUTH_TOKEN is not set. Getting it from doppler..."
-            FLY_DEV_AUTH_TOKEN=$(doppler secrets get --plain FLY_DEV_AUTH_TOKEN)
+            FLY_DEV_AUTH_TOKEN=$(${pkgs.doppler}/bin/doppler secrets get --plain FLY_DEV_AUTH_TOKEN)
           fi
 
           echo "Copying dev image to Fly.io registry..."
