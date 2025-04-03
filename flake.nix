@@ -67,8 +67,6 @@
       buildGoModule = pkgs.buildGoModule.override {go = pkgs.go_1_24;};
       buildWithSpecificGo = pkg: pkg.override {inherit buildGoModule;};
 
-      bunDeps = pkgs.callPackage ./bun.nix {};
-
       scripts = {
         dx = {
           exec = ''$EDITOR $REPO_ROOT/flake.nix'';
@@ -129,19 +127,15 @@
           '';
           description = "Code Generation Steps for specific directory changes.";
         };
-        nix-generate-all = {
+        generate-all = {
           exec = ''
             ${pkgs.templ}/bin/templ generate
-
+            ${pkgs.go}/bin/go run $REPO_ROOT/cmd/update-css --cwd $REPO_ROOT
             ${pkgs.tailwindcss}/bin/tailwindcss \
                 --minify \
                 -i ./input.css \
                 -o ./cmd/conneroh/_static/dist/style.css \
-                --cwd . &
-
-            ${pkgs.go}/bin/go run $REPO_ROOT/cmd/update-css --cwd $REPO_ROOT &
-
-            wait
+                --cwd .
           '';
           description = "Generate all files in parallel";
         };
@@ -306,8 +300,14 @@
         tag = "latest";
         version = self.shortRev or "dirty";
         nativeBuildInputs = [];
-        preBuild = ''${scripts.nix-generate-all.exec}'';
-
+        preBuild = ''
+          ${pkgs.templ}/bin/templ generate
+          ${pkgs.tailwindcss}/bin/tailwindcss \
+              --minify \
+              -i ./input.css \
+              -o ./cmd/conneroh/_static/dist/style.css \
+              --cwd .
+        '';
         config = {
           WorkingDir = "/root";
           Cmd = ["/bin/conneroh.com"];
