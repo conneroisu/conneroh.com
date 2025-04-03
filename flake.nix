@@ -21,10 +21,6 @@
       inputs.flake-utils.follows = "flake-utils";
     };
 
-    mk-shell-bin.url = "github:rrbutani/nix-mk-shell-bin";
-
-    bun2nix.url = "github:baileyluTCD/bun2nix";
-
     systems.url = "github:nix-systems/default";
   };
 
@@ -213,8 +209,7 @@
               nixd
               statix
               deadnix
-              inputs.bun2nix.defaultPackage.${pkgs.system}.bin
-              nix-fast-build
+              # inputs.bun2nix.defaultPackage.${pkgs.system}.bin
 
               # Go Tools
               go_1_24
