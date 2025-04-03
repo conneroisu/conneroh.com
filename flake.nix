@@ -16,7 +16,7 @@
     };
 
     twerge = {
-      url = "github:conneroisu/twerge?tag=v0.2.7";
+      url = "github:conneroisu/twerge?tag=v0.2.9";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "flake-utils";
     };
@@ -79,12 +79,6 @@
             '';
             description = "Run Linting Steps.";
           };
-          build = {
-            exec = ''
-              nix build --accept-flake-config .#packages.x86_64-linux.conneroh
-            '';
-            description = "Build the package";
-          };
           update = {
             exec = ''
               ${pkgs.doppler}/bin/doppler run -- ${pkgs.go}/bin/go run $REPO_ROOT/cmd/update --cwd $REPO_ROOT
@@ -116,13 +110,14 @@
           };
           generate-all = {
             exec = ''
+              export REPO_ROOT=$(git rev-parse --show-toplevel)
               ${pkgs.templ}/bin/templ generate
               ${pkgs.go}/bin/go run $REPO_ROOT/cmd/update-css --cwd $REPO_ROOT
               ${pkgs.tailwindcss}/bin/tailwindcss \
                   --minify \
                   -i ./input.css \
                   -o ./cmd/conneroh/_static/dist/style.css \
-                  --cwd .
+                  --cwd $REPO_ROOT
             '';
             description = "Generate all files in parallel";
           };
@@ -151,7 +146,7 @@
             description = "Format code files";
           };
           run = {
-            exec = ''cd $REPO_ROOT && air'';
+            exec = "cd $REPO_ROOT && air";
             description = "Run the application with air for hot reloading";
           };
         };
