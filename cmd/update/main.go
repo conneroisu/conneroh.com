@@ -111,54 +111,32 @@ func Run(
 		}
 	}()
 
-	slog.Info("parsing assets", "loc", assetsLoc)
 	assets, ignored, err := parse(cache, assetsLoc)
 	if err != nil {
 		return err
 	}
-	slog.Info("assets parsed", "len", len(assets), "ignored", len(ignored))
 
-	slog.Info("actualizing assets", "dest", assetsLoc)
 	actualized, err := actualizeAssets(ctx, client, ignored, assets)
 	if err != nil {
 		return err
 	}
-	slog.Info("assets are up to date", "len", len(actualized), "ignored", len(ignored))
 
 	mdParser := NewMDParser(actualized)
 
-	slog.Info("actualizing posts", "dest", postsLoc)
-	parsedPosts, err = actualize[gen.Post](
-		ctx,
-		&eg,
-		cache,
-		mdParser,
-		postsLoc,
-	)
+	parsedPosts, err = actualize[gen.Post](ctx, &eg, cache, mdParser, postsLoc)
 	if err != nil {
 		return err
 	}
-	slog.Info("actualized posts", "len", len(parsedPosts), "ignored", len(ignored))
 
-	slog.Info("actualizing projects", "dest", projectsLoc)
-	parsedProjects, err = actualize[gen.Project](
-		ctx,
-		&eg,
-		cache,
-		mdParser,
-		projectsLoc,
-	)
+	parsedProjects, err = actualize[gen.Project](ctx, &eg, cache, mdParser, projectsLoc)
 	if err != nil {
 		return err
 	}
-	slog.Info("actualized projects", "len", len(parsedProjects))
 
-	slog.Info("actualizing tags", "dest", tagsLoc)
 	parsedTags, err = actualize[gen.Tag](ctx, &eg, cache, mdParser, tagsLoc)
 	if err != nil {
 		return err
 	}
-	slog.Info("actualized tags", "len", len(parsedTags), "ignored", len(ignored))
 
 	postGen, err := genstruct.NewGenerator(genstruct.Config{
 		PackageName: "gen",
@@ -187,12 +165,18 @@ func actualize[T gen.Post | gen.Tag | gen.Project](
 		parsed   []*T
 		parseWg  sync.WaitGroup
 	)
+
+	// Get files to process
 	assets, ignored, err := parse(cache, loc)
 	if err != nil {
 		return nil, err
 	}
+	slog.Info("actualizing", slog.String("loc", loc))
+	defer slog.Info("actualization complete", slog.String("loc", loc), slog.Int("count", len(parsed)), slog.Int("ignored", len(ignored)))
+
+	// Start a goroutine to collect results
 	parseWg.Add(1)
-	go func() { // collect results
+	go func() {
 		defer parseWg.Done()
 		var res *result
 		for res = range resultCh {
@@ -201,6 +185,7 @@ func actualize[T gen.Post | gen.Tag | gen.Project](
 			}
 		}
 	}()
+
 	// Process each asset concurrently
 	for _, asset := range assets {
 		assetCopy := asset // Create a copy for the goroutine
@@ -212,6 +197,7 @@ func actualize[T gen.Post | gen.Tag | gen.Project](
 			return err
 		})
 	}
+
 	// Wait for all processing to complete
 	err = eg.Wait()
 	close(resultCh) // Close channel after all goroutines are done
@@ -315,11 +301,10 @@ func realizeMD[T gen.Post | gen.Project | gen.Tag](
 		resp.Embedding,
 		projectionMatrixCreate(gen.EmbedLength, 3),
 	)
-	// var fixedArray [768]float64
 	copy(fm.Vec[:], resp.Embedding[:gen.EmbedLength])
-	// fm.Vec = fixedArray
 	return gen.New[T](fm), nil
 }
+
 func actualizeAssets(
 	ctx context.Context,
 	client *s3.Client,
@@ -329,7 +314,6 @@ func actualizeAssets(
 	eg := errgroup.Group{}
 	eg.SetLimit(*workers)
 	var asset Asset
-	copy(fullAssets, assets)
 	for _, asset = range assets {
 		eg.Go(func() (err error) {
 			contentType := mime.TypeByExtension(filepath.Ext(asset.Path))
@@ -463,7 +447,9 @@ func NewMDParser(
 	assets []Asset,
 ) goldmark.Markdown {
 	exts = append(exts, goldmark.WithExtensions(
-		&wikilink.Extender{Resolver: NewCustomResolver(assets)},
+		&wikilink.Extender{
+			Resolver: NewCustomResolver(assets),
+		},
 	))
 	return goldmark.New(exts...)
 }
@@ -498,7 +484,7 @@ func (b *CredHandler) Retrieve(
 	return aws.Credentials{AccessKeyID: b.ID, SecretAccessKey: b.Key}, nil
 }
 
-// CustomResolver is a wikilink.Resolver that resolves pages referenced by
+// CustomResolver is a wikilink.Resolver that resolves pages and media referenced by
 // wikilinks to their destinations.
 type CustomResolver struct {
 	Assets []Asset
@@ -516,10 +502,7 @@ func (c *CustomResolver) ResolveWikilink(n *wikilink.Node) (destination []byte, 
 	targetStr := string(n.Target)
 	for _, asset := range c.Assets {
 		if targetStr == asset.Path ||
-			strings.HasSuffix(
-				targetStr,
-				asset.Path[strings.LastIndex(asset.Path, "/")+1:],
-			) {
+			strings.HasSuffix(targetStr, asset.Path[strings.LastIndex(asset.Path, "/")+1:]) {
 			return []byte(asset.URL()), nil
 		}
 	}
@@ -538,21 +521,22 @@ func parse(
 			if d.IsDir() {
 				return nil
 			}
-			asset, err := os.ReadFile(fPath)
+			body, err := os.ReadFile(fPath)
 			if err != nil {
 				return err
 			}
-			hash := hashFileContent(asset)
+			hash := hashFileContent(body)
 			path := pathify(fPath)
 			slug := slugify(fPath)
-			cache.Hashes[fPath] = hash
 			if cache.Hashes[fPath] == hash {
+				cache.Hashes[fPath] = hash
 				ignoredSlugs = append(ignoredSlugs, slug)
 				return nil
 			}
+			cache.Hashes[fPath] = hash
 			parsedAssets = append(parsedAssets, Asset{
 				Path: path,
-				Data: asset,
+				Data: body,
 				Slug: slug,
 			})
 			return nil

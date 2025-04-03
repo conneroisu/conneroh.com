@@ -161,12 +161,12 @@ templ listProjectItem(project *gen.Project) {
 				@icon("arrow-right", templ.Attributes{})
 			</a>
 			<span
-				class={ twerge.It("absolute bottom-0 left-0 bg-red-500 text-white text-xs px-2 py-1 rounded-tr-md text-gray-400") }
+				class={ twerge.It("absolute bottom-0 left-0 bg-red-500 text-white text-xs px-2 py-1 rounded-tr-md text-gray-200") }
 			>
 				{ strconv.Itoa(len(project.Posts)) } posts
 			</span>
 			<span
-				class={ twerge.It("absolute bottom-0 right-0 bg-blue-500 text-white text-xs px-2 py-1 rounded-tl-md text-gray-400") }
+				class={ twerge.It("absolute bottom-0 right-0 bg-blue-500 text-white text-xs px-2 py-1 rounded-tl-md text-gray-200") }
 			>
 				{ strconv.Itoa(len(project.Tags)) } tags
 			</span>
@@ -208,20 +208,16 @@ templ listTagItem(
 			>
 				{ tag.Description }
 			</div>
-			<div
-				class={ twerge.It("flex items-center justify-between text-sm") }
+			<span
+				class={ twerge.It("absolute bottom-0 left-0 bg-red-500 text-white text-xs px-2 py-1 rounded-tr-md text-gray-200") }
 			>
-				<span
-					class={ twerge.It("text-gray-400") }
-				>
-					{ strconv.Itoa(len(tag.PostSlugs)) } posts
-				</span>
-				<span
-					class={ twerge.It("text-gray-400") }
-				>
-					{ strconv.Itoa(len(tag.ProjectSlugs)) } projects
-				</span>
-			</div>
+				{ strconv.Itoa(len(tag.Posts)) } posts
+			</span>
+			<span
+				class={ twerge.It("absolute bottom-0 right-0 bg-blue-500 text-white text-xs px-2 py-1 rounded-tl-md text-gray-200") }
+			>
+				{ strconv.Itoa(len(tag.Projects)) } projects
+			</span>
 		</div>
 	</a>
 }
@@ -248,11 +244,6 @@ templ listPostItem(
 				post.Title,
 				twerge.It("w-full h-48 object-cover object-center"),
 			)
-			<div
-				class={ twerge.It("absolute bottom-0 right-0 bg-blue-500 text-white text-xs px-2 py-1 rounded-tl-md") }
-			>
-				{ post.CreatedAt.Format("Jan 02, 2006") }
-			</div>
 			<div
 				class={ twerge.It("p-6") }
 			>
@@ -284,16 +275,22 @@ templ listPostItem(
 						}
 					}
 				</div>
-				<div
-					class={ twerge.It("flex justify-between items-center") }
-				>
-					<a
-						class={ twerge.It("text-blue-400 hover:underline text-sm font-medium flex items-center") }
-					>
-						Read More
-						@icon("arrow-right", templ.Attributes{})
-					</a>
-				</div>
+			</div>
+			<a
+				class={ twerge.It("text-blue-400 hover:underline text-sm font-medium flex items-center absolute bottom-5 left-0 right-0 justify-center") }
+			>
+				Read More
+				@icon("arrow-right", templ.Attributes{})
+			</a>
+			<span
+				class={ twerge.It("absolute bottom-0 left-0 bg-red-500 text-white text-xs px-2 py-1 rounded-tr-md text-gray-200") }
+			>
+				{ strconv.Itoa(len(post.Tags)) } tags | { strconv.Itoa(len(post.Projects)) } projects
+			</span>
+			<div
+				class={ twerge.It("absolute bottom-0 right-0 bg-blue-500 text-white text-xs px-2 py-1 rounded-tl-md") }
+			>
+				{ post.CreatedAt.Format("Jan 02, 2006") }
 			</div>
 		</a>
 	</div>

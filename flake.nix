@@ -109,6 +109,7 @@
         generate-reload = {
           exec = ''
             export REPO_ROOT=$(git rev-parse --show-toplevel) # needed
+            cd $REPO_ROOT
             if ${pkgs.hasher}/bin/hasher -dir "$REPO_ROOT/cmd/conneroh/views" -v -exclude "*_templ.go"; then
               echo ""
               if ${pkgs.hasher}/bin/hasher -dir "$REPO_ROOT/internal/data/docs" -v -exclude "*_templ.go"; then
@@ -124,6 +125,7 @@
               ${pkgs.templ}/bin/templ generate --log-level error
               ${pkgs.tailwindcss}/bin/tailwindcss -m -i ./input.css -o ./cmd/conneroh/_static/dist/style.css --cwd $REPO_ROOT
             fi
+            cd -
           '';
           description = "Generate templ files and wait for completion";
         };
