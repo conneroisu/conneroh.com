@@ -66,7 +66,7 @@
       };
       buildGoModule = pkgs.buildGoModule.override {go = pkgs.go_1_24;};
       buildWithSpecificGo = pkg: pkg.override {inherit buildGoModule;};
-    in rec {
+    in {
       devShells.default = let
         scripts = {
           dx = {
