@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/a-h/templ"
-	"github.com/conneroisu/conneroh.com/cmd/conneroh/layouts"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/views"
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
 	"github.com/conneroisu/conneroh.com/internal/routing"
@@ -21,11 +20,9 @@ var posts = views.List(
 )
 
 func postsHandler(
-	allPosts *[]*gen.Post,
-	allProjects *[]*gen.Project,
-	allTags *[]*gen.Tag,
+	renderFn func(templ.Component) templ.Component,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		templ.Handler(layouts.Page(posts)).ServeHTTP(w, r)
+		templ.Handler(renderFn(posts)).ServeHTTP(w, r)
 	}
 }

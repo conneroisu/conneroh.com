@@ -62,21 +62,21 @@ type (
 		Content         string
 		BannerPath      string `yaml:"banner_path"`
 		RawContent      string
-		Icon            string    `yaml:"icon"`
-		CreatedAt       time.Time `yaml:"created_at"`
-		UpdatedAt       time.Time `yaml:"updated_at"`
-		X               float64
-		Y               float64
-		Z               float64
-		Vec             [EmbedLength]float64
-		TagSlugs        []string      `yaml:"tags"`
-		PostSlugs       []string      `yaml:"posts"`
-		ProjectSlugs    []string      `yaml:"projects"`
-		EmploymentSlugs []string      `yaml:"employments"`
-		Posts           []*Post       `yaml:"-" structgen:"PostSlugs"`
-		Tags            []*Tag        `yaml:"-" structgen:"TagSlugs"`
-		Projects        []*Project    `yaml:"-" structgen:"ProjectSlugs"`
-		Employments     []*Employment `yaml:"-" structgen:"EmploymentSlugs"`
+		Icon            string               `yaml:"icon"`
+		CreatedAt       time.Time            `yaml:"created_at"`
+		UpdatedAt       time.Time            `yaml:"updated_at"`
+		X               float64              `json:"-" yaml:"-"`
+		Y               float64              `json:"-" yaml:"-"`
+		Z               float64              `json:"-" yaml:"-"`
+		Vec             [EmbedLength]float64 `json:"-" yaml:"-"`
+		TagSlugs        []string             `yaml:"tags"`
+		PostSlugs       []string             `yaml:"posts"`
+		ProjectSlugs    []string             `yaml:"projects"`
+		EmploymentSlugs []string             `yaml:"employments"`
+		Posts           []*Post              `yaml:"-" structgen:"PostSlugs"`
+		Tags            []*Tag               `yaml:"-" structgen:"TagSlugs"`
+		Projects        []*Project           `yaml:"-" structgen:"ProjectSlugs"`
+		Employments     []*Employment        `yaml:"-" structgen:"EmploymentSlugs"`
 	}
 )
 

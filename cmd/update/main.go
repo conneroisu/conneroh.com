@@ -6,6 +6,7 @@ import (
 	"context"
 	"crypto/md5"
 	"encoding/hex"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io/fs"
@@ -27,7 +28,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/conneroisu/conneroh.com/internal/cache"
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
-	"github.com/conneroisu/genstruct"
 	"github.com/yuin/goldmark"
 	highlighting "github.com/yuin/goldmark-highlighting/v2"
 	"github.com/yuin/goldmark/extension"
@@ -40,12 +40,12 @@ import (
 	"go.abhg.dev/goldmark/wikilink"
 	"golang.org/x/sync/errgroup"
 	"gonum.org/v1/gonum/mat"
-	// "github.com/pkg/profile"
 )
 
 const (
 	embeddingModel = "nomic-embed-text"
 	hashFile       = "config.json"
+	vaultLoc       = "internal/data/docs/"
 	assetsLoc      = "internal/data/docs/assets/"
 	postsLoc       = "internal/data/docs/posts/"
 	tagsLoc        = "internal/data/docs/tags/"
@@ -63,7 +63,8 @@ var (
 			Key: os.Getenv("AWS_SECRET_ACCESS_KEY"),
 		},
 	})
-	llama = &api.Client{}
+	mdParser = newMDParser(client)
+	llama    = &api.Client{}
 )
 
 func main() {
@@ -76,6 +77,13 @@ func main() {
 	if *cwd != "" {
 		noError(os.Chdir(*cwd))
 	}
+	if err := run(ctx); err != nil {
+		slog.Error("error", slog.String("err", err.Error()))
+		os.Exit(1)
+	}
+}
+
+func run(ctx context.Context) error {
 	eg := errgroup.Group{}
 	eg.SetLimit(*workers)
 
@@ -89,30 +97,47 @@ func main() {
 	err = actualizeAssets(ctx, client, assets)
 	noError(err)
 
-	mdParser := NewMDParser(client)
+	parsedPosts, err := actualize[gen.Post](ctx, cache, postsLoc)
+	if err != nil {
+		return err
+	}
 
-	parsedPosts, err := actualize[gen.Post](ctx, cache, mdParser, postsLoc)
-	noError(err)
+	parsedProjects, err := actualize[gen.Project](ctx, cache, projectsLoc)
+	if err != nil {
+		return err
+	}
 
-	parsedProjects, err := actualize[gen.Project](ctx, cache, mdParser, projectsLoc)
-	noError(err)
+	parsedTags, err := actualize[gen.Tag](ctx, cache, tagsLoc)
+	if err != nil {
+		return err
+	}
 
-	parsedTags, err := actualize[gen.Tag](ctx, cache, mdParser, tagsLoc)
-	noError(err)
+	// postGen, err := genstruct.NewGenerator(genstruct.Config{
+	// 	PackageName: "gen",
+	// 	OutputFile:  "internal/data/gen/generated_data.go",
+	// }, parsedPosts, parsedTags, parsedProjects)
+	// if err != nil {
+	// 	return err
+	// }
+	//
+	// return postGen.Generate()
+	var result ResultLog
+	result.Posts = parsedPosts
+	result.Tags = parsedTags
+	result.Projects = parsedProjects
+	return json.NewEncoder(os.Stdout).Encode(result)
+}
 
-	postGen, err := genstruct.NewGenerator(genstruct.Config{
-		PackageName: "gen",
-		OutputFile:  "internal/data/gen/generated_data.go",
-	}, parsedPosts, parsedTags, parsedProjects)
-	noError(err)
-
-	noError(postGen.Generate())
+// ResultLog is the result of the update command.
+type ResultLog struct {
+	Posts    []*gen.Post    `json:"posts"`
+	Tags     []*gen.Tag     `json:"tags"`
+	Projects []*gen.Project `json:"projects"`
 }
 
 func actualize[T gen.Post | gen.Tag | gen.Project](
 	ctx context.Context,
 	cache *cache.Cache,
-	mdParser goldmark.Markdown,
 	loc string,
 ) ([]*T, error) {
 	type result struct {
@@ -413,8 +438,8 @@ var exts = []goldmark.Option{
 	),
 }
 
-// NewMDParser creates a new markdown parser.
-func NewMDParser(
+// newMDParser creates a new markdown parser.
+func newMDParser(
 	client *s3.Client,
 ) goldmark.Markdown {
 	exts = append(exts, goldmark.WithExtensions(

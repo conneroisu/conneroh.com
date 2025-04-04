@@ -72,11 +72,11 @@ func AddRoutes(
 
 	h.Handle(
 		"GET /posts",
-		postsHandler(&gen.AllPosts, &gen.AllProjects, &gen.AllTags),
+		postsHandler(layouts.Page),
 	)
 	h.Handle(
 		"GET /morph/posts",
-		postsHandler(&gen.AllPosts, &gen.AllProjects, &gen.AllTags),
+		postsHandler(layouts.Morpher),
 	)
 
 	h.Handle(
