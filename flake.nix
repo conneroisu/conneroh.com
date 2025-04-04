@@ -41,13 +41,13 @@
         inherit system;
         overlays = [
           overlay
-          inputs.twerge.overlays."${system}".default
         ];
       };
       buildGoModule = pkgs.buildGoModule.override {go = pkgs.go_1_24;};
       buildWithSpecificGo = pkg: pkg.override {inherit buildGoModule;};
     in {
       devShells.default = let
+        inherit (inputs.twerge.packages."${system}") hasher;
         scripts = {
           dx = {
             exec = ''$EDITOR $REPO_ROOT/flake.nix'';
@@ -83,9 +83,9 @@
             exec = ''
               export REPO_ROOT=$(git rev-parse --show-toplevel) # needed
               cd $REPO_ROOT
-              if ${pkgs.hasher}/bin/hasher -dir "$REPO_ROOT/cmd/conneroh/views" -v -exclude "*_templ.go"; then
+              if ${hasher}/bin/hasher -dir "$REPO_ROOT/cmd/conneroh/views" -v -exclude "*_templ.go"; then
                 echo ""
-                if ${pkgs.hasher}/bin/hasher -dir "$REPO_ROOT/internal/data/docs" -v -exclude "*_templ.go"; then
+                if ${hasher}/bin/hasher -dir "$REPO_ROOT/internal/data/docs" -v -exclude "*_templ.go"; then
                   echo ""
                 else
                   echo "Changes detected in docs, running update script..."
