@@ -202,8 +202,8 @@
               go_1_24
               air
               templ
-              revive
               golangci-lint
+              (buildWithSpecificGo revive)
               (buildWithSpecificGo gopls)
               (buildWithSpecificGo templ)
               (buildWithSpecificGo golines)

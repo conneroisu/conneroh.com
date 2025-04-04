@@ -11,33 +11,6 @@ import (
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/layouts"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/views"
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
-	"github.com/conneroisu/conneroh.com/internal/routing"
-)
-
-var (
-	home = views.Home(
-		&gen.AllPosts,
-		&gen.AllProjects,
-		&gen.AllTags,
-	)
-	projects = views.List(
-		routing.PluralTargetProject,
-		&gen.AllPosts,
-		&gen.AllProjects,
-		&gen.AllTags,
-		[]string{},
-		[]string{},
-		[]string{},
-	)
-	tags = views.List(
-		routing.PluralTargetTag,
-		&gen.AllPosts,
-		&gen.AllProjects,
-		&gen.AllTags,
-		[]string{},
-		[]string{},
-		[]string{},
-	)
 )
 
 // AddRoutes adds all routes to the router.
@@ -63,10 +36,7 @@ func AddRoutes(
 	h.Handle(
 		"GET /favicon.ico",
 		http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-			_, err := w.Write(static.Favicon)
-			if err != nil {
-				return
-			}
+			_, _ = w.Write(static.Favicon)
 		}),
 	)
 
@@ -81,16 +51,16 @@ func AddRoutes(
 
 	h.Handle(
 		"GET /projects",
-		templ.Handler(layouts.Page(projects)))
+		projectsHandler(layouts.Page))
 	h.Handle(
 		"GET /morph/projects",
-		templ.Handler(layouts.Morpher(projects)))
+		projectsHandler(layouts.Morpher))
 	h.Handle(
 		"GET /tags",
-		templ.Handler(layouts.Page(tags)))
+		tagsHandler(layouts.Page))
 	h.Handle(
 		"GET /morph/tags",
-		templ.Handler(layouts.Morpher(tags)))
+		tagsHandler(layouts.Morpher))
 
 	for _, p := range gen.AllPosts {
 		h.Handle(

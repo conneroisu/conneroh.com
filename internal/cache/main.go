@@ -4,6 +4,8 @@ package cache
 import (
 	"encoding/json"
 	"os"
+
+	"github.com/rotisserie/eris"
 )
 
 // Cache is the storage of previous hashes.
@@ -41,7 +43,11 @@ func LoadCache(hashFilePath string) (*Cache, error) {
 
 	var cache Cache
 	if err := json.Unmarshal(data, &cache); err != nil {
-		return nil, err
+		return nil, eris.Wrapf(
+			err,
+			"failed to unmarshal cache from %s",
+			hashFilePath,
+		)
 	}
 	cache.HashFile = hashFilePath
 

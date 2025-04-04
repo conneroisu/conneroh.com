@@ -12,6 +12,7 @@ require (
 	github.com/ollama/ollama v0.6.3
 	github.com/playwright-community/playwright-go v0.5001.0
 	github.com/quail-ink/goldmark-enclave v0.1.5
+	github.com/rotisserie/eris v0.5.4
 	github.com/yuin/goldmark v1.7.8
 	github.com/yuin/goldmark-highlighting/v2 v2.0.0-20230729083705-37449abec8cc
 	go.abhg.dev/goldmark/anchor v0.1.1

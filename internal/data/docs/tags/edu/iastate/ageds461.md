@@ -7,16 +7,19 @@ tags: []
 created_at: 2025-03-27T14:13:11.000-06:00
 description: This is a class taken at Iowa State University.
 title: AGEDS461
-updated_at: 2025-04-03T19:08:50.000-06:00
+updated_at: 2025-04-04T16:51:39.000-06:00
 ---
 
 # AGEDS 461 - Technology Transfer and the Role of Agricultural and Extension Education
+
+Taking this class as a freshman in 2021 was a great experience. I had the opportunity to work with some other students in the class, and I was able to learn a lot from them; about the course, about myself, and about the university.
 
 ## Official Course Catalog Description
 
 **AGEDS 461** is a 3-credit course offered by the Department of Agricultural Education and Studies at Iowa State University. According to the official course catalog, it **examines the processes by which innovations in agriculture, food, and natural resources are diffused across global societies**, focusing on how an innovation’s characteristics influence the rate of adoption ([Agricultural Education and Studies (AGEDS) | Iowa State University Catalog](https://catalog.iastate.edu/previouscatalogs/2024-2025/azcourses/ageds/#:~:text=Prereq%3A%20Junior%20classification%20Examine%20the,%28Typically%20Offered%3A%20Fall)). Students learn to apply **Diffusion of Innovations Theory** and alternative models to analyze and solve problems facing communities, industries, and organizations in both domestic and international settings ([Agricultural Education and Studies (AGEDS) | Iowa State University Catalog](https://catalog.iastate.edu/previouscatalogs/2024-2025/azcourses/ageds/#:~:text=Prereq%3A%20Junior%20classification%20Examine%20the,%28Typically%20Offered%3A%20Fall)). This course meets the university’s **International Perspectives Requirement** and typically is offered in the Fall semester ([Agricultural Education and Studies (AGEDS) | Iowa State University Catalog](https://catalog.iastate.edu/previouscatalogs/2024-2025/azcourses/ageds/#:~:text=and%20alternative%20models%20will%20be,%28Typically%20Offered%3A%20Fall)).
 
-_Catalog Description:_ _“AGEDS 461: Innovation Diffusion and the Role of Agricultural and Extension Education (Dual-listed with AGEDS 561). Prereq: Junior classification. Examine the processes by which innovations in agriculture, food, and natural resources are diffused across global societies based on their performance characteristics that influence rate of adoption. Diffusion of Innovations Theory and alternative models will be applied to analyze and solve issues facing communities, industries, and organizations in domestic and international settings. Meets International Perspectives Requirement.”_ ([Agricultural Education and Studies (AGEDS) | Iowa State University Catalog](https://catalog.iastate.edu/previouscatalogs/2024-2025/azcourses/ageds/#:~:text=Prereq%3A%20Junior%20classification%20Examine%20the,%28Typically%20Offered%3A%20Fall))
+Catalog Description:
+“AGEDS 461: Innovation Diffusion and the Role of Agricultural and Extension Education (Dual-listed with AGEDS 561). Prereq: Junior classification. Examine the processes by which innovations in agriculture, food, and natural resources are diffused across global societies based on their performance characteristics that influence rate of adoption. Diffusion of Innovations Theory and alternative models will be applied to analyze and solve issues facing communities, industries, and organizations in domestic and international settings. Meets International Perspectives Requirement.”_ ([Agricultural Education and Studies (AGEDS) | Iowa State University Catalog](https://catalog.iastate.edu/previouscatalogs/2024-2025/azcourses/ageds/#:~:text=Prereq%3A%20Junior%20classification%20Examine%20the,%28Typically%20Offered%3A%20Fall))
 
 ## Course Overview and Objectives
 
@@ -50,8 +53,6 @@ The course syllabus is structured to progressively cover both theory and applica
 13. **Week 13 – Student Presentations on Diffusion Case Studies:** Students present on individual or group case studies they have been researching. Each presentation analyzes a specific innovation’s diffusion (could be an international development project or a new ag technology) and relates it to course concepts. Peers and instructor provide feedback.
 14. **Week 14 – Designing an Extension Intervention:** A capstone discussion on putting it all together – students outline an extension education intervention to promote a new innovation, applying best practices learned. This may involve small group workshopping of final project plans, ensuring that theoretical and practical elements are integrated.
 15. **Week 15 – Course Synthesis and Final Exam:** Wrap-up of major themes. Reflection on how diffusion theory informs the role of agricultural educators and extension agents in the real world. Any remaining student project reports are submitted. The **final exam** is administered (covering post-midterm material and cumulative concepts), or final project presentations are completed if a written exam is not given.
-
-_Note:_ The above schedule is based on a recent syllabus and is meant to illustrate the progression of topics from foundational theory to practical application. Specific ordering and content may vary by instructor or semester, but the core themes (diffusion theory, innovation attributes, adopter dynamics, case studies, and program planning in extension) are consistently covered.
 
 ## Assignments and Major Projects
 
