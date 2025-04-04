@@ -20,14 +20,12 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/conneroisu/conneroh.com/internal/assets"
 	"github.com/conneroisu/conneroh.com/internal/cache"
 	"github.com/conneroisu/conneroh.com/internal/credited"
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
-	"github.com/conneroisu/conneroh.com/internal/marked"
 	"github.com/conneroisu/genstruct"
-	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/parser"
-	"go.abhg.dev/goldmark/frontmatter"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -53,7 +51,7 @@ var (
 // Define parse and actualization result types
 type parseResult struct {
 	location string
-	assets   []Asset
+	assets   []assets.Asset
 	ignored  []string
 	err      error
 }
@@ -100,7 +98,7 @@ func run(ctx context.Context, getenv func(string) string) (err error) {
 	if err != nil {
 		return err
 	}
-	mdParser := marked.NewMDParser(awsClient)
+	mdParser := assets.NewMDParser(parser.NewContext(), awsClient)
 
 	// Log cache stats
 	slog.Info("cache loaded", "entries", len(objCache.Hashes))
@@ -140,7 +138,7 @@ func run(ctx context.Context, getenv func(string) string) (err error) {
 		for _, loc := range locations {
 			loc := loc // Capture for closure
 			eg.Go(func() error {
-				assets, ignored, err := parse(objCache, loc)
+				assets, ignored, egErr := parse(objCache, loc)
 
 				// Store result safely
 				mu.Lock()
@@ -148,7 +146,7 @@ func run(ctx context.Context, getenv func(string) string) (err error) {
 					location: loc,
 					assets:   assets,
 					ignored:  ignored,
-					err:      err,
+					err:      egErr,
 				}
 				results[loc] = result
 				mu.Unlock()
@@ -215,7 +213,7 @@ func run(ctx context.Context, getenv func(string) string) (err error) {
 			// Process assets immediately once parsing is complete
 			assetResult, exists := results[assetsLoc]
 			if exists && assetResult.err == nil {
-				err := actualizeAssets(ctx, awsClient, assetResult.assets)
+				err = actualizeAssets(ctx, awsClient, assetResult.assets)
 				if err != nil {
 					return fmt.Errorf("failed to actualize assets: %w", err)
 				}
@@ -294,7 +292,7 @@ func run(ctx context.Context, getenv func(string) string) (err error) {
 func startActualization(
 	ctx context.Context,
 	ollama *credited.OllamaClient,
-	mdParser goldmark.Markdown,
+	mdParser *assets.MDParser,
 	result parseResult,
 	resultCh chan<- actualizeResult,
 ) {
@@ -344,8 +342,8 @@ func startActualization(
 func actualize[T gen.Post | gen.Tag | gen.Project](
 	ctx context.Context,
 	ollama *credited.OllamaClient,
-	mdParser goldmark.Markdown,
-	contents []Asset,
+	mdParser *assets.MDParser,
+	contents []assets.Asset,
 	ignored []string,
 ) ([]*T, error) {
 	amount := len(contents)
@@ -368,8 +366,7 @@ func actualize[T gen.Post | gen.Tag | gen.Project](
 		index, asset := i, content // Capture for closure
 
 		eg.Go(func() error {
-			pCtx := parser.NewContext()
-			realized, err := realizeMD[T](ctx, ollama, pCtx, mdParser, asset)
+			realized, err := realizeMD[T](ctx, ollama, mdParser, asset)
 			if err != nil {
 				return eris.Wrapf(
 					err,
@@ -405,7 +402,7 @@ func actualize[T gen.Post | gen.Tag | gen.Project](
 func parse(
 	cacheObj *cache.Cache,
 	loc string,
-) (parsedAssets []Asset, ignoredSlugs []string, err error) {
+) (parsedAssets []assets.Asset, ignoredSlugs []string, err error) {
 	eg := &errgroup.Group{}
 	eg.SetLimit(*workers)
 
@@ -475,7 +472,7 @@ func parse(
 				} else {
 					// File is new or has changed
 					cacheObj.Hashes[filePath] = hash
-					parsedAssets = append(parsedAssets, Asset{
+					parsedAssets = append(parsedAssets, assets.Asset{
 						Path: path,
 						Data: body,
 						Slug: slug,
@@ -511,7 +508,7 @@ func parse(
 func actualizeAssets(
 	ctx context.Context,
 	client *credited.AWSClient,
-	assets []Asset,
+	assets []assets.Asset,
 ) error {
 	amount := len(assets)
 	if amount == 0 {
@@ -600,46 +597,19 @@ func rememberMD[T gen.Post | gen.Project | gen.Tag](ignored []string) []*T {
 func realizeMD[T gen.Post | gen.Project | gen.Tag](
 	ctx context.Context,
 	ollama *credited.OllamaClient,
-	pCtx parser.Context,
-	mdParser goldmark.Markdown,
-	parsed Asset,
+	mdParser *assets.MDParser,
+	parsed assets.Asset,
 ) (*T, error) {
 	var (
-		emb      gen.Embedded
-		buf      = bytes.NewBufferString("")
-		metadata *frontmatter.Data
-		err      error
+		emb gen.Embedded
+		err error
 	)
 
 	// Convert markdown to HTML
-	err = mdParser.Convert(parsed.Data, buf, parser.WithContext(pCtx))
+	emb, err = mdParser.Convert(parsed)
 	if err != nil {
 		return nil, err
 	}
-
-	// Get frontmatter
-	metadata = frontmatter.Get(pCtx)
-	if metadata == nil {
-		return nil, eris.Errorf(
-			"frontmatter is nil for %s",
-			parsed.Path,
-		)
-	}
-
-	// Decode frontmatter
-	err = metadata.Decode(&emb)
-	if err != nil {
-		return nil, eris.Wrapf(
-			err,
-			"failed to decode frontmatter of %s",
-			parsed.Path,
-		)
-	}
-
-	// Set slug and content
-	emb.Slug = parsed.Slug
-	emb.Content = buf.String()
-	emb.RawContent = string(parsed.Data)
 
 	err = gen.Defaults(&emb)
 	if err != nil {
@@ -653,23 +623,8 @@ func realizeMD[T gen.Post | gen.Project | gen.Tag](
 	if err != nil {
 		return nil, err
 	}
-	// Create and return new instance
+
 	return gen.New[T](&emb), nil
-}
-
-// Asset is a struct for embedding assets.
-type Asset struct {
-	Slug string
-	Path string
-	Data []byte
-}
-
-// URL returns the url of the asset.
-func (a *Asset) URL() string {
-	return fmt.Sprintf(
-		"https://conneroh.fly.storage.tigris.dev/%s",
-		a.Path,
-	)
 }
 
 func slugify(s string) string {
