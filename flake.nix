@@ -9,12 +9,6 @@
       inputs.systems.follows = "systems";
     };
 
-    nix2container = {
-      url = "github:nlewo/nix2container";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-utils.follows = "flake-utils";
-    };
-
     twerge = {
       url = "github:conneroisu/twerge?tag=v0.2.9";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -52,7 +46,6 @@
       };
       buildGoModule = pkgs.buildGoModule.override {go = pkgs.go_1_24;};
       buildWithSpecificGo = pkg: pkg.override {inherit buildGoModule;};
-      nix2containerPkgs = inputs.nix2container.packages.x86_64-linux;
     in {
       devShells.default = let
         scripts = {
@@ -271,7 +264,7 @@
         name = "conneroh.com";
         fly-name = "conneroh-com";
         fly-name-dev = "conneroh-com-dev";
-        vendorHash = "sha256-K52okJQZ/y1VQb8ob4zcbuNC8hjhgUTPDBeVA1FJCKA=";
+        vendorHash = "sha256-PjUcAcxt1GvEJUiGmt1zd1dxtOwY3rdlXpU4HUdacU8=";
         created = "now";
         tag = "latest";
         version = self.shortRev or "dirty";
@@ -300,35 +293,15 @@
           '';
           subPackages = ["."];
         };
-        C-conneroh = pkgs.dockerTools.buildLayeredImage {
+        C-conneroh = pkgs.dockerTools.buildImage {
           inherit name config tag created;
-          contents = [
+          copyToRoot = [
             conneroh
             pkgs.cacert
           ];
-          extraCommands = ''
-            echo "$(git rev-parse HEAD)" > REVISION
-          '';
         };
-        C-conneroh-dev = pkgs.dockerTools.buildLayeredImage {
+        C-conneroh-dev = pkgs.dockerTools.buildImage {
           inherit name config tag created;
-          contents = [
-            conneroh
-            pkgs.cacert
-          ];
-          extraCommands = ''
-            echo "$(git rev-parse HEAD)" > REVISION
-          '';
-        };
-        C-conneroh-2cont = nix2containerPkgs.nix2container.buildImage {
-          name = "conneroh-2cont";
-          config = {
-            Cmd = ["/bin/conneroh.com"];
-            Env = [
-              "SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
-              "NIX_SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
-            ];
-          };
           copyToRoot = [
             conneroh
             pkgs.cacert
