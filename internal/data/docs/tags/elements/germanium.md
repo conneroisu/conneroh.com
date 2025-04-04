@@ -6,7 +6,7 @@ tags: []
 created_at: 2025-03-28T20:06:42.000-06:00
 description: Germanium
 title: Germanium
-updated_at: 2025-03-28T20:18:30.000-06:00
+updated_at: 2025-04-04T05:28:01.000-06:00
 ---
 
 # Germanium
@@ -66,5 +66,3 @@ SpecificHeat: 0.32
 NumberofShells: 4
 
 NumberofValence: 4.0
-
-![[Pasted image 20240131101234.png]]

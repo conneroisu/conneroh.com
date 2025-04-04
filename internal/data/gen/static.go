@@ -84,7 +84,5 @@ type (
 func New[
 	T Post | Project | Tag,
 ](emb *Embedded) *T {
-	return &T{
-		Embedded: *emb,
-	}
+	return &T{Embedded: *emb}
 }

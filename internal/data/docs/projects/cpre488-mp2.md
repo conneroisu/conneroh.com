@@ -15,7 +15,7 @@ tags:
 created_at: 2025-03-27T14:13:10.000-06:00
 description: The third Project from CPRE488 at Iowa State University
 title: CPRE488 MP2
-updated_at: 2025-04-02T15:01:50.000-06:00
+updated_at: 2025-04-04T06:02:03.000-06:00
 ---
 
 # CPRE488 MP2
@@ -706,8 +706,3 @@ for (int x = 0; x < 1000; x++) {
 }
 ```
 
-The resulting effects can be seen below:
-
-![[projects/cpre488-mp2/Sobel_ex.png]]
-
-It should be noted that a better result could have been achieved should only luminance value be used, but I ran out of time before I could implement it.

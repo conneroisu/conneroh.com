@@ -17,7 +17,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"sync"
 
 	mathjax "github.com/litao91/goldmark-mathjax"
 	"github.com/ollama/ollama/api"
@@ -84,21 +83,21 @@ func main() {
 	noError(err)
 	defer noError(cache.Close())
 
-	assets, ignored, err := parse(cache, assetsLoc)
+	assets, _, err := parse(cache, assetsLoc)
 	noError(err)
 
-	_, err = actualizeAssets(ctx, client, ignored, assets)
+	err = actualizeAssets(ctx, client, assets)
 	noError(err)
 
 	mdParser := NewMDParser(client)
 
-	parsedPosts, err := actualize[gen.Post](ctx, &eg, cache, mdParser, postsLoc)
+	parsedPosts, err := actualize[gen.Post](ctx, cache, mdParser, postsLoc)
 	noError(err)
 
-	parsedProjects, err := actualize[gen.Project](ctx, &eg, cache, mdParser, projectsLoc)
+	parsedProjects, err := actualize[gen.Project](ctx, cache, mdParser, projectsLoc)
 	noError(err)
 
-	parsedTags, err := actualize[gen.Tag](ctx, &eg, cache, mdParser, tagsLoc)
+	parsedTags, err := actualize[gen.Tag](ctx, cache, mdParser, tagsLoc)
 	noError(err)
 
 	postGen, err := genstruct.NewGenerator(genstruct.Config{
@@ -112,58 +111,65 @@ func main() {
 
 func actualize[T gen.Post | gen.Tag | gen.Project](
 	ctx context.Context,
-	eg *errgroup.Group,
 	cache *cache.Cache,
 	mdParser goldmark.Markdown,
 	loc string,
 ) ([]*T, error) {
 	type result struct {
-		item *T
-		err  error
+		item  *T
+		index int
+		err   error
 	}
-	var (
-		resultCh = make(chan *result) // safely collect results from goroutines
-		parsed   []*T
-		parseWg  sync.WaitGroup
-	)
+	type input struct {
+		asset Asset
+		index int
+	}
 
 	// Get files to process
 	contents, ignored, err := parse(cache, loc)
-	noError(err)
-	slog.Info("actualizing", slog.String("loc", loc))
-	defer slog.Info("actualization complete", slog.String("loc", loc), slog.Int("count", len(parsed)), slog.Int("ignored", len(ignored)))
+	if err != nil {
+		return nil, err
+	}
+	amount := len(contents)
+	defer slog.Info("actualization complete", slog.String("loc", loc), slog.Int("ignored", len(ignored)))
+	slog.Info("actualizing", slog.String("loc", loc), slog.Int("amount", amount))
+	var (
+		resultCh = make(chan *result, *workers) // safely collect results from goroutines
+		inputCh  = make(chan input, *workers)   // safely collect inputs from goroutines
+		parsed   = make([]*T, amount)
+	)
 
-	// Start a goroutine to collect results
-	parseWg.Add(1)
-	go func() {
-		defer parseWg.Done()
-		var res *result
-		for res = range resultCh {
-			if res.err == nil {
-				parsed = append(parsed, res.item)
+	for wi := range *workers {
+		go func(wi int) {
+			for i := range inputCh {
+				slog.Info("processing", "worker", wi, "path", i.asset.Path)
+				realized, workErr := realizeMD[T](ctx, parser.NewContext(), mdParser, i.asset)
+				resultCh <- &result{item: realized, err: workErr, index: i.index}
 			}
+		}(wi)
+	}
+
+	// Process each asset concurrently
+	go func() {
+		for i, content := range contents {
+			inputCh <- input{asset: content, index: i}
 		}
 	}()
 
-	// Process each asset concurrently
-	for _, content := range contents {
-		assetCopy := content // Create a copy for the goroutine
-		eg.Go(func() (workErr error) {
-			slog.Info("processing", "path", assetCopy.Path)
-			realized, workErr := realizeMD[T](ctx, mdParser, assetCopy)
-			if workErr == nil && realized != nil {
-				resultCh <- &result{item: realized, err: nil}
-			}
-			return err
-		})
+	j := 1
+	for res := range resultCh {
+		if res.err != nil {
+			return nil, res.err
+		}
+		parsed[res.index] = res.item
+		if j == amount {
+			break
+		}
+		j++
 	}
-
 	// Wait for all processing to complete
-	noError(eg.Wait())
 	close(resultCh) // Close channel after all goroutines are done
-
-	// Wait for collection goroutine to finish
-	parseWg.Wait()
+	close(inputCh)  // Close channel after all goroutines are done
 
 	// Include previously parsed items that were ignored this time
 	remembered := rememberMD[T](ignored)
@@ -213,13 +219,13 @@ func rememberMD[T gen.Post | gen.Project | gen.Tag](ignored []string) []*T {
 }
 func realizeMD[T gen.Post | gen.Project | gen.Tag](
 	ctx context.Context,
+	pCtx parser.Context,
 	md goldmark.Markdown,
 	parsed Asset,
 ) (*T, error) {
 	var (
 		fm       gen.Embedded
 		buf      = bytes.NewBufferString("")
-		pCtx     = parser.NewContext()
 		metadata = frontmatter.Get(pCtx)
 		err      error
 	)
@@ -268,35 +274,45 @@ func realizeMD[T gen.Post | gen.Project | gen.Tag](
 func actualizeAssets(
 	ctx context.Context,
 	client *s3.Client,
-	ignore []string,
 	assets []Asset,
-) (fullAssets []Asset, err error) {
-	eg := errgroup.Group{}
-	eg.SetLimit(*workers)
-	var asset Asset
+) (err error) {
+	var (
+		asset   Asset
+		amount  = len(assets)
+		inputCh = make(chan Asset, *workers)
+		errCh   = make(chan error)
+	)
+
+	for wi := range *workers {
+		go func(wi int) {
+			for asset = range inputCh {
+				contentType := mime.TypeByExtension(filepath.Ext(asset.Path))
+				slog.Info("uploading", "worker", wi, "path", asset.Path, "contentType", contentType)
+				_, err = client.PutObject(ctx, &s3.PutObjectInput{
+					Bucket:      aws.String("conneroh"),
+					Key:         aws.String(asset.Path),
+					Body:        bytes.NewReader(asset.Data),
+					ContentType: aws.String(contentType),
+				})
+				errCh <- err
+			}
+		}(wi)
+	}
+
+	j := 0
 	for _, asset = range assets {
-		eg.Go(func() (err error) {
-			contentType := mime.TypeByExtension(filepath.Ext(asset.Path))
-			slog.Info("uploading", "path", asset.Path, "contentType", contentType)
-			_, err = client.PutObject(ctx, &s3.PutObjectInput{
-				Bucket:      aws.String("conneroh"),
-				Key:         aws.String(asset.Path),
-				Body:        bytes.NewReader(asset.Data),
-				ContentType: aws.String(contentType),
-			})
-			return
-		})
+		select {
+		case err = <-errCh:
+			return err
+		case inputCh <- asset:
+			if j == amount-1 {
+				break
+			}
+			j++
+		}
 	}
-	noError(eg.Wait())
-	for _, ignoredPath := range ignore {
-		data, err := os.ReadFile(filepath.Join(assetsLoc, ignoredPath))
-		noError(err)
-		fullAssets = append(assets, Asset{
-			Path: ignoredPath,
-			Data: data,
-		})
-	}
-	return fullAssets, nil
+	close(inputCh)
+	return nil
 }
 
 // Generate a deterministic projection matrix for dimensionality reduction
@@ -386,7 +402,6 @@ var exts = []goldmark.Option{
 		},
 		highlighting.NewHighlighting(highlighting.WithStyle("monokai")),
 	),
-
 	goldmark.WithParserOptions(
 		parser.WithAutoHeadingID(),
 		parser.WithAttribute(),
@@ -469,17 +484,17 @@ func parse(
 	cache *cache.Cache,
 	loc string,
 ) (parsedAssets []Asset, ignoredSlugs []string, err error) {
-	var (
-		hash string
-		path string
-		slug string
-	)
 	err = filepath.WalkDir(
 		loc,
 		func(fPath string, d fs.DirEntry, err error) error {
 			if err != nil {
 				return err
 			}
+			var (
+				hash string
+				path string
+				slug string
+			)
 			if d.IsDir() {
 				return nil
 			}
