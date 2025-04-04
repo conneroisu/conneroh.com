@@ -70,9 +70,12 @@ func main() {
 }
 
 func run(
-	ctx context.Context,
+	outerCtx context.Context,
 	getenv func(string) string,
 ) (err error) {
+	ctx, cancel := context.WithCancel(outerCtx)
+	defer cancel()
+
 	start := time.Now()
 	if *cwd != "" {
 		err = os.Chdir(*cwd)
