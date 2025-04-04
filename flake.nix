@@ -139,6 +139,18 @@
             '';
             description = "Format code files";
           };
+          generate-js = {
+            exec = ''
+              ${pkgs.bun}/bin/bun build \
+                  $REPO_ROOT/index.js \
+                  --minify \
+                  --minify-syntax \
+                  --minify-whitespace  \
+                  --minify-identifiers \
+                  --outdir $REPO_ROOT/cmd/conneroh/_static/dist/ &
+            '';
+            description = "Generate JS files";
+          };
           run = {
             exec = "cd $REPO_ROOT && air";
             description = "Run the application with air for hot reloading";
