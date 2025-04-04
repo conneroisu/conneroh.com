@@ -1,9 +1,7 @@
 ---
-
 id: nitrogen
 
 aliases:
-
   - Nitrogen
 
 tags: []
@@ -15,10 +13,7 @@ description: Nitrogen
 title: Nitrogen
 
 updated_at: 2025-03-28T20:07:40.000-06:00
-
 ---
-
-
 
 # Nitrogen
 
@@ -77,4 +72,3 @@ SpecificHeat: 1.04
 NumberofShells: 2
 
 NumberofValence: 5.0
-

@@ -1,9 +1,7 @@
 ---
-
 id: sulfur
 
 aliases:
-
   - Sulfur
 
 tags: []
@@ -15,10 +13,7 @@ description: Sulfur
 title: Sulfur
 
 updated_at: 2025-03-28T20:07:41.000-06:00
-
 ---
-
-
 
 # Sulfur
 
@@ -77,4 +72,3 @@ SpecificHeat: 0.71
 NumberofShells: 3
 
 NumberofValence: 6.0
-

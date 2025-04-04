@@ -1,9 +1,7 @@
 ---
-
 id: radon
 
 aliases:
-
   - Radon
 
 tags: []
@@ -15,10 +13,7 @@ description: Radon
 title: Radon
 
 updated_at: 2025-03-28T20:07:41.000-06:00
-
 ---
-
-
 
 # Radon
 
@@ -77,4 +72,3 @@ SpecificHeat: 0.094
 NumberofShells: 6
 
 NumberofValence: 8.0
-

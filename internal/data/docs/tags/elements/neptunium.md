@@ -1,9 +1,7 @@
 ---
-
 id: neptunium
 
 aliases:
-
   - Neptunium
 
 tags: []
@@ -15,10 +13,7 @@ description: Neptunium
 title: Neptunium
 
 updated_at: 2025-03-28T20:07:40.000-06:00
-
 ---
-
-
 
 # Neptunium
 
@@ -77,4 +72,3 @@ SpecificHeat: nan
 NumberofShells: 7
 
 NumberofValence: nan
-

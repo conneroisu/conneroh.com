@@ -1,9 +1,7 @@
 ---
-
 id: vanadium
 
 aliases:
-
   - Vanadium
 
 tags: []
@@ -15,10 +13,7 @@ description: Vanadium
 title: Vanadium
 
 updated_at: 2025-03-28T20:07:42.000-06:00
-
 ---
-
-
 
 # Vanadium
 
@@ -68,7 +63,7 @@ BoilingPoint: 3680.0
 
 NumberOfIsotopes: 9.0
 
-Discoverer:    del Rio
+Discoverer: del Rio
 
 Year: 1801.0
 
@@ -77,4 +72,3 @@ SpecificHeat: 0.489
 NumberofShells: 4
 
 NumberofValence: nan
-

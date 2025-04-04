@@ -1,9 +1,7 @@
 ---
-
 id: meitnerium
 
 aliases:
-
   - Meitnerium
 
 tags: []
@@ -15,10 +13,7 @@ description: Meitnerium
 title: Meitnerium
 
 updated_at: 2025-03-28T20:07:40.000-06:00
-
 ---
-
-
 
 # Meitnerium
 
@@ -77,4 +72,3 @@ SpecificHeat: nan
 NumberofShells: 7
 
 NumberofValence: nan
-

@@ -1,9 +1,7 @@
 ---
-
 id: lanthanum
 
 aliases:
-
   - Lanthanum
 
 tags: []
@@ -15,10 +13,7 @@ description: Lanthanum
 title: Lanthanum
 
 updated_at: 2025-03-28T20:07:39.000-06:00
-
 ---
-
-
 
 # Lanthanum
 
@@ -77,4 +72,3 @@ SpecificHeat: 0.195
 NumberofShells: 6
 
 NumberofValence: nan
-

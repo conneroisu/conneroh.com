@@ -1,9 +1,7 @@
 ---
-
 id: molybdenum
 
 aliases:
-
   - Molybdenum
 
 tags: []
@@ -15,10 +13,7 @@ description: Molybdenum
 title: Molybdenum
 
 updated_at: 2025-03-28T20:07:40.000-06:00
-
 ---
-
-
 
 # Molybdenum
 
@@ -77,4 +72,3 @@ SpecificHeat: 0.251
 NumberofShells: 5
 
 NumberofValence: nan
-

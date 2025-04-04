@@ -9,8 +9,6 @@ title: Dubnium
 updated_at: 2025-03-28T20:18:29.000-06:00
 ---
 
-
-
 # Dubnium
 
 AtomicNumber: 105
@@ -68,4 +66,3 @@ SpecificHeat: nan
 NumberofShells: 7
 
 NumberofValence: nan
-

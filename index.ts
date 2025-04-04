@@ -14,4 +14,3 @@ window.Alpine = Alpine;
 
 Alpine.plugin(intersect);
 Alpine.start();
-

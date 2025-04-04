@@ -20,7 +20,7 @@ updated_at: 2025-04-02T15:01:50.000-06:00
 
 # CPRE488 MP2
 
-## Detailed System Diagram 
+## Detailed System Diagram
 
 The following diagram illustrates the interconnection between the various modules in the
 system, both at the IP core level (i.e. the components in our VIVADO design) as well as the board
@@ -29,6 +29,7 @@ level (i.e. the various chips that work together to connect the output video to 
 ![[projects/cpre488-mp2/image-pipeline-diagram.png]]
 
 ## Starter Hardware Operation Intentions
+
 The overall goal of the starter hardware to to provide an interface to FMC device such that a test image sequence can be displayed over the HDMI port on the FMC device. To accomplish this, a Test Pattern Generator IP is instantiated and configured using the AXI bus to produce a video stream that is provided to the VDMA. The VDMA is configured to store this stream to a memory location and forward the stream to an AXI Stream output IP block, which passes the stream to the AVNET HDMI Output IP block. This gives the test pattern stream a direct path to the FMC module so it can be displayed.
 
 However, we also need to incorporate timing information. Similar to the VGA protocol, HDMI requires timing signals to make sure line draws are all synced up. To do this a Video Timing Controller IP block is used. This IP block is configured off of an AXI bus fed to it and it outputs all the timing signals that the HDMI IP block needs. These timing signals are fed into the AXI Stream to Video Out IP block, which then forwards the timing signals to the AVNET HDMI Output.
@@ -41,10 +42,10 @@ Finally, there are two clock domains defined for this design, a 100MHz clock and
 
 This design only allows for the display of the test pattern, so we need to add more IP cores later to use the camera.
 
-
 ## What are the changes we made to `camera_app.c`?
 
 ### TPG Change
+
 For the TPG change, we referenced the provided datasheet to see what we configure via memory mapped registers. We saw that we had the ability to set a foreground and background to be a variety of preset patters. So, we set the background to a colored bars pattern (register value `0x9`) and the foreground to be a colored box that bounces around (register value `0x1`). Since we were enabling a box, we had to specify its dimensions and colors, which was simple to due since there were registers for each. The relevant code for this update is shown below:
 
 ```c
@@ -78,13 +79,13 @@ For the TPG change, we referenced the provided datasheet to see what we configur
    TPG_CR[0]     = 0x81;  // TPG Control
 ```
 
-
 A picture of the output of this change is shown below:
 
 ![[projects/cpre488-mp2/tpg_change.png]]
 
 ### Software Only Change (TPG Registers not Modified)
-For the software only change, we decided to read out the pixel colors in the YUV format and halve the luminance.  We believed that knowing the YUV format early on in the lab would be beneficial later when we have to implement SW demosaicing. The code that reads the YUV data, halves the luminance, and then writes it back is shown below:
+
+For the software only change, we decided to read out the pixel colors in the YUV format and halve the luminance. We believed that knowing the YUV format early on in the lab would be beneficial later when we have to implement SW demosaicing. The code that reads the YUV data, halves the luminance, and then writes it back is shown below:
 
 ```c
 for (i = 0; i < 1920*1080; i += 2)
@@ -112,6 +113,7 @@ A picture of the output from this change is shown below:
 ![[projects/cpre488-mp2/tpg_change_sw.png]]
 
 Though it is quite hard to see in this image, the luminance has be halved. My phone camera dod not pick this up well.
+
 ## In the (`.xdc`) constraints file, what does the `_p` and `_n` pairing of signals signify, and what this configuration is typically used for?
 
 In the constraints file, the `_p` and `_n` suffix pairs indicate differential signaling, specifically LVDS (Low-Voltage Differential Signaling). This is confirmed by the IOSTANDARD setting for these signals:
@@ -125,10 +127,12 @@ set_property IOSTANDARD LVDS_25 [get_ports IO_VITA_CAM_data_*]
 ### What LVDS Is and How Does It Work?
 
 LVDS uses a pair of complementary signals that are transmitted on two separate traces:
+
 - The `_p` suffix indicates the positive/true signal
 - The `_n` suffix indicates the negative/complement signal
 
 The actual data is determined by the voltage difference between these two signals rather than the absolute voltage level. Typically, a small voltage difference (around 350mV) is used, where:
+
 - A positive difference represents a logical '1'
 - A negative difference represents a logical '0'
 
@@ -151,6 +155,7 @@ LVDS is used for the VITA camera interface for several important reasons:
    This ensures proper signal integrity by eliminating reflections.
 
 In this design, LVDS is specifically used for:
+
 - Clock signals (`IO_VITA_CAM_clk_out_p/n`) - to provide a stable, clean timing reference
 - Synchronization signals (`IO_VITA_CAM_sync_p/n`) - for frame timing synchronization
 - Data lines (`IO_VITA_CAM_data_p/n`) - carrying the actual pixel data from the sensor
@@ -160,7 +165,7 @@ In this design, LVDS is specifically used for:
 The 0x10000000 offset creates a safe "sandbox" for the video frame buffers that won't interfere with other memory usage in the system. This is particularly important for video processing which involves large, continuous memory accesses through DMA that could otherwise corrupt system memory.
 
 It would not make sense to append 0x00000000 to the output of the VITA-2000 camera because it would almost certainly result in memory corruption as the video data would overwrite critical program memory.
-  
+
 ## Why at this point, does the camera had no color?
 
 Before implementing the demosaicing algorithm and software processing, the camera had no color because the raw data from the camera sensor is in a Bayer pattern format rather than a processed RGB or YCbCr color format.
@@ -168,9 +173,8 @@ Before implementing the demosaicing algorithm and software processing, the camer
 **Bayer Pattern Sensor Format**:
 
 The VITA-2000 camera sensor uses a Bayer filter pattern. This means each pixel captures only one color component (Red, Green, or Blue) arranged in a specific pattern.
-    
-**Direct Raw Data Display**: Without the demosaic and color processing enabled, the system is directly displaying the raw Bayer pattern data, which appears as a grayscale or monochrome image. Each pixel only contains intensity information for a single color, but the display treats it as luminance-only data.
 
+**Direct Raw Data Display**: Without the demosaic and color processing enabled, the system is directly displaying the raw Bayer pattern data, which appears as a grayscale or monochrome image. Each pixel only contains intensity information for a single color, but the display treats it as luminance-only data.
 
 ## Software Demosaicing Implementation
 
@@ -222,7 +226,7 @@ Since the demosaicing software takes a while to run, we take a single snapshot i
 For displaying the image, we decided to treat two different read frame buffers as front and back buffers. The demosaicing code updates the back buffer while the read channel of the VDMA streams the front buffer contents to the HDMI interface. Then once the demosaicing software has ran, the buffers are swapped, which displays the latest processed frame. This worked quite well and removed many artifacts in our images. An example of an image that resulted from the software demosaicing is shown below (image quality is a bit poor due to my phone):
 
 ![[projects/cpre488-mp2/sw_demo.png]]
-   
+
 ## YCbCr 4:2:2 Format Analysis
 
 ### Note from the Documentation
@@ -235,9 +239,10 @@ $$
 
 Equation 3-11
 
-This conversion is a horizontal 2:1 decimation operation, implemented using a low-pass FIR filter to suppress chroma aliasing. In order to evaluate output pixel $o_x$,$o_y$, the FIR filter in the core convolves COEFk_HPHASE0, where k is the coefficient index, $i_x$,$i_y$ are pixels from the input image, and $[ ]^M_m$ represents rounding with clipping at M, and clamping at m. DW is the Data Width or number of bits per video component. Ntaps is the number of filter taps. The predefined filter coefficients are `[0.25 0.5 0.25]`. 
+This conversion is a horizontal 2:1 decimation operation, implemented using a low-pass FIR filter to suppress chroma aliasing. In order to evaluate output pixel $o_x$,$o_y$, the FIR filter in the core convolves COEFk_HPHASE0, where k is the coefficient index, $i_x$,$i_y$ are pixels from the input image, and $[ ]^M_m$ represents rounding with clipping at M, and clamping at m. DW is the Data Width or number of bits per video component. Ntaps is the number of filter taps. The predefined filter coefficients are `[0.25 0.5 0.25]`.
 
 ### Primary Analysis
+
 In the YCbCr 4:2:2 format, each 32-bit word (0xF0525A52, 0x36912291, 0x6E29F029) contains data for two adjacent pixels. Breaking down these values:
 
 ```c
@@ -251,28 +256,31 @@ for (i = 0; i < storage_size / config->uNumFrames_HdmiFrameBuffer; i += 4) {
    - This represents two pixels in sequence
    - First 16 bits (0xF052): Y1=0xF0, Cb=0x52
    - Second 16 bits (0x5A52): Y2=0x5A, Cr=0x52
-   
+
 ```c
 // Frame #2 - Green pixels
 for (i = 0; i < storage_size / config->uNumFrames_HdmiFrameBuffer; i += 4) {
   *pStorageMem++ = 0x36912291; // Green
 }
 ```
+
 2. **Green Example (0x36912291)**:
    - First 16 bits (0x3691): Y1=0x36, Cb=0x91
    - Second 16 bits (0x2291): Y2=0x22, Cr=0x91
-   
+
 ```c
 // Frame #3 - Blue pixels
 for (i = 0; i < storage_size / config->uNumFrames_HdmiFrameBuffer; i += 4) {
   *pStorageMem++ = 0x6E29F029;  // Blue
 }
 ```
+
 3. **Blue Example (0x6E29F029)**:
    - First 16 bits (0x6E29): Y1=0x6E, Cb=0x29
    - Second 16 bits (0xF029): Y2=0xF0, Cr=0x29
 
 The pattern for each color follows the YCbCr 4:2:2 format where:
+
 - Each 16-bit word contains one Y (luminance) value and one chrominance (Cb or Cr) value
 - The chrominance values alternate between Cb and Cr
 - Two adjacent pixels share the same Cb and Cr values (the subsampling)
@@ -280,11 +288,13 @@ The pattern for each color follows the YCbCr 4:2:2 format where:
 ## Format Structure
 
 The 4:2:2 format packs data as follows for each pair of pixels:
+
 ```
 [Y1][Cb][Y2][Cr]
 ```
 
 Where:
+
 - Y1: Luminance for first pixel
 - Cb: Blue color difference (shared between two pixels)
 - Y2: Luminance for second pixel
@@ -304,29 +314,32 @@ The pipeline consists of an IP block that does demosaicing to the incoming video
 
 1. Demosaicing
 2. RGB to YUV 444 Conversion
-3. YUV 444 to YUV 422 Conversion 
+3. YUV 444 to YUV 422 Conversion
 
 ## Performance
 
 ### Introduction (how we measured performance)
 
-We measured the performance of the software and hardware pipelines in this design utilizing interrupt-driven time measurements. Using interrupts allows the software to be aware when a frame is read or written by the VDMA. Then by using timers, we can get extremely accurate frame write times, which can be used to derive the resulting average frames per second (FPS). 
+We measured the performance of the software and hardware pipelines in this design utilizing interrupt-driven time measurements. Using interrupts allows the software to be aware when a frame is read or written by the VDMA. Then by using timers, we can get extremely accurate frame write times, which can be used to derive the resulting average frames per second (FPS).
 
-### Software Pipeline 
+### Software Pipeline
 
 #### Performance
+
 For subgroup B, we determined that the average frame rate is `0.396 FPS`
 
 This is quite slow, which is due to the software demosaicing algorithm not being optimized well and the fact that over 2 million half-word writes are required to process a single image!
 
 #### Testing Methodology
-As previously stated, we used interrupts and timers to measure the FPS. We setup interrupts for the VDMA read channel frame completion and the write channel frame completion. This allowed us to know when frames were written to the VDMA and read from the VDMA. However, we had to find a solution to isolate the frame that is being processed since we don't shut down the VDMA. 
+
+As previously stated, we used interrupts and timers to measure the FPS. We setup interrupts for the VDMA read channel frame completion and the write channel frame completion. This allowed us to know when frames were written to the VDMA and read from the VDMA. However, we had to find a solution to isolate the frame that is being processed since we don't shut down the VDMA.
 
 To do this, we stored a single frame in frame buffer 0, which the demosaicing software ran on. Then, once the demosaicing was finished, we updated the VDMA read channel to read this new frame out. By using the park pointer VDMA registers, we were able to detect when this new frame was written out and start/stop timers accordingly on this event. By comparing the current write time to the previous write time, we can determine how long it took to write out the last frame, which gives us our FPS value! Finally, we averaged 10 FPS values together to produce a final FPS value!
 
 The interrupt service routines and park pointer register modification code is shown below:
 
 Globals
+
 ```c
 // Timing globals
 static fps_t fps;
@@ -346,6 +359,7 @@ static float frame_time = 0;
 ```
 
 ISRS:
+
 ```c
 void video_frame_output_isr(void* CallBackRef, u32 InterruptTypes)
 {
@@ -411,6 +425,7 @@ void camera_input_isr(void* CallBackRef, u32 InterruptTypes)
 ```
 
 Park Pointer Register Modifications
+
 ```c
 		set_park_frame(&(config->vdma_hdmi), 0, XAXIVDMA_WRITE);
 
@@ -449,14 +464,17 @@ Park Pointer Register Modifications
 		// Update pMM2S_Mem to point to back buffer.
 		pMM2S_Mem = (Xuint16 *)XAxiVdma_ReadReg(config->vdma_hdmi.BaseAddr, XAXIVDMA_MM2S_ADDR_OFFSET+XAXIVDMA_START_ADDR_OFFSET + (back_buffer_frame * 0x4));
 ```
-### Hardware Pipeline 
+
+### Hardware Pipeline
 
 #### Performance
+
 For subgroup B, we determined that the average frame rate is `59.794 FPS`
 
 This is what we expect since the timing was setup for 60Hz writes, which is 60 times a second.
 
 #### Testing Methodology
+
 The testing methodology used for the hardware pipeline is quite similar to what we used for the software pipeline. We made use of VDMA read and write interrupts and the processing system timers to record the time passed between frame writes. However, since we don't have to wait on C code to run, we did not need to single out a frame and keep track of it. We could simply let the VDMA run with a few conditions to make sure we are recording the times fine:
 
 - A VDMA write must happen before a VDMA read can occur. We need to take into consideration the VDMA write time.
@@ -543,9 +561,10 @@ Overall, it was quite tedious to get interrupts working, but it definitely paid 
 
 The following sections describe the bonus credit tasks that were completed for this project and how they were implemented/accomplished.
 
-### Various analog and digital adjustments for the gain, exposure, and other common user-configurable digital camera settings. 
+### Various analog and digital adjustments for the gain, exposure, and other common user-configurable digital camera settings.
 
 We implemented the following adjustments:
+
 - Contrast
 - Brightness
 - Saturation
@@ -560,6 +579,7 @@ These were implemented by leveraging the second Subsystem which converts 4:4:4 t
 The brightness level is adjusted dynamically through a dedicated function. When invoked (for example, via board buttons), it calls the hardware API to update the brightness level of the processed video image.
 
 **Code Sample:**
+
 ```c
 void set_brightness(
     camera_config_t *config,
@@ -575,13 +595,13 @@ void set_brightness(
 }
 ```
 
-
 ### 2. Contrast Adjustment
 
 **Explanation:**  
 Similarly, contrast is adjusted using a dedicated function that calls the hardware API to modify the contrast level. This allows users to dynamically control the difference between light and dark areas in the image.
 
 **Code Sample:**
+
 ```c
 void set_contrast(
     camera_config_t *config,
@@ -603,6 +623,7 @@ void set_contrast(
 The saturation adjustment function controls the vividness of the colors in the video output. This function calls the corresponding hardware API to adjust the saturation level in the YCrCb color space.
 
 **Code Sample:**
+
 ```c
 void set_saturation(
     camera_config_t *config,
@@ -618,14 +639,14 @@ void set_saturation(
 }
 ```
 
-Using the buttons on the board (code resused from mp-1), the user can adjust the gain, contrast, brightness, and saturation. 
+Using the buttons on the board (code resused from mp-1), the user can adjust the gain, contrast, brightness, and saturation.
 
-### A video mode, which records and can replay up to 5 seconds of 1080p video. 
+### A video mode, which records and can replay up to 5 seconds of 1080p video.
 
 Video mode was about decreasing the delay from image to image in the play mode and increasing the number of images that can be stored in the software. This was done by removing the 2-second delay in image capture and increasing the heap size to correspond with the increased number of stored images.
 
-
 **Code Sample:**
+
 ```c
 _HEAP_SIZE = DEFINED(_HEAP_SIZE) ? _HEAP_SIZE : 0x19000000;
 ```
@@ -640,7 +661,7 @@ As the zoom increased past the 85% threshold, only a small segment of the top of
 
 ![[projects/cpre488-mp2/pip_fun.png]]
 
-For that reason, I figured that using the horizontal and vertical scaler cores could help align the output video resolution. However, I was unsure as to how to properly sequence the core configurations as there was a lack of relative documentation. Looking at the AMD forums, it seemed that many people experiencing similar artifacts blamed unaligned VDMA writes or bandwidth bottlenecks. In an attempt to address the VDMA issues, I tried to dynamically reconfigure the VDMA such that it could scale the non-1080p output of the zoom core to 1080p for the HDMI. I also tried allowing for unaligned VDMA reads and writes. Neither of these worked. I also wanted to try increasing the sample rate of the hardware pipeline to 2 or more pixels per clock, but I ran out of time before I could test this hypothesis. 
+For that reason, I figured that using the horizontal and vertical scaler cores could help align the output video resolution. However, I was unsure as to how to properly sequence the core configurations as there was a lack of relative documentation. Looking at the AMD forums, it seemed that many people experiencing similar artifacts blamed unaligned VDMA writes or bandwidth bottlenecks. In an attempt to address the VDMA issues, I tried to dynamically reconfigure the VDMA such that it could scale the non-1080p output of the zoom core to 1080p for the HDMI. I also tried allowing for unaligned VDMA reads and writes. Neither of these worked. I also wanted to try increasing the sample rate of the hardware pipeline to 2 or more pixels per clock, but I ran out of time before I could test this hypothesis.
 
 In the end, I was able to perform a digital zoom in some way, as seen (barely) in the following image:
 
@@ -689,5 +710,4 @@ The resulting effects can be seen below:
 
 ![[projects/cpre488-mp2/Sobel_ex.png]]
 
-It should be noted that a better result could have been achieved should only luminance value be used, but I ran out of time before I could implement it.  
-
+It should be noted that a better result could have been achieved should only luminance value be used, but I ran out of time before I could implement it.

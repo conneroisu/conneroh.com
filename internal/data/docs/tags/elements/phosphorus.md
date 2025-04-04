@@ -1,9 +1,7 @@
 ---
-
 id: phosphorus
 
 aliases:
-
   - Phosphorus
 
 tags: []
@@ -15,10 +13,7 @@ description: Phosphorus
 title: Phosphorus
 
 updated_at: 2025-03-28T20:07:40.000-06:00
-
 ---
-
-
 
 # Phosphorus
 
@@ -77,4 +72,3 @@ SpecificHeat: 0.769
 NumberofShells: 3
 
 NumberofValence: 5.0
-

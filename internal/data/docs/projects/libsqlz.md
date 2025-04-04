@@ -36,7 +36,6 @@ libsqlz is designed for developers who have a clear understanding of their datab
 
 Integrating libsqlz into your Zig project is straightforward. Begin by adding it as a dependency in your `build.zig` file:
 
-
 ```zig
 const std = @import("std");
 
@@ -55,13 +54,11 @@ pub fn build(b: *std.Build) void {
 }
 ```
 
-
 This setup ensures that libsqlz is seamlessly integrated into your Zig project's build process.
 
 ## Exploring libsqlz Through Examples
 
 Consider a scenario where you have a `users` table in your database. With libsqlz, you can define a corresponding Zig struct at compile time, ensuring that your code remains type-safe and closely aligned with your database schema.
-
 
 ```zig
 const libsqlz = @import("libsqlz");
@@ -73,11 +70,10 @@ const User = struct {
 };
 ```
 
-
 This approach not only enhances type safety but also allows for compile-time checks, reducing the likelihood of runtime errors.
 
 ## The Journey Ahead
 
 Developing libsqlz has been a journey of exploration and innovation. As I continue to learn zig I am sure to refine its features and expand its capabilities, I invite fellow Zig developers to explore, contribute, and provide feedback. Together, we can create a tool that embodies the principles of performance, safety, and simplicity that Zig stands for.
 
-For more information, detailed documentation, and contribution guidelines, visit the [libsqlz GitHub repository](https://github.com/conneroisu/libsqlz). Let's collaborate to transform the way we interact with databases in Zig, making the process more efficient and enjoyable. 
+For more information, detailed documentation, and contribution guidelines, visit the [libsqlz GitHub repository](https://github.com/conneroisu/libsqlz). Let's collaborate to transform the way we interact with databases in Zig, making the process more efficient and enjoyable.

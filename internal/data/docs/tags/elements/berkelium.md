@@ -9,8 +9,6 @@ title: Berkelium
 updated_at: 2025-03-28T20:18:28.000-06:00
 ---
 
-
-
 # Berkelium
 
 AtomicNumber: 97
@@ -68,4 +66,3 @@ SpecificHeat: nan
 NumberofShells: 7
 
 NumberofValence: nan
-

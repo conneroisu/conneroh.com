@@ -1,9 +1,7 @@
 ---
-
 id: protactinium
 
 aliases:
-
   - Protactinium
 
 tags: []
@@ -15,10 +13,7 @@ description: Protactinium
 title: Protactinium
 
 updated_at: 2025-03-28T20:07:41.000-06:00
-
 ---
-
-
 
 # Protactinium
 
@@ -77,4 +72,3 @@ SpecificHeat: nan
 NumberofShells: 7
 
 NumberofValence: nan
-

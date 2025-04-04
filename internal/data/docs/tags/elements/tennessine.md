@@ -1,9 +1,7 @@
 ---
-
 id: tennessine
 
 aliases:
-
   - Tennessine
 
 tags: []
@@ -15,10 +13,7 @@ description: Tennessine
 title: Tennessine
 
 updated_at: 2025-03-28T20:07:42.000-06:00
-
 ---
-
-
 
 # Tennessine
 
@@ -77,4 +72,3 @@ SpecificHeat: nan
 NumberofShells: 7
 
 NumberofValence: 7.0
-

@@ -1,9 +1,7 @@
 ---
-
 id: lawrencium
 
 aliases:
-
   - Lawrencium
 
 tags: []
@@ -15,10 +13,7 @@ description: Lawrencium
 title: Lawrencium
 
 updated_at: 2025-03-28T20:07:39.000-06:00
-
 ---
-
-
 
 # Lawrencium
 
@@ -77,4 +72,3 @@ SpecificHeat: nan
 NumberofShells: 7
 
 NumberofValence: nan
-

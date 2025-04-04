@@ -9,8 +9,6 @@ title: Carbon
 updated_at: 2025-03-28T20:18:29.000-06:00
 ---
 
-
-
 # Carbon
 
 AtomicNumber: 6
@@ -68,4 +66,3 @@ SpecificHeat: 0.709
 NumberofShells: 2
 
 NumberofValence: 4.0
-

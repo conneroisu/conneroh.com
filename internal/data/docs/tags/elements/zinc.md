@@ -1,9 +1,7 @@
 ---
-
 id: zinc
 
 aliases:
-
   - Zinc
 
 tags: []
@@ -15,10 +13,7 @@ description: Zinc
 title: Zinc
 
 updated_at: 2025-03-28T20:14:59.000-06:00
-
 ---
-
-
 
 # Zinc
 
@@ -77,4 +72,3 @@ SpecificHeat: 0.388
 NumberofShells: 4
 
 NumberofValence: nan
-

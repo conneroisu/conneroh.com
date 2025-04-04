@@ -9,15 +9,13 @@ title: Darmstadtium
 updated_at: 2025-03-28T20:18:29.000-06:00
 ---
 
-
-
-# Darmstadtium 
+# Darmstadtium
 
 AtomicNumber: 110
 
-Element: Darmstadtium 
+Element: Darmstadtium
 
-Symbol: Ds 
+Symbol: Ds
 
 AtomicMass: 271.0
 
@@ -68,4 +66,3 @@ SpecificHeat: nan
 NumberofShells: 7
 
 NumberofValence: nan
-

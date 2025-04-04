@@ -16,21 +16,21 @@ Package routing provides implementations for routing.
 
 ## Index
 
-- [type APIFn](<#APIFn>)
-- [type APIHandler](<#APIHandler>)
-- [type APIMap](<#APIMap>)
-  - [func \(m APIMap\) AddRoutes\(mux \*http.ServeMux, fullPosts \*\[\]gen.Post, fullProjects \*\[\]gen.Project, fullTags \*\[\]gen.Tag, postsSlugMap \*map\[string\]gen.Post, projectsSlugMap \*map\[string\]gen.Project, tagsSlugMap \*map\[string\]gen.Tag\) error](<#APIMap.AddRoutes>)
-- [type ErrMissingParam](<#ErrMissingParam>)
-  - [func \(e ErrMissingParam\) Error\(\) string](<#ErrMissingParam.Error>)
-- [type ErrNotFound](<#ErrNotFound>)
-  - [func \(e ErrNotFound\) Error\(\) string](<#ErrNotFound.Error>)
-- [type PluralTarget](<#PluralTarget>)
-- [type SingleFn](<#SingleFn>)
-- [type SingleTarget](<#SingleTarget>)
-
+- [type APIFn](#APIFn)
+- [type APIHandler](#APIHandler)
+- [type APIMap](#APIMap)
+  - [func \(m APIMap\) AddRoutes\(mux \*http.ServeMux, fullPosts \*\[\]gen.Post, fullProjects \*\[\]gen.Project, fullTags \*\[\]gen.Tag, postsSlugMap \*map\[string\]gen.Post, projectsSlugMap \*map\[string\]gen.Project, tagsSlugMap \*map\[string\]gen.Tag\) error](#APIMap.AddRoutes)
+- [type ErrMissingParam](#ErrMissingParam)
+  - [func \(e ErrMissingParam\) Error\(\) string](#ErrMissingParam.Error)
+- [type ErrNotFound](#ErrNotFound)
+  - [func \(e ErrNotFound\) Error\(\) string](#ErrNotFound.Error)
+- [type PluralTarget](#PluralTarget)
+- [type SingleFn](#SingleFn)
+- [type SingleTarget](#SingleTarget)
 
 <a name="APIFn"></a>
-## type [APIFn](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/main.go#L15>)
+
+## type [APIFn](https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/main.go#L15)
 
 APIFn is a function that handles an API request.
 
@@ -39,7 +39,8 @@ type APIFn func(http.ResponseWriter, *http.Request) error
 ```
 
 <a name="APIHandler"></a>
-## type [APIHandler](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/main.go#L18-L25>)
+
+## type [APIHandler](https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/main.go#L18-L25)
 
 APIHandler is a function that returns an APIFn.
 
@@ -55,7 +56,8 @@ type APIHandler func(
 ```
 
 <a name="APIMap"></a>
-## type [APIMap](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/main.go#L28>)
+
+## type [APIMap](https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/main.go#L28)
 
 APIMap is a map of API functions.
 
@@ -64,7 +66,8 @@ type APIMap map[string]APIHandler
 ```
 
 <a name="APIMap.AddRoutes"></a>
-### func \(APIMap\) [AddRoutes](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/main.go#L31-L39>)
+
+### func \(APIMap\) [AddRoutes](https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/main.go#L31-L39)
 
 ```go
 func (m APIMap) AddRoutes(mux *http.ServeMux, fullPosts *[]gen.Post, fullProjects *[]gen.Project, fullTags *[]gen.Tag, postsSlugMap *map[string]gen.Post, projectsSlugMap *map[string]gen.Project, tagsSlugMap *map[string]gen.Tag) error
@@ -73,7 +76,8 @@ func (m APIMap) AddRoutes(mux *http.ServeMux, fullPosts *[]gen.Post, fullProject
 AddRoutes adds all routes to the router.
 
 <a name="ErrMissingParam"></a>
-## type [ErrMissingParam](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/errors.go#L23-L26>)
+
+## type [ErrMissingParam](https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/errors.go#L23-L26)
 
 ErrMissingParam is an error that is returned when a required parameter is missing.
 
@@ -85,7 +89,8 @@ type ErrMissingParam struct {
 ```
 
 <a name="ErrMissingParam.Error"></a>
-### func \(ErrMissingParam\) [Error](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/errors.go#L29>)
+
+### func \(ErrMissingParam\) [Error](https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/errors.go#L29)
 
 ```go
 func (e ErrMissingParam) Error() string
@@ -94,7 +99,8 @@ func (e ErrMissingParam) Error() string
 Error implements the error interface on ErrMissingParam.
 
 <a name="ErrNotFound"></a>
-## type [ErrNotFound](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/errors.go#L9-L11>)
+
+## type [ErrNotFound](https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/errors.go#L9-L11)
 
 ErrNotFound is an error that is returned when a resource is not found.
 
@@ -105,7 +111,8 @@ type ErrNotFound struct {
 ```
 
 <a name="ErrNotFound.Error"></a>
-### func \(ErrNotFound\) [Error](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/errors.go#L14>)
+
+### func \(ErrNotFound\) [Error](https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/errors.go#L14)
 
 ```go
 func (e ErrNotFound) Error() string
@@ -114,7 +121,8 @@ func (e ErrNotFound) Error() string
 Error implements the error interface on ErrNotFound.
 
 <a name="PluralTarget"></a>
-## type [PluralTarget](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/statics.go#L18>)
+
+## type [PluralTarget](https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/statics.go#L18)
 
 PluralTarget is the target of a plural view. string
 
@@ -136,7 +144,8 @@ const (
 ```
 
 <a name="SingleFn"></a>
-## type [SingleFn](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/main.go#L12>)
+
+## type [SingleFn](https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/main.go#L12)
 
 SingleFn returns a fullFn for the single view.
 
@@ -145,7 +154,8 @@ type SingleFn func(target SingleTarget, id string) templ.Component
 ```
 
 <a name="SingleTarget"></a>
-## type [SingleTarget](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/statics.go#L5>)
+
+## type [SingleTarget](https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/statics.go#L5)
 
 SingleTarget is the target of a single view. string
 
@@ -166,7 +176,6 @@ const (
 )
 ```
 
-Generated by [gomarkdoc](<https://github.com/princjef/gomarkdoc>)
-
+Generated by [gomarkdoc](https://github.com/princjef/gomarkdoc)
 
 <!-- gomarkdoc:embed:end -->

@@ -1,9 +1,7 @@
 ---
-
 id: samarium
 
 aliases:
-
   - Samarium
 
 tags: []
@@ -15,10 +13,7 @@ description: Samarium
 title: Samarium
 
 updated_at: 2025-03-28T20:07:41.000-06:00
-
 ---
-
-
 
 # Samarium
 
@@ -77,4 +72,3 @@ SpecificHeat: 0.197
 NumberofShells: 6
 
 NumberofValence: nan
-

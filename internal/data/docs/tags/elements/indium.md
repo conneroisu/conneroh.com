@@ -1,9 +1,7 @@
 ---
-
 id: indium
 
 aliases:
-
   - Indium
 
 tags: []
@@ -15,10 +13,7 @@ description: Indium
 title: Indium
 
 updated_at: 2025-03-28T20:07:39.000-06:00
-
 ---
-
-
 
 # Indium
 
@@ -77,4 +72,3 @@ SpecificHeat: 0.233
 NumberofShells: 5
 
 NumberofValence: 3.0
-

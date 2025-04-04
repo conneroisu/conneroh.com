@@ -9,8 +9,6 @@ title: Helium
 updated_at: 2025-03-28T20:18:49.000-06:00
 ---
 
-
-
 # Helium
 
 AtomicNumber: 2
@@ -68,4 +66,3 @@ SpecificHeat: 5.193
 NumberofShells: 1
 
 NumberofValence: nan
-

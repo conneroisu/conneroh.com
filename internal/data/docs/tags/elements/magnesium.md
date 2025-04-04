@@ -1,9 +1,7 @@
 ---
-
 id: magnesium
 
 aliases:
-
   - Magnesium
 
 tags: []
@@ -15,10 +13,7 @@ description: Magnesium
 title: Magnesium
 
 updated_at: 2025-03-28T20:07:40.000-06:00
-
 ---
-
-
 
 # Magnesium
 
@@ -77,4 +72,3 @@ SpecificHeat: 1.023
 NumberofShells: 3
 
 NumberofValence: 2.0
-

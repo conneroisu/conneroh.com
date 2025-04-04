@@ -1,9 +1,7 @@
 ---
-
 id: tin
 
 aliases:
-
   - Tin
 
 tags: []
@@ -15,10 +13,7 @@ description: Tin
 title: Tin
 
 updated_at: 2025-03-28T20:07:42.000-06:00
-
 ---
-
-
 
 # Tin
 
@@ -77,4 +72,3 @@ SpecificHeat: 0.228
 NumberofShells: 5
 
 NumberofValence: 4.0
-

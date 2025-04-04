@@ -1,9 +1,7 @@
 ---
-
 id: zirconium
 
 aliases:
-
   - Zirconium
 
 tags: []
@@ -15,10 +13,7 @@ description: Zirconium
 title: Zirconium
 
 updated_at: 2025-03-28T20:07:42.000-06:00
-
 ---
-
-
 
 # Zirconium
 
@@ -77,4 +72,3 @@ SpecificHeat: 0.278
 NumberofShells: 5
 
 NumberofValence: nan
-

@@ -28,7 +28,6 @@ In the realm of modern development, managing environment secrets securely and ef
 
 To incorporate **doppler.nvim** into your Neovim setup using `lazy.nvim`, add the following configuration to your `init.lua`:
 
-
 ```lua
 return {
     "conneroisu/doppler.nvim",
@@ -37,7 +36,6 @@ return {
     },
 }
 ```
-
 
 This setup ensures that **doppler.nvim** loads only when required, maintaining an efficient editing environment.
 
@@ -48,7 +46,6 @@ In scenarios where tests or development processes require environment-specific s
 ## Project Structure
 
 The **doppler.nvim** project is organized as follows:
-
 
 ```
 .
@@ -66,7 +63,6 @@ The **doppler.nvim** project is organized as follows:
 │       └── doppler_spec.lua
 ```
 
-
 This structure delineates the core functionality (`lua/doppler/`), plugin initialization (`plugin/doppler.lua`), and testing framework (`tests/`).
 
 ## Contribution and Community
@@ -75,4 +71,4 @@ Developed by Conner Ohnesorge, a senior in Electrical Engineering and Computer S
 
 ## Conclusion
 
-**doppler.nvim** offers a seamless integration of Doppler's secret management into Neovim, enhancing both security and efficiency for developers. By automating the injection of environment secrets, it allows developers to focus on coding without the overhead of manual secret management. Explore the [doppler.nvim GitHub repository](https://github.com/conneroisu/doppler.nvim) to integrate this functionality into your Neovim setup. 
+**doppler.nvim** offers a seamless integration of Doppler's secret management into Neovim, enhancing both security and efficiency for developers. By automating the injection of environment secrets, it allows developers to focus on coding without the overhead of manual secret management. Explore the [doppler.nvim GitHub repository](https://github.com/conneroisu/doppler.nvim) to integrate this functionality into your Neovim setup.

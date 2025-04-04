@@ -9,8 +9,6 @@ title: Aluminum
 updated_at: 2025-03-28T20:18:28.000-06:00
 ---
 
-
-
 # Aluminum
 
 AtomicNumber: 13
@@ -68,4 +66,3 @@ SpecificHeat: 0.897
 NumberofShells: 3
 
 NumberofValence: 3.0
-

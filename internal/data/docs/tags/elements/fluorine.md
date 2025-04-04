@@ -9,8 +9,6 @@ title: Fluorine
 updated_at: 2025-03-28T20:18:29.000-06:00
 ---
 
-
-
 # Fluorine
 
 AtomicNumber: 9
@@ -68,4 +66,3 @@ SpecificHeat: 0.824
 NumberofShells: 2
 
 NumberofValence: 7.0
-

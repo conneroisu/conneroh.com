@@ -9,8 +9,6 @@ title: Dysprosium
 updated_at: 2025-03-28T20:18:29.000-06:00
 ---
 
-
-
 # Dysprosium
 
 AtomicNumber: 66
@@ -68,4 +66,3 @@ SpecificHeat: 0.17
 NumberofShells: 6
 
 NumberofValence: nan
-

@@ -9,8 +9,6 @@ title: Flerovium
 updated_at: 2025-03-28T20:18:29.000-06:00
 ---
 
-
-
 # Flerovium
 
 AtomicNumber: 114
@@ -68,4 +66,3 @@ SpecificHeat: nan
 NumberofShells: 7
 
 NumberofValence: 4.0
-

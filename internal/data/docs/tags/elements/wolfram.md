@@ -1,9 +1,7 @@
 ---
-
 id: wolfram
 
 aliases:
-
   - Wolfram
 
 tags: []
@@ -15,10 +13,7 @@ description: Wolfram
 title: Wolfram
 
 updated_at: 2025-03-28T20:07:42.000-06:00
-
 ---
-
-
 
 # Wolfram
 
@@ -77,4 +72,3 @@ SpecificHeat: 0.132
 NumberofShells: 6
 
 NumberofValence: nan
-

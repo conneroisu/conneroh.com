@@ -24,16 +24,13 @@ As an electrical engineering student passionate about integrating advanced techn
 
 To incorporate mathpix-go into your Go project, execute:
 
-
 ```bash
 go get github.com/conneroisu/mathpix-go
 ```
 
-
 **Example Usage:**
 
 Below is a basic example demonstrating how to use mathpix-go to convert an image containing a mathematical expression into LaTeX code:
-
 
 ```go
 package main
@@ -72,7 +69,6 @@ func main() {
     fmt.Println("LaTeX Code:", response.Latex)
 }
 ```
-
 
 In this example, the `mathpix.NewClient` function initializes a new client with the provided API key and application ID. An image file is then opened and passed to the `Image` method of the client, which sends the image to the Mathpix API for processing. The resulting LaTeX code is printed to the console.
 

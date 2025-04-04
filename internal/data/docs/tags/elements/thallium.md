@@ -1,9 +1,7 @@
 ---
-
 id: thallium
 
 aliases:
-
   - Thallium
 
 tags: []
@@ -15,10 +13,7 @@ description: Thallium
 title: Thallium
 
 updated_at: 2025-03-28T20:07:42.000-06:00
-
 ---
-
-
 
 # Thallium
 
@@ -77,4 +72,3 @@ SpecificHeat: 0.129
 NumberofShells: 6
 
 NumberofValence: 3.0
-

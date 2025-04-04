@@ -1,9 +1,7 @@
 ---
-
 id: thulium
 
 aliases:
-
   - Thulium
 
 tags: []
@@ -15,10 +13,7 @@ description: Thulium
 title: Thulium
 
 updated_at: 2025-03-28T20:07:42.000-06:00
-
 ---
-
-
 
 # Thulium
 
@@ -77,4 +72,3 @@ SpecificHeat: 0.16
 NumberofShells: 6
 
 NumberofValence: nan
-

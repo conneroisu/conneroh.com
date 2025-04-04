@@ -1,9 +1,7 @@
 ---
-
 id: iron
 
 aliases:
-
   - Iron
 
 tags: []
@@ -15,10 +13,7 @@ description: Iron
 title: Iron
 
 updated_at: 2025-03-28T20:07:39.000-06:00
-
 ---
-
-
 
 # Iron
 
@@ -77,4 +72,3 @@ SpecificHeat: 0.449
 NumberofShells: 4
 
 NumberofValence: nan
-

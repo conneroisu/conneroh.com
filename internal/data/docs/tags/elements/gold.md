@@ -9,8 +9,6 @@ title: Gold
 updated_at: 2025-03-28T20:18:30.000-06:00
 ---
 
-
-
 # Gold
 
 AtomicNumber: 79
@@ -68,4 +66,3 @@ SpecificHeat: 0.129
 NumberofShells: 6
 
 NumberofValence: nan
-

@@ -9,8 +9,6 @@ title: Hafnium
 updated_at: 2025-03-28T20:18:30.000-06:00
 ---
 
-
-
 # Hafnium
 
 AtomicNumber: 72
@@ -68,4 +66,3 @@ SpecificHeat: 0.144
 NumberofShells: 6
 
 NumberofValence: nan
-

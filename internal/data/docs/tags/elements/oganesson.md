@@ -1,9 +1,7 @@
 ---
-
 id: oganesson
 
 aliases:
-
   - Oganesson
 
 tags: []
@@ -15,10 +13,7 @@ description: Oganesson
 title: Oganesson
 
 updated_at: 2025-03-28T20:07:40.000-06:00
-
 ---
-
-
 
 # Oganesson
 
@@ -77,4 +72,3 @@ SpecificHeat: nan
 NumberofShells: 7
 
 NumberofValence: 8.0
-

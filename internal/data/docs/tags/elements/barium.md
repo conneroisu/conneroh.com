@@ -9,8 +9,6 @@ title: Barium
 updated_at: 2025-03-28T20:18:28.000-06:00
 ---
 
-
-
 # Barium
 
 AtomicNumber: 56
@@ -68,4 +66,3 @@ SpecificHeat: 0.204
 NumberofShells: 6
 
 NumberofValence: 2.0
-

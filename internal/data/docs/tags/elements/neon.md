@@ -1,9 +1,7 @@
 ---
-
 id: neon
 
 aliases:
-
   - Neon
 
 tags: []
@@ -15,10 +13,7 @@ description: Neon
 title: Neon
 
 updated_at: 2025-03-28T20:07:40.000-06:00
-
 ---
-
-
 
 # Neon
 
@@ -77,4 +72,3 @@ SpecificHeat: 1.03
 NumberofShells: 2
 
 NumberofValence: 8.0
-

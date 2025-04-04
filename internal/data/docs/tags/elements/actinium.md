@@ -9,8 +9,6 @@ title: Actinium
 updated_at: 2025-03-28T20:18:28.000-06:00
 ---
 
-
-
 # Actinium
 
 AtomicNumber: 89
@@ -68,4 +66,3 @@ SpecificHeat: 0.12
 NumberofShells: 7
 
 NumberofValence: nan
-

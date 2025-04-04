@@ -9,8 +9,6 @@ title: Gallium
 updated_at: 2025-03-28T20:18:30.000-06:00
 ---
 
-
-
 # Gallium
 
 AtomicNumber: 31
@@ -68,4 +66,3 @@ SpecificHeat: 0.371
 NumberofShells: 4
 
 NumberofValence: 3.0
-

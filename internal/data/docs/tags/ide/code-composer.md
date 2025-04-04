@@ -22,6 +22,7 @@ Code Composer Studio is "an integrated development environment (IDE) for TI's mi
 ## Key Components and Features
 
 ### Development Tools
+
 - **Optimizing C/C++ Compiler**: CCS includes highly optimized compilers tailored for TI devices, with the TI Arm Clang compiler being particularly notable for "exceptional code size for TI Arm-based microcontrollers" through features like link-time optimization.
 - **Source Code Editor**: Provides comprehensive code editing capabilities with syntax highlighting and code completion.
 - **Project Build Environment**: Manages project settings, dependencies, and build configurations.
@@ -35,11 +36,13 @@ Code Composer Studio is "an integrated development environment (IDE) for TI's mi
 2. **EnergyTrace™**: A specialized "power analyzer tool for Code Composer Studio that measures and displays the energy profile of an application and helps optimize it for ultra-low-power consumption". This is particularly valuable for battery-powered applications.
 
 3. **Advanced Debugging**: CCS provides multiple trace capabilities, including:
+
    - Core Trace: Records program execution history
    - EnergyTrace™: Monitors power consumption
    - Runtime Object View: For RTOS object status monitoring
 
 4. **Optimization Options**: The compiler offers multiple optimization levels, from basic (-O0) to highly aggressive (-Ofast), with specialized options for:
+
    - Size optimization (-Os, -Oz)
    - Performance optimization (-O2, -O3)
    - Debug-friendly optimization (-Og)
@@ -52,6 +55,7 @@ Code Composer Studio is "an integrated development environment (IDE) for TI's mi
 ## Platform Support
 
 Code Composer Studio is available across multiple platforms, including:
+
 - Windows
 - Linux
 - macOS
@@ -64,6 +68,7 @@ The most recent versions of CCS have been transitioning from the Eclipse framewo
 ## Target Hardware Support
 
 Code Composer Studio supports a wide range of TI devices, including:
+
 - SimpleLink™ wireless MCUs
 - MSP430™ ultra-low-power MCUs
 - C2000™ real-time control MCUs

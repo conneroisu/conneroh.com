@@ -1,9 +1,7 @@
 ---
-
 id: rhenium
 
 aliases:
-
   - Rhenium
 
 tags: []
@@ -15,10 +13,7 @@ description: Rhenium
 title: Rhenium
 
 updated_at: 2025-03-28T20:07:41.000-06:00
-
 ---
-
-
 
 # Rhenium
 
@@ -77,4 +72,3 @@ SpecificHeat: 0.137
 NumberofShells: 6
 
 NumberofValence: nan
-

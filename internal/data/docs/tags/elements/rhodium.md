@@ -1,9 +1,7 @@
 ---
-
 id: rhodium
 
 aliases:
-
   - Rhodium
 
 tags: []
@@ -15,10 +13,7 @@ description: Rhodium
 title: Rhodium
 
 updated_at: 2025-03-28T20:07:41.000-06:00
-
 ---
-
-
 
 # Rhodium
 
@@ -77,4 +72,3 @@ SpecificHeat: 0.243
 NumberofShells: 5
 
 NumberofValence: nan
-

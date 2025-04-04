@@ -36,9 +36,7 @@ func run(
 	eg, _ := errgroup.WithContext(ctx)
 	eg.SetLimit(workers)
 	// Set skip browser installation since we're using Nix-provided browsers
-	runOption := &playwright.RunOptions{
-		SkipInstallBrowsers: true,
-	}
+	runOption := &playwright.RunOptions{SkipInstallBrowsers: true}
 
 	// Install playwright driver (will use PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1)
 	err := playwright.Install(runOption)
@@ -114,7 +112,7 @@ func run(
 				return pErr
 			}
 			time.Sleep(time.Second)
-			slog.Info("Visited post", "url", url)
+			slog.Info("visited post", "url", url)
 			return nil
 		})
 
@@ -140,7 +138,7 @@ func run(
 				return err
 			}
 			time.Sleep(time.Second)
-			slog.Info("Visited project", "url", url)
+			slog.Info("visited project", "url", url)
 			return nil
 		})
 	}
@@ -167,7 +165,7 @@ func run(
 				return err
 			}
 			time.Sleep(time.Second)
-			slog.Info("Visited tag", "url", url)
+			slog.Info("visited tag", "url", url)
 			return nil
 		})
 	}

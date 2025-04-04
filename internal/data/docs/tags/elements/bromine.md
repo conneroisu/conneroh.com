@@ -9,8 +9,6 @@ title: Bromine
 updated_at: 2025-03-28T20:18:29.000-06:00
 ---
 
-
-
 # Bromine
 
 AtomicNumber: 35
@@ -68,4 +66,3 @@ SpecificHeat: 0.474
 NumberofShells: 4
 
 NumberofValence: 7.0
-

@@ -17,10 +17,10 @@ updated_at: 2025-03-28T20:07:29.000-06:00
 # Making Vivado not suck at Git
 
 Vivado is a great tool for prototyping and simulation, but it's not really
-great for version control. I've been using Vivado for a while now inside of 
+great for version control. I've been using Vivado for a while now inside of
 [CPRE 488](/tags/edu/iastate/cpre488), and I've found that it's really
 difficult to use Git with Vivado.
 
 ## The Problem
 
-Vivado creates a lot of files 
+Vivado creates a lot of files

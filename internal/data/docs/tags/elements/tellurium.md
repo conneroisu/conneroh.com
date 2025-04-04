@@ -1,9 +1,7 @@
 ---
-
 id: tellurium
 
 aliases:
-
   - Tellurium
 
 tags: []
@@ -15,10 +13,7 @@ description: Tellurium
 title: Tellurium
 
 updated_at: 2025-03-28T20:07:42.000-06:00
-
 ---
-
-
 
 # Tellurium
 
@@ -77,4 +72,3 @@ SpecificHeat: 0.202
 NumberofShells: 5
 
 NumberofValence: 6.0
-

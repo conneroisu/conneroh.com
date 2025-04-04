@@ -8,6 +8,7 @@ description: Golang library for generating static structs, with a focus on perfo
 title: genstruct
 updated_at: 2025-03-28T20:07:29.000-06:00
 ---
+
 # genstruct
 
 ## Overview
@@ -22,4 +23,3 @@ Pkg Docs: [https://godoc.org/github.com/conneroisu/genstruct](https://godoc.org/
 ```bash
 go get github.com/connero/genstruct
 ```
-

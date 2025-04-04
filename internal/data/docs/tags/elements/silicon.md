@@ -1,9 +1,7 @@
 ---
-
 id: silicon
 
 aliases:
-
   - Silicon
 
 tags: []
@@ -15,10 +13,7 @@ description: Silicon
 title: Silicon
 
 updated_at: 2025-03-28T20:07:41.000-06:00
-
 ---
-
-
 
 # Silicon
 
@@ -77,6 +72,3 @@ SpecificHeat: 0.705
 NumberofShells: 3
 
 NumberofValence: 4.0
-
-
-

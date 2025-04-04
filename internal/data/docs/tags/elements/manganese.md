@@ -1,9 +1,7 @@
 ---
-
 id: manganese
 
 aliases:
-
   - Manganese
 
 tags: []
@@ -15,10 +13,7 @@ description: Manganese
 title: Manganese
 
 updated_at: 2025-03-28T20:07:40.000-06:00
-
 ---
-
-
 
 # Manganese
 
@@ -77,4 +72,3 @@ SpecificHeat: 0.479
 NumberofShells: 4
 
 NumberofValence: nan
-

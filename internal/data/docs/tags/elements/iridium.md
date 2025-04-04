@@ -1,9 +1,7 @@
 ---
-
 id: iridium
 
 aliases:
-
   - Iridium
 
 tags: []
@@ -15,10 +13,7 @@ description: Iridium
 title: Iridium
 
 updated_at: 2025-03-28T20:07:39.000-06:00
-
 ---
-
-
 
 # Iridium
 
@@ -77,4 +72,3 @@ SpecificHeat: 0.131
 NumberofShells: 6
 
 NumberofValence: nan
-

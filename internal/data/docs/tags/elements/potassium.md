@@ -1,9 +1,7 @@
 ---
-
 id: potassium
 
 aliases:
-
   - Potassium
 
 tags: []
@@ -15,10 +13,7 @@ description: Potassium
 title: Potassium
 
 updated_at: 2025-03-28T20:07:41.000-06:00
-
 ---
-
-
 
 # Potassium
 
@@ -77,4 +72,3 @@ SpecificHeat: 0.757
 NumberofShells: 4
 
 NumberofValence: 1.0
-

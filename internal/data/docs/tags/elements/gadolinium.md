@@ -9,8 +9,6 @@ title: Gadolinium
 updated_at: 2025-03-28T20:18:30.000-06:00
 ---
 
-
-
 # Gadolinium
 
 AtomicNumber: 64
@@ -68,4 +66,3 @@ SpecificHeat: 0.236
 NumberofShells: 6
 
 NumberofValence: nan
-

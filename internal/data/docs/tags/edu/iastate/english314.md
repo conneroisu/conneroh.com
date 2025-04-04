@@ -9,16 +9,17 @@ title: ENGL314
 updated_at: 2025-03-30T10:06:16.000-06:00
 ---
 
+# ENGL 314: Technical Communication
 
-# ENGL 314: Technical Communication  
 **Course Title:** Technical Communication  
 **Description:** Rhetorical concepts and processes to successfully communicate technical information individually and collaboratively via written, oral, visual, and electronic modes. Emphasizes the major strategies for analyzing expert and lay audiences and adapting information to those audiences. Covers developing and designing usable technical documentation, visualizing data, and presenting technical information orally ([English (ENGL) | Iowa State University Catalog](https://catalog.iastate.edu/previouscatalogs/2018-2019/azcourses/engl/#:~:text=Rhetorical%20concepts%20and%20processes%20to,and%20presenting%20technical%20information%20orally)).  
-**Tags:**  
-- technical-communication  
-- audience-analysis  
-- technical-documentation  
-- data-visualization  
-- presentation-skills  
+**Tags:**
+
+- technical-communication
+- audience-analysis
+- technical-documentation
+- data-visualization
+- presentation-skills
 
 Through readings, lecture videos, discussions, and assignments, I learned to better:
 

@@ -9,8 +9,6 @@ title: Cesium
 updated_at: 2025-03-28T20:18:29.000-06:00
 ---
 
-
-
 # Cesium
 
 AtomicNumber: 55
@@ -68,4 +66,3 @@ SpecificHeat: 0.242
 NumberofShells: 6
 
 NumberofValence: 1.0
-

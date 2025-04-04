@@ -1,9 +1,7 @@
 ---
-
 id: promethium
 
 aliases:
-
   - Promethium
 
 tags: []
@@ -15,10 +13,7 @@ description: Promethium
 title: Promethium
 
 updated_at: 2025-03-28T20:07:41.000-06:00
-
 ---
-
-
 
 # Promethium
 
@@ -77,4 +72,3 @@ SpecificHeat: nan
 NumberofShells: 6
 
 NumberofValence: nan
-

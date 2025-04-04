@@ -52,6 +52,7 @@
       };
       buildGoModule = pkgs.buildGoModule.override {go = pkgs.go_1_24;};
       buildWithSpecificGo = pkg: pkg.override {inherit buildGoModule;};
+      nix2containerPkgs = inputs.nix2container.packages.x86_64-linux;
     in {
       devShells.default = let
         scripts = {
@@ -318,6 +319,20 @@
           extraCommands = ''
             echo "$(git rev-parse HEAD)" > REVISION
           '';
+        };
+        C-conneroh-2cont = nix2containerPkgs.nix2container.buildImage {
+          name = "conneroh-2cont";
+          config = {
+            Cmd = ["/bin/conneroh.com"];
+            Env = [
+              "SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
+              "NIX_SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
+            ];
+          };
+          copyToRoot = [
+            conneroh
+            pkgs.cacert
+          ];
         };
         deployPackage = pkgs.writeShellScriptBin "deploy" ''
           set -e

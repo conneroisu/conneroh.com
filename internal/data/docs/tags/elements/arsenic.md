@@ -9,8 +9,6 @@ title: Arsenic
 updated_at: 2025-03-28T20:18:28.000-06:00
 ---
 
-
-
 # Arsenic
 
 AtomicNumber: 33
@@ -68,4 +66,3 @@ SpecificHeat: 0.329
 NumberofShells: 4
 
 NumberofValence: 5.0
-

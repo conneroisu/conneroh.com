@@ -1,9 +1,7 @@
 ---
-
 id: osmium
 
 aliases:
-
   - Osmium
 
 tags: []
@@ -15,10 +13,7 @@ description: Osmium
 title: Osmium
 
 updated_at: 2025-03-28T20:07:40.000-06:00
-
 ---
-
-
 
 # Osmium
 
@@ -77,4 +72,3 @@ SpecificHeat: 0.13
 NumberofShells: 6
 
 NumberofValence: nan
-

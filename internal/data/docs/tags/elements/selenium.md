@@ -1,9 +1,7 @@
 ---
-
 id: selenium
 
 aliases:
-
   - Selenium
 
 tags: []
@@ -15,10 +13,7 @@ description: Selenium
 title: Selenium
 
 updated_at: 2025-03-28T20:07:41.000-06:00
-
 ---
-
-
 
 # Selenium
 
@@ -77,4 +72,3 @@ SpecificHeat: 0.321
 NumberofShells: 4
 
 NumberofValence: 6.0
-

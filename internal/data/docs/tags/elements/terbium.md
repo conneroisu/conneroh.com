@@ -1,9 +1,7 @@
 ---
-
 id: terbium
 
 aliases:
-
   - Terbium
 
 tags: []
@@ -15,10 +13,7 @@ description: Terbium
 title: Terbium
 
 updated_at: 2025-03-28T20:07:42.000-06:00
-
 ---
-
-
 
 # Terbium
 
@@ -77,4 +72,3 @@ SpecificHeat: 0.182
 NumberofShells: 6
 
 NumberofValence: nan
-

@@ -8,6 +8,5 @@ description: Freund-Vector Corp. is a global service provider and manufacturer o
 title: Freund-Vector Corp.
 updated_at: 2025-03-28T20:07:30.000-06:00
 ---
+
 # Freund-Vector Corp.
-
-

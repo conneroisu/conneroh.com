@@ -1,9 +1,7 @@
 ---
-
 id: radium
 
 aliases:
-
   - Radium
 
 tags: []
@@ -15,10 +13,7 @@ description: Radium
 title: Radium
 
 updated_at: 2025-03-28T20:07:41.000-06:00
-
 ---
-
-
 
 # Radium
 
@@ -77,4 +72,3 @@ SpecificHeat: nan
 NumberofShells: 7
 
 NumberofValence: 2.0
-

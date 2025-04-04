@@ -13,6 +13,7 @@ description: The second Project from CPRE488 at Iowa State University
 title: CPRE488 MP1
 updated_at: 2025-04-01T08:24:54.000-06:00
 ---
+
 # CPRE488 MP1
 
 An embedded systems design lab with the goal of implementing and deploying a Positional Pulse Modulation (PPM) detection and generate circuit on a Zedboard FPGA using VHDL. This custom circuit had to be able to detect an incoming PPM signal from an HA-T6A RC controller and generate an identical signal. The final project features a C program that allows users to switch between a hardware relay mode, which relays the HA-T6A raw input, and a software relay mode, which relays the generated PPM output. This C program also allows users to debug the PPM detection circuit, record and play controller inputs for UAV flight, and ease flight controls through a filter mode.
@@ -42,7 +43,6 @@ Testing the controls, we found that each of the channels corresponded to the fol
 - CH5: Pit Trim
 - CH6: HOV Pit
 
-
 ## 4. Based on the ZedBoard documentation and your oscilloscope measurement of the trainer port, what concerns do you have about making this connection?
 
 The only real issue was VCC mismatch between the two systems - the HA-T6A controller had a 5 V VCC but the Zedboard had a 3.3V VCC. To avoid frying the Zedboard, we were provided a Sparkfun Logic Level Converter which down stepped from 5V to 3.3 V and upstepped from 3.3 V to 5 V .
@@ -54,7 +54,7 @@ Attached below is a figure that represents the structure of our custom AMBAAXI4-
 It should be noted that subsection B deviated in this design by instantiating their PPM capture and generate FSMs in the slave instantiation instead of at the top level. In hindsight, we believe this was the better approach as it eliminated the need for excess signals at the top level.
 ![projects/cpre488-mp1/668e3735ce19f4a8823916f67fa11f10_MD5.jpg](assets/668e3735ce19f4a8823916f67fa11f10_MD5.jpg)
 
-# How does an address on the AMBA bus generate a read or write enable signal for the slave registers in your design, and how will your PPM state machine get access to the IP core's Memory Mapped registers? 
+# How does an address on the AMBA bus generate a read or write enable signal for the slave registers in your design, and how will your PPM state machine get access to the IP core's Memory Mapped registers?
 
 ## 6. Address decoding
 
@@ -67,7 +67,7 @@ The AMBAAXI IP is connected to the Zynq processor on the main design through an 
 slv_reg0 = 0x43C00000
 slv_reg1 = 0x43C00004
 slv_reg2 $=0 \times 43 C 00008$
-slv_regX $=0 \times 43 \mathrm{C} 00000+(4$ * X$)$
+slv_regX $=0 \times 43 \mathrm{C} 00000+(4$ \* X$)$
 For example, with a 32-bit data bus, the design decodes address bits [5:2] to select among the 16 registers. The decoded value creates a 4-bit index (b"0000" to b"1111") that selects registers slv_reg0 through slv_reg15.
 
 ## 7. How does the PPM state machine get access to the IP core's Memory Mapped registers:
@@ -89,6 +89,7 @@ When this signal is asserted, the design decodes the address to determine which 
 
 1. The address comes from axi_awaddr, which latches the AXI address S_AXI_AWADDR when a valid address is presented
 2. The address is decoded by extracting the relevant bits:
+
 ```
 1 loc_addr := axi_awaddr(ADDR_LSB + OPT_MEM_ADDR_BITS DOWNTO ADDR_LSB);
 ```
@@ -335,6 +336,7 @@ The generator FSM receives its configuration values through intermediate signals
 
 1. Software mode (slv_reg8 through slv_reg13) when slv_reg0(0) = '1'
 2. Hardware relay mode (slv_reg2 through slv_reg7) when slv_reg0(0) = '0'
+
 ```
 GENERATE_PPM_UPDATE : PROCESS (S_AXI_ACLK) IS
 BEGIN
@@ -352,7 +354,6 @@ BEGIN
 END PROCESS GENERATE_PPM_UPDATE;
 ```
 
-
 ## 31. Key Architecture Points
 
 1. No Direct Register Access: The FSMs don't directly read from or write to the AXI interface. Instead, they interface through signals and dedicated processes.
@@ -363,4 +364,3 @@ END PROCESS GENERATE_PPM_UPDATE;
 ## 32. Bonus Credit
 
 We did not attempt any bonus credit for this lab.
-

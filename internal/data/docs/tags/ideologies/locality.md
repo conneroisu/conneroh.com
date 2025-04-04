@@ -17,4 +17,3 @@ Two types of locality
 Temporal locality: Recently accessed data items are likely to be accessed again soon.
 
 Spatial locality: Data items whose addresses are close to each other are likely to be accessed close in time.
-

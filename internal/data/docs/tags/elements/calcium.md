@@ -9,8 +9,6 @@ title: Calcium
 updated_at: 2025-03-28T20:18:29.000-06:00
 ---
 
-
-
 # Calcium
 
 AtomicNumber: 20
@@ -68,4 +66,3 @@ SpecificHeat: 0.647
 NumberofShells: 4
 
 NumberofValence: 2.0
-

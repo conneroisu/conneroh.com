@@ -9,8 +9,6 @@ title: Chlorine
 updated_at: 2025-03-28T20:18:29.000-06:00
 ---
 
-
-
 # Chlorine
 
 AtomicNumber: 17
@@ -68,4 +66,3 @@ SpecificHeat: 0.479
 NumberofShells: 3
 
 NumberofValence: 7.0
-

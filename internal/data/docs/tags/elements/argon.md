@@ -9,8 +9,6 @@ title: Argon
 updated_at: 2025-03-28T20:18:28.000-06:00
 ---
 
-
-
 # Argon
 
 AtomicNumber: 18
@@ -68,4 +66,3 @@ SpecificHeat: 0.52
 NumberofShells: 3
 
 NumberofValence: 8.0
-

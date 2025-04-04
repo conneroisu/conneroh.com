@@ -15,6 +15,7 @@ updated_at: 2025-04-01T05:55:55.000-06:00
 Github: [https://github.com/conneroisu/groq-go](https://github.com/conneroisu/groq-go)
 
 # groq-go
+
 As a college student passionate about developing tools that bridge the gap between Go applications and advanced language models, I created **groq-go**—an unofficial Go client library for the Groq API. This project enables seamless integration with various language models hosted on Groq's platform, facilitating efficient and type-safe interactions.
 
 **Key Features of groq-go:**
@@ -37,11 +38,9 @@ As a college student passionate about developing tools that bridge the gap betwe
 
 To incorporate groq-go into your Go project, use the following command:
 
-
 ```bash
 go get github.com/conneroisu/groq-go
 ```
-
 
 **Examples and Use Cases:**
 
@@ -69,4 +68,4 @@ The repository includes an `examples` directory showcasing various applications 
 
 For more information, to explore the source code, or to contribute to the project, visit the GitHub repository: [https://github.com/conneroisu/groq-go](https://github.com/conneroisu/groq-go)
 
-By developing groq-go, I aim to empower Go developers to harness the capabilities of advanced language models, fostering innovation and efficiency in application development. 
+By developing groq-go, I aim to empower Go developers to harness the capabilities of advanced language models, fostering innovation and efficiency in application development.

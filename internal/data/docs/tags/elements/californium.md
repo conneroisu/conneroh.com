@@ -9,8 +9,6 @@ title: Californium
 updated_at: 2025-03-28T20:18:29.000-06:00
 ---
 
-
-
 # Californium
 
 AtomicNumber: 98
@@ -68,4 +66,3 @@ SpecificHeat: nan
 NumberofShells: 7
 
 NumberofValence: nan
-

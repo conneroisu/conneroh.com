@@ -23,9 +23,7 @@ At its core, seltabl is a Go library accompanied by a command-line interface (CL
 ## Key Features
 
 - **Configurable Parsing:** seltabl allows for customizable parsing configurations, enabling developers to tailor the extraction process to their specific needs.
-  
 - **Goquery Integration:** By leveraging goquery, seltabl offers a familiar and powerful selection syntax, akin to jQuery, making it accessible for those already acquainted with CSS selectors.
-  
 - **Developer Tooling:** The inclusion of a language server and CLI utilities enhances the development experience, providing tools for code generation, linting, and testing.
 
 ## Getting Started with seltabl
@@ -88,4 +86,4 @@ This snippet demonstrates how seltabl can be employed to parse an HTML table, ex
 
 The development of seltabl has been a journey of learning, innovation, and community engagement. As I continue to refine and expand its capabilities, I invite fellow developers to explore, contribute, and provide feedback. Together, we can make web data extraction in Go not just a necessity, but a delight.
 
-For more information, detailed documentation, and contribution guidelines, visit the [seltabl GitHub repository](https://github.com/conneroisu/seltabl). Let's embark on this journey together, transforming challenges into opportunities and code into solutions. 
+For more information, detailed documentation, and contribution guidelines, visit the [seltabl GitHub repository](https://github.com/conneroisu/seltabl). Let's embark on this journey together, transforming challenges into opportunities and code into solutions.

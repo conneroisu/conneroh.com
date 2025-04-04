@@ -1,9 +1,7 @@
 ---
-
 id: iodine
 
 aliases:
-
   - Iodine
 
 tags: []
@@ -15,10 +13,7 @@ description: Iodine
 title: Iodine
 
 updated_at: 2025-03-28T20:07:39.000-06:00
-
 ---
-
-
 
 # Iodine
 
@@ -77,4 +72,3 @@ SpecificHeat: 0.214
 NumberofShells: 5
 
 NumberofValence: 7.0
-

@@ -49,6 +49,7 @@ It follows a modern server-side rendering approach with HTMX for dynamic content
 ```
 
 The site organizes content into three main types:
+
 - **Posts** - Blog articles
 - **Projects** - Portfolio projects
 - **Tags** - Skills and categories
@@ -126,12 +127,12 @@ slug: example-post-slug
 description: Short description of the post
 created_at: 2025-03-27T05:48:53.000-06:00
 updated_at: 2025-03-27T14:13:10.000-06:00
-banner_path: /dist/img/example-banner.jpg  # Optional
+banner_path: /dist/img/example-banner.jpg # Optional
 tags:
   - go
   - web-development
 projects:
-  - related-project-slug  # Optional related projects
+  - related-project-slug # Optional related projects
 ---
 
 # Markdown Content
@@ -185,10 +186,10 @@ The site uses HTMX for navigation and content loading:
 
 ```html
 <!-- Example of HTMX usage for navigation -->
-<a 
-  hx-get="/morph/projects" 
-  hx-target="#bodiody" 
-  hx-swap="outerHTML" 
+<a
+  hx-get="/morph/projects"
+  hx-target="#bodiody"
+  hx-swap="outerHTML"
   hx-push-url="/projects"
 >
   Projects
@@ -200,12 +201,13 @@ Alpine.js is used for client-side interactivity:
 ```html
 <!-- Example of Alpine.js usage for tabs -->
 <div x-data="{ activeTab: 'posts' }">
-  <button @click="activeTab = 'posts'" :class="{ 'active': activeTab === 'posts' }">
+  <button
+    @click="activeTab = 'posts'"
+    :class="{ 'active': activeTab === 'posts' }"
+  >
     Posts
   </button>
-  <div x-show="activeTab === 'posts'">
-    Posts content here...
-  </div>
+  <div x-show="activeTab === 'posts'">Posts content here...</div>
 </div>
 ```
 

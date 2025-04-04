@@ -9,8 +9,6 @@ title: Antimony
 updated_at: 2025-03-28T20:18:28.000-06:00
 ---
 
-
-
 # Antimony
 
 AtomicNumber: 51
@@ -68,4 +66,3 @@ SpecificHeat: 0.207
 NumberofShells: 5
 
 NumberofValence: 5.0
-

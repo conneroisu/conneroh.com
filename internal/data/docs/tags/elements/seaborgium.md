@@ -1,9 +1,7 @@
 ---
-
 id: seaborgium
 
 aliases:
-
   - Seaborgium
 
 tags: []
@@ -15,10 +13,7 @@ description: Seaborgium
 title: Seaborgium
 
 updated_at: 2025-03-28T20:07:41.000-06:00
-
 ---
-
-
 
 # Seaborgium
 
@@ -77,4 +72,3 @@ SpecificHeat: nan
 NumberofShells: 7
 
 NumberofValence: nan
-

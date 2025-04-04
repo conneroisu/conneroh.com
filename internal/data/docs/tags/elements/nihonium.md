@@ -1,9 +1,7 @@
 ---
-
 id: nihonium
 
 aliases:
-
   - Nihonium
 
 tags: []
@@ -15,10 +13,7 @@ description: Nihonium
 title: Nihonium
 
 updated_at: 2025-03-28T20:07:40.000-06:00
-
 ---
-
-
 
 # Nihonium
 
@@ -77,4 +72,3 @@ SpecificHeat: nan
 NumberofShells: 7
 
 NumberofValence: 3.0
-

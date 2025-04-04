@@ -9,8 +9,6 @@ title: Beryllium
 updated_at: 2025-03-28T20:18:28.000-06:00
 ---
 
-
-
 # Beryllium
 
 AtomicNumber: 4
@@ -68,4 +66,3 @@ SpecificHeat: 1.825
 NumberofShells: 2
 
 NumberofValence: 2.0
-

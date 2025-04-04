@@ -9,8 +9,6 @@ title: Chromium
 updated_at: 2025-03-28T20:18:29.000-06:00
 ---
 
-
-
 # Chromium
 
 AtomicNumber: 24
@@ -68,4 +66,3 @@ SpecificHeat: 0.449
 NumberofShells: 4
 
 NumberofValence: nan
-

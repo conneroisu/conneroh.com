@@ -1,9 +1,7 @@
 ---
-
 id: hydrogen
 
 aliases:
-
   - Hydrogen
 
 tags: []
@@ -15,10 +13,7 @@ description: Hydrogen
 title: Hydrogen
 
 updated_at: 2025-03-28T20:07:39.000-06:00
-
 ---
-
-
 
 # Hydrogen
 
@@ -77,4 +72,3 @@ SpecificHeat: 14.304
 NumberofShells: 1
 
 NumberofValence: 1.0
-

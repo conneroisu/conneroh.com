@@ -1,9 +1,7 @@
 ---
-
 id: roentgenium
 
 aliases:
-
   - Roentgenium
 
 tags: []
@@ -15,18 +13,15 @@ description: Roentgenium
 title: Roentgenium
 
 updated_at: 2025-03-28T20:07:41.000-06:00
-
 ---
 
-
-
-# Roentgenium 
+# Roentgenium
 
 AtomicNumber: 111
 
-Element: Roentgenium 
+Element: Roentgenium
 
-Symbol: Rg 
+Symbol: Rg
 
 AtomicMass: 272.0
 
@@ -77,4 +72,3 @@ SpecificHeat: nan
 NumberofShells: 7
 
 NumberofValence: nan
-

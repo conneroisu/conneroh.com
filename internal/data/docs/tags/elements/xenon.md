@@ -1,9 +1,7 @@
 ---
-
 id: xenon
 
 aliases:
-
   - Xenon
 
 tags: []
@@ -15,10 +13,7 @@ description: Xenon
 title: Xenon
 
 updated_at: 2025-03-28T20:07:42.000-06:00
-
 ---
-
-
 
 # Xenon
 
@@ -77,4 +72,3 @@ SpecificHeat: 0.158
 NumberofShells: 5
 
 NumberofValence: 8.0
-

@@ -9,8 +9,6 @@ title: Copper
 updated_at: 2025-03-28T20:18:29.000-06:00
 ---
 
-
-
 # Copper
 
 AtomicNumber: 29
@@ -68,4 +66,3 @@ SpecificHeat: 0.385
 NumberofShells: 4
 
 NumberofValence: nan
-

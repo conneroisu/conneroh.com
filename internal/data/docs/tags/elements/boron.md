@@ -9,8 +9,6 @@ title: Boron
 updated_at: 2025-03-28T20:18:29.000-06:00
 ---
 
-
-
 # Boron
 
 AtomicNumber: 5
@@ -68,4 +66,3 @@ SpecificHeat: 1.026
 NumberofShells: 2
 
 NumberofValence: 3.0
-

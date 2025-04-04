@@ -1,9 +1,7 @@
 ---
-
 id: moscovium
 
 aliases:
-
   - Moscovium
 
 tags: []
@@ -15,10 +13,7 @@ description: Moscovium
 title: Moscovium
 
 updated_at: 2025-03-28T20:07:40.000-06:00
-
 ---
-
-
 
 # Moscovium
 
@@ -77,4 +72,3 @@ SpecificHeat: nan
 NumberofShells: 7
 
 NumberofValence: 5.0
-

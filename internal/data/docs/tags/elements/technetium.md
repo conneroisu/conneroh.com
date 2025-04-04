@@ -1,9 +1,7 @@
 ---
-
 id: technetium
 
 aliases:
-
   - Technetium
 
 tags: []
@@ -15,10 +13,7 @@ description: Technetium
 title: Technetium
 
 updated_at: 2025-03-28T20:07:41.000-06:00
-
 ---
-
-
 
 # Technetium
 
@@ -77,4 +72,3 @@ SpecificHeat: nan
 NumberofShells: 5
 
 NumberofValence: nan
-

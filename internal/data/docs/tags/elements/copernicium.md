@@ -9,15 +9,13 @@ title: Copernicium
 updated_at: 2025-03-28T20:18:29.000-06:00
 ---
 
-
-
-# Copernicium 
+# Copernicium
 
 AtomicNumber: 112
 
-Element: Copernicium 
+Element: Copernicium
 
-Symbol: Cn 
+Symbol: Cn
 
 AtomicMass: 285.0
 
@@ -68,4 +66,3 @@ SpecificHeat: nan
 NumberofShells: 7
 
 NumberofValence: nan
-

@@ -1,9 +1,7 @@
 ---
-
 id: ytterbium
 
 aliases:
-
   - Ytterbium
 
 tags: []
@@ -15,10 +13,7 @@ description: Ytterbium
 title: Ytterbium
 
 updated_at: 2025-03-28T20:07:42.000-06:00
-
 ---
-
-
 
 # Ytterbium
 
@@ -77,4 +72,3 @@ SpecificHeat: 0.155
 NumberofShells: 6
 
 NumberofValence: nan
-

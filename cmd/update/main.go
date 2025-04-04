@@ -79,18 +79,18 @@ func main() {
 	}
 	eg := errgroup.Group{}
 	eg.SetLimit(*workers)
+
 	cache, err := cache.LoadCache(hashFile)
 	noError(err)
-
 	defer noError(cache.Close())
 
 	assets, ignored, err := parse(cache, assetsLoc)
 	noError(err)
 
-	actualized, err := actualizeAssets(ctx, client, ignored, assets)
+	_, err = actualizeAssets(ctx, client, ignored, assets)
 	noError(err)
 
-	mdParser := NewMDParser(actualized)
+	mdParser := NewMDParser(client)
 
 	parsedPosts, err := actualize[gen.Post](ctx, &eg, cache, mdParser, postsLoc)
 	noError(err)
@@ -400,11 +400,11 @@ var exts = []goldmark.Option{
 
 // NewMDParser creates a new markdown parser.
 func NewMDParser(
-	assets []Asset,
+	client *s3.Client,
 ) goldmark.Markdown {
 	exts = append(exts, goldmark.WithExtensions(
 		&wikilink.Extender{
-			Resolver: NewCustomResolver(assets),
+			Resolver: NewCustomResolver(client),
 		},
 	))
 	return goldmark.New(exts...)
@@ -441,11 +441,11 @@ func (b *CredHandler) Retrieve(
 
 // CustomResolver is a wikilink.Resolver that resolves pages and media referenced by
 // wikilinks to their destinations.
-type CustomResolver struct{ Assets []Asset }
+type CustomResolver struct{ client *s3.Client }
 
 // NewCustomResolver creates a new wikilink resolver.
-func NewCustomResolver(assets []Asset) *CustomResolver {
-	return &CustomResolver{Assets: assets}
+func NewCustomResolver(client *s3.Client) *CustomResolver {
+	return &CustomResolver{client: client}
 }
 
 // ResolveWikilink returns the address of the page that the provided
@@ -453,18 +453,27 @@ func NewCustomResolver(assets []Asset) *CustomResolver {
 // being placed into a link.
 func (c *CustomResolver) ResolveWikilink(n *wikilink.Node) (destination []byte, err error) {
 	targetStr := string(n.Target)
-	for _, asset := range c.Assets {
-		if targetStr == asset.Path ||
-			strings.HasSuffix(targetStr, asset.Path[strings.LastIndex(asset.Path, "/")+1:]) {
-			return []byte(asset.URL()), nil
-		}
+	_, err = c.client.GetObject(context.Background(), &s3.GetObjectInput{
+		Bucket: aws.String("conneroh"),
+		Key:    aws.String(targetStr),
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to get object(%s): %w", targetStr, err)
 	}
-	panic(fmt.Sprintf("unknown path: %s\n%v", targetStr, c.Assets))
+	return fmt.Appendf(nil,
+		"https://conneroh.fly.storage.tigris.dev/%s",
+		targetStr,
+	), nil
 }
 func parse(
 	cache *cache.Cache,
 	loc string,
 ) (parsedAssets []Asset, ignoredSlugs []string, err error) {
+	var (
+		hash string
+		path string
+		slug string
+	)
 	err = filepath.WalkDir(
 		loc,
 		func(fPath string, d fs.DirEntry, err error) error {
@@ -478,9 +487,9 @@ func parse(
 			if err != nil {
 				return err
 			}
-			hash := hashFileContent(body)
-			path := pathify(fPath)
-			slug := slugify(fPath)
+			hash = hashFileContent(body)
+			path = pathify(fPath)
+			slug = slugify(fPath)
 			if cache.Hashes[fPath] == hash {
 				cache.Hashes[fPath] = hash
 				ignoredSlugs = append(ignoredSlugs, slug)

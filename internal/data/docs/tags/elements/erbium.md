@@ -9,8 +9,6 @@ title: Erbium
 updated_at: 2025-03-28T20:18:29.000-06:00
 ---
 
-
-
 # Erbium
 
 AtomicNumber: 68
@@ -68,4 +66,3 @@ SpecificHeat: 0.168
 NumberofShells: 6
 
 NumberofValence: nan
-

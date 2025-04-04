@@ -11,6 +11,7 @@ updated_at: 2025-03-28T20:07:30.000-06:00
 ---
 
 # semanticrouter-go
+
 As a college student with a keen interest in artificial intelligence and software development, I developed **semanticrouter-go**, a high-performance, cost-effective AI decision-making library written in pure Go. This project aims to enhance the efficiency of large language models (LLMs) and AI agents by providing a rapid decision-making layer that leverages semantic vector spaces for routing requests based on configurable semantic meanings. citeturn0search0
 
 **Key Features of semanticrouter-go:**
@@ -27,16 +28,13 @@ As a college student with a keen interest in artificial intelligence and softwar
 
 To incorporate semanticrouter-go into your Go project, execute:
 
-
 ```bash
 go get github.com/conneroisu/semanticrouter-go
 ```
 
-
 **Example Use Case:**
 
 Consider a scenario in a veterinary application where it's essential to distinguish between noteworthy medical inquiries and casual chitchat. semanticrouter-go can be configured to route user inputs accordingly:
-
 
 ```go
 package main
@@ -102,7 +100,6 @@ func run() error {
 }
 ```
 
-
 In this example, the router evaluates the input "How's the weather today?" and classifies it under the "chitchat" route, demonstrating its ability to discern between different types of user interactions. citeturn0search0
 
 **Development and Contribution:**
@@ -111,4 +108,4 @@ semanticrouter-go is designed with a focus on performance and simplicity, aiming
 
 For more information, to explore the source code, or to contribute to the project, visit the GitHub repository: [https://github.com/conneroisu/semanticrouter-go](https://github.com/conneroisu/semanticrouter-go)
 
-By developing semanticrouter-go, I aim to empower Go developers to implement rapid and intelligent decision-making capabilities within their AI applications, fostering innovation and efficiency in the field of artificial intelligence. 
+By developing semanticrouter-go, I aim to empower Go developers to implement rapid and intelligent decision-making capabilities within their AI applications, fostering innovation and efficiency in the field of artificial intelligence.
