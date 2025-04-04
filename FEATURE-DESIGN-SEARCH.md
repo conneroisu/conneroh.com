@@ -7,6 +7,15 @@
 - raw text search using embeddings
 - enable recommendations toggle?
 
+## Autocomplete Types
+As you start typing, you will see a list of autocompletes:
+- 1. categories (i.e. tag, project, post) 
+
+## Autocomplete States
+
+- 1. State 1: Shows autocompletes for categories and natural language
+- 2. State 2: We have a category selected, show relevant autocompletes for the (tags, projects, posts)
+
 ### Search by tags
 
 - `-tag:programming-language/go` will not show posts with `programming-language/go` tag
@@ -140,10 +149,10 @@ The global search will:
 
 #### Search Endpoints
 
-- `POST /api/search/posts` - Search posts with query/filters
-- `POST /api/search/projects` - Search projects with query/filters
-- `POST /api/search/tags` - Search tags with query/filters
-- `POST /api/search/all` - Global search across all content
+- `POST /search/posts` - Search posts with query/filters
+- `POST /search/projects` - Search projects with query/filters
+- `POST /search/tags` - Search tags with query/filters
+- `POST /search/all` - Global search across all content
 
 #### Autocomplete Endpoints
 
@@ -413,90 +422,6 @@ templ PostSearchResults(posts []*gen.Post, query SearchQuery) {
 }
 ```
 
-## Integration With Existing Code
-
-### Adding Search Routes
-
-Add these routes to your existing `routes.go`:
-
-```go
-// Add search routes
-h.Handle("POST /search/posts", http.HandlerFunc(SearchPostsHandler))
-h.Handle("POST /search/projects", http.HandlerFunc(SearchProjectsHandler))
-h.Handle("POST /search/tags", http.HandlerFunc(SearchTagsHandler))
-h.Handle("POST /search/all", http.HandlerFunc(SearchAllHandler))
-
-// Add autocomplete routes
-h.Handle("GET /autocomplete/tags", http.HandlerFunc(AutocompleteTagsHandler))
-h.Handle("GET /autocomplete/projects", http.HandlerFunc(AutocompleteProjectsHandler))
-h.Handle("GET /autocomplete/posts", http.HandlerFunc(AutocompletePostsHandler))
-h.Handle("GET /autocomplete/all", http.HandlerFunc(AutocompleteAllHandler))
-```
-
-## User Experience Improvements
-
-### Keyboard Navigation
-
-Enhance the search UI with keyboard navigation:
-
-```js
-document.addEventListener("alpine:init", () => {
-  Alpine.data("searchUI", () => ({
-    selectedIndex: -1,
-    suggestions: [],
-
-    init() {
-      // Handle keyboard navigation
-      this.$watch("suggestions", () => {
-        this.selectedIndex = -1;
-      });
-    },
-
-    onKeyDown(e) {
-      if (e.key === "ArrowDown") {
-        e.preventDefault();
-        this.selectedIndex = Math.min(
-          this.selectedIndex + 1,
-          this.suggestions.length - 1,
-        );
-      } else if (e.key === "ArrowUp") {
-        e.preventDefault();
-        this.selectedIndex = Math.max(this.selectedIndex - 1, -1);
-      } else if (e.key === "Enter" && this.selectedIndex >= 0) {
-        e.preventDefault();
-        this.selectSuggestion(this.suggestions[this.selectedIndex]);
-      }
-    },
-
-    selectSuggestion(suggestion) {
-      // Add the suggestion to the query
-      // ...
-    },
-  }));
-});
-```
-
-### Search History
-
-Store recent searches in local storage:
-
-```js
-function saveSearchToHistory(query) {
-  const searches = JSON.parse(localStorage.getItem("recentSearches") || "[]");
-
-  // Don't add duplicates
-  if (!searches.includes(query)) {
-    searches.unshift(query);
-
-    // Keep only the 10 most recent searches
-    if (searches.length > 10) {
-      searches.pop();
-    }
-
-    localStorage.setItem("recentSearches", JSON.stringify(searches));
-  }
-}
-```
 
 ## Progressive Enhancement
 

@@ -8,7 +8,7 @@
       url = "github:numtide/flake-utils";
       inputs.systems.follows = "systems";
     };
-
+    bun2nix.url = "github:baileyluTCD/bun2nix";
     twerge = {
       url = "github:conneroisu/twerge?tag=v0.2.9";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -184,7 +184,7 @@
               nixd
               statix
               deadnix
-              # inputs.bun2nix.defaultPackage.${pkgs.system}.bin
+              inputs.bun2nix.defaultPackage.${pkgs.system}.bin
 
               # Go Tools
               go_1_24
