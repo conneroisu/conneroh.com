@@ -4,8 +4,6 @@ package main
 import (
 	"bytes"
 	"context"
-	"crypto/md5"
-	"encoding/hex"
 	"flag"
 	"fmt"
 	"io/fs"
@@ -98,22 +96,22 @@ func run(ctx context.Context, getenv func(string) string) (err error) {
 	if err != nil {
 		return err
 	}
-	updateCache, err := cache.LoadCache(hashFile)
+	objCache, err := cache.LoadCache(hashFile)
 	if err != nil {
 		return err
 	}
 	mdParser := marked.NewMDParser(awsClient)
 
 	// Log cache stats
-	slog.Info("cache loaded", "entries", len(updateCache.Hashes))
+	slog.Info("cache loaded", "entries", len(objCache.Hashes))
 
 	// Make sure cache is written at the end, regardless of how the function exits
 	defer func() {
 		// Log final cache stats and time
 		slog.Info("saving cache",
-			"entries", len(updateCache.Hashes),
+			"entries", len(objCache.Hashes),
 			"duration", time.Since(start).String())
-		err = updateCache.Close()
+		err = objCache.Close()
 		if err != nil {
 			err = eris.Wrap(
 				err,
@@ -142,7 +140,7 @@ func run(ctx context.Context, getenv func(string) string) (err error) {
 		for _, loc := range locations {
 			loc := loc // Capture for closure
 			eg.Go(func() error {
-				assets, ignored, err := parse(updateCache, loc)
+				assets, ignored, err := parse(objCache, loc)
 
 				// Store result safely
 				mu.Lock()
@@ -460,7 +458,7 @@ func parse(
 				}
 
 				// Calculate hash
-				hash := hashFileContent(body)
+				hash := cache.Hash(body)
 				path := pathify(filePath)
 				slug := slugify(filePath)
 
@@ -560,11 +558,6 @@ func actualizeAssets(
 
 	slog.Info("assets upload complete", "total", amount)
 	return nil
-}
-
-func hashFileContent(content []byte) string {
-	sum := md5.Sum(content)
-	return hex.EncodeToString(sum[:])
 }
 
 func rememberMD[T gen.Post | gen.Project | gen.Tag](ignored []string) []*T {
