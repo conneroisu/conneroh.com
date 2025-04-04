@@ -36,16 +36,12 @@ const (
 	postsLoc    = "internal/data/docs/posts/"
 	tagsLoc     = "internal/data/docs/tags/"
 	projectsLoc = "internal/data/docs/projects/"
-
-	baseBucketEndpoint = "https://fly.storage.tigris.dev"
 )
 
 var (
-	locations      = []string{assetsLoc, postsLoc, projectsLoc, tagsLoc}
-	workers        = flag.Int("jobs", 20, "number of parallel uploads")
-	cwd            = flag.String("cwd", "", "current working directory")
-	debug          = flag.Bool("debug", false, "enable debug logging for cache operations")
-	errInvalidFlag = eris.New("invalid flag value")
+	workers = flag.Int("jobs", 20, "number of parallel uploads")
+	cwd     = flag.String("cwd", "", "current working directory")
+	debug   = flag.Bool("debug", false, "enable debug logging for cache operations")
 )
 
 // Define parse and actualization result types
@@ -67,14 +63,16 @@ type actualizeResult struct {
 func main() {
 	flag.Parse()
 	ctx := context.Background()
-
 	if err := run(ctx, os.Getenv); err != nil {
 		slog.Error("error", slog.String("err", err.Error()))
 		os.Exit(1)
 	}
 }
 
-func run(ctx context.Context, getenv func(string) string) (err error) {
+func run(
+	ctx context.Context,
+	getenv func(string) string,
+) (err error) {
 	start := time.Now()
 	if *cwd != "" {
 		err = os.Chdir(*cwd)
@@ -135,7 +133,7 @@ func run(ctx context.Context, getenv func(string) string) (err error) {
 		var mu sync.Mutex
 
 		// Start parsing each location
-		for _, loc := range locations {
+		for _, loc := range []string{assetsLoc, postsLoc, projectsLoc, tagsLoc} {
 			loc := loc // Capture for closure
 			eg.Go(func() error {
 				assets, ignored, egErr := parse(objCache, loc)
