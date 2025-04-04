@@ -339,7 +339,7 @@
 
           if [ -z "$FLY_AUTH_TOKEN" ]; then
             echo "FLY_AUTH_TOKEN is not set. Getting it from doppler..."
-            FLY_AUTH_TOKEN=$(${pkgs.doppler}/bin/doppler secrets get --plain FLY_AUTH_TOKEN)
+            FLY_AUTH_TOKEN=$(doppler secrets get --plain FLY_AUTH_TOKEN)
           fi
 
           echo "Copying image to Fly.io registry..."
@@ -363,7 +363,7 @@
 
           if [ -z "$FLY_DEV_AUTH_TOKEN" ]; then
             echo "FLY_AUTH_TOKEN is not set. Getting it from doppler..."
-            FLY_DEV_AUTH_TOKEN=$(${pkgs.doppler}/bin/doppler secrets get --plain FLY_DEV_AUTH_TOKEN)
+            FLY_DEV_AUTH_TOKEN=$(doppler secrets get --plain FLY_DEV_AUTH_TOKEN)
           fi
 
           echo "Copying dev image to Fly.io registry..."
