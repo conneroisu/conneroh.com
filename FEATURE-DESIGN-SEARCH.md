@@ -22,8 +22,8 @@
 - `-post:hello-world` will not show results related to the `hello-world` post
 - `post:hello-world` will show posts with `hello-world` post
 
-HTMX endpoint for list pages: `/search/{tag|project|post}`
-HTMX endpoint for global search: `/search/all`
+HTMX endpoint for list pages: `/search/{tag|project|post}/...`
+HTMX endpoint for global search: `/search/all/...`
 
 ## Auto-complete
 
