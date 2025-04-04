@@ -20,23 +20,23 @@ var (
 		&gen.AllProjects,
 		&gen.AllTags,
 	)
-	posts = views.List(
-		routing.PluralTargetPost,
-		&gen.AllPosts,
-		&gen.AllProjects,
-		&gen.AllTags,
-	)
 	projects = views.List(
 		routing.PluralTargetProject,
 		&gen.AllPosts,
 		&gen.AllProjects,
 		&gen.AllTags,
+		[]string{},
+		[]string{},
+		[]string{},
 	)
 	tags = views.List(
 		routing.PluralTargetTag,
 		&gen.AllPosts,
 		&gen.AllProjects,
 		&gen.AllTags,
+		[]string{},
+		[]string{},
+		[]string{},
 	)
 )
 
@@ -72,10 +72,13 @@ func AddRoutes(
 
 	h.Handle(
 		"GET /posts",
-		templ.Handler(layouts.Page(posts)))
+		postsHandler(&gen.AllPosts, &gen.AllProjects, &gen.AllTags),
+	)
 	h.Handle(
 		"GET /morph/posts",
-		templ.Handler(layouts.Morpher(posts)))
+		postsHandler(&gen.AllPosts, &gen.AllProjects, &gen.AllTags),
+	)
+
 	h.Handle(
 		"GET /projects",
 		templ.Handler(layouts.Page(projects)))

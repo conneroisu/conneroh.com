@@ -71,6 +71,9 @@ templ List(
 	posts *[]*gen.Post,
 	projects *[]*gen.Project,
 	tags *[]*gen.Tag,
+	postReq []string,
+	projectReq []string,
+	tagReq []string,
 ) {
 	<div
 		class={ twerge.It("container mx-auto px-4 py-8") }
@@ -83,25 +86,39 @@ templ List(
 		@search(
 			target,
 		)
-		<div
-			id={ fmt.Sprintf("list-%s", target) }
-			class={ twerge.It("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6") }
-		>
-			switch target {
-				case routing.PluralTargetPost:
-					for _, post := range *posts {
-						@listPostItem(post)
-					}
-				case routing.PluralTargetProject:
-					for _, project := range *projects {
-						@listProjectItem(project)
-					}
-				case routing.PluralTargetTag:
-					for _, tag := range *tags {
-						@listTagItem(tag)
-					}
-			}
-		</div>
+		@Results(
+			target,
+			posts,
+			projects,
+			tags,
+		)
+	</div>
+}
+
+templ Results(
+	target routing.PluralTarget,
+	posts *[]*gen.Post,
+	projects *[]*gen.Project,
+	tags *[]*gen.Tag,
+) {
+	<div
+		id={ fmt.Sprintf("list-%s", target) }
+		class={ twerge.It("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6") }
+	>
+		switch target {
+			case routing.PluralTargetPost:
+				for _, post := range *posts {
+					@listPostItem(post)
+				}
+			case routing.PluralTargetProject:
+				for _, project := range *projects {
+					@listProjectItem(project)
+				}
+			case routing.PluralTargetTag:
+				for _, tag := range *tags {
+					@listTagItem(tag)
+				}
+		}
 	</div>
 }
 
