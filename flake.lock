@@ -196,8 +196,32 @@
         "bun2nix": "bun2nix",
         "flake-utils": "flake-utils_2",
         "nixpkgs": "nixpkgs_2",
+        "sqlcquash": "sqlcquash",
         "systems": "systems_2",
         "twerge": "twerge"
+      }
+    },
+    "sqlcquash": {
+      "inputs": {
+        "flake-utils": [
+          "flake-utils"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1743842642,
+        "narHash": "sha256-xHogooPXCg/hMkCmKfHvQuDktmy1h5OcoRHcVeC1S70=",
+        "owner": "conneroisu",
+        "repo": "sqlcquash",
+        "rev": "3408bb43da93b4a9ef56405ebd3f474712b6d276",
+        "type": "github"
+      },
+      "original": {
+        "owner": "conneroisu",
+        "repo": "sqlcquash",
+        "type": "github"
       }
     },
     "systems": {

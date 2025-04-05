@@ -14,6 +14,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "flake-utils";
     };
+    sqlcquash = {
+      url = "github:conneroisu/sqlcquash?tag=v0.1.0";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.follows = "flake-utils";
+    };
 
     systems.url = "github:nix-systems/default";
   };
@@ -227,6 +232,9 @@
               openssl.dev
               skopeo
 
+              # Sql
+              sqlc
+
               # Playwright
               playwright-driver # Provides browser archives and driver scripts
               (
@@ -248,10 +256,11 @@
               glib # Low-level core library
               gtk3 # GUI toolkit
             ]
-            ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [
-              # macOS-specific dependencies
-              libiconv
-            ]
+            ++ (with pkgs;
+              lib.optionals stdenv.isDarwin [
+                # macOS-specific dependencies
+                libiconv
+              ])
             ++ pkgs.lib.optionals pkgs.stdenv.isLinux [
               # Linux-specific dependencies
               chromium # Chromium browser
