@@ -42,7 +42,7 @@ func Tag(
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		var templ_7745c5c3_Var2 = []any{twerge.It("container mx-auto px-4 py-8 max-w-5xl")}
+		var templ_7745c5c3_Var2 = []any{twerge.It("py-8 px-4 container mx-auto")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var2...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -229,7 +229,7 @@ func Tag(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var18 = []any{twerge.It("py-4 px-1 border-b-2 font-medium text-sm sm:text-base border-blue-500 text-blue-500")}
+		var templ_7745c5c3_Var18 = []any{twerge.It("border-b-2 font-medium py-4 text-sm sm:text-base px-1")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var18...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -277,7 +277,7 @@ func Tag(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var22 = []any{twerge.It("py-4 px-1 border-b-2 font-medium text-sm sm:text-base border-transparent text-gray-500 text-gray-400 hover:text-gray-300")}
+		var templ_7745c5c3_Var22 = []any{twerge.It("border-b-2 font-medium py-4 text-sm sm:text-base px-1")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var22...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -325,7 +325,7 @@ func Tag(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var26 = []any{twerge.It("py-4 px-1 border-b-2 font-medium text-sm sm:text-base")}
+		var templ_7745c5c3_Var26 = []any{twerge.It("border-b-2 font-medium py-4 text-sm sm:text-base px-1")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var26...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

@@ -113,7 +113,7 @@ func run(ctx context.Context) error {
 		for orig, class := range twerge.ClassMapStr {
 			if gen == class {
 				if genMerged != orig {
-					return eris.Errorf("\n\n %s has been merged to %s ", orig, genMerged)
+					return eris.Errorf("\n\n '%s' has been merged to '%s'", orig, genMerged)
 				}
 			}
 		}

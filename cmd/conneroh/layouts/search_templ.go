@@ -391,7 +391,7 @@ func search() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var34 = []any{twerge.It("block px-4 py-3 hover:bg-gray-700 transition-colors")}
+		var templ_7745c5c3_Var34 = []any{twerge.It("transition-colors px-4 block py-3 hover:bg-gray-700")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var34...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -611,7 +611,7 @@ func search() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var54 = []any{twerge.It("md:hidden text-gray-300 hover:text-white focus:outline-none")}
+		var templ_7745c5c3_Var54 = []any{twerge.It("text-gray-300 hover:text-white focus:outline-none md:hidden")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var54...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

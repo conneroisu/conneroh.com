@@ -13,7 +13,7 @@ templ Project(
 	fullTags *[]*gen.Tag,
 ) {
 	<div
-		class={ twerge.It("container mx-auto px-4 py-8 max-w-4xl") }
+		class={ twerge.It("py-8 px-4 container mx-auto") }
 	>
 		<header
 			class={ twerge.It("mb-8") }
@@ -78,7 +78,7 @@ templ Project(
 				Content
 			</h2>
 			<div
-				class={ twerge.It("mt-6 mb-4 my-4 my-4 my-2 my-6 max-w-none text-gray-300 leading-relaxed") }
+				class={ twerge.It("my-6 text-gray-300 leading-relaxed max-w-none") }
 			>
 				<article>
 					@templ.Raw(project.Content)

@@ -14,7 +14,7 @@ templ Post(
 	fullTags *[]*gen.Tag,
 ) {
 	<article
-		class={ twerge.It("container mx-auto px-4 py-8 max-w-3xl") }
+		class={ twerge.It("py-8 px-4 container mx-auto") }
 	>
 		<div
 			class={ twerge.It("mb-8") }
@@ -61,7 +61,7 @@ templ Post(
 			class={ twerge.It("bg-gray-800 rounded-lg shadow-lg overflow-hidden p-6 mb-8") }
 		>
 			<div
-				class={ twerge.It("mt-6 mb-4 my-4 my-4 my-2 my-6 max-w-none text-gray-300 leading-relaxed") }
+				class={ twerge.It("my-6 text-gray-300 leading-relaxed max-w-none") }
 			>
 				@templ.Raw(post.Content)
 			</div>

@@ -15,7 +15,7 @@ templ header() {
 				x-data="{ isMenuOpen: false }"
 			>
 				<div
-					class={ twerge.It("flex items-center justify-between h-16") }
+					class={ twerge.It("justify-between h-16 flex items-center") }
 				>
 					// Left side: Logo and navigation links
 					<div
@@ -23,7 +23,7 @@ templ header() {
 					>
 						// Mobile menu button
 						@icon("menu", templ.Attributes{
-							"class":  twerge.It("sm:hidden p-2 rounded-md hover:text-gray-200 text-gray-300 hover:text-white hover:bg-gray-700 focus:outline-none mr-2"),
+							"class":  twerge.It("p-2 hover:text-white rounded-md hover:bg-gray-700 sm:hidden mr-2 text-gray-300 focus:outline-none"),
 							"@click": "isMenuOpen = !isMenuOpen",
 						})
 						// Logo - visible on all screens

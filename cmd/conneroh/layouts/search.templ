@@ -164,7 +164,7 @@ templ search() {
 								<li>
 									<a
 										:href="result.url"
-										class={ twerge.It("block px-4 py-3 hover:bg-gray-700 transition-colors") }
+										class={ twerge.It("transition-colors px-4 block py-3 hover:bg-gray-700") }
 										@click="isSearchOpen = false"
 									>
 										<div
@@ -239,7 +239,7 @@ templ search() {
 		// Mobile search toggle button
 		<button
 			@click="isSearchOpen = !isSearchOpen"
-			class={ twerge.It("md:hidden text-gray-300 hover:text-white focus:outline-none") }
+			class={ twerge.It("text-gray-300 hover:text-white focus:outline-none md:hidden") }
 		>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"

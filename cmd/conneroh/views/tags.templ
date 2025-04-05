@@ -15,7 +15,7 @@ templ Tag(
 	fullTags *[]*gen.Tag,
 ) {
 	<div
-		class={ twerge.It("container mx-auto px-4 py-8 max-w-5xl") }
+		class={ twerge.It("py-8 px-4 container mx-auto") }
 	>
 		<header
 			class={ twerge.It("text-center mb-12") }
@@ -49,21 +49,21 @@ templ Tag(
 					<button
 						@click="activeTab = 'posts'"
 						:class={ fmt.Sprintf("{'%s': activeTab === 'posts', '%s': activeTab !== 'posts'}", twerge.It("border-blue-500 text-blue-500"), twerge.It("border-transparent text-gray-500 text-gray-400 hover:text-gray-300")) }
-						class={ twerge.It("py-4 px-1 border-b-2 font-medium text-sm sm:text-base border-blue-500 text-blue-500") }
+						class={ twerge.It("border-b-2 font-medium py-4 text-sm sm:text-base px-1") }
 					>
 						Posts ({ fmt.Sprintf("%d", len(tag.Posts)) })
 					</button>
 					<button
 						@click="activeTab = 'projects'"
 						:class={ fmt.Sprintf("{'%s': activeTab === 'projects', '%s': activeTab !== 'projects'}", twerge.It("border-blue-500 text-blue-500"), twerge.It("border-transparent text-gray-500 text-gray-400 hover:text-gray-300")) }
-						class={ twerge.It("py-4 px-1 border-b-2 font-medium text-sm sm:text-base border-transparent text-gray-500 text-gray-400 hover:text-gray-300") }
+						class={ twerge.It("border-b-2 font-medium py-4 text-sm sm:text-base px-1") }
 					>
 						Projects ({ fmt.Sprintf("%d", len(tag.Projects)) })
 					</button>
 					<button
 						@click="activeTab = 'related'"
 						:class={ fmt.Sprintf("{'%s': activeTab === 'related', '%s': activeTab !== 'related'}", twerge.It("border-blue-500 text-blue-500"), twerge.It("border-transparent text-gray-500 text-gray-400 hover:text-gray-300")) }
-						class={ twerge.It("py-4 px-1 border-b-2 font-medium text-sm sm:text-base") }
+						class={ twerge.It("border-b-2 font-medium py-4 text-sm sm:text-base px-1") }
 					>
 						Related Tags ({ fmt.Sprintf("%d", len(tag.Tags)) })
 					</button>

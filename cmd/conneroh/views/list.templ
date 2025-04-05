@@ -76,7 +76,7 @@ templ List(
 	tagReq []string,
 ) {
 	<div
-		class={ twerge.It("container mx-auto px-4 py-8") }
+		class={ twerge.It("py-8 px-4 container mx-auto") }
 	>
 		<h1
 			class={ twerge.It("text-3xl font-bold mb-6 text-white") }
@@ -215,7 +215,7 @@ templ listTagItem(
 					{ tag.Title }
 				</h2>
 				<div
-					class={ twerge.It("bg-gray-700 rounded-full flex items-center justify-center h-8 w-8") }
+					class={ twerge.It("justify-center bg-gray-700 rounded-full items-center flex w-8 h-8") }
 				>
 					@icon(tag.Icon, templ.Attributes{"class": "stoke-white"})
 				</div>

@@ -82,7 +82,7 @@ func header() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var6 = []any{twerge.It("flex items-center justify-between h-16")}
+		var templ_7745c5c3_Var6 = []any{twerge.It("justify-between h-16 flex items-center")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var6...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -127,7 +127,7 @@ func header() templ.Component {
 			return templ_7745c5c3_Err
 		}
 		templ_7745c5c3_Err = icon("menu", templ.Attributes{
-			"class":  twerge.It("sm:hidden p-2 rounded-md hover:text-gray-200 text-gray-300 hover:text-white hover:bg-gray-700 focus:outline-none mr-2"),
+			"class":  twerge.It("p-2 hover:text-white rounded-md hover:bg-gray-700 sm:hidden mr-2 text-gray-300 focus:outline-none"),
 			"@click": "isMenuOpen = !isMenuOpen",
 		}).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
