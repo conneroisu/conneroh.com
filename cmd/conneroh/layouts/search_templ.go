@@ -281,7 +281,7 @@ func search() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var24 = []any{twerge.It("animate-spin h-5 w-5 mx-auto")}
+		var templ_7745c5c3_Var24 = []any{twerge.It("w-5 mx-auto animate-spin h-5")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var24...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -1161,7 +1161,7 @@ func search() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var104 = []any{twerge.It("mr-4 flex-shrink-0 h-10 w-10 rounded-full bg-blue-900 flex items-center justify-center text-blue-300")}
+		var templ_7745c5c3_Var104 = []any{twerge.It("flex-shrink-0flex items-center bg-blue-900 mr-4 h-10 w-10 justify-center text-blue-300 rounded-full")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var104...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

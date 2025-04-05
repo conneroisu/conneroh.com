@@ -120,7 +120,7 @@ templ search() {
 						class={ twerge.It("p-4 text-center text-gray-400") }
 					>
 						<svg
-							class={ twerge.It("animate-spin h-5 w-5 mx-auto") }
+							class={ twerge.It("w-5 mx-auto animate-spin h-5") }
 							xmlns="http://www.w3.org/2000/svg"
 							fill="none"
 							viewBox="0 0 24 24"
@@ -404,7 +404,7 @@ templ search() {
 									>
 										// Icon based on result type
 										<div
-											class={ twerge.It("mr-4 flex-shrink-0 h-10 w-10 rounded-full bg-blue-900 flex items-center justify-center text-blue-300") }
+											class={ twerge.It("flex-shrink-0 flex items-center bg-blue-900 mr-4 h-10 w-10 justify-center text-blue-300 rounded-full") }
 										>
 											<svg
 												x-show="result.type === 'post'"

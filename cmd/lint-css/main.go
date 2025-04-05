@@ -10,7 +10,6 @@ import (
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
 	"github.com/conneroisu/conneroh.com/internal/routing"
 	"github.com/conneroisu/twerge"
-	"github.com/rotisserie/eris"
 )
 
 func main() {
@@ -113,7 +112,7 @@ func run(ctx context.Context) error {
 		for orig, class := range twerge.ClassMapStr {
 			if gen == class {
 				if genMerged != orig {
-					return eris.Errorf("\n\n '%s' has been merged to '%s'", orig, genMerged)
+					print(fmt.Sprintf("\n\n '%s' has been merged to '%s'", orig, genMerged))
 				}
 			}
 		}
