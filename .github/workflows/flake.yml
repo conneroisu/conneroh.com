@@ -37,21 +37,21 @@ jobs:
           nix run --accept-flake-config .#deployPackage
         env:
           FLY_AUTH_TOKEN: ${{ secrets.FLY_AUTH_TOKEN }}
-    - name: Create a comment with a link
-        uses: actions/github-script@v6
-        with:
-          github_token: ${{ github.token }}
-          script: |
-            const core = require('@actions/core');
-            const github = require('@actions/github').getOctokit(process.env.GITHUB_TOKEN);
-            const prNumber = ${{ github.event.number }}
-            const commentBody = `Check out this link: [My Link](https://example.com/${prNumber})`
-            github.rest.issues.createComment({
-              owner: ${{ github.repository_owner.login }},
-              repo: ${{ github.repository_name }},
-              issue_number: prNumber,
-              body: commentBody
-            });
+      - name: Create a comment with a link
+          uses: actions/github-script@v6
+          with:
+            github_token: ${{ github.token }}
+            script: |
+              const core = require('@actions/core');
+              const github = require('@actions/github').getOctokit(process.env.GITHUB_TOKEN);
+              const prNumber = ${{ github.event.number }}
+              const commentBody = `Check out this link: [My Link](https://example.com/${prNumber})`
+              github.rest.issues.createComment({
+                owner: ${{ github.repository_owner.login }},
+                repo: ${{ github.repository_name }},
+                issue_number: prNumber,
+                body: commentBody
+              });
   deploy-dev:
     name: Deploy To Development
     if: github.ref != 'refs/heads/main'
