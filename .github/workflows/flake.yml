@@ -38,8 +38,8 @@ jobs:
         env:
           FLY_AUTH_TOKEN: ${{ secrets.FLY_AUTH_TOKEN }}
       - name: Create a comment with a link
-          uses: actions/github-script@v6
-          with:
+        uses: actions/github-script@v6
+        with:
             github_token: ${{ github.token }}
             script: |
               const core = require('@actions/core');
