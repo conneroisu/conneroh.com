@@ -27,12 +27,10 @@ func AddRoutes(
 	)
 	h.Handle(
 		"GET /morph/home",
-		templ.Handler(layouts.Morpher(home)),
-	)
+		templ.Handler(layouts.Morpher(home)))
 	h.Handle(
 		"GET /dist/",
-		http.FileServer(http.FS(static.Dist)),
-	)
+		http.FileServer(http.FS(static.Dist)))
 	h.Handle(
 		"GET /favicon.ico",
 		http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
@@ -42,13 +40,10 @@ func AddRoutes(
 
 	h.Handle(
 		"GET /posts",
-		postsHandler(layouts.Page),
-	)
+		postsHandler(layouts.Page))
 	h.Handle(
 		"GET /morph/posts",
-		postsHandler(layouts.Morpher),
-	)
-
+		postsHandler(layouts.Morpher))
 	h.Handle(
 		"GET /projects",
 		projectsHandler(layouts.Page))
