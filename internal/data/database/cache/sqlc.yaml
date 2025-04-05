@@ -1,5 +1,0 @@
-version: "2"
-sql:
-  - schema: combined/schema.sql
-    queries: combined/queries.sql
-    engine: sqlite

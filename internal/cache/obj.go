@@ -40,7 +40,6 @@ func LoadCache(hashFilePath string) (*Cache, error) {
 		}
 		return nil, err
 	}
-
 	var cache Cache
 	if err := json.Unmarshal(data, &cache); err != nil {
 		return nil, eris.Wrapf(

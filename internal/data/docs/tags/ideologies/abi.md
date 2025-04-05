@@ -5,8 +5,8 @@ aliases:
 tags: []
 created_at: 2025-03-30T17:23:08.000-06:00
 description: Application Binary Interface (ABI) is a specification that defines the low-level interface between an application (or library) and the operating system (or another application).
-title: Application Binary Interface (ABI)
-updated_at: 2025-03-30T17:23:19.000-06:00
+title: ABI
+updated_at: 2025-04-05T05:37:33.000-06:00
 ---
 
 # Application Binary Interface (ABI)

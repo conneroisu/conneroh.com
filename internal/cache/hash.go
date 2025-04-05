@@ -10,4 +10,3 @@ func Hash(content []byte) string {
 	sum := md5.Sum(content)
 	return hex.EncodeToString(sum[:])
 }
-

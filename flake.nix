@@ -14,11 +14,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "flake-utils";
     };
-    sqlcquash = {
-      url = "github:conneroisu/sqlcquash?tag=v0.1.0";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-utils.follows = "flake-utils";
-    };
 
     systems.url = "github:nix-systems/default";
   };
@@ -231,9 +226,6 @@
               flyctl
               openssl.dev
               skopeo
-
-              # Sql
-              sqlc
 
               # Playwright
               playwright-driver # Provides browser archives and driver scripts
