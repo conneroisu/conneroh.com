@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS paths (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    path TEXT NOT NULL,
+    hash TEXT NOT NULL,
+    UNIQUE (path, hash)
+);
