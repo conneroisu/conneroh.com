@@ -6,7 +6,7 @@ tags: []
 created_at: 2025-03-28T20:07:11.000-06:00
 description: CPRE 381
 title: CPRE 381
-updated_at: 2025-03-28T20:08:06.000-06:00
+updated_at: 2025-04-05T06:10:34.000-06:00
 ---
 
 # CPRE 381

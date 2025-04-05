@@ -19,7 +19,7 @@ templ search(
 		>
 			<input
 				id={ fmt.Sprintf("search-%s", target) }
-				class={ twerge.It("w-full pl-10 pr-4 py-2 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700 text-gray-900 text-white") }
+				class={ twerge.It("w-full pl-10 pr-4 py-2 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700 text-white") }
 				type="search"
 				name="search"
 				placeholder={ fmt.Sprintf("Search %s...", target) }
@@ -138,7 +138,7 @@ templ listProjectItem(project *gen.Project) {
 			@image(
 				project.BannerPath,
 				project.Title,
-				twerge.It("w-full h-48 object-cover"),
+				twerge.It("h-48 object-cover w-full"),
 			)
 			<div
 				class={ twerge.It("p-6 flex flex-col flex-grow") }
@@ -260,7 +260,7 @@ templ listPostItem(
 			@image(
 				post.BannerPath,
 				post.Title,
-				twerge.It("w-full h-48 object-cover object-center"),
+				twerge.It("h-48 object-cover w-full"),
 			)
 			<div
 				class={ twerge.It("p-6") }

@@ -83,7 +83,7 @@ func search(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var6 = []any{twerge.It("w-full pl-10 pr-4 py-2 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700 text-gray-900 text-white")}
+		var templ_7745c5c3_Var6 = []any{twerge.It("w-full pl-10 pr-4 py-2 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700 text-white")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var6...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -609,7 +609,7 @@ func listProjectItem(project *gen.Project) templ.Component {
 		templ_7745c5c3_Err = image(
 			project.BannerPath,
 			project.Title,
-			twerge.It("w-full h-48 object-cover"),
+			twerge.It("h-48 object-cover w-full"),
 		).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -1278,7 +1278,7 @@ func listPostItem(
 		templ_7745c5c3_Err = image(
 			post.BannerPath,
 			post.Title,
-			twerge.It("w-full h-48 object-cover object-center"),
+			twerge.It("h-48 object-cover w-full"),
 		).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
