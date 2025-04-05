@@ -351,7 +351,7 @@ func Post(
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var27 = []any{twerge.It("text-2xl font-bold text-white mb-4")}
+			var templ_7745c5c3_Var27 = []any{twerge.It("font-bold text-white mb-4 text-2xl")}
 			templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var27...)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err

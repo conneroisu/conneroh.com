@@ -1161,7 +1161,7 @@ func search() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var104 = []any{twerge.It("flex-shrink-0flex items-center bg-blue-900 mr-4 h-10 w-10 justify-center text-blue-300 rounded-full")}
+		var templ_7745c5c3_Var104 = []any{twerge.It("flex-shrink-0 flex items-center bg-blue-900 mr-4 h-10 w-10 justify-center text-blue-300 rounded-full")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var104...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
