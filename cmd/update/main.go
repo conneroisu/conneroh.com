@@ -2,13 +2,11 @@
 package main
 
 import (
-	"bytes"
 	"context"
 	"flag"
 	"fmt"
 	"io/fs"
 	"log/slog"
-	"mime"
 	"os"
 	"path/filepath"
 	"strings"
@@ -18,8 +16,6 @@ import (
 
 	"github.com/rotisserie/eris"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/conneroisu/conneroh.com/internal/assets"
 	"github.com/conneroisu/conneroh.com/internal/cache"
 	"github.com/conneroisu/conneroh.com/internal/credited"
@@ -528,30 +524,14 @@ func actualizeAssets(
 		asset := asset // Capture for closure
 
 		eg.Go(func() error {
-			contentType := mime.TypeByExtension(filepath.Ext(asset.Path))
-			slog.Info("uploading asset", "path", asset.Path, "contentType", contentType)
-
-			_, err := client.PutObject(ctx, &s3.PutObjectInput{
-				Bucket:      aws.String("conneroh"),
-				Key:         aws.String(asset.Path),
-				Body:        bytes.NewReader(asset.Data),
-				ContentType: aws.String(contentType),
-			})
-
-			if err != nil {
-				// Log error but let errgroup handle it
-				slog.Error("asset upload failed", "path", asset.Path, "error", err)
-				return fmt.Errorf("failed to upload asset %s: %w", asset.Path, err)
-			}
-
-			return nil
+			return asset.Upload(ctx, client)
 		})
 	}
 
 	// Wait for all uploads to complete and check for errors
 	err := eg.Wait()
 	if err != nil {
-		return err
+		return eris.Wrap(err, "failed to upload assets")
 	}
 
 	slog.Info("assets upload complete", "total", amount)
