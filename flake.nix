@@ -202,8 +202,8 @@
               go_1_24
               air
               templ
-              revive
               golangci-lint
+              (buildWithSpecificGo revive)
               (buildWithSpecificGo gopls)
               (buildWithSpecificGo templ)
               (buildWithSpecificGo golines)
@@ -248,10 +248,11 @@
               glib # Low-level core library
               gtk3 # GUI toolkit
             ]
-            ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [
-              # macOS-specific dependencies
-              libiconv
-            ]
+            ++ (with pkgs;
+              lib.optionals stdenv.isDarwin [
+                # macOS-specific dependencies
+                libiconv
+              ])
             ++ pkgs.lib.optionals pkgs.stdenv.isLinux [
               # Linux-specific dependencies
               chromium # Chromium browser
@@ -276,7 +277,7 @@
         name = "conneroh.com";
         fly-name = "conneroh-com";
         fly-name-dev = "conneroh-com-dev";
-        vendorHash = "sha256-PjUcAcxt1GvEJUiGmt1zd1dxtOwY3rdlXpU4HUdacU8=";
+        vendorHash = "sha256-cYtMPdhz2sz1WGS/kHqs7DumCy+pNYaGbpNKAI43Wb4=";
         created = "now";
         tag = "latest";
         version = self.shortRev or "dirty";

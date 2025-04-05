@@ -4,10 +4,12 @@ aliases:
   - CPRE 281
 tags:
   - ide/modelsim
+  - hdl/verilog
+  - hdl/vhdl
 created_at: 2025-03-28T19:47:43.000-06:00
 description: This is a class taken at Iowa State University.
-title: CPRE 281
-updated_at: 2025-03-28T20:08:06.000-06:00
+title: CPRE281
+updated_at: 2025-04-05T06:10:19.000-06:00
 ---
 
 # CPRE 281

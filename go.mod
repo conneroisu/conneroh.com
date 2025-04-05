@@ -6,12 +6,13 @@ require (
 	github.com/a-h/templ v0.3.857
 	github.com/aws/aws-sdk-go-v2 v1.36.3
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.78.2
-	github.com/conneroisu/genstruct v0.1.1
+	github.com/conneroisu/genstruct v0.1.2
 	github.com/conneroisu/twerge v0.2.9
 	github.com/litao91/goldmark-mathjax v0.0.0-20210217064022-a43cf739a50f
 	github.com/ollama/ollama v0.6.3
 	github.com/playwright-community/playwright-go v0.5001.0
 	github.com/quail-ink/goldmark-enclave v0.1.5
+	github.com/rotisserie/eris v0.5.4
 	github.com/yuin/goldmark v1.7.8
 	github.com/yuin/goldmark-highlighting/v2 v2.0.0-20230729083705-37449abec8cc
 	go.abhg.dev/goldmark/anchor v0.1.1

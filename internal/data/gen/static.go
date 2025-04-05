@@ -2,8 +2,10 @@ package gen
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
+	"github.com/rotisserie/eris"
 	"gopkg.in/yaml.v3"
 )
 
@@ -85,4 +87,80 @@ func New[
 	T Post | Project | Tag,
 ](emb *Embedded) *T {
 	return &T{Embedded: *emb}
+}
+
+var (
+	// ErrValueMissing is returned when a value is missing
+	ErrValueMissing = eris.Errorf("missing value")
+
+	// ErrValueInvalid is returned when the slug is invalid
+	ErrValueInvalid = eris.Errorf("invalid value")
+)
+
+// Defaults sets the default values for the embedding if they are missing.
+func Defaults(emb *Embedded) error {
+	if emb == nil {
+		return eris.Wrap(
+			ErrValueMissing,
+			"whole embedding is nil",
+		)
+	}
+	// Set default icon if not provided
+	if emb.Icon == "" {
+		emb.Icon = "tag"
+	}
+
+	return nil
+}
+
+// Validate validate the given embedding.
+func Validate(emb *Embedded) error {
+	if emb.Title == "" {
+		return eris.Wrapf(
+			ErrValueMissing,
+			"%s is missing title",
+			emb.RawContent,
+		)
+	}
+
+	if emb.Slug == "" {
+		return eris.Wrapf(
+			ErrValueMissing,
+			"%s is missing slug",
+			emb.Title,
+		)
+	}
+
+	if emb.Description == "" {
+		return eris.Wrapf(
+			ErrValueMissing,
+			"%s is missing description",
+			emb.Slug,
+		)
+	}
+
+	if emb.Content == "" {
+		return eris.Wrapf(
+			ErrValueMissing,
+			"%s is missing content",
+			emb.Slug,
+		)
+	}
+
+	if emb.RawContent == "" {
+		return eris.Wrapf(
+			ErrValueMissing,
+			"%s is missing raw content",
+			emb.Slug,
+		)
+	}
+
+	if strings.Contains(emb.Slug, " ") {
+		return eris.Wrapf(
+			ErrValueInvalid,
+			"slug %s contains spaces",
+			emb.Slug,
+		)
+	}
+	return nil
 }

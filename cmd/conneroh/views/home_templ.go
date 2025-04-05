@@ -1056,7 +1056,7 @@ func Home(
 		}
 		for i, post := range *fullPosts {
 			if i < 4 {
-				var templ_7745c5c3_Var88 = []any{twerge.It("bg-gray-800 rounded-lg overflow-hidden shadow-md transition-transform duration-300 hover:scale-105 hover:shadow-lg")}
+				var templ_7745c5c3_Var88 = []any{twerge.It("overflow-hidden duration-300 hover:shadow-lg bg-gray-800 hover:scale-105 shadow-md transition-transform rounded-lg")}
 				templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var88...)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err

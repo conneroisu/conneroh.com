@@ -151,7 +151,7 @@ func header() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\" hx-get=\"/morph/home\" hx-swap=\"outerHTML\" hx-trigger=\"click\" hx-target=\"#bodiody\" hx-push-url=\"/\" aria-label=\"Back to Home\">Conner Ohnesorge</a>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\" hx-get=\"/morph/home\" hx-push-url=\"/\" hx-swap=\"outerHTML\" hx-trigger=\"click\" hx-target=\"#bodiody\" aria-label=\"Back to Home\">Conner Ohnesorge</a>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -217,7 +217,7 @@ func header() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "\" hx-target=\"#bodiody\" hx-get=\"/morph/posts\" hx-swap=\"outerHTML\" hx-trigger=\"click\" hx-push-url=\"/posts\">Posts</a> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "\" hx-target=\"#bodiody\" hx-get=\"/morph/posts\" hx-swap=\"outerHTML\" hx-trigger=\"click\" hx-push-url=\"/posts\" preload=\"mouseover\">Posts</a> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -239,7 +239,7 @@ func header() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "\" hx-target=\"#bodiody\" hx-get=\"/morph/tags\" hx-swap=\"outerHTML\" hx-trigger=\"click\" hx-push-url=\"/tags\">Tags</a></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "\" hx-target=\"#bodiody\" hx-get=\"/morph/tags\" hx-swap=\"outerHTML\" hx-trigger=\"click\" hx-push-url=\"/tags\" preload=\"mouseover\">Tags</a></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -291,7 +291,7 @@ func header() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "\" hx-target=\"#bodiody\" hx-get=\"/morph/projects\" hx-swap=\"outerHTML\" hx-trigger=\"click\" hx-push-url=\"/projects\" @click=\"isMenuOpen = false\">Projects</a> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "\" hx-target=\"#bodiody\" hx-get=\"/morph/projects\" hx-swap=\"outerHTML\" hx-trigger=\"click\" hx-push-url=\"/projects\" @click=\"isMenuOpen = false\" preload=\"ontouchstart\">Projects</a> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -313,7 +313,7 @@ func header() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "\" hx-target=\"#bodiody\" hx-get=\"/morph/posts\" hx-swap=\"outerHTML\" hx-trigger=\"click\" hx-push-url=\"/posts\" @click=\"isMenuOpen = false\">Posts</a> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "\" hx-target=\"#bodiody\" hx-get=\"/morph/posts\" hx-swap=\"outerHTML\" hx-trigger=\"click\" hx-push-url=\"/posts\" @click=\"isMenuOpen = false\" preload=\"ontouchstart\">Posts</a> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -335,7 +335,7 @@ func header() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "\" hx-target=\"#bodiody\" hx-get=\"/morph/tags\" hx-swap=\"outerHTML\" hx-trigger=\"click\" hx-push-url=\"/tags\" @click=\"isMenuOpen = false\">Tags</a></div></div></nav></header>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "\" hx-target=\"#bodiody\" hx-get=\"/morph/tags\" hx-swap=\"outerHTML\" hx-trigger=\"click\" hx-push-url=\"/tags\" @click=\"isMenuOpen = false\" preload=\"ontouchstart\">Tags</a></div></div></nav></header>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -374,7 +374,7 @@ func icon(
 		var templ_7745c5c3_Var29 string
 		templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("https://conneroh.fly.storage.tigris.dev/svg/%s.svg", id))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/layouts/header.templ`, Line: 136, Col: 77}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/layouts/header.templ`, Line: 141, Col: 77}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var29))
 		if templ_7745c5c3_Err != nil {

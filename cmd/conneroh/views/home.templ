@@ -236,7 +236,7 @@ templ Home(
 				for i, post := range *fullPosts {
 					if i < 4 {
 						<div
-							class={ twerge.It("bg-gray-800 rounded-lg overflow-hidden shadow-md transition-transform duration-300 hover:scale-105 hover:shadow-lg") }
+							class={ twerge.It("overflow-hidden duration-300 hover:shadow-lg bg-gray-800 hover:scale-105 shadow-md transition-transform rounded-lg") }
 						>
 							<a
 								hx-get={ fmt.Sprintf("/morph/post/%s", post.Slug) }

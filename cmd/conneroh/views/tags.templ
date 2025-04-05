@@ -71,121 +71,37 @@ templ Tag(
 			</div>
 			// Posts Tab
 			<div x-show="activeTab === 'posts'">
-				if len(tag.Posts) > 0 {
-					@List(routing.PluralTargetPost, &tag.Posts, fullProjects, fullTags)
-				} else {
-					<div
-						class={ twerge.It("text-center py-12 text-gray-400") }
-					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							class={ twerge.It("h-12 w-12 mx-auto mb-4") }
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
-						>
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-						</svg>
-						<p>No posts found with this tag</p>
-					</div>
-				}
+				@List(
+					routing.PluralTargetPost,
+					&tag.Posts,
+					nil, nil, nil, nil,
+					[]string{fmt.Sprintf("tag:%s", tag.Slug)},
+				)
 			</div>
 			// Projects Tab
 			<div x-show="activeTab === 'projects'" x-cloak>
-				if len(tag.Projects) > 0 {
-					<div
-						class={ twerge.It("grid grid-cols-1 md:grid-cols-2 gap-6") }
-					>
-						for _, project := range tag.Projects {
-							<a
-								href={ templ.SafeURL(fmt.Sprintf("/project/%s", project.Slug)) }
-								class={ twerge.It("bg-gray-800 rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-300") }
-							>
-								<h2
-									class={ twerge.It("text-xl font-semibold text-white mb-2") }
-								>
-									{ project.Title }
-								</h2>
-								<p
-									class={ twerge.It("text-gray-300 mb-4 line-clamp-2") }
-								>
-									{ project.Description }
-								</p>
-								<div
-									class={ twerge.It("flex justify-between items-center") }
-								>
-									<span
-										class={ twerge.It("text-blue-400 hover:underline text-sm font-medium") }
-									>
-										View project
-									</span>
-									<span
-										class={ twerge.It("text-sm text-gray-400") }
-									>
-										{ project.CreatedAt.Format("Jan 2, 2006") }
-									</span>
-								</div>
-							</a>
-						}
-					</div>
-				} else {
-					<div
-						class={ twerge.It("text-center py-12 text-gray-400") }
-					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							class={ twerge.It("h-12 w-12 mx-auto mb-4") }
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke="currentColor"
-						>
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-						</svg>
-						<p>No projects found with this tag</p>
-					</div>
-				}
+				@List(
+					routing.PluralTargetProject,
+					nil,
+					&tag.Projects,
+					nil,
+					[]string{},
+					[]string{fmt.Sprintf("tag:%s", tag.Slug)},
+					[]string{},
+				)
 			</div>
 			// Related Tags Tab
 			<div
 				x-show="activeTab === 'related'"
 				x-cloak
 			>
-				<div
-					class={ twerge.It("grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4") }
-				>
-					for _, relatedTag := range tag.Tags {
-						<a
-							href={ templ.SafeURL(fmt.Sprintf("/tag/%s", relatedTag.Slug)) }
-							class={ twerge.It("bg-gray-800 rounded-lg p-4 hover:shadow-md transition-shadow duration-300 flex items-center") }
-						>
-							<div
-								class={ twerge.It("text-gray-500 mr-3") }
-							>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									class={ twerge.It("h-5 w-5") }
-									fill="none"
-									viewBox="0 0 24 24"
-									stroke="currentColor"
-								>
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
-								</svg>
-							</div>
-							<div>
-								<h3
-									class={ twerge.It("font-medium text-white") }
-								>
-									{ relatedTag.Title }
-								</h3>
-								<p
-									class={ twerge.It("text-xs text-gray-400 line-clamp-1") }
-								>
-									{ fmt.Sprintf("%d posts, %d projects", len(relatedTag.Posts), len(relatedTag.Projects)) }
-								</p>
-							</div>
-						</a>
-					}
-				</div>
+				@List(
+					routing.PluralTargetTag,
+					nil, nil,
+					&tag.Tags,
+					nil, nil,
+					[]string{fmt.Sprintf("tag:%s", tag.Slug)},
+				)
 			</div>
 		</div>
 	</div>

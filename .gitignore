@@ -17,3 +17,4 @@ result
 servers
 CLAUDE.md
 tigris.yaml
+cache.sqlite

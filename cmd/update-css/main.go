@@ -30,18 +30,27 @@ func genCSS(ctx context.Context) error {
 			&gen.AllPosts,
 			&gen.AllProjects,
 			&gen.AllTags,
+			nil,
+			nil,
+			nil,
 		)).Render(ctx, io.Discard)
 		_ = layouts.Page(views.List(
 			routing.PluralTargetProject,
 			&gen.AllPosts,
 			&gen.AllProjects,
 			&gen.AllTags,
+			nil,
+			nil,
+			nil,
 		)).Render(ctx, io.Discard)
 		_ = layouts.Page(views.List(
 			routing.PluralTargetTag,
 			&gen.AllPosts,
 			&gen.AllProjects,
 			&gen.AllTags,
+			nil,
+			nil,
+			nil,
 		)).Render(ctx, io.Discard)
 		_ = views.TagControl(
 			&gen.Tag{},
