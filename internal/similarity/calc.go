@@ -111,3 +111,13 @@ func WithPearsonCorrelation(coefficient float64) Option {
 		})
 	}
 }
+
+// WithHammingDistance sets the HammingDistance function with a coefficient.
+func WithHammingDistance(coefficient float64) Option {
+	return func(c *Calculator) {
+		c.biFuncs = append(c.biFuncs, biFuncCoefficient{
+			handler:     hammingDistance,
+			coefficient: coefficient,
+		})
+	}
+}
