@@ -42,7 +42,7 @@ func Tag(
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		var templ_7745c5c3_Var2 = []any{twerge.It("py-8 px-4 container mx-auto")}
+		var templ_7745c5c3_Var2 = []any{twerge.It("container mx-auto px-4 py-8")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var2...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -88,7 +88,7 @@ func Tag(
 		}
 		templ_7745c5c3_Err = icon(tag.Icon, templ.Attributes{
 			"style": "width: 4em; height: 4em;",
-			"class": twerge.It("inline-block p-4"),
+			"class": twerge.It("p-4 inline-block"),
 		}).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -229,7 +229,7 @@ func Tag(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var18 = []any{twerge.It("border-b-2 font-medium py-4 text-sm sm:text-base px-1")}
+		var templ_7745c5c3_Var18 = []any{twerge.It("sm:text-base font-medium py-4 text-sm border-b-2 px-1")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var18...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -239,9 +239,9 @@ func Tag(
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var19 string
-		templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("{'%s': activeTab === 'posts', '%s': activeTab !== 'posts'}", twerge.It("border-blue-500 text-blue-500"), twerge.It("border-transparent text-gray-500 text-gray-400 hover:text-gray-300")))
+		templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("{'%s': activeTab === 'posts', '%s': activeTab !== 'posts'}", twerge.It("border-blue-500 text-blue-500"), twerge.It("hover:text-gray-300 border-transparent text-gray-400")))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/tags.templ`, Line: 51, Col: 213}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/tags.templ`, Line: 51, Col: 199}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 		if templ_7745c5c3_Err != nil {
@@ -277,7 +277,7 @@ func Tag(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var22 = []any{twerge.It("border-b-2 font-medium py-4 text-sm sm:text-base px-1")}
+		var templ_7745c5c3_Var22 = []any{twerge.It("sm:text-base font-medium py-4 text-sm border-b-2 px-1")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var22...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -287,9 +287,9 @@ func Tag(
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var23 string
-		templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("{'%s': activeTab === 'projects', '%s': activeTab !== 'projects'}", twerge.It("border-blue-500 text-blue-500"), twerge.It("border-transparent text-gray-500 text-gray-400 hover:text-gray-300")))
+		templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("{'%s': activeTab === 'projects', '%s': activeTab !== 'projects'}", twerge.It("border-blue-500 text-blue-500"), twerge.It("hover:text-gray-300 border-transparent text-gray-400")))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/tags.templ`, Line: 58, Col: 219}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/tags.templ`, Line: 58, Col: 205}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
 		if templ_7745c5c3_Err != nil {
@@ -325,7 +325,7 @@ func Tag(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var26 = []any{twerge.It("border-b-2 font-medium py-4 text-sm sm:text-base px-1")}
+		var templ_7745c5c3_Var26 = []any{twerge.It("sm:text-base font-medium py-4 text-sm border-b-2 px-1")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var26...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -335,9 +335,9 @@ func Tag(
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var27 string
-		templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("{'%s': activeTab === 'related', '%s': activeTab !== 'related'}", twerge.It("border-blue-500 text-blue-500"), twerge.It("border-transparent text-gray-500 text-gray-400 hover:text-gray-300")))
+		templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("{'%s': activeTab === 'related', '%s': activeTab !== 'related'}", twerge.It("border-blue-500 text-blue-500"), twerge.It("hover:text-gray-300 border-transparent text-gray-400")))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/tags.templ`, Line: 65, Col: 217}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/tags.templ`, Line: 65, Col: 203}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
 		if templ_7745c5c3_Err != nil {

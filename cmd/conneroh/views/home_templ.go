@@ -39,7 +39,7 @@ func Home(
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		var templ_7745c5c3_Var2 = []any{twerge.It("py-20 bg-gradient-to-b from-gray-900 to-gray-800")}
+		var templ_7745c5c3_Var2 = []any{twerge.It("from-gray-900 to-gray-800 py-20 bg-gradient-to-b")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var2...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -61,7 +61,7 @@ func Home(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var4 = []any{twerge.It("container px-4 mx-auto")}
+		var templ_7745c5c3_Var4 = []any{twerge.It("px-4 mx-auto container")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var4...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -83,7 +83,7 @@ func Home(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var6 = []any{twerge.It("flex flex-col lg:flex-row items-center justify-between")}
+		var templ_7745c5c3_Var6 = []any{twerge.It("flex-col lg:flex-row items-center justify-between flex")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var6...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -105,7 +105,7 @@ func Home(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var8 = []any{twerge.It("lg:w-1/2 mb-10 lg:mb-0")}
+		var templ_7745c5c3_Var8 = []any{twerge.It("lg:mb-0 lg:w-1/2 mb-10")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var8...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -127,7 +127,7 @@ func Home(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var10 = []any{twerge.It("text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-4 text-white")}
+		var templ_7745c5c3_Var10 = []any{twerge.It("text-white mb-4 text-4xl md:text-5xl font-bold lg:text-6xl leading-tight")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var10...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -149,7 +149,7 @@ func Home(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var12 = []any{twerge.It("text-xl text-gray-300 mb-8 max-w-md")}
+		var templ_7745c5c3_Var12 = []any{twerge.It("text-gray-300 mb-8 max-w-md text-xl")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var12...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -171,7 +171,7 @@ func Home(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var14 = []any{twerge.It("text-xl text-gray-300 mb-8 max-w-md")}
+		var templ_7745c5c3_Var14 = []any{twerge.It("text-gray-300 mb-8 max-w-md text-xl")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var14...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -215,7 +215,7 @@ func Home(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var18 = []any{twerge.It("flex flex-wrap gap-4")}
+		var templ_7745c5c3_Var18 = []any{twerge.It("flex-wrap gap-4 flex")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var18...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -237,7 +237,7 @@ func Home(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var20 = []any{twerge.It("font-medium bg-white text-gray-900 rounded-md hover:opacity-90 transition-opacity px-6 py-3")}
+		var templ_7745c5c3_Var20 = []any{twerge.It("bg-white text-gray-900 hover:opacity-90 py-3 transition-opacity px-6 rounded-md font-medium")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var20...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -259,7 +259,7 @@ func Home(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var22 = []any{twerge.It("px-6 border border-gray-600 text-gray-300 hover:bg-gray-800 transition-colors rounded-md py-3 font-medium")}
+		var templ_7745c5c3_Var22 = []any{twerge.It("border py-3 transition-colors font-medium rounded-md hover:bg-gray-800 border-gray-600 px-6 text-gray-300")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var22...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -281,7 +281,7 @@ func Home(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var24 = []any{twerge.It("lg:w-1/2 relative")}
+		var templ_7745c5c3_Var24 = []any{twerge.It("relative lg:w-1/2")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var24...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -303,7 +303,7 @@ func Home(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var26 = []any{twerge.It("relative shadow-lg mx-auto h-64 md:h-80 rounded-full w-64 md:w-80 bg-blue-600")}
+		var templ_7745c5c3_Var26 = []any{twerge.It("w-64 bg-blue-600 h-64 relative mx-auto md:h-80 md:w-80 shadow-lg rounded-full")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var26...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -325,7 +325,7 @@ func Home(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var28 = []any{twerge.It("absolute inset-0 flex items-center justify-center text-white font-bold text-xl")}
+		var templ_7745c5c3_Var28 = []any{twerge.It("font-bold text-white inset-0 items-center absolute justify-center flex text-xl")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var28...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -347,7 +347,7 @@ func Home(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var30 = []any{twerge.It("bg-blue-600 rounded-full relative shadow-lg mx-auto")}
+		var templ_7745c5c3_Var30 = []any{twerge.It("relative shadow-lg bg-blue-600 rounded-full mx-auto")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var30...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -369,7 +369,7 @@ func Home(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var32 = []any{twerge.It("absolute -bottom-4 -right-4 w-24 h-24 bg-purple-600 rounded-full z-0")}
+		var templ_7745c5c3_Var32 = []any{twerge.It("h-24 w-24 bg-purple-600 -bottom-4 rounded-full absolute z-0 -right-4")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var32...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -391,7 +391,7 @@ func Home(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var34 = []any{twerge.It("absolute -top-4 -left-4 w-16 h-16 bg-pink-600 rounded-full z-0")}
+		var templ_7745c5c3_Var34 = []any{twerge.It("-left-4 -top-4 h-16 bg-pink-600 w-16 absolute z-0 rounded-full")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var34...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -435,7 +435,7 @@ func Home(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var38 = []any{twerge.It("container px-4 mx-auto")}
+		var templ_7745c5c3_Var38 = []any{twerge.It("px-4 mx-auto container")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var38...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -457,7 +457,7 @@ func Home(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var40 = []any{twerge.It("flex flex-col md:flex-row justify-between items-center mb-12 pr-4")}
+		var templ_7745c5c3_Var40 = []any{twerge.It("justify-between items-center mb-12 pr-4 flex flex-col md:flex-row")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var40...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -501,7 +501,7 @@ func Home(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var44 = []any{twerge.It("text-blue-400 hover:underline text-lg font-medium flex items-center")}
+		var templ_7745c5c3_Var44 = []any{twerge.It("flex items-center text-blue-400 hover:underline text-lg font-medium")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var44...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -531,7 +531,7 @@ func Home(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var46 = []any{twerge.It("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8")}
+		var templ_7745c5c3_Var46 = []any{twerge.It("md:grid-cols-2 lg:grid-cols-3 gap-8 grid grid-cols-1")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var46...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -555,7 +555,7 @@ func Home(
 		}
 		for i, project := range *fullProjects {
 			if i < 6 {
-				var templ_7745c5c3_Var48 = []any{twerge.It("bg-gray-900 rounded-lg overflow-hidden shadow-md transition-transform duration-300 hover:scale-105 hover:shadow-lg")}
+				var templ_7745c5c3_Var48 = []any{twerge.It("hover:shadow-lg shadow-md rounded-lg transition-transform overflow-hidden hover:scale-105 duration-300 bg-gray-900")}
 				templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var48...)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -577,7 +577,7 @@ func Home(
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var50 = []any{twerge.It("block cursor-pointer")}
+				var templ_7745c5c3_Var50 = []any{twerge.It("cursor-pointer block")}
 				templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var50...)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -625,7 +625,7 @@ func Home(
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var54 = []any{twerge.It("h-48 bg-gray-700 flex items-center justify-center overflow-hidden")}
+				var templ_7745c5c3_Var54 = []any{twerge.It("bg-gray-700 flex items-center justify-center overflow-hidden h-48")}
 				templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var54...)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -710,7 +710,7 @@ func Home(
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var60 = []any{twerge.It("text-xl font-bold text-white mb-2")}
+				var templ_7745c5c3_Var60 = []any{twerge.It("font-bold text-white mb-2 text-xl")}
 				templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var60...)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -803,7 +803,7 @@ func Home(
 					return templ_7745c5c3_Err
 				}
 				for _, tag := range project.Tags {
-					var templ_7745c5c3_Var68 = []any{twerge.It("inline-block px-3 py-1 text-sm font-medium rounded-full bg-blue-900 text-blue-200 hover:bg-blue-200 hover:bg-blue-800 transition-colors")}
+					var templ_7745c5c3_Var68 = []any{twerge.It("inline-block transition-colors text-sm text-blue-200 py-1 hover:bg-blue-800 font-medium px-3 bg-blue-900 rounded-full")}
 					templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var68...)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
@@ -852,7 +852,7 @@ func Home(
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var72 = []any{twerge.It("text-blue-400 hover:underline text-sm font-medium flex items-center")}
+				var templ_7745c5c3_Var72 = []any{twerge.It("flex items-center text-blue-400 hover:underline text-sm font-medium")}
 				templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var72...)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -936,7 +936,7 @@ func Home(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var78 = []any{twerge.It("container px-4 mx-auto")}
+		var templ_7745c5c3_Var78 = []any{twerge.It("px-4 mx-auto container")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var78...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -958,7 +958,7 @@ func Home(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var80 = []any{twerge.It("flex flex-col md:flex-row justify-between items-center mb-12 pr-4")}
+		var templ_7745c5c3_Var80 = []any{twerge.It("justify-between items-center mb-12 pr-4 flex flex-col md:flex-row")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var80...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -1002,7 +1002,7 @@ func Home(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var84 = []any{twerge.It("text-blue-400 hover:underline text-lg font-medium flex items-center")}
+		var templ_7745c5c3_Var84 = []any{twerge.It("flex items-center text-blue-400 hover:underline text-lg font-medium")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var84...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -1056,7 +1056,7 @@ func Home(
 		}
 		for i, post := range *fullPosts {
 			if i < 4 {
-				var templ_7745c5c3_Var88 = []any{twerge.It("overflow-hidden duration-300 hover:shadow-lg bg-gray-800 hover:scale-105 shadow-md transition-transform rounded-lg")}
+				var templ_7745c5c3_Var88 = []any{twerge.It("hover:scale-105 duration-300 hover:shadow-lg rounded-lg bg-gray-800 overflow-hidden shadow-md transition-transform")}
 				templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var88...)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -1078,7 +1078,7 @@ func Home(
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var90 = []any{twerge.It("block cursor-pointer")}
+				var templ_7745c5c3_Var90 = []any{twerge.It("cursor-pointer block")}
 				templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var90...)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -1126,7 +1126,7 @@ func Home(
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var94 = []any{twerge.It("h-48 bg-gray-700 overflow-hidden")}
+				var templ_7745c5c3_Var94 = []any{twerge.It("bg-gray-700 overflow-hidden h-48")}
 				templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var94...)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -1158,7 +1158,7 @@ func Home(
 						return templ_7745c5c3_Err
 					}
 				} else {
-					var templ_7745c5c3_Var96 = []any{twerge.It("w-full h-full flex items-center justify-center")}
+					var templ_7745c5c3_Var96 = []any{twerge.It("h-full flex items-center justify-center w-full")}
 					templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var96...)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
@@ -1229,7 +1229,7 @@ func Home(
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var102 = []any{twerge.It("text-xl font-bold text-white mb-2")}
+				var templ_7745c5c3_Var102 = []any{twerge.It("font-bold text-white mb-2 text-xl")}
 				templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var102...)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -1322,7 +1322,7 @@ func Home(
 					return templ_7745c5c3_Err
 				}
 				for _, tag := range post.Tags {
-					var templ_7745c5c3_Var110 = []any{twerge.It("px-2 py-1 bg-green-900 text-green-200 text-xs rounded-md hover:bg-green-800 transition-colors")}
+					var templ_7745c5c3_Var110 = []any{twerge.It("text-xs text-green-200 hover:bg-green-800 px-2 py-1 bg-green-900 transition-colors rounded-md")}
 					templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var110...)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
@@ -1388,7 +1388,7 @@ func Home(
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var115 = []any{twerge.It("text-blue-400 hover:underline text-sm font-medium flex items-center")}
+				var templ_7745c5c3_Var115 = []any{twerge.It("flex items-center text-blue-400 hover:underline text-sm font-medium")}
 				templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var115...)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -1486,7 +1486,7 @@ func Home(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var123 = []any{twerge.It("container px-4 mx-auto")}
+		var templ_7745c5c3_Var123 = []any{twerge.It("px-4 mx-auto container")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var123...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -1508,7 +1508,7 @@ func Home(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var125 = []any{twerge.It("flex flex-col md:flex-row justify-between items-center mb-12 pr-4")}
+		var templ_7745c5c3_Var125 = []any{twerge.It("justify-between items-center mb-12 pr-4 flex flex-col md:flex-row")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var125...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -1552,7 +1552,7 @@ func Home(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var129 = []any{twerge.It("text-blue-400 hover:underline text-lg font-medium flex items-center")}
+		var templ_7745c5c3_Var129 = []any{twerge.It("flex items-center text-blue-400 hover:underline text-lg font-medium")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var129...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -1605,7 +1605,7 @@ func Home(
 			return templ_7745c5c3_Err
 		}
 		for _, tag := range *fullTags {
-			var templ_7745c5c3_Var133 = []any{twerge.It("block bg-gray-900 rounded-lg p-6 text-center hover:shadow-md transition-shadow")}
+			var templ_7745c5c3_Var133 = []any{twerge.It("bg-gray-900 rounded-lg hover:shadow-md block p-6 text-center transition-shadow")}
 			templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var133...)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -1653,7 +1653,7 @@ func Home(
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var137 = []any{twerge.It("w-12 h-12 bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-4")}
+			var templ_7745c5c3_Var137 = []any{twerge.It("w-12 items-center mx-auto bg-blue-900 justify-center h-12 rounded-full flex mb-4")}
 			templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var137...)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -1745,7 +1745,7 @@ func Home(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var144 = []any{twerge.It("container px-4 mx-auto")}
+		var templ_7745c5c3_Var144 = []any{twerge.It("px-4 mx-auto container")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var144...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -1811,7 +1811,7 @@ func Home(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var150 = []any{twerge.It("text-gray-300 mb-8")}
+		var templ_7745c5c3_Var150 = []any{twerge.It("mb-8 text-gray-300")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var150...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -1855,7 +1855,7 @@ func Home(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var154 = []any{twerge.It("w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center text-gray-300 transition-colors hover:bg-blue-400")}
+		var templ_7745c5c3_Var154 = []any{twerge.It("h-12 items-center flex transition-colors text-gray-300 justify-center w-12 hover:bg-blue-400 bg-gray-700 rounded-full")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var154...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -1885,7 +1885,7 @@ func Home(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var156 = []any{twerge.It("w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center text-gray-300 transition-colors hover:bg-gray-800")}
+		var templ_7745c5c3_Var156 = []any{twerge.It("w-12 rounded-full text-gray-300 h-12 justify-center bg-gray-700 hover:bg-gray-800 flex items-center transition-colors")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var156...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -1915,7 +1915,7 @@ func Home(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var158 = []any{twerge.It("w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center text-gray-300 transition-colors hover:bg-blue-400")}
+		var templ_7745c5c3_Var158 = []any{twerge.It("h-12 items-center flex transition-colors text-gray-300 justify-center w-12 hover:bg-blue-400 bg-gray-700 rounded-full")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var158...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -1945,7 +1945,7 @@ func Home(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var160 = []any{twerge.It("w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center text-gray-300 transition-colors hover:bg-red-500")}
+		var templ_7745c5c3_Var160 = []any{twerge.It("h-12 hover:bg-red-500 flex justify-center bg-gray-700 w-12 transition-colors rounded-full items-center text-gray-300")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var160...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -1975,7 +1975,7 @@ func Home(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var162 = []any{twerge.It("p-8 rounded-lg shadow-md bg-gray-800")}
+		var templ_7745c5c3_Var162 = []any{twerge.It("shadow-md p-8 bg-gray-800 rounded-lg")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var162...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -2041,7 +2041,7 @@ func Home(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var168 = []any{twerge.It("block text-sm font-medium text-gray-300 mb-1")}
+		var templ_7745c5c3_Var168 = []any{twerge.It("font-medium text-gray-300 mb-1 block text-sm")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var168...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -2063,7 +2063,7 @@ func Home(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var170 = []any{twerge.It("w-full px-4 py-2 border border-gray-600 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500")}
+		var templ_7745c5c3_Var170 = []any{twerge.It("rounded-md text-white py-2 border-gray-600 focus:ring-2 px-4 focus:ring-blue-500 w-full border bg-gray-700 focus:outline-none")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var170...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -2085,7 +2085,7 @@ func Home(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var172 = []any{twerge.It("block text-sm font-medium text-gray-300 mb-1")}
+		var templ_7745c5c3_Var172 = []any{twerge.It("font-medium text-gray-300 mb-1 block text-sm")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var172...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -2107,7 +2107,7 @@ func Home(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var174 = []any{twerge.It("w-full px-4 py-2 border border-gray-600 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500")}
+		var templ_7745c5c3_Var174 = []any{twerge.It("rounded-md text-white py-2 border-gray-600 focus:ring-2 px-4 focus:ring-blue-500 w-full border bg-gray-700 focus:outline-none")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var174...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -2129,7 +2129,7 @@ func Home(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var176 = []any{twerge.It("block text-sm font-medium text-gray-300 mb-1")}
+		var templ_7745c5c3_Var176 = []any{twerge.It("font-medium text-gray-300 mb-1 block text-sm")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var176...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -2151,7 +2151,7 @@ func Home(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var178 = []any{twerge.It("w-full px-4 py-2 border border-gray-600 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500")}
+		var templ_7745c5c3_Var178 = []any{twerge.It("rounded-md text-white py-2 border-gray-600 focus:ring-2 px-4 focus:ring-blue-500 w-full border bg-gray-700 focus:outline-none")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var178...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -2173,7 +2173,7 @@ func Home(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var180 = []any{twerge.It("block text-sm font-medium text-gray-300 mb-1")}
+		var templ_7745c5c3_Var180 = []any{twerge.It("font-medium text-gray-300 mb-1 block text-sm")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var180...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -2195,7 +2195,7 @@ func Home(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var182 = []any{twerge.It("w-full px-4 py-2 border border-gray-600 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500")}
+		var templ_7745c5c3_Var182 = []any{twerge.It("rounded-md text-white py-2 border-gray-600 focus:ring-2 px-4 focus:ring-blue-500 w-full border bg-gray-700 focus:outline-none")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var182...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -2217,7 +2217,7 @@ func Home(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var184 = []any{twerge.It("w-full px-6 py-3 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors")}
+		var templ_7745c5c3_Var184 = []any{twerge.It("focus:outline-none focus:ring-2 font-medium transition-colors focus:ring-offset-2 py-3 text-white rounded-md bg-blue-600 w-full px-6 focus:ring-blue-500 hover:bg-blue-700")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var184...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

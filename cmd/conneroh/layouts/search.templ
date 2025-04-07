@@ -61,7 +61,7 @@ templ search() {
 		>
 			<button
 				@click="isSearchOpen = !isSearchOpen"
-				class={ twerge.It("p-2 text-gray-300 hover:text-white rounded-md hover:bg-gray-700 transition-colors") }
+				class={ twerge.It("text-gray-300 rounded-md p-2 transition-colors hover:text-white hover:bg-gray-700") }
 			>
 				@icon("search", templ.Attributes{})
 			</button>
@@ -69,8 +69,8 @@ templ search() {
 			<div
 				x-show="isSearchOpen"
 				@click.away="isSearchOpen = false"
-				class={ twerge.It("absolute right-0 top-full mt-2 w-80 bg-gray-800 shadow-lg rounded-lg overflow-hidden z-30") }
-				x-transition:enter="transition ease-out duration-200"
+				class={ twerge.It("mt-2 top-full w-80 absolute overflow-hidden shadow-lg rounded-lg z-30 right-0 bg-gray-800") }
+				x-transition:enter="ease-out duration-200 transition"
 				x-transition:enter-start="opacity-0 scale-95"
 				x-transition:enter-end="opacity-100 scale-100"
 				x-transition:leave="transition ease-in duration-150"
@@ -79,7 +79,7 @@ templ search() {
 			>
 				// Search input
 				<div
-					class={ twerge.It("p-3 border-b border-gray-700") }
+					class={ twerge.It("p-3 border-gray-700 border-b") }
 				>
 					<div
 						class={ twerge.It("relative") }
@@ -87,7 +87,7 @@ templ search() {
 						<input
 							x-ref="searchInput"
 							x-model="searchQuery"
-							class={ twerge.It("w-full pl-10 pr-4 py-2 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700 text-gray-900 text-white") }
+							class={ twerge.It("focus:ring-blue-500 rounded-md focus:outline-none bg-gray-700 pl-10 focus:ring-2 border-gray-600 pr-4 w-full py-2 text-white border") }
 							type="search"
 							placeholder="Search site..."
 							aria-label="Search"
@@ -95,7 +95,7 @@ templ search() {
 							@keydown.enter="if (searchResults.length > 0) window.location.href = searchResults[0].url"
 						/>
 						<div
-							class={ twerge.It("absolute left-3 top-2.5 text-gray-500") }
+							class={ twerge.It("text-gray-500 absolute left-3 top-2.5") }
 						>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
@@ -111,13 +111,13 @@ templ search() {
 				</div>
 				// Results container
 				<div
-					class={ twerge.It("max-h-64 overflow-y-auto") }
+					class={ twerge.It("overflow-y-auto max-h-64") }
 					x-show="showResults"
 				>
 					// Loading indicator
 					<div
 						x-show="isLoading"
-						class={ twerge.It("p-4 text-center text-gray-400") }
+						class={ twerge.It("text-center p-4 text-gray-400") }
 					>
 						<svg
 							class={ twerge.It("w-5 mx-auto animate-spin h-5") }
@@ -143,7 +143,7 @@ templ search() {
 					// No results message
 					<div
 						x-show="!isLoading && searchQuery.length >= 2 && searchResults.length === 0"
-						class={ twerge.It("p-4 text-center text-gray-400") }
+						class={ twerge.It("text-center p-4 text-gray-400") }
 					>
 						No results found for "<span x-text="searchQuery"></span>"
 					</div>
@@ -152,7 +152,7 @@ templ search() {
 						x-show="!isLoading && searchResults.length > 0"
 					>
 						<h3
-							class={ twerge.It("text-xs font-semibold text-gray-400 uppercase tracking-wider px-4 pt-3 pb-2") }
+							class={ twerge.It("font-semibold tracking-wider text-gray-400 px-4 text-xs uppercase pb-2 pt-3") }
 						>
 							Search Results
 						</h3>
@@ -164,7 +164,7 @@ templ search() {
 								<li>
 									<a
 										:href="result.url"
-										class={ twerge.It("transition-colors px-4 block py-3 hover:bg-gray-700") }
+										class={ twerge.It("hover:bg-gray-700 py-3 px-4 block transition-colors") }
 										@click="isSearchOpen = false"
 									>
 										<div
@@ -207,7 +207,7 @@ templ search() {
 											</div>
 											<div>
 												<p
-													class={ twerge.It("text-sm font-medium text-white") }
+													class={ twerge.It("text-white text-sm font-medium") }
 													x-text="result.title"
 												></p>
 												<p
@@ -222,7 +222,7 @@ templ search() {
 						</ul>
 						// View all results link
 						<div
-							class={ twerge.It("px-4 py-3 border-t border-gray-700") }
+							class={ twerge.It("px-4 border-t border-gray-700 py-3") }
 						>
 							<a
 								:href="'/search?q=' + encodeURIComponent(searchQuery)"
@@ -270,8 +270,8 @@ templ search() {
 		// Mobile search panel
 		<div
 			x-show="isSearchOpen"
-			class={ twerge.It("md:hidden fixed inset-0 z-50 bg-gray-900 pt-16 px-4 pb-4") }
-			x-transition:enter="transition ease-out duration-200"
+			class={ twerge.It("z-50 fixed inset-0 md:hidden pb-4 px-4 bg-gray-900 pt-16") }
+			x-transition:enter="ease-out duration-200 transition"
 			x-transition:enter-start="opacity-0"
 			x-transition:enter-end="opacity-100"
 			x-transition:leave="transition ease-in duration-150"
@@ -285,7 +285,7 @@ templ search() {
 			>
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
-					class={ twerge.It("h-6 w-6") }
+					class={ twerge.It("w-6 h-6") }
 					fill="none"
 					viewBox="0 0 24 24"
 					stroke="currentColor"
@@ -294,7 +294,7 @@ templ search() {
 				</svg>
 			</button>
 			<h2
-				class={ twerge.It("text-xl font-bold text-white mb-4") }
+				class={ twerge.It("font-bold text-white mb-4 text-xl") }
 			>Search</h2>
 			// Mobile search input
 			<div
@@ -303,7 +303,7 @@ templ search() {
 				<input
 					x-ref="mobileSearchInput"
 					x-model="searchQuery"
-					class={ twerge.It("w-full pl-10 pr-4 py-3 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-800 text-white") }
+					class={ twerge.It("pr-4 bg-gray-800 focus:ring-2 focus:outline-none text-white border w-full py-3 pl-10 rounded-lg border-gray-600 focus:ring-blue-500") }
 					type="search"
 					placeholder="Search site..."
 					aria-label="Search"
@@ -325,15 +325,15 @@ templ search() {
 			</div>
 			// Mobile results container
 			<div
-				class={ twerge.It("overflow-y-auto mt-4 max-h-[calc(100vh-180px)]") }
+				class={ twerge.It("max-h-[calc(100vh-180px)] overflow-y-auto mt-4") }
 			>
 				// Loading indicator
 				<div
 					x-show="isLoading"
-					class={ twerge.It("py-8 text-center text-gray-400") }
+					class={ twerge.It("text-center text-gray-400 py-8") }
 				>
 					<svg
-						class={ twerge.It("animate-spin h-8 w-8 mx-auto mb-2") }
+						class={ twerge.It("h-8 w-8 mx-auto mb-2 animate-spin") }
 						xmlns="http://www.w3.org/2000/svg"
 						fill="none"
 						viewBox="0 0 24 24"
@@ -357,11 +357,11 @@ templ search() {
 				// No results message
 				<div
 					x-show="!isLoading && searchQuery.length >= 2 && searchResults.length === 0"
-					class={ twerge.It("py-8 text-center text-gray-400") }
+					class={ twerge.It("text-center text-gray-400 py-8") }
 				>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
-						class={ twerge.It("h-16 w-16 mx-auto mb-4 text-gray-600") }
+						class={ twerge.It("mb-4 text-gray-600 h-16 w-16 mx-auto") }
 						fill="none"
 						viewBox="0 0 24 24"
 						stroke="currentColor"
@@ -383,7 +383,7 @@ templ search() {
 					x-show="!isLoading && searchResults.length > 0"
 				>
 					<h3
-						class={ twerge.It("text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3") }
+						class={ twerge.It("font-semibold text-gray-400 uppercase tracking-wider mb-3 text-sm") }
 					>
 						Search Results
 					</h3>
@@ -392,11 +392,11 @@ templ search() {
 					>
 						<template x-for="(result, index) in searchResults" :key="index">
 							<li
-								class={ twerge.It("bg-gray-800 rounded-lg shadow-sm") }
+								class={ twerge.It("rounded-lg shadow-sm bg-gray-800") }
 							>
 								<a
 									:href="result.url"
-									class={ twerge.It("block p-4 hover:bg-gray-700 rounded-lg transition-colors") }
+									class={ twerge.It("hover:bg-gray-700 rounded-lg p-4 transition-colors block") }
 									@click="isSearchOpen = false"
 								>
 									<div
@@ -404,7 +404,7 @@ templ search() {
 									>
 										// Icon based on result type
 										<div
-											class={ twerge.It("flex-shrink-0 flex items-center bg-blue-900 mr-4 h-10 w-10 justify-center text-blue-300 rounded-full") }
+											class={ twerge.It("flex-shrink-0 text-blue-300 items-center h-10 justify-center rounded-full bg-blue-900 mr-4 w-10 flex") }
 										>
 											<svg
 												x-show="result.type === 'post'"
@@ -439,7 +439,7 @@ templ search() {
 										</div>
 										<div>
 											<p
-												class={ twerge.It("text-base font-medium text-white") }
+												class={ twerge.It("font-medium text-white text-base") }
 												x-text="result.title"
 											></p>
 											<p
@@ -454,11 +454,11 @@ templ search() {
 					</ul>
 					// View all results link
 					<div
-						class={ twerge.It("mt-4 pt-4 border-t border-gray-700") }
+						class={ twerge.It("border-t border-gray-700 mt-4 pt-4") }
 					>
 						<a
 							:href="'/search?q=' + encodeURIComponent(searchQuery)"
-							class={ twerge.It("block w-full py-3 px-4 bg-blue-500 hover:bg-blue-600 text-white font-medium text-center rounded-lg transition-colors") }
+							class={ twerge.It("text-center font-medium w-full transition-colors hover:bg-blue-600 text-white rounded-lg py-3 block bg-blue-500 px-4") }
 							@click="isSearchOpen = false"
 						>
 							View all results

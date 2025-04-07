@@ -169,7 +169,7 @@ func TagControl(
 			templ_7745c5c3_Var8 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		var templ_7745c5c3_Var9 = []any{twerge.It("inline-block px-3 py-1 text-sm font-medium rounded-full bg-blue-900 text-blue-200 hover:bg-blue-200 hover:bg-blue-800 transition-colors flex items-center h-8 flex-row justify-between w-full hover:underline")}
+		var templ_7745c5c3_Var9 = []any{twerge.It("items-center text-blue-200 py-1 hover:bg-blue-800 rounded-full bg-blue-900 justify-between flex font-medium h-8 px-3 text-sm w-full hover:underline transition-colors flex-row")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var9...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
