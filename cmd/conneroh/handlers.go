@@ -39,3 +39,10 @@ func searchHandler(
 		}
 	}
 }
+
+func filter(
+	embs []gen.Embedded,
+	query string,
+) []gen.Embedded {
+	return embs
+}
