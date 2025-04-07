@@ -252,21 +252,22 @@
                 # macOS-specific dependencies
                 libiconv
               ])
-            ++ pkgs.lib.optionals pkgs.stdenv.isLinux [
-              # Linux-specific dependencies
-              chromium # Chromium browser
-              xorg.libXcomposite # X11 Composite extension - needed by browsers
-              xorg.libXdamage # X11 Damage extension - needed by browsers
-              xorg.libXfixes # X11 Fixes extension - needed by browsers
-              xorg.libXrandr # X11 RandR extension - needed by browsers
-              xorg.libX11 # X11 client-side library
-              xorg.libxcb # X11 C Bindings library
-              mesa # OpenGL implementation
-              alsa-lib # Audio library
-              nss # Network Security Services
-              nspr # NetScape Portable Runtime
-              pango # Text layout and rendering
-            ]
+            ++ (with pkgs;
+              lib.optionals stdenv.isLinux [
+                # Linux-specific dependencies
+                chromium # Chromium browser
+                xorg.libXcomposite # X11 Composite extension - needed by browsers
+                xorg.libXdamage # X11 Damage extension - needed by browsers
+                xorg.libXfixes # X11 Fixes extension - needed by browsers
+                xorg.libXrandr # X11 RandR extension - needed by browsers
+                xorg.libX11 # X11 client-side library
+                xorg.libxcb # X11 C Bindings library
+                mesa # OpenGL implementation
+                alsa-lib # Audio library
+                nss # Network Security Services
+                nspr # NetScape Portable Runtime
+                pango # Text layout and rendering
+              ])
             # Add the generated script packages
             ++ scriptPackages;
         };
