@@ -30,14 +30,26 @@ func filterProjects(
 	projects []*gen.Project,
 	query string,
 ) []*gen.Project {
-	return projects
+	filtered := make([]*gen.Project, 0)
+	for _, project := range projects {
+		if strings.Contains(project.Title, query) {
+			filtered = append(filtered, project)
+		}
+	}
+	return filtered
 }
 
 func filterTags(
 	tags []*gen.Tag,
 	query string,
 ) []*gen.Tag {
-	return tags
+	filtered := make([]*gen.Tag, 0)
+	for _, tag := range tags {
+		if strings.Contains(tag.Title, query) {
+			filtered = append(filtered, tag)
+		}
+	}
+	return filtered
 }
 
 func searchHandler(
@@ -52,21 +64,21 @@ func searchHandler(
 			if header == "" {
 				templ.Handler(layouts.Page(views.List(target, &filtered, nil, nil, query))).ServeHTTP(w, r)
 			} else {
-				templ.Handler(views.Results(target, &gen.AllPosts, nil, nil)).ServeHTTP(w, r)
+				templ.Handler(views.Results(target, &filtered, nil, nil)).ServeHTTP(w, r)
 			}
 		case routing.PluralTargetProject:
 			filtered := filterProjects(gen.AllProjects, query)
 			if header == "" {
 				templ.Handler(layouts.Page(views.List(target, nil, &filtered, nil, query))).ServeHTTP(w, r)
 			} else {
-				templ.Handler(views.Results(target, nil, &gen.AllProjects, nil)).ServeHTTP(w, r)
+				templ.Handler(views.Results(target, nil, &filtered, nil)).ServeHTTP(w, r)
 			}
 		case routing.PluralTargetTag:
 			filtered := filterTags(gen.AllTags, query)
 			if header == "" {
 				templ.Handler(layouts.Page(views.List(target, nil, nil, &filtered, query))).ServeHTTP(w, r)
 			} else {
-				templ.Handler(views.Results(target, nil, nil, &gen.AllTags)).ServeHTTP(w, r)
+				templ.Handler(views.Results(target, nil, nil, &filtered)).ServeHTTP(w, r)
 			}
 		}
 	}
