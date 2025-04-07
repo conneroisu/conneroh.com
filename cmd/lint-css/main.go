@@ -4,6 +4,10 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"io/fs"
+	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/layouts"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/views"
@@ -14,25 +18,21 @@ import (
 
 func main() {
 	ctx := context.Background()
-	if err := run(ctx); err != nil {
+
+	// Check if a directory argument is provided
+	if len(os.Args) < 2 {
+		fmt.Println("Usage: program <directory>")
+		os.Exit(1)
+	}
+
+	dirPath := os.Args[1]
+
+	if err := run(ctx, dirPath); err != nil {
 		panic(err)
 	}
 }
 
-func run(ctx context.Context) error {
-	//
-	// for k, v := range css.ClassMapStr {
-	// 	for k2, v2 := range css.ClassMapStr {
-	// 		if v == v2 {
-	// 			return eris.Errorf(`
-	// 				'%s' : %s
-	// 				'%s' : %s
-	// 				Duplicate class name
-	// 			`, k, k2, v, v2)
-	// 		}
-	// 	}
-	// }
-
+func run(ctx context.Context, dirPath string) error {
 	var (
 		_ = layouts.Page(views.Home(
 			&gen.AllPosts,
@@ -101,21 +101,92 @@ func run(ctx context.Context) error {
 		_ = layouts.Layout("hello").Render(ctx, io.Discard)
 	)
 
+	// Print the original mappings
+	fmt.Println("Original class mappings:")
 	for gen, genMerged := range twerge.GenClassMergeStr {
 		fmt.Printf("%s : %s\n", gen, genMerged)
 	}
+
+	fmt.Println("\nClass map strings:")
 	for orig, class := range twerge.ClassMapStr {
 		fmt.Printf("%s : %s\n", orig, class)
 	}
 
+	// Create a replacement map for HTML class replacements
+	replacementMap := make(map[string]string)
+
+	// Populate the replacement map with classes that need to be replaced
+	fmt.Println("\nClasses to be replaced:")
 	for gen, genMerged := range twerge.GenClassMergeStr {
 		for orig, class := range twerge.ClassMapStr {
 			if gen == class {
 				if genMerged != orig {
-					print(fmt.Sprintf("\n\n '%s' has been merged to '%s'", orig, genMerged))
+					// For each original class that has been merged, add an entry to replace it with the merged version
+					replacementMap[orig] = genMerged
+					fmt.Printf("'%s' -> '%s'\n", orig, genMerged)
 				}
 			}
 		}
 	}
+
+	// Count of files processed and modified
+	filesProcessed := 0
+	filesModified := 0
+
+	// Walk through all files in the directory recursively
+	err := filepath.Walk(dirPath, func(path string, info fs.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		// Skip directories
+		if info.IsDir() {
+			return nil
+		}
+
+		// Only process .templ files
+		if !strings.HasSuffix(path, ".templ") {
+			return nil
+		}
+
+		filesProcessed++
+
+		// Read the file content
+		content, err := os.ReadFile(path)
+		if err != nil {
+			return err
+		}
+
+		// Convert to string for processing
+		fileContent := string(content)
+		originalContent := fileContent
+
+		// Apply each replacement
+		for orig, merged := range replacementMap {
+			fileContent = strings.ReplaceAll(fileContent, orig, merged)
+		}
+
+		// Check if the content was modified
+		if fileContent != originalContent {
+			filesModified++
+
+			// Write the modified content back to the file
+			err = os.WriteFile(path, []byte(fileContent), info.Mode())
+			if err != nil {
+				return err
+			}
+
+			fmt.Printf("Modified file: %s\n", path)
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("\nSummary: Processed %d .templ files, modified %d files\n", filesProcessed, filesModified)
+
 	return nil
 }
