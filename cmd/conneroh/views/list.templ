@@ -10,6 +10,7 @@ import (
 
 templ search(
 	target routing.PluralTarget,
+	query string,
 ) {
 	<div
 		class={ twerge.It("p-3 border-gray-700 border-b") }
@@ -20,12 +21,14 @@ templ search(
 			<input
 				id={ fmt.Sprintf("search-%s", target) }
 				class={ twerge.It("text-white border-gray-600 rounded-md focus:outline-none bg-gray-700 border focus:ring-blue-500 w-full focus:ring-2 pr-4 py-2 pl-10") }
-				type="search"
 				name="search"
+				value={ query }
 				placeholder={ fmt.Sprintf("Search %s...", target) }
-				hx-post={ fmt.Sprintf("/search/%s", target) }
-				hx-trigger="input changed delay:300ms, keyup[key=='Enter'], load"
+				hx-get={ fmt.Sprintf("/search/%s", target) }
+				hx-trigger="keyup changed delay:300ms"
 				hx-target={ fmt.Sprintf("#list-%s", target) }
+				hx-push-url="true"
+				hx-swap="outerHTML"
 				hx-indicator="#search-indicator"
 			/>
 			<div
@@ -71,9 +74,7 @@ templ List(
 	posts *[]*gen.Post,
 	projects *[]*gen.Project,
 	tags *[]*gen.Tag,
-	postReq []string,
-	projectReq []string,
-	tagReq []string,
+	query string,
 ) {
 	<div
 		class={ twerge.It("py-8 px-4 container mx-auto") }
@@ -85,6 +86,7 @@ templ List(
 		</h1>
 		@search(
 			target,
+			query,
 		)
 		@Results(
 			target,

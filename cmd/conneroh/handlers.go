@@ -4,50 +4,38 @@ import (
 	"net/http"
 
 	"github.com/a-h/templ"
+	"github.com/conneroisu/conneroh.com/cmd/conneroh/layouts"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/views"
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
 	"github.com/conneroisu/conneroh.com/internal/routing"
 )
 
-var (
-	posts = views.List(
-		routing.PluralTargetPost,
-		&gen.AllPosts,
-		&gen.AllProjects,
-		&gen.AllTags,
-		[]string{},
-		[]string{},
-		[]string{},
-	)
-	home = views.Home(
-		&gen.AllPosts,
-		&gen.AllProjects,
-		&gen.AllTags,
-	)
-	projects = views.List(
-		routing.PluralTargetProject,
-		&gen.AllPosts,
-		&gen.AllProjects,
-		&gen.AllTags,
-		[]string{},
-		[]string{},
-		[]string{},
-	)
-	tags = views.List(
-		routing.PluralTargetTag,
-		&gen.AllPosts,
-		&gen.AllProjects,
-		&gen.AllTags,
-		[]string{},
-		[]string{},
-		[]string{},
-	)
-)
+const hName = "HX-Trigger-Name"
 
-func postsHandler(
-	renderFn func(templ.Component) templ.Component,
+func searchHandler(
+	target routing.PluralTarget,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		templ.Handler(renderFn(posts)).ServeHTTP(w, r)
+		query := r.URL.Query().Get("search")
+		header := r.Header.Get(hName)
+		if header == "" {
+			switch target {
+			case routing.PluralTargetPost:
+				templ.Handler(layouts.Page(views.List(target, &gen.AllPosts, nil, nil, query))).ServeHTTP(w, r)
+			case routing.PluralTargetProject:
+				templ.Handler(layouts.Page(views.List(target, nil, &gen.AllProjects, nil, query))).ServeHTTP(w, r)
+			case routing.PluralTargetTag:
+				templ.Handler(layouts.Page(views.List(target, nil, nil, &gen.AllTags, query))).ServeHTTP(w, r)
+			}
+			return
+		}
+		switch target {
+		case routing.PluralTargetPost:
+			templ.Handler(views.Results(target, &gen.AllPosts, nil, nil)).ServeHTTP(w, r)
+		case routing.PluralTargetProject:
+			templ.Handler(views.Results(target, nil, &gen.AllProjects, nil)).ServeHTTP(w, r)
+		case routing.PluralTargetTag:
+			templ.Handler(views.Results(target, nil, nil, &gen.AllTags)).ServeHTTP(w, r)
+		}
 	}
 }

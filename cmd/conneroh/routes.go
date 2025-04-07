@@ -11,6 +11,36 @@ import (
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/layouts"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/views"
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
+	"github.com/conneroisu/conneroh.com/internal/routing"
+)
+
+var (
+	posts = views.List(
+		routing.PluralTargetPost,
+		&gen.AllPosts,
+		&gen.AllProjects,
+		&gen.AllTags,
+		"",
+	)
+	home = views.Home(
+		&gen.AllPosts,
+		&gen.AllProjects,
+		&gen.AllTags,
+	)
+	projects = views.List(
+		routing.PluralTargetProject,
+		&gen.AllPosts,
+		&gen.AllProjects,
+		&gen.AllTags,
+		"",
+	)
+	tags = views.List(
+		routing.PluralTargetTag,
+		&gen.AllPosts,
+		&gen.AllProjects,
+		&gen.AllTags,
+		"",
+	)
 )
 
 // AddRoutes adds all routes to the router.
@@ -44,6 +74,7 @@ func AddRoutes(
 	h.Handle(
 		"GET /morph/posts",
 		templ.Handler(layouts.Morpher(posts)))
+	h.Handle("GET /search/posts", searchHandler(routing.PluralTargetPost))
 	h.Handle(
 		"GET /projects",
 		templ.Handler(layouts.Page(projects)))
@@ -51,11 +82,18 @@ func AddRoutes(
 		"GET /morph/projects",
 		templ.Handler(layouts.Morpher(projects)))
 	h.Handle(
+		"GET /search/projects",
+		searchHandler(routing.PluralTargetProject))
+
+	h.Handle(
 		"GET /tags",
 		templ.Handler(layouts.Page(tags)))
 	h.Handle(
 		"GET /morph/tags",
 		templ.Handler(layouts.Morpher(tags)))
+	h.Handle(
+		"GET /search/tags",
+		searchHandler(routing.PluralTargetTag))
 
 	for _, p := range gen.AllPosts {
 		h.Handle(

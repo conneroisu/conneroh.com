@@ -74,8 +74,8 @@ templ Tag(
 				@List(
 					routing.PluralTargetPost,
 					&tag.Posts,
-					nil, nil, nil, nil,
-					[]string{fmt.Sprintf("tag:%s", tag.Slug)},
+					nil, nil,
+					"",
 				)
 			</div>
 			// Projects Tab
@@ -85,9 +85,7 @@ templ Tag(
 					nil,
 					&tag.Projects,
 					nil,
-					[]string{},
-					[]string{fmt.Sprintf("tag:%s", tag.Slug)},
-					[]string{},
+					"",
 				)
 			</div>
 			// Related Tags Tab
@@ -99,8 +97,7 @@ templ Tag(
 					routing.PluralTargetTag,
 					nil, nil,
 					&tag.Tags,
-					nil, nil,
-					[]string{fmt.Sprintf("tag:%s", tag.Slug)},
+					"",
 				)
 			</div>
 		</div>
