@@ -2,6 +2,7 @@ package conneroh
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/a-h/templ"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/layouts"
@@ -16,7 +17,13 @@ func filterPosts(
 	posts []*gen.Post,
 	query string,
 ) []*gen.Post {
-	return posts
+	filtered := make([]*gen.Post, 0)
+	for _, post := range posts {
+		if strings.Contains(post.Title, query) {
+			filtered = append(filtered, post)
+		}
+	}
+	return filtered
 }
 
 func filterProjects(
