@@ -22,7 +22,7 @@ templ Home(
 				class={ twerge.It("lg:flex-row items-center justify-between flex flex-col") }
 			>
 				<div
-					class={ twerge.It("lg:mb-0 lg:w-1/2 mb-10") }
+					class={ twerge.It("lg:w-1/2 mb-10 lg:mb-0") }
 				>
 					<h1
 						class={ twerge.It("text-white text-4xl font-bold lg:text-6xl mb-4 leading-tight md:text-5xl") }
@@ -30,12 +30,12 @@ templ Home(
 						Conner Ohnesorge
 					</h1>
 					<p
-						class={ twerge.It("text-gray-300 mb-8 max-w-md text-xl") }
+						class={ twerge.It("text-xl text-gray-300 mb-8 max-w-md") }
 					>
 						Electrical Engineer & Software Developer specialized in creating robust, scalable, and elegant solutions.
 					</p>
 					<p
-						class={ twerge.It("text-gray-300 mb-8 max-w-md text-xl") }
+						class={ twerge.It("text-xl text-gray-300 mb-8 max-w-md") }
 					>
 						Electrical Engineering Bachelors Degree and Minor in Computer Science from
 						<a
@@ -63,7 +63,7 @@ templ Home(
 					</div>
 				</div>
 				<div
-					class={ twerge.It("relative lg:w-1/2") }
+					class={ twerge.It("lg:w-1/2 relative") }
 				>
 					<div
 						class={ twerge.It("mx-auto bg-blue-600 md:h-80 w-64 relative md:w-80 shadow-lg rounded-full h-64") }
@@ -92,7 +92,7 @@ templ Home(
 	// Featured Projects Section
 	<section
 		id="projects"
-		class={ twerge.It("py-16 bg-gray-800") }
+		class={ twerge.It("bg-gray-800 py-16") }
 	>
 		<div
 			class={ twerge.It("container px-4 mx-auto") }
@@ -101,7 +101,7 @@ templ Home(
 				class={ twerge.It("flex flex-col md:flex-row justify-between items-center mb-12 pr-4") }
 			>
 				<h2
-					class={ twerge.It("font-bold text-white mb-4 text-3xl") }
+					class={ twerge.It("mb-4 text-3xl font-bold text-white") }
 				>
 					Featured Projects
 				</h2>
@@ -133,10 +133,10 @@ templ Home(
 								hx-swap="outerHTML"
 								hx-target="#bodiody"
 								preload="mouseover"
-								class={ twerge.It("cursor-pointer block") }
+								class={ twerge.It("block cursor-pointer") }
 							>
 								<div
-									class={ twerge.It("bg-gray-700 flex items-center justify-center overflow-hidden h-48") }
+									class={ twerge.It("justify-center overflow-hidden h-48 bg-gray-700 flex items-center") }
 								>
 									if project.BannerPath != "" {
 										@image(
@@ -148,7 +148,7 @@ templ Home(
 										// Project image placeholder
 										<svg
 											xmlns="http://www.w3.org/2000/svg"
-											class={ twerge.It("h-12 w-12 text-gray-500") }
+											class={ twerge.It("w-12 text-gray-500 h-12") }
 											fill="none"
 											viewBox="0 0 24 24"
 											stroke="currentColor"
@@ -166,7 +166,7 @@ templ Home(
 										{ project.Title }
 									</h3>
 									<p
-										class={ twerge.It("text-gray-300 mb-4 line-clamp-2") }
+										class={ twerge.It("mb-4 line-clamp-2 text-gray-300") }
 									>
 										{ project.Description }
 									</p>
@@ -189,7 +189,7 @@ templ Home(
 										hx-swap="outerHTML"
 										hx-target="#bodiody"
 										preload="mouseover"
-										class={ twerge.It("flex items-center text-blue-400 hover:underline text-sm font-medium") }
+										class={ twerge.It("font-medium flex items-center text-blue-400 hover:underline text-sm") }
 									>
 										View Project
 										@icon("arrow-right", templ.Attributes{})
@@ -213,7 +213,7 @@ templ Home(
 				class={ twerge.It("flex flex-col md:flex-row justify-between items-center mb-12 pr-4") }
 			>
 				<h2
-					class={ twerge.It("font-bold text-white mb-4 text-3xl") }
+					class={ twerge.It("mb-4 text-3xl font-bold text-white") }
 				>
 					Recent Posts
 				</h2>
@@ -231,7 +231,7 @@ templ Home(
 				</a>
 			</div>
 			<div
-				class={ twerge.It("grid grid-cols-1 lg:grid-cols-2 gap-8") }
+				class={ twerge.It("grid-cols-1 lg:grid-cols-2 gap-8 grid") }
 			>
 				for i, post := range *fullPosts {
 					if i < 4 {
@@ -245,11 +245,11 @@ templ Home(
 								hx-swap="outerHTML"
 								hx-target="#bodiody"
 								preload="mouseover"
-								class={ twerge.It("cursor-pointer block") }
+								class={ twerge.It("block cursor-pointer") }
 							>
 								// Post banner image
 								<div
-									class={ twerge.It("bg-gray-700 overflow-hidden h-48") }
+									class={ twerge.It("h-48 bg-gray-700 overflow-hidden") }
 								>
 									if post.BannerPath != "" {
 										@image(
@@ -263,7 +263,7 @@ templ Home(
 										>
 											<svg
 												xmlns="http://www.w3.org/2000/svg"
-												class={ twerge.It("h-12 w-12 text-gray-500") }
+												class={ twerge.It("w-12 text-gray-500 h-12") }
 												fill="none"
 												viewBox="0 0 24 24"
 												stroke="currentColor"
@@ -287,7 +287,7 @@ templ Home(
 										{ post.Title }
 									</h3>
 									<p
-										class={ twerge.It("text-gray-300 mb-4 line-clamp-2") }
+										class={ twerge.It("mb-4 line-clamp-2 text-gray-300") }
 									>
 										{ post.Description }
 									</p>
@@ -315,12 +315,12 @@ templ Home(
 										hx-swap="outerHTML"
 										hx-target="#bodiody"
 										preload="mouseover"
-										class={ twerge.It("flex items-center text-blue-400 hover:underline text-sm font-medium") }
+										class={ twerge.It("font-medium flex items-center text-blue-400 hover:underline text-sm") }
 									>
 										Read Post
 										<svg
 											xmlns="http://www.w3.org/2000/svg"
-											class={ twerge.It("h-4 w-4 ml-1") }
+											class={ twerge.It("ml-1 h-4 w-4") }
 											viewBox="0 0 20 20"
 											fill="currentColor"
 										>
@@ -341,7 +341,7 @@ templ Home(
 	</section>
 	// Skills/Tags Section
 	<section
-		class={ twerge.It("py-16 bg-gray-800") }
+		class={ twerge.It("bg-gray-800 py-16") }
 	>
 		<div
 			class={ twerge.It("container px-4 mx-auto") }
@@ -350,7 +350,7 @@ templ Home(
 				class={ twerge.It("flex flex-col md:flex-row justify-between items-center mb-12 pr-4") }
 			>
 				<h2
-					class={ twerge.It("font-bold text-white mb-4 text-3xl") }
+					class={ twerge.It("mb-4 text-3xl font-bold text-white") }
 				>
 					Skills & Technologies
 				</h2>
@@ -385,7 +385,7 @@ templ Home(
 							@icon(tag.Icon, templ.Attributes{})
 						</div>
 						<h3
-							class={ twerge.It("font-medium text-white") }
+							class={ twerge.It("text-white font-medium") }
 						>
 							{ tag.Title }
 						</h3>
@@ -406,7 +406,7 @@ templ Home(
 				class={ twerge.It("text-center max-w-2xl mx-auto") }
 			>
 				<h2
-					class={ twerge.It("font-bold text-white mb-4 text-3xl") }
+					class={ twerge.It("mb-4 text-3xl font-bold text-white") }
 				>
 					Get In Touch
 				</h2>
@@ -451,7 +451,7 @@ templ Home(
 						class={ twerge.It("space-y-6") }
 					>
 						<div
-							class={ twerge.It("grid grid-cols-1 md:grid-cols-2 gap-6") }
+							class={ twerge.It("md:grid-cols-2 gap-6 grid grid-cols-1") }
 						>
 							<div>
 								<label

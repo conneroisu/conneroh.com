@@ -42,7 +42,7 @@ func Tag(
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		var templ_7745c5c3_Var2 = []any{twerge.It("container mx-auto px-4 py-8")}
+		var templ_7745c5c3_Var2 = []any{twerge.It("py-8 px-4 container mx-auto")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var2...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -64,7 +64,7 @@ func Tag(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var4 = []any{twerge.It("text-center mb-12")}
+		var templ_7745c5c3_Var4 = []any{twerge.It("mb-12 text-center")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var4...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -88,12 +88,12 @@ func Tag(
 		}
 		templ_7745c5c3_Err = icon(tag.Icon, templ.Attributes{
 			"style": "width: 4em; height: 4em;",
-			"class": twerge.It("p-4 inline-block"),
+			"class": twerge.It("inline-block p-4"),
 		}).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var6 = []any{twerge.It("text-4xl font-bold text-white mb-4")}
+		var templ_7745c5c3_Var6 = []any{twerge.It("font-bold text-white mb-4 text-4xl")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var6...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -128,7 +128,7 @@ func Tag(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var9 = []any{twerge.It("text-xl text-gray-300 max-w-2xl mx-auto")}
+		var templ_7745c5c3_Var9 = []any{twerge.It("max-w-2xl mx-auto text-xl text-gray-300")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var9...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -185,7 +185,7 @@ func Tag(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var14 = []any{twerge.It("border-b border-gray-700 mb-6")}
+		var templ_7745c5c3_Var14 = []any{twerge.It("mb-6 border-b border-gray-700")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var14...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -207,7 +207,7 @@ func Tag(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var16 = []any{twerge.It("flex space-x-8")}
+		var templ_7745c5c3_Var16 = []any{twerge.It("space-x-8 flex")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var16...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -229,7 +229,7 @@ func Tag(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var18 = []any{twerge.It("sm:text-base font-medium py-4 text-sm border-b-2 px-1")}
+		var templ_7745c5c3_Var18 = []any{twerge.It("py-4 border-b-2 px-1 sm:text-base text-sm font-medium")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var18...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -239,7 +239,7 @@ func Tag(
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var19 string
-		templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("{'%s': activeTab === 'posts', '%s': activeTab !== 'posts'}", twerge.It("border-blue-500 text-blue-500"), twerge.It("hover:text-gray-300 border-transparent text-gray-400")))
+		templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("{'%s': activeTab === 'posts', '%s': activeTab !== 'posts'}", twerge.It("text-blue-500 border-blue-500"), twerge.It("text-gray-400 hover:text-gray-300 border-transparent")))
 		if templ_7745c5c3_Err != nil {
 			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/tags.templ`, Line: 51, Col: 199}
 		}
@@ -277,7 +277,7 @@ func Tag(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var22 = []any{twerge.It("sm:text-base font-medium py-4 text-sm border-b-2 px-1")}
+		var templ_7745c5c3_Var22 = []any{twerge.It("py-4 border-b-2 px-1 sm:text-base text-sm font-medium")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var22...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -287,7 +287,7 @@ func Tag(
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var23 string
-		templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("{'%s': activeTab === 'projects', '%s': activeTab !== 'projects'}", twerge.It("border-blue-500 text-blue-500"), twerge.It("hover:text-gray-300 border-transparent text-gray-400")))
+		templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("{'%s': activeTab === 'projects', '%s': activeTab !== 'projects'}", twerge.It("text-blue-500 border-blue-500"), twerge.It("text-gray-400 hover:text-gray-300 border-transparent")))
 		if templ_7745c5c3_Err != nil {
 			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/tags.templ`, Line: 58, Col: 205}
 		}
@@ -325,7 +325,7 @@ func Tag(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var26 = []any{twerge.It("sm:text-base font-medium py-4 text-sm border-b-2 px-1")}
+		var templ_7745c5c3_Var26 = []any{twerge.It("py-4 border-b-2 px-1 sm:text-base text-sm font-medium")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var26...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -335,7 +335,7 @@ func Tag(
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var27 string
-		templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("{'%s': activeTab === 'related', '%s': activeTab !== 'related'}", twerge.It("border-blue-500 text-blue-500"), twerge.It("hover:text-gray-300 border-transparent text-gray-400")))
+		templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("{'%s': activeTab === 'related', '%s': activeTab !== 'related'}", twerge.It("text-blue-500 border-blue-500"), twerge.It("text-gray-400 hover:text-gray-300 border-transparent")))
 		if templ_7745c5c3_Err != nil {
 			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/tags.templ`, Line: 65, Col: 203}
 		}

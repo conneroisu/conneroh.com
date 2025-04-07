@@ -25,7 +25,7 @@ templ Post(
 				{ post.Title }
 			</h1>
 			<div
-				class={ twerge.It("mb-6 flex items-center text-gray-400") }
+				class={ twerge.It("items-center text-gray-400 mb-6 flex") }
 			>
 				<time>
 					{ post.CreatedAt.Format("Jan 2, 2006") }
@@ -71,12 +71,12 @@ templ Post(
 				class={ twerge.It("pt-8 mt-12 border-t border-gray-700") }
 			>
 				<h2
-					class={ twerge.It("mb-4 text-2xl font-bold text-white") }
+					class={ twerge.It("text-2xl font-bold text-white mb-4") }
 				>
 					Related Projects
 				</h2>
 				<div
-					class={ twerge.It("grid grid-cols-1 md:grid-cols-2 gap-4") }
+					class={ twerge.It("gap-4 grid grid-cols-1 md:grid-cols-2") }
 				>
 					for _, project := range post.Projects {
 						<a
@@ -91,12 +91,12 @@ templ Post(
 						>
 							<div>
 								<h3
-									class={ twerge.It("font-medium text-white") }
+									class={ twerge.It("text-white font-medium") }
 								>
 									{ project.Slug }
 								</h3>
 								<p
-									class={ twerge.It("line-clamp-2 text-gray-400 text-sm") }
+									class={ twerge.It("text-gray-400 text-sm line-clamp-2") }
 								>
 									{ project.Description }
 								</p>

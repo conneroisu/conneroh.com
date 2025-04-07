@@ -18,7 +18,7 @@ templ Tag(
 		class={ twerge.It("py-8 px-4 container mx-auto") }
 	>
 		<header
-			class={ twerge.It("text-center mb-12") }
+			class={ twerge.It("mb-12 text-center") }
 		>
 			@icon(tag.Icon, templ.Attributes{
 				"style": "width: 4em; height: 4em;",
@@ -44,7 +44,7 @@ templ Tag(
 				class={ twerge.It("mb-6 border-b border-gray-700") }
 			>
 				<nav
-					class={ twerge.It("flex space-x-8") }
+					class={ twerge.It("space-x-8 flex") }
 				>
 					<button
 						@click="activeTab = 'posts'"

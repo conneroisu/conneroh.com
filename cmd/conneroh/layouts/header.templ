@@ -15,11 +15,11 @@ templ header() {
 				x-data="{ isMenuOpen: false }"
 			>
 				<div
-					class={ twerge.It("flex items-center justify-between h-16") }
+					class={ twerge.It("h-16 flex items-center justify-between") }
 				>
 					// Left side: Logo and navigation links
 					<div
-						class={ twerge.It("flex items-center") }
+						class={ twerge.It("items-center flex") }
 					>
 						// Mobile menu button
 						@icon("menu", templ.Attributes{
@@ -44,7 +44,7 @@ templ header() {
 							preload="mouseover"
 						>
 							<a
-								class={ twerge.It("hover:text-white cursor-pointer text-gray-300") }
+								class={ twerge.It("cursor-pointer text-gray-300 hover:text-white") }
 								hx-target="#bodiody"
 								hx-get="/morph/projects"
 								hx-swap="outerHTML"
@@ -54,7 +54,7 @@ templ header() {
 								Projects
 							</a>
 							<a
-								class={ twerge.It("hover:text-white cursor-pointer text-gray-300") }
+								class={ twerge.It("cursor-pointer text-gray-300 hover:text-white") }
 								hx-target="#bodiody"
 								hx-get="/morph/posts"
 								hx-swap="outerHTML"
@@ -65,7 +65,7 @@ templ header() {
 								Posts
 							</a>
 							<a
-								class={ twerge.It("hover:text-white cursor-pointer text-gray-300") }
+								class={ twerge.It("cursor-pointer text-gray-300 hover:text-white") }
 								hx-target="#bodiody"
 								hx-get="/morph/tags"
 								hx-swap="outerHTML"
@@ -83,8 +83,8 @@ templ header() {
 				// Mobile navigation menu - toggled by button
 				<div
 					x-show="isMenuOpen"
-					class={ twerge.It("pt-2 pb-4 space-y-1 sm:hidden") }
-					x-transition:enter="ease-out duration-200 transition"
+					class={ twerge.It("pb-4 space-y-1 sm:hidden pt-2") }
+					x-transition:enter="duration-200 transition ease-out"
 					x-transition:enter-start="opacity-0 transform -translate-y-2"
 					x-transition:enter-end="transform translate-y-0 opacity-100"
 					x-transition:leave="transition ease-in duration-150"

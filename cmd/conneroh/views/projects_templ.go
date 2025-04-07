@@ -40,7 +40,7 @@ func Project(
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		var templ_7745c5c3_Var2 = []any{twerge.It("container mx-auto px-4 py-8")}
+		var templ_7745c5c3_Var2 = []any{twerge.It("py-8 px-4 container mx-auto")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var2...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -84,7 +84,7 @@ func Project(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var6 = []any{twerge.It("text-4xl font-bold text-white mb-4")}
+		var templ_7745c5c3_Var6 = []any{twerge.It("font-bold text-white mb-4 text-4xl")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var6...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -120,7 +120,7 @@ func Project(
 			return templ_7745c5c3_Err
 		}
 		if len(project.Tags) > 0 {
-			var templ_7745c5c3_Var9 = []any{twerge.It("flex flex-wrap gap-2 mb-6")}
+			var templ_7745c5c3_Var9 = []any{twerge.It("gap-2 mb-6 flex flex-wrap")}
 			templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var9...)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -143,7 +143,7 @@ func Project(
 				return templ_7745c5c3_Err
 			}
 			for _, tag := range project.Tags {
-				var templ_7745c5c3_Var11 = []any{twerge.It("bg-blue-900 hover:bg-blue-800 font-medium inline-block rounded-full px-3 transition-colors text-sm text-blue-200 py-1")}
+				var templ_7745c5c3_Var11 = []any{twerge.It("rounded-full hover:bg-blue-800 font-medium px-3 py-1 text-sm transition-colors text-blue-200 bg-blue-900 inline-block")}
 				templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var11...)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -197,7 +197,7 @@ func Project(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var15 = []any{twerge.It("overflow-hidden p-6 bg-gray-800 mb-8 rounded-lg shadow-lg")}
+		var templ_7745c5c3_Var15 = []any{twerge.It("shadow-lg rounded-lg bg-gray-800 mb-8 p-6 overflow-hidden")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var15...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -219,7 +219,7 @@ func Project(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var17 = []any{twerge.It("mb-4 border-b border-gray-700 pb-4")}
+		var templ_7745c5c3_Var17 = []any{twerge.It("border-gray-700 pb-4 mb-4 border-b")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var17...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -241,7 +241,7 @@ func Project(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var19 = []any{twerge.It("text-2xl font-semibold text-white")}
+		var templ_7745c5c3_Var19 = []any{twerge.It("font-semibold text-white text-2xl")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var19...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -263,7 +263,7 @@ func Project(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var21 = []any{twerge.It("mt-2 w-16 h-1 bg-blue-500")}
+		var templ_7745c5c3_Var21 = []any{twerge.It("h-1 bg-blue-500 mt-2 w-16")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var21...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -307,7 +307,7 @@ func Project(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var25 = []any{twerge.It("text-gray-300 leading-relaxed whitespace-pre-line")}
+		var templ_7745c5c3_Var25 = []any{twerge.It("leading-relaxed whitespace-pre-line text-gray-300")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var25...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -342,7 +342,7 @@ func Project(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var28 = []any{twerge.It("text-gray-400 mt-6 flex items-center text-sm")}
+		var templ_7745c5c3_Var28 = []any{twerge.It("mt-6 flex items-center text-sm text-gray-400")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var28...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -385,7 +385,7 @@ func Project(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var31 = []any{twerge.It("overflow-hidden p-6 bg-gray-800 mb-8 rounded-lg shadow-lg")}
+		var templ_7745c5c3_Var31 = []any{twerge.It("shadow-lg rounded-lg bg-gray-800 mb-8 p-6 overflow-hidden")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var31...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -407,7 +407,7 @@ func Project(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var33 = []any{twerge.It("text-white mb-4 text-2xl font-semibold")}
+		var templ_7745c5c3_Var33 = []any{twerge.It("font-semibold text-white mb-4 text-2xl")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var33...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -429,7 +429,7 @@ func Project(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var35 = []any{twerge.It("text-gray-300 leading-relaxed max-w-none my-6")}
+		var templ_7745c5c3_Var35 = []any{twerge.It("leading-relaxed max-w-none my-6 text-gray-300")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var35...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -482,7 +482,7 @@ func Project(
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var39 = []any{twerge.It("mb-4 text-2xl font-bold text-white")}
+			var templ_7745c5c3_Var39 = []any{twerge.It("text-2xl font-bold text-white mb-4")}
 			templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var39...)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -504,7 +504,7 @@ func Project(
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var41 = []any{twerge.It("grid grid-cols-1 md:grid-cols-2 gap-6")}
+			var templ_7745c5c3_Var41 = []any{twerge.It("md:grid-cols-2 gap-6 grid grid-cols-1")}
 			templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var41...)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -584,7 +584,7 @@ func Project(
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var48 = []any{twerge.It("text-gray-300 mb-4 line-clamp-2")}
+				var templ_7745c5c3_Var48 = []any{twerge.It("mb-4 line-clamp-2 text-gray-300")}
 				templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var48...)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -619,7 +619,7 @@ func Project(
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var51 = []any{twerge.It("flex items-center text-blue-400 hover:underline text-sm font-medium")}
+				var templ_7745c5c3_Var51 = []any{twerge.It("font-medium flex items-center text-blue-400 hover:underline text-sm")}
 				templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var51...)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -650,7 +650,7 @@ func Project(
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var54 = []any{twerge.It("h-4 w-4 ml-1")}
+				var templ_7745c5c3_Var54 = []any{twerge.It("ml-1 h-4 w-4")}
 				templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var54...)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err

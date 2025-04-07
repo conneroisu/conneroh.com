@@ -40,12 +40,12 @@ templ TagControl(
 		class={ twerge.It("w-full text-blue-200 px-3 items-center flex-row flex text-sm bg-blue-900 transition-colors py-1 hover:bg-blue-800 justify-between font-medium h-8 rounded-full hover:underline") }
 	>
 		<div
-			class={ twerge.It("flex items-center") }
+			class={ twerge.It("items-center flex") }
 		>
 			@icon(tag.Icon, templ.Attributes{"x-show": "open", "x-transition": ""})
 		</div>
 		<div
-			class={ twerge.It("flex items-center") }
+			class={ twerge.It("items-center flex") }
 		>
 			<a
 				x-on:click="open = true"
@@ -66,7 +66,7 @@ templ TagControl(
 			</a>
 		</div>
 		<div
-			class={ twerge.It("flex items-center") }
+			class={ twerge.It("items-center flex") }
 		>
 			@icon("circle-plus", templ.Attributes{"x-show": "open", "x-transition": ""})
 			@icon("circle-minus", templ.Attributes{"x-show": "open", "x-transition": ""})
