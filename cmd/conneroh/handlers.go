@@ -12,37 +12,55 @@ import (
 
 const hName = "HX-Trigger-Name"
 
+func filterPosts(
+	posts []*gen.Post,
+	query string,
+) []*gen.Post {
+	return posts
+}
+
+func filterProjects(
+	projects []*gen.Project,
+	query string,
+) []*gen.Project {
+	return projects
+}
+
+func filterTags(
+	tags []*gen.Tag,
+	query string,
+) []*gen.Tag {
+	return tags
+}
+
 func searchHandler(
 	target routing.PluralTarget,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		query := r.URL.Query().Get("search")
 		header := r.Header.Get(hName)
-		if header == "" {
-			switch target {
-			case routing.PluralTargetPost:
-				templ.Handler(layouts.Page(views.List(target, &gen.AllPosts, nil, nil, query))).ServeHTTP(w, r)
-			case routing.PluralTargetProject:
-				templ.Handler(layouts.Page(views.List(target, nil, &gen.AllProjects, nil, query))).ServeHTTP(w, r)
-			case routing.PluralTargetTag:
-				templ.Handler(layouts.Page(views.List(target, nil, nil, &gen.AllTags, query))).ServeHTTP(w, r)
-			}
-			return
-		}
 		switch target {
 		case routing.PluralTargetPost:
-			templ.Handler(views.Results(target, &gen.AllPosts, nil, nil)).ServeHTTP(w, r)
+			filtered := filterPosts(gen.AllPosts, query)
+			if header == "" {
+				templ.Handler(layouts.Page(views.List(target, &filtered, nil, nil, query))).ServeHTTP(w, r)
+			} else {
+				templ.Handler(views.Results(target, &gen.AllPosts, nil, nil)).ServeHTTP(w, r)
+			}
 		case routing.PluralTargetProject:
-			templ.Handler(views.Results(target, nil, &gen.AllProjects, nil)).ServeHTTP(w, r)
+			filtered := filterProjects(gen.AllProjects, query)
+			if header == "" {
+				templ.Handler(layouts.Page(views.List(target, nil, &filtered, nil, query))).ServeHTTP(w, r)
+			} else {
+				templ.Handler(views.Results(target, nil, &gen.AllProjects, nil)).ServeHTTP(w, r)
+			}
 		case routing.PluralTargetTag:
-			templ.Handler(views.Results(target, nil, nil, &gen.AllTags)).ServeHTTP(w, r)
+			filtered := filterTags(gen.AllTags, query)
+			if header == "" {
+				templ.Handler(layouts.Page(views.List(target, nil, nil, &filtered, query))).ServeHTTP(w, r)
+			} else {
+				templ.Handler(views.Results(target, nil, nil, &gen.AllTags)).ServeHTTP(w, r)
+			}
 		}
 	}
-}
-
-func filter(
-	embs []gen.Embedded,
-	query string,
-) []gen.Embedded {
-	return embs
 }
