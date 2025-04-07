@@ -8,10 +8,13 @@ import (
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/layouts"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/views"
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
+	"github.com/conneroisu/conneroh.com/internal/hx"
 	"github.com/conneroisu/conneroh.com/internal/routing"
 )
 
-const hName = "HX-Trigger-Name"
+const (
+	maxSearchRoutines = 10
+)
 
 func filterPosts(
 	posts []*gen.Post,
@@ -57,7 +60,7 @@ func searchHandler(
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		query := r.URL.Query().Get("search")
-		header := r.Header.Get(hName)
+		header := r.Header.Get(hx.HdrTriggerName)
 		switch target {
 		case routing.PluralTargetPost:
 			filtered := filterPosts(gen.AllPosts, query)
