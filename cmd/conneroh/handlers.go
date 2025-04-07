@@ -51,19 +51,3 @@ func postsHandler(
 		templ.Handler(renderFn(posts)).ServeHTTP(w, r)
 	}
 }
-
-func projectsHandler(
-	renderFn func(templ.Component) templ.Component,
-) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		templ.Handler(renderFn(projects)).ServeHTTP(w, r)
-	}
-}
-
-func tagsHandler(
-	renderFn func(templ.Component) templ.Component,
-) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		templ.Handler(renderFn(tags)).ServeHTTP(w, r)
-	}
-}

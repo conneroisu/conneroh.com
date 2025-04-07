@@ -24,7 +24,7 @@ templ search(
 				name="search"
 				placeholder={ fmt.Sprintf("Search %s...", target) }
 				hx-post={ fmt.Sprintf("/search/%s", target) }
-				hx-trigger="input changed delay:500ms, keyup[key=='Enter'], load"
+				hx-trigger="input changed delay:300ms, keyup[key=='Enter'], load"
 				hx-target={ fmt.Sprintf("#list-%s", target) }
 				hx-indicator="#search-indicator"
 			/>

@@ -40,22 +40,22 @@ func AddRoutes(
 
 	h.Handle(
 		"GET /posts",
-		postsHandler(layouts.Page))
+		templ.Handler(layouts.Page(posts)))
 	h.Handle(
 		"GET /morph/posts",
-		postsHandler(layouts.Morpher))
+		templ.Handler(layouts.Morpher(posts)))
 	h.Handle(
 		"GET /projects",
-		projectsHandler(layouts.Page))
+		templ.Handler(layouts.Page(projects)))
 	h.Handle(
 		"GET /morph/projects",
-		projectsHandler(layouts.Morpher))
+		templ.Handler(layouts.Morpher(projects)))
 	h.Handle(
 		"GET /tags",
-		tagsHandler(layouts.Page))
+		templ.Handler(layouts.Page(tags)))
 	h.Handle(
 		"GET /morph/tags",
-		tagsHandler(layouts.Morpher))
+		templ.Handler(layouts.Morpher(tags)))
 
 	for _, p := range gen.AllPosts {
 		h.Handle(
