@@ -19,8 +19,8 @@
   };
 
   nixConfig = {
-    extra-substituters = ''https://conneroisu.cachix.org'';
-    extra-trusted-public-keys = ''conneroisu.cachix.org-1:PgOlJ8/5i/XBz2HhKZIYBSxNiyzalr1B/63T74lRcU0='';
+    extra-substituters = ''https://semanticrouter-go.cachix.org'';
+    extra-trusted-public-keys = ''semanticrouter-go.cachix.org-1:4VjKw9HkEJQ4XsnfJ/NIjcYCfk3pyNjJRjL5EWZS3gI='';
     extra-experimental-features = "nix-command flakes";
   };
 
