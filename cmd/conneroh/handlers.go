@@ -39,12 +39,17 @@ func filterProjects(
 	projects []*gen.Project,
 	query string,
 ) []*gen.Project {
+	p := pool.New().WithMaxGoroutines(maxSearchRoutines)
 	filtered := make([]*gen.Project, 0)
 	for _, project := range projects {
-		if strings.Contains(project.Title, query) {
-			filtered = append(filtered, project)
-		}
+		project := project
+		p.Go(func() {
+			if strings.Contains(project.Title, query) {
+				filtered = append(filtered, project)
+			}
+		})
 	}
+	p.Wait()
 	return filtered
 }
 
