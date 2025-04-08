@@ -11,7 +11,6 @@ require (
 	github.com/litao91/goldmark-mathjax v0.0.0-20210217064022-a43cf739a50f
 	github.com/ollama/ollama v0.6.3
 	github.com/playwright-community/playwright-go v0.5001.0
-	github.com/pmezard/go-difflib v1.0.0
 	github.com/quail-ink/goldmark-enclave v0.1.5
 	github.com/rotisserie/eris v0.5.4
 	github.com/yuin/goldmark v1.7.8

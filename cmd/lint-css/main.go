@@ -14,7 +14,6 @@ import (
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
 	"github.com/conneroisu/conneroh.com/internal/routing"
 	"github.com/conneroisu/twerge"
-	"github.com/pmezard/go-difflib/difflib"
 )
 
 func main() {
@@ -164,18 +163,18 @@ func run(ctx context.Context, dirPath string) error {
 		if fileContent != originalContent {
 			filesModified++
 
-			// diff the original and modified content
-			diff, err := difflib.GetUnifiedDiffString(difflib.UnifiedDiff{
-				A:        difflib.SplitLines(originalContent),
-				B:        difflib.SplitLines(fileContent),
-				FromFile: "Original",
-				ToFile:   "Modified",
-				Context:  3,
-			})
-			if err != nil {
-				return err
-			}
-			fmt.Printf("Diff:\n%s\n", diff)
+			// // diff the original and modified content
+			// diff, err := difflib.GetUnifiedDiffString(difflib.UnifiedDiff{
+			// 	A:        difflib.SplitLines(originalContent),
+			// 	B:        difflib.SplitLines(fileContent),
+			// 	FromFile: "Original",
+			// 	ToFile:   "Modified",
+			// 	Context:  3,
+			// })
+			// if err != nil {
+			// 	return err
+			// }
+			// fmt.Printf("Diff:\n%s\n", diff)
 
 			// Write the modified content back to the file
 			err = os.WriteFile(path, []byte(fileContent), info.Mode())
