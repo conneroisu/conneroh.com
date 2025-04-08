@@ -10,38 +10,28 @@ import (
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
 	"github.com/conneroisu/conneroh.com/internal/hx"
 	"github.com/conneroisu/conneroh.com/internal/routing"
-	"github.com/sourcegraph/conc/stream"
+	"github.com/sourcegraph/conc/pool"
 )
 
 const (
 	maxSearchRoutines = 10
 )
 
-func mapStream(
-	in chan int,
-	out chan int,
-	f func(int) int,
-) {
-	s := stream.New().WithMaxGoroutines(10)
-	for elem := range in {
-		elem := elem
-		s.Go(func() stream.Callback {
-			res := f(elem)
-			return func() { out <- res }
-		})
-	}
-	s.Wait()
-}
 func filterPosts(
 	posts []*gen.Post,
 	query string,
 ) []*gen.Post {
+	p := pool.New().WithMaxGoroutines(maxSearchRoutines)
 	filtered := make([]*gen.Post, 0)
 	for _, post := range posts {
-		if strings.Contains(post.Title, query) {
-			filtered = append(filtered, post)
-		}
+		post := post
+		p.Go(func() {
+			if strings.Contains(post.Title, query) {
+				filtered = append(filtered, post)
+			}
+		})
 	}
+	p.Wait()
 	return filtered
 }
 
@@ -62,12 +52,17 @@ func filterTags(
 	tags []*gen.Tag,
 	query string,
 ) []*gen.Tag {
+	p := pool.New().WithMaxGoroutines(maxSearchRoutines)
 	filtered := make([]*gen.Tag, 0)
 	for _, tag := range tags {
-		if strings.Contains(tag.Title, query) {
-			filtered = append(filtered, tag)
-		}
+		tag := tag
+		p.Go(func() {
+			if strings.Contains(tag.Title, query) {
+				filtered = append(filtered, tag)
+			}
+		})
 	}
+	p.Wait()
 	return filtered
 }
 

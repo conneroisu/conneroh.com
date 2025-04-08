@@ -80,6 +80,13 @@ type (
 		Projects        []*Project    `yaml:"-" structgen:"ProjectSlugs"`
 		Employments     []*Employment `yaml:"-" structgen:"EmploymentSlugs"`
 	}
+
+	// TODO: integrate or remove this (planned to allow for better sorting)
+	// // Parsed is a parsed struct.
+	// Parsed struct {
+	// 	Embedded
+	// 	Weight int `yaml:"weight"`
+	// }
 )
 
 // New creates a new instance of the given type.
