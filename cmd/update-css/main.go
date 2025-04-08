@@ -31,6 +31,8 @@ func genCSS(ctx context.Context) error {
 			&gen.AllProjects,
 			&gen.AllTags,
 			"",
+			1,
+			10,
 		)).Render(ctx, io.Discard)
 		_ = layouts.Page(views.List(
 			routing.PluralTargetProject,
@@ -38,6 +40,8 @@ func genCSS(ctx context.Context) error {
 			&gen.AllProjects,
 			&gen.AllTags,
 			"",
+			1,
+			10,
 		)).Render(ctx, io.Discard)
 		_ = layouts.Page(views.List(
 			routing.PluralTargetTag,
@@ -45,6 +49,8 @@ func genCSS(ctx context.Context) error {
 			&gen.AllProjects,
 			&gen.AllTags,
 			"",
+			1,
+			10,
 		)).Render(ctx, io.Discard)
 		_ = views.TagControl(
 			&gen.Tag{},

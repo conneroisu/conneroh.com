@@ -44,13 +44,18 @@ func run(ctx context.Context, dirPath string) error {
 			&gen.AllPosts,
 			&gen.AllProjects,
 			&gen.AllTags,
-			"")).Render(ctx, io.Discard)
+			"",
+			1,
+			10,
+		)).Render(ctx, io.Discard)
 		_ = layouts.Page(views.List(
 			routing.PluralTargetProject,
 			&gen.AllPosts,
 			&gen.AllProjects,
 			&gen.AllTags,
 			"",
+			1,
+			10,
 		)).Render(ctx, io.Discard)
 		_ = layouts.Page(views.List(
 			routing.PluralTargetTag,
@@ -58,6 +63,8 @@ func run(ctx context.Context, dirPath string) error {
 			&gen.AllProjects,
 			&gen.AllTags,
 			"",
+			1,
+			10,
 		)).Render(ctx, io.Discard)
 		_ = views.TagControl(
 			&gen.Tag{},

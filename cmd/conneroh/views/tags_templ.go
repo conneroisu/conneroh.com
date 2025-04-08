@@ -378,6 +378,7 @@ func Tag(
 			&tag.Posts,
 			nil, nil,
 			"",
+			0, 0,
 		).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -391,7 +392,7 @@ func Tag(
 			nil,
 			&tag.Projects,
 			nil,
-			"",
+			"", 0, 0,
 		).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -404,7 +405,7 @@ func Tag(
 			routing.PluralTargetTag,
 			nil, nil,
 			&tag.Tags,
-			"",
+			"", 0, 0,
 		).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

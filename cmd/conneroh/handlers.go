@@ -2,6 +2,7 @@ package conneroh
 
 import (
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/a-h/templ"
@@ -73,29 +74,39 @@ func filterTags(
 
 func searchHandler(
 	target routing.PluralTarget,
+	pages int,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		query := r.URL.Query().Get("search")
+		pageStr := r.URL.Query().Get("page")
+		if pageStr == "" {
+			pageStr = "1"
+		}
+		page, err := strconv.Atoi(pageStr)
+		if err != nil {
+			return
+		}
+
 		header := r.Header.Get(hx.HdrTriggerName)
 		switch target {
 		case routing.PluralTargetPost:
 			filtered := filterPosts(gen.AllPosts, query)
 			if header == "" {
-				templ.Handler(layouts.Page(views.List(target, &filtered, nil, nil, query))).ServeHTTP(w, r)
+				templ.Handler(layouts.Page(views.List(target, &filtered, nil, nil, query, page, pages))).ServeHTTP(w, r)
 			} else {
 				templ.Handler(views.Results(target, &filtered, nil, nil)).ServeHTTP(w, r)
 			}
 		case routing.PluralTargetProject:
 			filtered := filterProjects(gen.AllProjects, query)
 			if header == "" {
-				templ.Handler(layouts.Page(views.List(target, nil, &filtered, nil, query))).ServeHTTP(w, r)
+				templ.Handler(layouts.Page(views.List(target, nil, &filtered, nil, query, page, pages))).ServeHTTP(w, r)
 			} else {
 				templ.Handler(views.Results(target, nil, &filtered, nil)).ServeHTTP(w, r)
 			}
 		case routing.PluralTargetTag:
 			filtered := filterTags(gen.AllTags, query)
 			if header == "" {
-				templ.Handler(layouts.Page(views.List(target, nil, nil, &filtered, query))).ServeHTTP(w, r)
+				templ.Handler(layouts.Page(views.List(target, nil, nil, &filtered, query, page, pages))).ServeHTTP(w, r)
 			} else {
 				templ.Handler(views.Results(target, nil, nil, &filtered)).ServeHTTP(w, r)
 			}
