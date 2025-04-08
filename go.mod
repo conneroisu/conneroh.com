@@ -8,12 +8,12 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.78.2
 	github.com/conneroisu/genstruct v0.1.2
 	github.com/conneroisu/twerge v0.2.9
-	github.com/gobwas/pool v0.2.1
 	github.com/litao91/goldmark-mathjax v0.0.0-20210217064022-a43cf739a50f
 	github.com/ollama/ollama v0.6.3
 	github.com/playwright-community/playwright-go v0.5001.0
 	github.com/quail-ink/goldmark-enclave v0.1.5
 	github.com/rotisserie/eris v0.5.4
+	github.com/sourcegraph/conc v0.3.0
 	github.com/yuin/goldmark v1.7.8
 	github.com/yuin/goldmark-highlighting/v2 v2.0.0-20230729083705-37449abec8cc
 	go.abhg.dev/goldmark/anchor v0.1.1
@@ -45,4 +45,6 @@ require (
 	github.com/go-jose/go-jose/v3 v3.0.3 // indirect
 	github.com/go-stack/stack v1.8.1 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
+	go.uber.org/atomic v1.7.0 // indirect
+	go.uber.org/multierr v1.9.0 // indirect
 )
