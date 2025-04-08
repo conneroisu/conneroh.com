@@ -19,8 +19,8 @@
   };
 
   nixConfig = {
-    extra-substituters = ''https://semanticrouter-go.cachix.org'';
-    extra-trusted-public-keys = ''semanticrouter-go.cachix.org-1:4VjKw9HkEJQ4XsnfJ/NIjcYCfk3pyNjJRjL5EWZS3gI='';
+    extra-substituters = ''https://conneroisu.cachix.org'';
+    extra-trusted-public-keys = ''conneroisu.cachix.org-1:PgOlJ8/5i/XBz2HhKZIYBSxNiyzalr1B/63T74lRcU0='';
     extra-experimental-features = "nix-command flakes";
   };
 
@@ -277,7 +277,7 @@
         name = "conneroh.com";
         fly-name = "conneroh-com";
         fly-name-dev = "conneroh-com-dev";
-        vendorHash = "sha256-cYtMPdhz2sz1WGS/kHqs7DumCy+pNYaGbpNKAI43Wb4=";
+        vendorHash = "sha256-XGYo1w2W5ridjVs9AVASj3SqILV/8B1xseTAjprK86I=";
         created = "now";
         tag = "latest";
         version = self.shortRev or "dirty";

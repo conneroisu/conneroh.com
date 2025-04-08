@@ -10,11 +10,23 @@ import (
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
 	"github.com/conneroisu/conneroh.com/internal/hx"
 	"github.com/conneroisu/conneroh.com/internal/routing"
+	"github.com/gobwas/pool"
 )
 
 const (
 	maxSearchRoutines = 10
 )
+
+func process(stream chan int) {
+	p := pool.New().WithMaxGoroutines(10)
+	for elem := range stream {
+		elem := elem
+		p.Go(func() {
+			handle(elem)
+		})
+	}
+	p.Wait()
+}
 
 func filterPosts(
 	posts []*gen.Post,
