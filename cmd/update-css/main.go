@@ -48,7 +48,6 @@ func genCSS(ctx context.Context) error {
 		)).Render(ctx, io.Discard)
 		_ = views.TagControl(
 			&gen.Tag{},
-			"#list-project",
 		).Render(ctx, io.Discard)
 		_ = layouts.Page(views.Post(
 			gen.AllPosts[0],
@@ -70,7 +69,6 @@ func genCSS(ctx context.Context) error {
 		)).Render(ctx, io.Discard)
 		_ = views.TagControl(
 			&gen.Tag{},
-			"#list-project",
 		).Render(ctx, io.Discard)
 		_ = layouts.Morpher(views.Post(
 			gen.AllPosts[0],

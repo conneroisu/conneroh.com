@@ -31,13 +31,18 @@ templ image(
 // See conneroh.views.List & conneroh.views.search
 templ TagControl(
 	tag *gen.Tag,
-	updateTarget string,
 ) {
 	<div
 		x-data="{ open: false }"
 		x-on:mouseover="open = true"
 		x-on:mouseleave="open = false"
 		class={ twerge.It("w-full text-blue-200 px-3 items-center flex-row flex text-sm bg-blue-900 transition-colors py-1 hover:bg-blue-800 justify-between font-medium h-8 rounded-full hover:underline") }
+		hx-swap="outerHTML"
+		hx-get={ fmt.Sprintf("/morph/tag/%s", tag.Slug) }
+		hx-target="#bodiody"
+		hx-trigger="click"
+		hx-push-url={ fmt.Sprintf("/tag/%s", tag.Slug) }
+		preload="mouseover"
 	>
 		<div
 			class={ twerge.It("items-center flex") }
@@ -47,29 +52,9 @@ templ TagControl(
 		<div
 			class={ twerge.It("items-center flex") }
 		>
-			<a
-				x-on:click="open = true"
-				x-show="!open"
-			>
+			<a>
 				{ tag.Title }
 			</a>
-			<a
-				x-show="open"
-				hx-swap="outerHTML"
-				hx-get={ fmt.Sprintf("/morph/tag/%s", tag.Slug) }
-				hx-target="#bodiody"
-				hx-trigger="click"
-				hx-push-url={ fmt.Sprintf("/tag/%s", tag.Slug) }
-				preload="mouseover"
-			>
-				{ tag.Title }
-			</a>
-		</div>
-		<div
-			class={ twerge.It("items-center flex") }
-		>
-			@icon("circle-plus", templ.Attributes{"x-show": "open", "x-transition": ""})
-			@icon("circle-minus", templ.Attributes{"x-show": "open", "x-transition": ""})
 		</div>
 	</div>
 }
