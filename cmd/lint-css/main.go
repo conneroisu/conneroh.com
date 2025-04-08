@@ -61,7 +61,6 @@ func run(ctx context.Context, dirPath string) error {
 		)).Render(ctx, io.Discard)
 		_ = views.TagControl(
 			&gen.Tag{},
-			"#list-project",
 		).Render(ctx, io.Discard)
 		_ = layouts.Page(views.Post(
 			gen.AllPosts[0],
@@ -83,7 +82,6 @@ func run(ctx context.Context, dirPath string) error {
 		)).Render(ctx, io.Discard)
 		_ = views.TagControl(
 			&gen.Tag{},
-			"#list-project",
 		).Render(ctx, io.Discard)
 		_ = layouts.Morpher(views.Post(
 			gen.AllPosts[0],

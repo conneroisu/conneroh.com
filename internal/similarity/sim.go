@@ -32,7 +32,7 @@ func normalizeScores(sim []float64) []float64 {
 	minimum := floats.Min(sim)
 	maximum := floats.Max(sim)
 	normalized := make([]float64, len(sim))
-	for i := 0; i < len(sim); i++ {
+	for i := range sim {
 		if maximum == minimum {
 			// Avoid division by zero if all values are the same
 			normalized[i] = 0
@@ -94,7 +94,7 @@ func manhattanDistance(xq, index *mat.VecDense) (float64, error) {
 	diff := mat.NewVecDense(xq.Len(), nil)
 	diff.SubVec(xq, index)
 	sum := 0.0
-	for i := 0; i < diff.Len(); i++ {
+	for i := range diff.Len() {
 		sum += math.Abs(diff.AtVec(i))
 	}
 	return mat.Norm(diff, 1), nil
@@ -110,7 +110,7 @@ func manhattanDistance(xq, index *mat.VecDense) (float64, error) {
 func jaccardSimilarity(xq, index *mat.VecDense) (float64, error) {
 	minSum := 0.0
 	maxSum := 0.0
-	for i := 0; i < xq.Len(); i++ {
+	for i := range xq.Len() {
 		minSum += math.Min(xq.AtVec(i), index.AtVec(i))
 		maxSum += math.Max(xq.AtVec(i), index.AtVec(i))
 	}
