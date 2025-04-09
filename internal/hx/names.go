@@ -13,4 +13,10 @@ var (
 		Val: "bodiody",
 		Sel: "#bodiody",
 	}
+
+	// Taggle is the target element for the content of the tag page.
+	Taggle = target{
+		Val: "taggle",
+		Sel: "#taggle",
+	}
 )
