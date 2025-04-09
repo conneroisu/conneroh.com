@@ -114,7 +114,6 @@ templ Home(
 				</h2>
 				<a
 					hx-get="/morph/projects"
-					hx-trigger="click"
 					hx-push-url="/projects"
 					hx-target={ hx.Bodiody.Sel }
 					preload="mouseover"
@@ -135,7 +134,6 @@ templ Home(
 							<a
 								hx-get={ fmt.Sprintf("/morph/project/%s", project.Slug) }
 								hx-push-url={ fmt.Sprintf("/project/%s", project.Slug) }
-								hx-trigger="click"
 								hx-swap="innerHTML"
 								hx-target={ hx.Bodiody.Sel }
 								preload="mouseover"
@@ -191,7 +189,6 @@ templ Home(
 									<a
 										hx-get={ fmt.Sprintf("/morph/project/%s", project.Slug) }
 										hx-push-url={ fmt.Sprintf("/project/%s", project.Slug) }
-										hx-trigger="click"
 										hx-target={ hx.Bodiody.Sel }
 										preload="mouseover"
 										class={ twerge.It("font-medium flex items-center text-blue-400 hover:underline text-sm") }
@@ -224,7 +221,6 @@ templ Home(
 				</h2>
 				<a
 					hx-get="/morph/posts"
-					hx-trigger="click"
 					hx-push-url="/posts"
 					hx-target={ hx.Bodiody.Sel }
 					class={ twerge.It("font-medium flex items-center text-blue-400 hover:underline text-lg") }
@@ -246,7 +242,6 @@ templ Home(
 							<a
 								hx-get={ fmt.Sprintf("/morph/post/%s", post.Slug) }
 								hx-push-url={ fmt.Sprintf("/post/%s", post.Slug) }
-								hx-trigger="click"
 								hx-swap="innerHTML"
 								hx-target={ hx.Bodiody.Sel }
 								preload="mouseover"
@@ -303,7 +298,6 @@ templ Home(
 											<a
 												hx-get={ fmt.Sprintf("/morph/tag/%s", tag.Slug) }
 												hx-push-url={ fmt.Sprintf("/tag/%s", tag.Slug) }
-												hx-trigger="click"
 												hx-target={ hx.Bodiody.Sel }
 												preload="mouseover"
 												class={ twerge.It("py-1 rounded-md px-2 bg-green-900 transition-colors text-xs hover:bg-green-800 text-green-200") }
@@ -315,7 +309,6 @@ templ Home(
 									<a
 										hx-get={ fmt.Sprintf("/morph/post/%s", post.Slug) }
 										hx-push-url={ fmt.Sprintf("/post/%s", post.Slug) }
-										hx-trigger="click"
 										hx-target={ hx.Bodiody.Sel }
 										preload="mouseover"
 										class={ twerge.It("font-medium flex items-center text-blue-400 hover:underline text-sm") }
@@ -359,7 +352,6 @@ templ Home(
 				</h2>
 				<a
 					hx-target={ hx.Bodiody.Sel }
-					hx-trigger="click"
 					hx-push-url="/tags"
 					preload="mouseover"
 					class={ twerge.It("font-medium flex items-center text-blue-400 hover:underline text-lg") }
@@ -374,7 +366,6 @@ templ Home(
 				for _, tag := range *fullTags {
 					<a
 						hx-target={ hx.Bodiody.Sel }
-						hx-trigger="click"
 						hx-push-url={ fmt.Sprintf("/tag/%s", tag.Slug) }
 						hx-get={ fmt.Sprintf("/morph/tag/%s", tag.Slug) }
 						preload="mouseover"

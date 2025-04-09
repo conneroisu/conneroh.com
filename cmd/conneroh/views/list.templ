@@ -253,7 +253,6 @@ templ listProjectItem(project *gen.Project) {
 	>
 		<a
 			hx-target={ hx.Bodiody.Sel }
-			hx-trigger="click"
 			hx-get={ project.MorphPath() }
 			hx-push-url={ project.PagePath() }
 			class={ twerge.It("cursor-pointer h-full") }
@@ -318,7 +317,6 @@ templ listProjectItem(project *gen.Project) {
 templ listTagItem(tag *gen.Tag) {
 	<a
 		hx-target={ hx.Bodiody.Sel }
-		hx-trigger="click"
 		hx-get={ tag.MorphPath() }
 		hx-push-url={ tag.PagePath() }
 		class={ twerge.It("p-6 rounded-lg overflow-hidden bg-gray-800 shadow-md hover:shadow-lg duration-300 transform transition-all hover:-translate-y-1") }
@@ -367,7 +365,6 @@ templ listPostItem(post *gen.Post) {
 	>
 		<a
 			hx-target={ hx.Bodiody.Sel }
-			hx-trigger="click"
 			hx-get={ post.MorphPath() }
 			hx-push-url={ post.PagePath() }
 			class={ twerge.It("block cursor-pointer") }
