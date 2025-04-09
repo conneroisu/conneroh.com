@@ -393,13 +393,13 @@ templ listPostItem(post *gen.Post) {
 				</p>
 				<div
 					class={ twerge.It("grid flex-wrap gap-2 mb-4 grid-cols-2") }
-					x-data="{ showAllTags: false }"
+					x-data="{ allTags: false }"
 				>
 					for i, tag := range post.Tags {
 						if i < 8 {
 							@TagControl(tag)
 						} else {
-							<div x-show="showAllTags">
+							<div x-show="allTags">
 								@TagControl(tag)
 							</div>
 						}
@@ -408,8 +408,8 @@ templ listPostItem(post *gen.Post) {
 						<button
 							type="button"
 							class={ twerge.It("w-full text-blue-200 px-3 items-center flex-row flex text-sm bg-blue-900 transition-colors py-1 hover:bg-blue-800 justify-between font-medium h-8 rounded-full hover:underline") }
-							x-on:click.stop="showAllTags = !showAllTags"
-							x-show="!showAllTags"
+							x-on:click.stop="allTags = !allTags"
+							x-show="!allTags"
 						>
 							@icon("ellipsis", templ.Attributes{})
 							<span>Show more tags ({ strconv.Itoa(len(post.Tags) - 8) })</span>
@@ -417,8 +417,8 @@ templ listPostItem(post *gen.Post) {
 						<button
 							type="button"
 							class={ twerge.It("w-full text-blue-200 px-3 items-center flex-row flex text-sm bg-blue-900 transition-colors py-1 hover:bg-blue-800 justify-between font-medium h-8 rounded-full hover:underline") }
-							x-on:click.stop="showAllTags = !showAllTags"
-							x-show="showAllTags"
+							x-on:click.stop="allTags = !allTags"
+							x-show="allTags"
 						>
 							@icon("minus", templ.Attributes{})
 							<span>Show less</span>
