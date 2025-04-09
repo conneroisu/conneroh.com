@@ -101,50 +101,6 @@ templ List(
 }
 
 templ pagination(page, pageCount int, target routing.PluralTarget) {
-	<div class="flex justify-center">
-		<ul class="flex justify-center">
-			<li class="mx-2">
-				<a
-					class="px-3 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700"
-					hx-get={ fmt.Sprintf("/search/%s?page=%d", target, page-1) }
-					hx-target="#list-suggest-post"
-					hx-swap="outerHTML"
-				>
-					Prev
-				</a>
-			</li>
-			for i := 1; i <= pageCount; i++ {
-				if i == page {
-					<li class="mx-2 text-white bg-gray-700 rounded-md">
-						{ strconv.Itoa(i) }
-					</li>
-				} else {
-					<li
-						class="mx-2"
-					>
-						<a
-							class="px-3 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700"
-							hx-get={ fmt.Sprintf("/search/%s?page=%d", target, i) }
-							hx-target="#list-suggest-post"
-							hx-swap="outerHTML"
-						>
-							{ strconv.Itoa(i) }
-						</a>
-					</li>
-				}
-			}
-			<li class="mx-2">
-				<a
-					class="px-3 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700"
-					hx-get={ fmt.Sprintf("/search/%s?page=%d", target, page+1) }
-					hx-target="#list-suggest-post"
-					hx-swap="outerHTML"
-				>
-					Next
-				</a>
-			</li>
-		</ul>
-	</div>
 }
 
 templ Results(
