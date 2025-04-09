@@ -83,7 +83,6 @@ templ Post(
 							hx-get={ fmt.Sprintf("/morph/project/%s", project.Slug) }
 							hx-push-url={ fmt.Sprintf("/project/%s", project.Slug) }
 							hx-target="#bodiody"
-							hx-swap="outerHTML"
 							hx-trigger="click"
 							hx-indicator="#bodiody"
 							preload="mouseover"

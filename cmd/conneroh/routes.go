@@ -28,7 +28,7 @@ func AddRoutes(
 	)
 	h.Handle(
 		"GET /morph/home",
-		templ.Handler(layouts.Morpher(home)))
+		templ.Handler(home))
 	h.Handle(
 		"GET /dist/",
 		http.FileServer(http.FS(static.Dist)))
@@ -44,7 +44,7 @@ func AddRoutes(
 		templ.Handler(layouts.Page(posts)))
 	h.Handle(
 		"GET /morph/posts",
-		templ.Handler(layouts.Morpher(posts)))
+		templ.Handler(posts))
 	h.Handle(
 		"GET /search/posts",
 		listHandler(routing.PostPluralPath))
@@ -54,7 +54,7 @@ func AddRoutes(
 		templ.Handler(layouts.Page(projects)))
 	h.Handle(
 		"GET /morph/projects",
-		templ.Handler(layouts.Morpher(projects)))
+		templ.Handler(projects))
 	h.Handle(
 		"GET /search/projects",
 		listHandler(routing.ProjectPluralPath))
@@ -64,7 +64,7 @@ func AddRoutes(
 		templ.Handler(layouts.Page(tags)))
 	h.Handle(
 		"GET /morph/tags",
-		templ.Handler(layouts.Morpher(tags)))
+		templ.Handler(tags))
 	h.Handle(
 		"GET /search/tags",
 		listHandler(routing.TagsPluralPath))
@@ -82,12 +82,12 @@ func AddRoutes(
 		h.Handle(fmt.Sprintf(
 			"GET /morph/post/%s",
 			p.Slug,
-		), templ.Handler(layouts.Morpher(views.Post(
+		), templ.Handler(views.Post(
 			p,
 			&gen.AllPosts,
 			&gen.AllProjects,
 			&gen.AllTags,
-		))))
+		)))
 	}
 	for _, p := range gen.AllProjects {
 		h.Handle(
@@ -101,12 +101,12 @@ func AddRoutes(
 		)
 		h.Handle(
 			fmt.Sprintf("GET /morph/project/%s", p.Slug),
-			templ.Handler(layouts.Morpher(views.Project(
+			templ.Handler(views.Project(
 				p,
 				&gen.AllPosts,
 				&gen.AllProjects,
 				&gen.AllTags,
-			))),
+			)),
 		)
 	}
 	for _, t := range gen.AllTags {
@@ -121,12 +121,12 @@ func AddRoutes(
 		)
 		h.Handle(
 			fmt.Sprintf("GET /morph/tag/%s", t.Slug),
-			templ.Handler(layouts.Morpher(views.Tag(
+			templ.Handler(views.Tag(
 				t,
 				&gen.AllPosts,
 				&gen.AllProjects,
 				&gen.AllTags,
-			))),
+			)),
 		)
 	}
 

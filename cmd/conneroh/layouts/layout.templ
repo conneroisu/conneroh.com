@@ -1,6 +1,9 @@
 package layouts
 
-import "github.com/conneroisu/twerge"
+import (
+	"github.com/conneroisu/conneroh.com/internal/hx"
+	"github.com/conneroisu/twerge"
+)
 
 templ Layout(title string) {
 	<!DOCTYPE html>
@@ -21,7 +24,7 @@ templ Layout(title string) {
 			hx-ext="preload"
 		>
 			@header()
-			<div id="bodiody">
+			<div id={ hx.Bodiody.Val }>
 				{ children... }
 			</div>
 		</body>

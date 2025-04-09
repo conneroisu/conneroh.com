@@ -1,1 +1,16 @@
 package hx
+
+type target struct {
+	Val string
+	Sel string
+}
+
+var (
+	// Bodiody is the target element for the body of the page.
+	//
+	// The body of the page is the whole page excluding the header.
+	Bodiody = target{
+		Val: "bodiody",
+		Sel: "#bodiody",
+	}
+)

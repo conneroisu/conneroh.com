@@ -3,6 +3,7 @@ package views
 import (
 	"fmt"
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
+	"github.com/conneroisu/conneroh.com/internal/hx"
 	"github.com/conneroisu/conneroh.com/internal/routing"
 	"github.com/conneroisu/twerge"
 	"strconv"
@@ -34,7 +35,6 @@ templ search(
 				name="search"
 				hx-push-url="true"
 				hx-trigger="keyup changed delay:300ms"
-				hx-swap="outerHTML"
 				hx-indicator="#search-indicator"
 				aria-label="Local Search"
 			/>
@@ -148,7 +148,6 @@ templ pageButton(pageNum string, currentPage int, target routing.PluralPath) {
 				name="pager"
 				hx-target="#listi"
 				hx-include="[name='search']"
-				hx-swap="outerHTML"
 				hx-push-url="true"
 				class={ twerge.It(inactiveBtnStyle) }
 			>
@@ -165,7 +164,6 @@ templ previousPageButton(currentPage int, target routing.PluralPath) {
 			hx-get={ fmt.Sprintf("/search/%s?page=%d", target, currentPage-1) }
 			hx-target="#listi"
 			hx-include="[name='search']"
-			hx-swap="outerHTML"
 			hx-push-url="true"
 			class={ twerge.It(inactiveBtnStyle + " flex items-center") }
 			aria-label="Previous page"
@@ -189,7 +187,7 @@ templ nextPageButton(currentPage, pageCount int, target routing.PluralPath) {
 			hx-get={ fmt.Sprintf("/search/%s?page=%d", target, currentPage+1) }
 			hx-target="#listi"
 			hx-include="[name='search']"
-			hx-swap="outerHTML"
+			hx-swap="innerHTML"
 			hx-push-url="true"
 			class={ twerge.It(inactiveBtnStyle + " flex items-center") }
 			aria-label="Next page"
@@ -254,8 +252,7 @@ templ listProjectItem(project *gen.Project) {
 		aria-label={ project.Title }
 	>
 		<a
-			hx-target="#bodiody"
-			hx-swap="outerHTML"
+			hx-target={ hx.Bodiody.Sel }
 			hx-trigger="click"
 			hx-get={ project.MorphPath() }
 			hx-push-url={ project.PagePath() }
@@ -320,8 +317,7 @@ templ listProjectItem(project *gen.Project) {
 
 templ listTagItem(tag *gen.Tag) {
 	<a
-		hx-target="#bodiody"
-		hx-swap="outerHTML"
+		hx-target={ hx.Bodiody.Sel }
 		hx-trigger="click"
 		hx-get={ tag.MorphPath() }
 		hx-push-url={ tag.PagePath() }
@@ -370,8 +366,7 @@ templ listPostItem(post *gen.Post) {
 		aria-label={ post.Title }
 	>
 		<a
-			hx-target="#bodiody"
-			hx-swap="outerHTML"
+			hx-target={ hx.Bodiody.Sel }
 			hx-trigger="click"
 			hx-get={ post.MorphPath() }
 			hx-push-url={ post.PagePath() }

@@ -31,7 +31,6 @@ templ header() {
 							class={ twerge.It("text-xl font-bold text-white cursor-pointer pr-4") }
 							hx-get="/morph/home"
 							hx-push-url="/"
-							hx-swap="outerHTML"
 							hx-trigger="click"
 							hx-target="#bodiody"
 							aria-label="Back to Home"
@@ -47,7 +46,6 @@ templ header() {
 								class={ twerge.It("cursor-pointer text-gray-300 hover:text-white") }
 								hx-target="#bodiody"
 								hx-get="/morph/projects"
-								hx-swap="outerHTML"
 								hx-trigger="click"
 								hx-push-url="/projects"
 							>
@@ -57,7 +55,6 @@ templ header() {
 								class={ twerge.It("cursor-pointer text-gray-300 hover:text-white") }
 								hx-target="#bodiody"
 								hx-get="/morph/posts"
-								hx-swap="outerHTML"
 								hx-trigger="click"
 								hx-push-url="/posts"
 								preload="mouseover"
@@ -68,7 +65,6 @@ templ header() {
 								class={ twerge.It("cursor-pointer text-gray-300 hover:text-white") }
 								hx-target="#bodiody"
 								hx-get="/morph/tags"
-								hx-swap="outerHTML"
 								hx-trigger="click"
 								hx-push-url="/tags"
 								preload="mouseover"
@@ -95,7 +91,6 @@ templ header() {
 						class={ twerge.It("hover:bg-gray-700 hover:text-white font-medium pl-3 text-base pr-4 block py-2 text-gray-300") }
 						hx-target="#bodiody"
 						hx-get="/morph/projects"
-						hx-swap="outerHTML"
 						hx-trigger="click"
 						hx-push-url="/projects"
 						@click="isMenuOpen = false"
@@ -107,7 +102,6 @@ templ header() {
 						class={ twerge.It("hover:bg-gray-700 hover:text-white font-medium pl-3 text-base pr-4 block py-2 text-gray-300") }
 						hx-target="#bodiody"
 						hx-get="/morph/posts"
-						hx-swap="outerHTML"
 						hx-trigger="click"
 						hx-push-url="/posts"
 						@click="isMenuOpen = false"
@@ -119,7 +113,6 @@ templ header() {
 						class={ twerge.It("hover:bg-gray-700 hover:text-white font-medium pl-3 text-base pr-4 block py-2 text-gray-300") }
 						hx-target="#bodiody"
 						hx-get="/morph/tags"
-						hx-swap="outerHTML"
 						hx-trigger="click"
 						hx-push-url="/tags"
 						@click="isMenuOpen = false"

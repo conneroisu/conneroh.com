@@ -76,12 +76,12 @@ func genCSS(ctx context.Context) error {
 		_ = views.TagControl(
 			&gen.Tag{},
 		).Render(ctx, io.Discard)
-		_ = layouts.Morpher(views.Post(
+		_ = views.Post(
 			gen.AllPosts[0],
 			&gen.AllPosts,
 			&gen.AllProjects,
 			&gen.AllTags,
-		)).Render(ctx, io.Discard)
+		).Render(ctx, io.Discard)
 		_ = layouts.Layout("hello").Render(ctx, io.Discard)
 	)
 	content := twerge.GenerateClassMapCode("css")

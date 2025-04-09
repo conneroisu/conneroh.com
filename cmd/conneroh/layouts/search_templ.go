@@ -49,7 +49,7 @@ func search() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" x-data=\"{\n\t\t\tisSearchOpen: false,\n\t\t\tsearchQuery: &#39;&#39;,\n\t\t\tsearchResults: [],\n\t\t\tisLoading: false,\n\t\t\tshowResults: false,\n\n\t\t\tasync search() {\n\t\t\t\tif (this.searchQuery.trim().length &lt; 2) {\n\t\t\t\t\tthis.searchResults = [];\n\t\t\t\t\tthis.showResults = false;\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t\t\n\t\t\t\tthis.isLoading = true;\n\t\t\t\tthis.showResults = true;\n\t\t\t\t\n\t\t\t\t// Simulate search results for demonstration\n\t\t\t\t// In a real app, you would make an API call here\n\t\t\t\tawait new Promise(resolve =&gt; setTimeout(resolve, 300));\n\t\t\t\t\n\t\t\t\t// Sample search logic - would be replaced with actual API call\n\t\t\t\tthis.searchResults = [\n\t\t\t\t\t{ type: &#39;post&#39;, title: &#39;Modern Frontend with HTMX&#39;, url: &#39;/post/modern-frontend-htmx-alpine&#39; },\n\t\t\t\t\t{ type: &#39;project&#39;, title: &#39;Project 2&#39;, url: &#39;/project/project-2&#39; },\n\t\t\t\t\t{ type: &#39;tag&#39;, title: &#39;Programming Languages&#39;, url: &#39;/tag/programming-languages-go&#39; }\n\t\t\t\t].filter(item =&gt; \n\t\t\t\t\titem.title.toLowerCase().includes(this.searchQuery.toLowerCase())\n\t\t\t\t);\n\t\t\t\t\n\t\t\t\tthis.isLoading = false;\n\t\t\t},\n\t\t\t\n\t\t\t// Initialize search when opened\n\t\t\tinit() {\n\t\t\t\tthis.$watch(&#39;isSearchOpen&#39;, (value) =&gt; {\n\t\t\t\t\tif (value &amp;&amp; this.$refs.searchInput) {\n\t\t\t\t\t\tsetTimeout(() =&gt; {\n\t\t\t\t\t\t\tthis.$refs.searchInput.focus();\n\t\t\t\t\t\t}, 100);\n\t\t\t\t\t}\n\t\t\t\t});\n\t\t\t\t\n\t\t\t\t// Initialize search when typing\n\t\t\t\tthis.$watch(&#39;searchQuery&#39;, () =&gt; {\n\t\t\t\t\tthis.search();\n\t\t\t\t});\n\t\t\t}\n\t\t}\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" x-data=\"{\n\t\t\tisSearchOpen: false,\n\t\t\tsearchQuery: &#39;&#39;,\n\t\t\tsearchResults: [],\n\t\t}\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -189,7 +189,7 @@ func search() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "\" type=\"search\" placeholder=\"Search site...\" aria-label=\"Search\" @keydown.escape=\"isSearchOpen = false\" @keydown.enter=\"if (searchResults.length &gt; 0) window.location.href = searchResults[0].url\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "\" type=\"search\" placeholder=\"Search site...\" aria-label=\"Search\" @keydown.escape=\"isSearchOpen = false\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -259,12 +259,12 @@ func search() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var22 = []any{twerge.It("text-center p-4 text-gray-400")}
+		var templ_7745c5c3_Var22 = []any{twerge.It("text-center p-4 text-gray-400  htmx-indicator")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var22...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "<div x-show=\"isLoading\" class=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "<div class=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

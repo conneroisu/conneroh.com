@@ -33,11 +33,9 @@ func NewServer(
 	ctx context.Context,
 ) http.Handler {
 	twerge.ClassMapStr = css.ClassMapStr
+	twerge.GenClassMergeStr = css.ClassMapStr
 	mux := http.NewServeMux()
-	err := AddRoutes(
-		ctx,
-		mux,
-	)
+	err := AddRoutes(ctx, mux)
 	if err != nil {
 		slog.Error("error adding routes", slog.String("error", err.Error()))
 		log.Fatal(err)
