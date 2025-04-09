@@ -2,6 +2,7 @@ package conneroh
 
 import (
 	"fmt"
+	"log/slog"
 	"net/http"
 	"sort"
 	"strconv"
@@ -43,7 +44,7 @@ var (
 		&gen.AllTags,
 		"",
 		1,
-		postPages,
+		projectPages,
 	)
 	projectPages = len(gen.AllProjects) / routing.MaxListLargeItems
 	tags         = views.List(
@@ -159,6 +160,7 @@ func paginate[T any](
 
 	// Calculate total number of pages
 	totalPages := (len(items) + pageSize - 1) / pageSize
+	slog.Info("total pages", "totalPages", totalPages, "items", len(items))
 
 	// Validate page number
 	if page < 1 {
@@ -169,7 +171,9 @@ func paginate[T any](
 
 	// Calculate start and end indices for the current page
 	startIndex := (page - 1) * pageSize
+	slog.Info("start index", "startIndex", startIndex)
 	endIndex := min(startIndex+pageSize, len(items))
+	slog.Info("end index", "endIndex", endIndex)
 
 	// Return the paginated subset and the total page count
 	if startIndex < len(items) {

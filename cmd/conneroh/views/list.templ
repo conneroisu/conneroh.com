@@ -8,6 +8,12 @@ import (
 	"strconv"
 )
 
+const (
+	activeBtnStyle   = "px-3 py-2 rounded-md bg-blue-600 text-white font-medium"
+	inactiveBtnStyle = "px-3 py-2 rounded-md border border-gray-700 bg-gray-800 text-gray-300 hover:bg-gray-700 transition-colors"
+	ellipsisStyle    = "px-2 py-1 text-gray-400"
+)
+
 templ search(
 	target routing.PluralTarget,
 	query string,
@@ -101,85 +107,101 @@ templ List(
 	</div>
 }
 
+// Main pagination component
 templ pagination(page, pageCount int, target routing.PluralTarget) {
 	if pageCount > 1 {
 		<div class={ twerge.It("flex justify-center items-center mt-8 space-x-2") }>
 			@previousPageButton(page, target)
-			// Page numbers
-			for i := 1; i <= pageCount; i++ {
-				if i == page {
-					<span class={ twerge.It("px-3 py-2 rounded-md bg-blue-600 text-white font-medium") }>
-						{ strconv.Itoa(i) }
-					</span>
-				} else if i <= routing.MaxPageNumber {
-					<a
-						hx-get={ fmt.Sprintf("/search/%s?page=%d", target, i) }
-						hx-target="#listi"
-						hx-include="[name='search']"
-						hx-swap="outerHTML"
-						hx-push-url="true"
-						class={ twerge.It("px-3 py-2 rounded-md border border-gray-700 bg-gray-800 text-gray-300 hover:bg-gray-700 transition-colors") }
-					>
-						{ strconv.Itoa(i) }
-					</a>
-				} else if i == 4 && page > 5 || i == pageCount-3 && page < pageCount-4 {
-					<span class={ twerge.It("px-2 text-gray-500") }>...</span>
-				}
-			}
+			// Desktop pagination (show all pages)
+			<div class={ twerge.It("hidden md:flex space-x-2") }>
+				@renderPageNumbers(page, pageCount, target, false)
+			</div>
+			// Mobile pagination (limited with ellipsis)
+			<div class={ twerge.It("flex md:hidden space-x-2") }>
+				@renderPageNumbers(page, pageCount, target, true)
+			</div>
 			@nextPageButton(page, pageCount, target)
 		</div>
 	}
 }
 
-templ previousPageButton(
-	page int,
-	target routing.PluralTarget,
-) {
-	// Previous page button
-	if page > 1 {
+// Helper to render pagination numbers based on device (mobile or desktop)
+templ renderPageNumbers(page, pageCount int, target routing.PluralTarget, isMobile bool) {
+	if isMobile {
+		for _, pageNum := range routing.GeneratePagination(page, pageCount, routing.MaxMobilePageNumber) {
+			@pageButton(pageNum, page, target)
+		}
+	} else {
+		for _, pageNum := range routing.GeneratePagination(page, pageCount, routing.MaxDesktopPageNumber) {
+			@pageButton(pageNum, page, target)
+		}
+	}
+}
+
+// Reusable page button component
+templ pageButton(pageNum string, currentPage int, target routing.PluralTarget) {
+	if pageNum == strconv.Itoa(currentPage) {
+		<span class={ twerge.It(activeBtnStyle) }>
+			{ pageNum }
+		</span>
+	} else {
+		if pageNum == "..." {
+			@icon("ellipsis", templ.Attributes{
+				"class": twerge.It(ellipsisStyle),
+			})
+		} else {
+			<a
+				hx-get={ fmt.Sprintf("/search/%s?page=%s", target, pageNum) }
+				hx-target="#listi"
+				hx-include="[name='search']"
+				hx-swap="outerHTML"
+				hx-push-url="true"
+				class={ twerge.It(inactiveBtnStyle) }
+			>
+				{ pageNum }
+			</a>
+		}
+	}
+}
+
+// Previous page button
+templ previousPageButton(currentPage int, target routing.PluralTarget) {
+	if currentPage > 1 {
 		<a
-			hx-get={ fmt.Sprintf("/search/%s?page=%d", target, page-1) }
+			hx-get={ fmt.Sprintf("/search/%s?page=%d", target, currentPage-1) }
 			hx-target="#listi"
+			hx-include="[name='search']"
 			hx-swap="outerHTML"
 			hx-push-url="true"
-			hx-include="[name='search']"
-			class={ twerge.It("px-3 py-2 rounded-md border border-gray-700 bg-gray-800 text-gray-300 hover:bg-gray-700 transition-colors") }
+			class={ twerge.It(inactiveBtnStyle + " flex items-center") }
 			aria-label="Previous page"
 		>
-			<span aria-hidden="true">←</span>
-			<span class={ twerge.It("sr-only") }>Previous</span>
+			@icon("chevron-left", templ.Attributes{})
 		</a>
 	} else {
-		<span class={ twerge.It("px-3 py-2 rounded-md border border-gray-700 bg-gray-900 text-gray-500 cursor-not-allowed") }>
-			<span aria-hidden="true">←</span>
-			<span class={ twerge.It("sr-only") }>Previous</span>
+		<span class={ twerge.It(inactiveBtnStyle + " opacity-50 flex items-center") } aria-disabled="true">
+			@icon("chevron-left", templ.Attributes{})
 		</span>
 	}
 }
 
-templ nextPageButton(
-	page, pageCount int,
-	target routing.PluralTarget,
-) {
-	// Next page button
-	if page < pageCount {
+// Next page button
+templ nextPageButton(currentPage, pageCount int, target routing.PluralTarget) {
+	if currentPage < pageCount {
 		<a
-			href={ templ.SafeURL(fmt.Sprintf("/%s?page=%d", target, page+1)) }
-			hx-get={ fmt.Sprintf("/search/%s?page=%d", target, page+1) }
+			hx-get={ fmt.Sprintf("/search/%s?page=%d", target, currentPage+1) }
 			hx-target="#listi"
 			hx-include="[name='search']"
 			hx-swap="outerHTML"
 			hx-push-url="true"
-			class={ twerge.It("px-3 py-2 rounded-md border border-gray-700 bg-gray-800 text-gray-300 hover:bg-gray-700 transition-colors") }
+			class={ twerge.It(inactiveBtnStyle + " flex items-center") }
 			aria-label="Next page"
 		>
-			<span aria-hidden="true">→</span>
-			<span class={ twerge.It("sr-only") }>Next</span>
+			@icon("chevron-right", templ.Attributes{})
 		</a>
 	} else {
-		<span class={ twerge.It("px-3 py-2 rounded-md border border-gray-700 bg-gray-900 text-gray-500 cursor-not-allowed") }>
-			<span aria-hidden="true">→</span>
-			<span class={ twerge.It("sr-only") }>Next</span>
+		<span class={ twerge.It(inactiveBtnStyle + " opacity-50 flex items-center") } aria-disabled="true">
+			@icon("chevron-right", templ.Attributes{})
 		</span>
 	}
 }
@@ -194,7 +216,11 @@ templ Results(
 	<div
 		id="listi"
 	>
-		@pagination(page, pageCount, target)
+		<div
+			class={ twerge.It("py-2 px-4 container mx-auto") }
+		>
+			@pagination(page, pageCount, target)
+		</div>
 		<div
 			class={ twerge.It("md:grid-cols-2 lg:grid-cols-3 gap-6 grid grid-cols-1") }
 		>
@@ -291,15 +317,13 @@ templ listProjectItem(project *gen.Project) {
 	</div>
 }
 
-templ listTagItem(
-	tag *gen.Tag,
-) {
+templ listTagItem(tag *gen.Tag) {
 	<a
 		hx-target="#bodiody"
 		hx-swap="outerHTML"
 		hx-trigger="click"
-		hx-get={ fmt.Sprintf("/morph/tag/%s", tag.Slug) }
-		hx-push-url={ fmt.Sprintf("/tag/%s", tag.Slug) }
+		hx-get={ tag.MorphPath() }
+		hx-push-url={ tag.PagePath() }
 		class={ twerge.It("p-6 rounded-lg overflow-hidden bg-gray-800 shadow-md hover:shadow-lg duration-300 transform transition-all hover:-translate-y-1") }
 		preload="mouseover"
 	>
@@ -339,9 +363,7 @@ templ listTagItem(
 	</a>
 }
 
-templ listPostItem(
-	post *gen.Post,
-) {
+templ listPostItem(post *gen.Post) {
 	<div
 		class={ twerge.It("p-6 rounded-lg overflow-hidden bg-gray-800 shadow-md hover:shadow-lg duration-300 transform transition-all hover:-translate-y-1") }
 		x-transition:enter={ twerge.It("duration-200 transition ease-out") }

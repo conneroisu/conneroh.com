@@ -1,0 +1,8034 @@
+package routing_test
+
+import (
+	"reflect"
+	"testing"
+
+	"github.com/conneroisu/conneroh.com/internal/routing"
+)
+
+func TestGeneratePagination(t *testing.T) {
+	tests := []struct {
+		name        string
+		device      string
+		totalPages  int
+		currentPage int
+		want        []string
+	}{
+
+		{
+			name:        "case 0",
+			device:      "desktop",
+			totalPages:  25,
+			currentPage: 14,
+			want:        []string{"...", "10", "11", "12", "13", "14", "15", "16", "17", "..."},
+		},
+
+		{
+			name:        "case 1",
+			device:      "desktop",
+			totalPages:  24,
+			currentPage: 9,
+			want:        []string{"...", "5", "6", "7", "8", "9", "10", "11", "12", "..."},
+		},
+
+		{
+			name:        "case 2",
+			device:      "desktop",
+			totalPages:  27,
+			currentPage: 15,
+			want:        []string{"...", "11", "12", "13", "14", "15", "16", "17", "18", "..."},
+		},
+
+		{
+			name:        "case 3",
+			device:      "mobile",
+			totalPages:  6,
+			currentPage: 4,
+			want:        []string{"...", "3", "4", "5", "6"},
+		},
+
+		{
+			name:        "case 4",
+			device:      "desktop",
+			totalPages:  19,
+			currentPage: 12,
+			want:        []string{"...", "8", "9", "10", "11", "12", "13", "14", "15", "..."},
+		},
+
+		{
+			name:        "case 5",
+			device:      "desktop",
+			totalPages:  30,
+			currentPage: 27,
+			want:        []string{"...", "22", "23", "24", "25", "26", "27", "28", "29", "30"},
+		},
+
+		{
+			name:        "case 6",
+			device:      "desktop",
+			totalPages:  19,
+			currentPage: 17,
+			want:        []string{"...", "11", "12", "13", "14", "15", "16", "17", "18", "19"},
+		},
+
+		{
+			name:        "case 7",
+			device:      "mobile",
+			totalPages:  29,
+			currentPage: 7,
+			want:        []string{"...", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 8",
+			device:      "mobile",
+			totalPages:  10,
+			currentPage: 5,
+			want:        []string{"...", "4", "5", "6", "..."},
+		},
+
+		{
+			name:        "case 9",
+			device:      "mobile",
+			totalPages:  25,
+			currentPage: 14,
+			want:        []string{"...", "13", "14", "15", "..."},
+		},
+
+		{
+			name:        "case 10",
+			device:      "mobile",
+			totalPages:  6,
+			currentPage: 3,
+			want:        []string{"...", "2", "3", "4", "..."},
+		},
+
+		{
+			name:        "case 11",
+			device:      "mobile",
+			totalPages:  21,
+			currentPage: 11,
+			want:        []string{"...", "10", "11", "12", "..."},
+		},
+
+		{
+			name:        "case 12",
+			device:      "desktop",
+			totalPages:  17,
+			currentPage: 3,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 13",
+			device:      "mobile",
+			totalPages:  22,
+			currentPage: 17,
+			want:        []string{"...", "16", "17", "18", "..."},
+		},
+
+		{
+			name:        "case 14",
+			device:      "desktop",
+			totalPages:  18,
+			currentPage: 11,
+			want:        []string{"...", "7", "8", "9", "10", "11", "12", "13", "14", "..."},
+		},
+
+		{
+			name:        "case 15",
+			device:      "mobile",
+			totalPages:  19,
+			currentPage: 12,
+			want:        []string{"...", "11", "12", "13", "..."},
+		},
+
+		{
+			name:        "case 16",
+			device:      "mobile",
+			totalPages:  26,
+			currentPage: 5,
+			want:        []string{"...", "4", "5", "6", "..."},
+		},
+
+		{
+			name:        "case 17",
+			device:      "mobile",
+			totalPages:  14,
+			currentPage: 10,
+			want:        []string{"...", "9", "10", "11", "..."},
+		},
+
+		{
+			name:        "case 18",
+			device:      "mobile",
+			totalPages:  9,
+			currentPage: 1,
+			want:        []string{"1", "2", "3", "..."},
+		},
+
+		{
+			name:        "case 19",
+			device:      "desktop",
+			totalPages:  20,
+			currentPage: 3,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 20",
+			device:      "mobile",
+			totalPages:  19,
+			currentPage: 11,
+			want:        []string{"...", "10", "11", "12", "..."},
+		},
+
+		{
+			name:        "case 21",
+			device:      "mobile",
+			totalPages:  17,
+			currentPage: 17,
+			want:        []string{"...", "14", "15", "16", "17"},
+		},
+
+		{
+			name:        "case 22",
+			device:      "desktop",
+			totalPages:  26,
+			currentPage: 16,
+			want:        []string{"...", "12", "13", "14", "15", "16", "17", "18", "19", "..."},
+		},
+
+		{
+			name:        "case 23",
+			device:      "desktop",
+			totalPages:  22,
+			currentPage: 16,
+			want:        []string{"...", "12", "13", "14", "15", "16", "17", "18", "19", "..."},
+		},
+
+		{
+			name:        "case 24",
+			device:      "mobile",
+			totalPages:  10,
+			currentPage: 4,
+			want:        []string{"...", "3", "4", "5", "..."},
+		},
+
+		{
+			name:        "case 25",
+			device:      "mobile",
+			totalPages:  8,
+			currentPage: 4,
+			want:        []string{"...", "3", "4", "5", "..."},
+		},
+
+		{
+			name:        "case 26",
+			device:      "mobile",
+			totalPages:  9,
+			currentPage: 5,
+			want:        []string{"...", "4", "5", "6", "..."},
+		},
+
+		{
+			name:        "case 27",
+			device:      "mobile",
+			totalPages:  5,
+			currentPage: 1,
+			want:        []string{"1", "2", "3", "4", "5"},
+		},
+
+		{
+			name:        "case 28",
+			device:      "desktop",
+			totalPages:  13,
+			currentPage: 9,
+			want:        []string{"...", "5", "6", "7", "8", "9", "10", "11", "12", "13"},
+		},
+
+		{
+			name:        "case 29",
+			device:      "mobile",
+			totalPages:  21,
+			currentPage: 7,
+			want:        []string{"...", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 30",
+			device:      "desktop",
+			totalPages:  29,
+			currentPage: 9,
+			want:        []string{"...", "5", "6", "7", "8", "9", "10", "11", "12", "..."},
+		},
+
+		{
+			name:        "case 31",
+			device:      "desktop",
+			totalPages:  25,
+			currentPage: 9,
+			want:        []string{"...", "5", "6", "7", "8", "9", "10", "11", "12", "..."},
+		},
+
+		{
+			name:        "case 32",
+			device:      "desktop",
+			totalPages:  29,
+			currentPage: 25,
+			want:        []string{"...", "21", "22", "23", "24", "25", "26", "27", "28", "29"},
+		},
+
+		{
+			name:        "case 33",
+			device:      "desktop",
+			totalPages:  26,
+			currentPage: 24,
+			want:        []string{"...", "18", "19", "20", "21", "22", "23", "24", "25", "26"},
+		},
+
+		{
+			name:        "case 34",
+			device:      "mobile",
+			totalPages:  19,
+			currentPage: 19,
+			want:        []string{"...", "16", "17", "18", "19"},
+		},
+
+		{
+			name:        "case 35",
+			device:      "desktop",
+			totalPages:  27,
+			currentPage: 14,
+			want:        []string{"...", "10", "11", "12", "13", "14", "15", "16", "17", "..."},
+		},
+
+		{
+			name:        "case 36",
+			device:      "desktop",
+			totalPages:  25,
+			currentPage: 18,
+			want:        []string{"...", "14", "15", "16", "17", "18", "19", "20", "21", "..."},
+		},
+
+		{
+			name:        "case 37",
+			device:      "desktop",
+			totalPages:  28,
+			currentPage: 21,
+			want:        []string{"...", "17", "18", "19", "20", "21", "22", "23", "24", "..."},
+		},
+
+		{
+			name:        "case 38",
+			device:      "mobile",
+			totalPages:  12,
+			currentPage: 7,
+			want:        []string{"...", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 39",
+			device:      "mobile",
+			totalPages:  27,
+			currentPage: 3,
+			want:        []string{"...", "2", "3", "4", "..."},
+		},
+
+		{
+			name:        "case 40",
+			device:      "desktop",
+			totalPages:  25,
+			currentPage: 19,
+			want:        []string{"...", "15", "16", "17", "18", "19", "20", "21", "22", "..."},
+		},
+
+		{
+			name:        "case 41",
+			device:      "mobile",
+			totalPages:  23,
+			currentPage: 15,
+			want:        []string{"...", "14", "15", "16", "..."},
+		},
+
+		{
+			name:        "case 42",
+			device:      "mobile",
+			totalPages:  9,
+			currentPage: 7,
+			want:        []string{"...", "6", "7", "8", "9"},
+		},
+
+		{
+			name:        "case 43",
+			device:      "desktop",
+			totalPages:  27,
+			currentPage: 21,
+			want:        []string{"...", "17", "18", "19", "20", "21", "22", "23", "24", "..."},
+		},
+
+		{
+			name:        "case 44",
+			device:      "mobile",
+			totalPages:  12,
+			currentPage: 11,
+			want:        []string{"...", "9", "10", "11", "12"},
+		},
+
+		{
+			name:        "case 45",
+			device:      "desktop",
+			totalPages:  16,
+			currentPage: 16,
+			want:        []string{"...", "8", "9", "10", "11", "12", "13", "14", "15", "16"},
+		},
+
+		{
+			name:        "case 46",
+			device:      "desktop",
+			totalPages:  15,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 47",
+			device:      "mobile",
+			totalPages:  19,
+			currentPage: 8,
+			want:        []string{"...", "7", "8", "9", "..."},
+		},
+
+		{
+			name:        "case 48",
+			device:      "desktop",
+			totalPages:  21,
+			currentPage: 8,
+			want:        []string{"...", "4", "5", "6", "7", "8", "9", "10", "11", "..."},
+		},
+
+		{
+			name:        "case 49",
+			device:      "mobile",
+			totalPages:  19,
+			currentPage: 14,
+			want:        []string{"...", "13", "14", "15", "..."},
+		},
+
+		{
+			name:        "case 50",
+			device:      "desktop",
+			totalPages:  28,
+			currentPage: 26,
+			want:        []string{"...", "20", "21", "22", "23", "24", "25", "26", "27", "28"},
+		},
+
+		{
+			name:        "case 51",
+			device:      "desktop",
+			totalPages:  30,
+			currentPage: 4,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 52",
+			device:      "desktop",
+			totalPages:  13,
+			currentPage: 8,
+			want:        []string{"...", "5", "6", "7", "8", "9", "10", "11", "12", "13"},
+		},
+
+		{
+			name:        "case 53",
+			device:      "mobile",
+			totalPages:  18,
+			currentPage: 14,
+			want:        []string{"...", "13", "14", "15", "..."},
+		},
+
+		{
+			name:        "case 54",
+			device:      "desktop",
+			totalPages:  19,
+			currentPage: 9,
+			want:        []string{"...", "5", "6", "7", "8", "9", "10", "11", "12", "..."},
+		},
+
+		{
+			name:        "case 55",
+			device:      "mobile",
+			totalPages:  19,
+			currentPage: 9,
+			want:        []string{"...", "8", "9", "10", "..."},
+		},
+
+		{
+			name:        "case 56",
+			device:      "desktop",
+			totalPages:  29,
+			currentPage: 28,
+			want:        []string{"...", "21", "22", "23", "24", "25", "26", "27", "28", "29"},
+		},
+
+		{
+			name:        "case 57",
+			device:      "mobile",
+			totalPages:  15,
+			currentPage: 10,
+			want:        []string{"...", "9", "10", "11", "..."},
+		},
+
+		{
+			name:        "case 58",
+			device:      "desktop",
+			totalPages:  25,
+			currentPage: 23,
+			want:        []string{"...", "17", "18", "19", "20", "21", "22", "23", "24", "25"},
+		},
+
+		{
+			name:        "case 59",
+			device:      "mobile",
+			totalPages:  11,
+			currentPage: 3,
+			want:        []string{"...", "2", "3", "4", "..."},
+		},
+
+		{
+			name:        "case 60",
+			device:      "mobile",
+			totalPages:  27,
+			currentPage: 26,
+			want:        []string{"...", "24", "25", "26", "27"},
+		},
+
+		{
+			name:        "case 61",
+			device:      "mobile",
+			totalPages:  6,
+			currentPage: 4,
+			want:        []string{"...", "3", "4", "5", "6"},
+		},
+
+		{
+			name:        "case 62",
+			device:      "desktop",
+			totalPages:  12,
+			currentPage: 4,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 63",
+			device:      "mobile",
+			totalPages:  10,
+			currentPage: 10,
+			want:        []string{"...", "7", "8", "9", "10"},
+		},
+
+		{
+			name:        "case 64",
+			device:      "desktop",
+			totalPages:  23,
+			currentPage: 14,
+			want:        []string{"...", "10", "11", "12", "13", "14", "15", "16", "17", "..."},
+		},
+
+		{
+			name:        "case 65",
+			device:      "desktop",
+			totalPages:  19,
+			currentPage: 12,
+			want:        []string{"...", "8", "9", "10", "11", "12", "13", "14", "15", "..."},
+		},
+
+		{
+			name:        "case 66",
+			device:      "desktop",
+			totalPages:  29,
+			currentPage: 27,
+			want:        []string{"...", "21", "22", "23", "24", "25", "26", "27", "28", "29"},
+		},
+
+		{
+			name:        "case 67",
+			device:      "desktop",
+			totalPages:  20,
+			currentPage: 6,
+			want:        []string{"...", "2", "3", "4", "5", "6", "7", "8", "9", "..."},
+		},
+
+		{
+			name:        "case 68",
+			device:      "desktop",
+			totalPages:  15,
+			currentPage: 14,
+			want:        []string{"...", "7", "8", "9", "10", "11", "12", "13", "14", "15"},
+		},
+
+		{
+			name:        "case 69",
+			device:      "mobile",
+			totalPages:  15,
+			currentPage: 4,
+			want:        []string{"...", "3", "4", "5", "..."},
+		},
+
+		{
+			name:        "case 70",
+			device:      "desktop",
+			totalPages:  28,
+			currentPage: 15,
+			want:        []string{"...", "11", "12", "13", "14", "15", "16", "17", "18", "..."},
+		},
+
+		{
+			name:        "case 71",
+			device:      "mobile",
+			totalPages:  26,
+			currentPage: 12,
+			want:        []string{"...", "11", "12", "13", "..."},
+		},
+
+		{
+			name:        "case 72",
+			device:      "mobile",
+			totalPages:  22,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "..."},
+		},
+
+		{
+			name:        "case 73",
+			device:      "desktop",
+			totalPages:  17,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 74",
+			device:      "mobile",
+			totalPages:  29,
+			currentPage: 20,
+			want:        []string{"...", "19", "20", "21", "..."},
+		},
+
+		{
+			name:        "case 75",
+			device:      "desktop",
+			totalPages:  27,
+			currentPage: 18,
+			want:        []string{"...", "14", "15", "16", "17", "18", "19", "20", "21", "..."},
+		},
+
+		{
+			name:        "case 76",
+			device:      "desktop",
+			totalPages:  15,
+			currentPage: 15,
+			want:        []string{"...", "7", "8", "9", "10", "11", "12", "13", "14", "15"},
+		},
+
+		{
+			name:        "case 77",
+			device:      "mobile",
+			totalPages:  19,
+			currentPage: 18,
+			want:        []string{"...", "16", "17", "18", "19"},
+		},
+
+		{
+			name:        "case 78",
+			device:      "mobile",
+			totalPages:  12,
+			currentPage: 7,
+			want:        []string{"...", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 79",
+			device:      "mobile",
+			totalPages:  29,
+			currentPage: 28,
+			want:        []string{"...", "26", "27", "28", "29"},
+		},
+
+		{
+			name:        "case 80",
+			device:      "desktop",
+			totalPages:  28,
+			currentPage: 19,
+			want:        []string{"...", "15", "16", "17", "18", "19", "20", "21", "22", "..."},
+		},
+
+		{
+			name:        "case 81",
+			device:      "desktop",
+			totalPages:  11,
+			currentPage: 4,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 82",
+			device:      "desktop",
+			totalPages:  19,
+			currentPage: 15,
+			want:        []string{"...", "11", "12", "13", "14", "15", "16", "17", "18", "19"},
+		},
+
+		{
+			name:        "case 83",
+			device:      "desktop",
+			totalPages:  25,
+			currentPage: 11,
+			want:        []string{"...", "7", "8", "9", "10", "11", "12", "13", "14", "..."},
+		},
+
+		{
+			name:        "case 84",
+			device:      "desktop",
+			totalPages:  25,
+			currentPage: 8,
+			want:        []string{"...", "4", "5", "6", "7", "8", "9", "10", "11", "..."},
+		},
+
+		{
+			name:        "case 85",
+			device:      "desktop",
+			totalPages:  13,
+			currentPage: 12,
+			want:        []string{"...", "5", "6", "7", "8", "9", "10", "11", "12", "13"},
+		},
+
+		{
+			name:        "case 86",
+			device:      "mobile",
+			totalPages:  18,
+			currentPage: 8,
+			want:        []string{"...", "7", "8", "9", "..."},
+		},
+
+		{
+			name:        "case 87",
+			device:      "desktop",
+			totalPages:  15,
+			currentPage: 3,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 88",
+			device:      "desktop",
+			totalPages:  15,
+			currentPage: 3,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 89",
+			device:      "desktop",
+			totalPages:  17,
+			currentPage: 5,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 90",
+			device:      "mobile",
+			totalPages:  26,
+			currentPage: 24,
+			want:        []string{"...", "23", "24", "25", "26"},
+		},
+
+		{
+			name:        "case 91",
+			device:      "mobile",
+			totalPages:  19,
+			currentPage: 11,
+			want:        []string{"...", "10", "11", "12", "..."},
+		},
+
+		{
+			name:        "case 92",
+			device:      "desktop",
+			totalPages:  29,
+			currentPage: 16,
+			want:        []string{"...", "12", "13", "14", "15", "16", "17", "18", "19", "..."},
+		},
+
+		{
+			name:        "case 93",
+			device:      "mobile",
+			totalPages:  11,
+			currentPage: 4,
+			want:        []string{"...", "3", "4", "5", "..."},
+		},
+
+		{
+			name:        "case 94",
+			device:      "desktop",
+			totalPages:  18,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 95",
+			device:      "mobile",
+			totalPages:  19,
+			currentPage: 5,
+			want:        []string{"...", "4", "5", "6", "..."},
+		},
+
+		{
+			name:        "case 96",
+			device:      "mobile",
+			totalPages:  27,
+			currentPage: 3,
+			want:        []string{"...", "2", "3", "4", "..."},
+		},
+
+		{
+			name:        "case 97",
+			device:      "desktop",
+			totalPages:  22,
+			currentPage: 5,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 98",
+			device:      "mobile",
+			totalPages:  20,
+			currentPage: 10,
+			want:        []string{"...", "9", "10", "11", "..."},
+		},
+
+		{
+			name:        "case 99",
+			device:      "desktop",
+			totalPages:  24,
+			currentPage: 1,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 100",
+			device:      "desktop",
+			totalPages:  17,
+			currentPage: 5,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 101",
+			device:      "mobile",
+			totalPages:  26,
+			currentPage: 9,
+			want:        []string{"...", "8", "9", "10", "..."},
+		},
+
+		{
+			name:        "case 102",
+			device:      "desktop",
+			totalPages:  11,
+			currentPage: 4,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 103",
+			device:      "mobile",
+			totalPages:  14,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "..."},
+		},
+
+		{
+			name:        "case 104",
+			device:      "mobile",
+			totalPages:  15,
+			currentPage: 3,
+			want:        []string{"...", "2", "3", "4", "..."},
+		},
+
+		{
+			name:        "case 105",
+			device:      "desktop",
+			totalPages:  19,
+			currentPage: 6,
+			want:        []string{"...", "2", "3", "4", "5", "6", "7", "8", "9", "..."},
+		},
+
+		{
+			name:        "case 106",
+			device:      "mobile",
+			totalPages:  19,
+			currentPage: 17,
+			want:        []string{"...", "16", "17", "18", "19"},
+		},
+
+		{
+			name:        "case 107",
+			device:      "mobile",
+			totalPages:  7,
+			currentPage: 7,
+			want:        []string{"...", "4", "5", "6", "7"},
+		},
+
+		{
+			name:        "case 108",
+			device:      "mobile",
+			totalPages:  16,
+			currentPage: 13,
+			want:        []string{"...", "12", "13", "14", "..."},
+		},
+
+		{
+			name:        "case 109",
+			device:      "mobile",
+			totalPages:  21,
+			currentPage: 3,
+			want:        []string{"...", "2", "3", "4", "..."},
+		},
+
+		{
+			name:        "case 110",
+			device:      "mobile",
+			totalPages:  13,
+			currentPage: 6,
+			want:        []string{"...", "5", "6", "7", "..."},
+		},
+
+		{
+			name:        "case 111",
+			device:      "desktop",
+			totalPages:  21,
+			currentPage: 11,
+			want:        []string{"...", "7", "8", "9", "10", "11", "12", "13", "14", "..."},
+		},
+
+		{
+			name:        "case 112",
+			device:      "mobile",
+			totalPages:  29,
+			currentPage: 19,
+			want:        []string{"...", "18", "19", "20", "..."},
+		},
+
+		{
+			name:        "case 113",
+			device:      "desktop",
+			totalPages:  22,
+			currentPage: 22,
+			want:        []string{"...", "14", "15", "16", "17", "18", "19", "20", "21", "22"},
+		},
+
+		{
+			name:        "case 114",
+			device:      "desktop",
+			totalPages:  21,
+			currentPage: 12,
+			want:        []string{"...", "8", "9", "10", "11", "12", "13", "14", "15", "..."},
+		},
+
+		{
+			name:        "case 115",
+			device:      "mobile",
+			totalPages:  22,
+			currentPage: 9,
+			want:        []string{"...", "8", "9", "10", "..."},
+		},
+
+		{
+			name:        "case 116",
+			device:      "desktop",
+			totalPages:  12,
+			currentPage: 10,
+			want:        []string{"...", "4", "5", "6", "7", "8", "9", "10", "11", "12"},
+		},
+
+		{
+			name:        "case 117",
+			device:      "desktop",
+			totalPages:  28,
+			currentPage: 13,
+			want:        []string{"...", "9", "10", "11", "12", "13", "14", "15", "16", "..."},
+		},
+
+		{
+			name:        "case 118",
+			device:      "desktop",
+			totalPages:  29,
+			currentPage: 3,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 119",
+			device:      "mobile",
+			totalPages:  24,
+			currentPage: 11,
+			want:        []string{"...", "10", "11", "12", "..."},
+		},
+
+		{
+			name:        "case 120",
+			device:      "desktop",
+			totalPages:  17,
+			currentPage: 12,
+			want:        []string{"...", "9", "10", "11", "12", "13", "14", "15", "16", "17"},
+		},
+
+		{
+			name:        "case 121",
+			device:      "desktop",
+			totalPages:  18,
+			currentPage: 7,
+			want:        []string{"...", "3", "4", "5", "6", "7", "8", "9", "10", "..."},
+		},
+
+		{
+			name:        "case 122",
+			device:      "desktop",
+			totalPages:  22,
+			currentPage: 9,
+			want:        []string{"...", "5", "6", "7", "8", "9", "10", "11", "12", "..."},
+		},
+
+		{
+			name:        "case 123",
+			device:      "desktop",
+			totalPages:  15,
+			currentPage: 5,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 124",
+			device:      "desktop",
+			totalPages:  21,
+			currentPage: 7,
+			want:        []string{"...", "3", "4", "5", "6", "7", "8", "9", "10", "..."},
+		},
+
+		{
+			name:        "case 125",
+			device:      "desktop",
+			totalPages:  10,
+			currentPage: 7,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"},
+		},
+
+		{
+			name:        "case 126",
+			device:      "desktop",
+			totalPages:  16,
+			currentPage: 15,
+			want:        []string{"...", "8", "9", "10", "11", "12", "13", "14", "15", "16"},
+		},
+
+		{
+			name:        "case 127",
+			device:      "desktop",
+			totalPages:  28,
+			currentPage: 13,
+			want:        []string{"...", "9", "10", "11", "12", "13", "14", "15", "16", "..."},
+		},
+
+		{
+			name:        "case 128",
+			device:      "mobile",
+			totalPages:  10,
+			currentPage: 5,
+			want:        []string{"...", "4", "5", "6", "..."},
+		},
+
+		{
+			name:        "case 129",
+			device:      "mobile",
+			totalPages:  15,
+			currentPage: 11,
+			want:        []string{"...", "10", "11", "12", "..."},
+		},
+
+		{
+			name:        "case 130",
+			device:      "mobile",
+			totalPages:  27,
+			currentPage: 13,
+			want:        []string{"...", "12", "13", "14", "..."},
+		},
+
+		{
+			name:        "case 131",
+			device:      "mobile",
+			totalPages:  6,
+			currentPage: 3,
+			want:        []string{"...", "2", "3", "4", "..."},
+		},
+
+		{
+			name:        "case 132",
+			device:      "mobile",
+			totalPages:  26,
+			currentPage: 17,
+			want:        []string{"...", "16", "17", "18", "..."},
+		},
+
+		{
+			name:        "case 133",
+			device:      "mobile",
+			totalPages:  11,
+			currentPage: 7,
+			want:        []string{"...", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 134",
+			device:      "mobile",
+			totalPages:  11,
+			currentPage: 11,
+			want:        []string{"...", "8", "9", "10", "11"},
+		},
+
+		{
+			name:        "case 135",
+			device:      "mobile",
+			totalPages:  15,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "..."},
+		},
+
+		{
+			name:        "case 136",
+			device:      "mobile",
+			totalPages:  24,
+			currentPage: 12,
+			want:        []string{"...", "11", "12", "13", "..."},
+		},
+
+		{
+			name:        "case 137",
+			device:      "desktop",
+			totalPages:  20,
+			currentPage: 12,
+			want:        []string{"...", "8", "9", "10", "11", "12", "13", "14", "15", "..."},
+		},
+
+		{
+			name:        "case 138",
+			device:      "desktop",
+			totalPages:  18,
+			currentPage: 16,
+			want:        []string{"...", "10", "11", "12", "13", "14", "15", "16", "17", "18"},
+		},
+
+		{
+			name:        "case 139",
+			device:      "desktop",
+			totalPages:  21,
+			currentPage: 11,
+			want:        []string{"...", "7", "8", "9", "10", "11", "12", "13", "14", "..."},
+		},
+
+		{
+			name:        "case 140",
+			device:      "mobile",
+			totalPages:  18,
+			currentPage: 9,
+			want:        []string{"...", "8", "9", "10", "..."},
+		},
+
+		{
+			name:        "case 141",
+			device:      "desktop",
+			totalPages:  16,
+			currentPage: 7,
+			want:        []string{"...", "3", "4", "5", "6", "7", "8", "9", "10", "..."},
+		},
+
+		{
+			name:        "case 142",
+			device:      "desktop",
+			totalPages:  24,
+			currentPage: 6,
+			want:        []string{"...", "2", "3", "4", "5", "6", "7", "8", "9", "..."},
+		},
+
+		{
+			name:        "case 143",
+			device:      "mobile",
+			totalPages:  18,
+			currentPage: 1,
+			want:        []string{"1", "2", "3", "..."},
+		},
+
+		{
+			name:        "case 144",
+			device:      "mobile",
+			totalPages:  16,
+			currentPage: 6,
+			want:        []string{"...", "5", "6", "7", "..."},
+		},
+
+		{
+			name:        "case 145",
+			device:      "mobile",
+			totalPages:  20,
+			currentPage: 15,
+			want:        []string{"...", "14", "15", "16", "..."},
+		},
+
+		{
+			name:        "case 146",
+			device:      "mobile",
+			totalPages:  11,
+			currentPage: 10,
+			want:        []string{"...", "8", "9", "10", "11"},
+		},
+
+		{
+			name:        "case 147",
+			device:      "desktop",
+			totalPages:  12,
+			currentPage: 3,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 148",
+			device:      "mobile",
+			totalPages:  10,
+			currentPage: 5,
+			want:        []string{"...", "4", "5", "6", "..."},
+		},
+
+		{
+			name:        "case 149",
+			device:      "mobile",
+			totalPages:  30,
+			currentPage: 12,
+			want:        []string{"...", "11", "12", "13", "..."},
+		},
+
+		{
+			name:        "case 150",
+			device:      "desktop",
+			totalPages:  25,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 151",
+			device:      "desktop",
+			totalPages:  24,
+			currentPage: 19,
+			want:        []string{"...", "16", "17", "18", "19", "20", "21", "22", "23", "24"},
+		},
+
+		{
+			name:        "case 152",
+			device:      "desktop",
+			totalPages:  17,
+			currentPage: 4,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 153",
+			device:      "desktop",
+			totalPages:  18,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 154",
+			device:      "mobile",
+			totalPages:  8,
+			currentPage: 7,
+			want:        []string{"...", "5", "6", "7", "8"},
+		},
+
+		{
+			name:        "case 155",
+			device:      "mobile",
+			totalPages:  10,
+			currentPage: 4,
+			want:        []string{"...", "3", "4", "5", "..."},
+		},
+
+		{
+			name:        "case 156",
+			device:      "desktop",
+			totalPages:  13,
+			currentPage: 3,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 157",
+			device:      "desktop",
+			totalPages:  21,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 158",
+			device:      "mobile",
+			totalPages:  25,
+			currentPage: 11,
+			want:        []string{"...", "10", "11", "12", "..."},
+		},
+
+		{
+			name:        "case 159",
+			device:      "mobile",
+			totalPages:  7,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "..."},
+		},
+
+		{
+			name:        "case 160",
+			device:      "desktop",
+			totalPages:  18,
+			currentPage: 9,
+			want:        []string{"...", "5", "6", "7", "8", "9", "10", "11", "12", "..."},
+		},
+
+		{
+			name:        "case 161",
+			device:      "mobile",
+			totalPages:  9,
+			currentPage: 3,
+			want:        []string{"...", "2", "3", "4", "..."},
+		},
+
+		{
+			name:        "case 162",
+			device:      "mobile",
+			totalPages:  8,
+			currentPage: 3,
+			want:        []string{"...", "2", "3", "4", "..."},
+		},
+
+		{
+			name:        "case 163",
+			device:      "desktop",
+			totalPages:  23,
+			currentPage: 5,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 164",
+			device:      "desktop",
+			totalPages:  27,
+			currentPage: 10,
+			want:        []string{"...", "6", "7", "8", "9", "10", "11", "12", "13", "..."},
+		},
+
+		{
+			name:        "case 165",
+			device:      "desktop",
+			totalPages:  15,
+			currentPage: 13,
+			want:        []string{"...", "7", "8", "9", "10", "11", "12", "13", "14", "15"},
+		},
+
+		{
+			name:        "case 166",
+			device:      "mobile",
+			totalPages:  11,
+			currentPage: 5,
+			want:        []string{"...", "4", "5", "6", "..."},
+		},
+
+		{
+			name:        "case 167",
+			device:      "desktop",
+			totalPages:  20,
+			currentPage: 11,
+			want:        []string{"...", "7", "8", "9", "10", "11", "12", "13", "14", "..."},
+		},
+
+		{
+			name:        "case 168",
+			device:      "mobile",
+			totalPages:  27,
+			currentPage: 5,
+			want:        []string{"...", "4", "5", "6", "..."},
+		},
+
+		{
+			name:        "case 169",
+			device:      "desktop",
+			totalPages:  27,
+			currentPage: 11,
+			want:        []string{"...", "7", "8", "9", "10", "11", "12", "13", "14", "..."},
+		},
+
+		{
+			name:        "case 170",
+			device:      "desktop",
+			totalPages:  30,
+			currentPage: 19,
+			want:        []string{"...", "15", "16", "17", "18", "19", "20", "21", "22", "..."},
+		},
+
+		{
+			name:        "case 171",
+			device:      "desktop",
+			totalPages:  18,
+			currentPage: 14,
+			want:        []string{"...", "10", "11", "12", "13", "14", "15", "16", "17", "18"},
+		},
+
+		{
+			name:        "case 172",
+			device:      "desktop",
+			totalPages:  20,
+			currentPage: 20,
+			want:        []string{"...", "12", "13", "14", "15", "16", "17", "18", "19", "20"},
+		},
+
+		{
+			name:        "case 173",
+			device:      "desktop",
+			totalPages:  29,
+			currentPage: 3,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 174",
+			device:      "desktop",
+			totalPages:  27,
+			currentPage: 10,
+			want:        []string{"...", "6", "7", "8", "9", "10", "11", "12", "13", "..."},
+		},
+
+		{
+			name:        "case 175",
+			device:      "mobile",
+			totalPages:  10,
+			currentPage: 9,
+			want:        []string{"...", "7", "8", "9", "10"},
+		},
+
+		{
+			name:        "case 176",
+			device:      "mobile",
+			totalPages:  28,
+			currentPage: 28,
+			want:        []string{"...", "25", "26", "27", "28"},
+		},
+
+		{
+			name:        "case 177",
+			device:      "desktop",
+			totalPages:  24,
+			currentPage: 18,
+			want:        []string{"...", "14", "15", "16", "17", "18", "19", "20", "21", "..."},
+		},
+
+		{
+			name:        "case 178",
+			device:      "mobile",
+			totalPages:  20,
+			currentPage: 10,
+			want:        []string{"...", "9", "10", "11", "..."},
+		},
+
+		{
+			name:        "case 179",
+			device:      "desktop",
+			totalPages:  26,
+			currentPage: 16,
+			want:        []string{"...", "12", "13", "14", "15", "16", "17", "18", "19", "..."},
+		},
+
+		{
+			name:        "case 180",
+			device:      "mobile",
+			totalPages:  15,
+			currentPage: 10,
+			want:        []string{"...", "9", "10", "11", "..."},
+		},
+
+		{
+			name:        "case 181",
+			device:      "mobile",
+			totalPages:  19,
+			currentPage: 15,
+			want:        []string{"...", "14", "15", "16", "..."},
+		},
+
+		{
+			name:        "case 182",
+			device:      "desktop",
+			totalPages:  15,
+			currentPage: 12,
+			want:        []string{"...", "7", "8", "9", "10", "11", "12", "13", "14", "15"},
+		},
+
+		{
+			name:        "case 183",
+			device:      "mobile",
+			totalPages:  14,
+			currentPage: 6,
+			want:        []string{"...", "5", "6", "7", "..."},
+		},
+
+		{
+			name:        "case 184",
+			device:      "desktop",
+			totalPages:  10,
+			currentPage: 3,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"},
+		},
+
+		{
+			name:        "case 185",
+			device:      "desktop",
+			totalPages:  28,
+			currentPage: 20,
+			want:        []string{"...", "16", "17", "18", "19", "20", "21", "22", "23", "..."},
+		},
+
+		{
+			name:        "case 186",
+			device:      "desktop",
+			totalPages:  15,
+			currentPage: 3,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 187",
+			device:      "desktop",
+			totalPages:  15,
+			currentPage: 3,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 188",
+			device:      "desktop",
+			totalPages:  10,
+			currentPage: 9,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"},
+		},
+
+		{
+			name:        "case 189",
+			device:      "desktop",
+			totalPages:  23,
+			currentPage: 10,
+			want:        []string{"...", "6", "7", "8", "9", "10", "11", "12", "13", "..."},
+		},
+
+		{
+			name:        "case 190",
+			device:      "mobile",
+			totalPages:  5,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "4", "5"},
+		},
+
+		{
+			name:        "case 191",
+			device:      "mobile",
+			totalPages:  18,
+			currentPage: 17,
+			want:        []string{"...", "15", "16", "17", "18"},
+		},
+
+		{
+			name:        "case 192",
+			device:      "desktop",
+			totalPages:  18,
+			currentPage: 13,
+			want:        []string{"...", "10", "11", "12", "13", "14", "15", "16", "17", "18"},
+		},
+
+		{
+			name:        "case 193",
+			device:      "desktop",
+			totalPages:  27,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 194",
+			device:      "mobile",
+			totalPages:  25,
+			currentPage: 9,
+			want:        []string{"...", "8", "9", "10", "..."},
+		},
+
+		{
+			name:        "case 195",
+			device:      "desktop",
+			totalPages:  12,
+			currentPage: 4,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 196",
+			device:      "desktop",
+			totalPages:  29,
+			currentPage: 11,
+			want:        []string{"...", "7", "8", "9", "10", "11", "12", "13", "14", "..."},
+		},
+
+		{
+			name:        "case 197",
+			device:      "mobile",
+			totalPages:  30,
+			currentPage: 14,
+			want:        []string{"...", "13", "14", "15", "..."},
+		},
+
+		{
+			name:        "case 198",
+			device:      "mobile",
+			totalPages:  30,
+			currentPage: 16,
+			want:        []string{"...", "15", "16", "17", "..."},
+		},
+
+		{
+			name:        "case 199",
+			device:      "desktop",
+			totalPages:  29,
+			currentPage: 18,
+			want:        []string{"...", "14", "15", "16", "17", "18", "19", "20", "21", "..."},
+		},
+
+		{
+			name:        "case 200",
+			device:      "desktop",
+			totalPages:  21,
+			currentPage: 18,
+			want:        []string{"...", "13", "14", "15", "16", "17", "18", "19", "20", "21"},
+		},
+
+		{
+			name:        "case 201",
+			device:      "desktop",
+			totalPages:  26,
+			currentPage: 12,
+			want:        []string{"...", "8", "9", "10", "11", "12", "13", "14", "15", "..."},
+		},
+
+		{
+			name:        "case 202",
+			device:      "mobile",
+			totalPages:  14,
+			currentPage: 4,
+			want:        []string{"...", "3", "4", "5", "..."},
+		},
+
+		{
+			name:        "case 203",
+			device:      "mobile",
+			totalPages:  10,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "..."},
+		},
+
+		{
+			name:        "case 204",
+			device:      "desktop",
+			totalPages:  16,
+			currentPage: 16,
+			want:        []string{"...", "8", "9", "10", "11", "12", "13", "14", "15", "16"},
+		},
+
+		{
+			name:        "case 205",
+			device:      "desktop",
+			totalPages:  11,
+			currentPage: 11,
+			want:        []string{"...", "3", "4", "5", "6", "7", "8", "9", "10", "11"},
+		},
+
+		{
+			name:        "case 206",
+			device:      "desktop",
+			totalPages:  15,
+			currentPage: 7,
+			want:        []string{"...", "3", "4", "5", "6", "7", "8", "9", "10", "..."},
+		},
+
+		{
+			name:        "case 207",
+			device:      "mobile",
+			totalPages:  7,
+			currentPage: 4,
+			want:        []string{"...", "3", "4", "5", "..."},
+		},
+
+		{
+			name:        "case 208",
+			device:      "mobile",
+			totalPages:  14,
+			currentPage: 9,
+			want:        []string{"...", "8", "9", "10", "..."},
+		},
+
+		{
+			name:        "case 209",
+			device:      "mobile",
+			totalPages:  18,
+			currentPage: 9,
+			want:        []string{"...", "8", "9", "10", "..."},
+		},
+
+		{
+			name:        "case 210",
+			device:      "mobile",
+			totalPages:  5,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "4", "5"},
+		},
+
+		{
+			name:        "case 211",
+			device:      "desktop",
+			totalPages:  26,
+			currentPage: 26,
+			want:        []string{"...", "18", "19", "20", "21", "22", "23", "24", "25", "26"},
+		},
+
+		{
+			name:        "case 212",
+			device:      "mobile",
+			totalPages:  17,
+			currentPage: 4,
+			want:        []string{"...", "3", "4", "5", "..."},
+		},
+
+		{
+			name:        "case 213",
+			device:      "desktop",
+			totalPages:  28,
+			currentPage: 3,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 214",
+			device:      "mobile",
+			totalPages:  12,
+			currentPage: 10,
+			want:        []string{"...", "9", "10", "11", "12"},
+		},
+
+		{
+			name:        "case 215",
+			device:      "desktop",
+			totalPages:  20,
+			currentPage: 3,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 216",
+			device:      "mobile",
+			totalPages:  8,
+			currentPage: 8,
+			want:        []string{"...", "5", "6", "7", "8"},
+		},
+
+		{
+			name:        "case 217",
+			device:      "desktop",
+			totalPages:  10,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"},
+		},
+
+		{
+			name:        "case 218",
+			device:      "mobile",
+			totalPages:  20,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "..."},
+		},
+
+		{
+			name:        "case 219",
+			device:      "desktop",
+			totalPages:  29,
+			currentPage: 11,
+			want:        []string{"...", "7", "8", "9", "10", "11", "12", "13", "14", "..."},
+		},
+
+		{
+			name:        "case 220",
+			device:      "desktop",
+			totalPages:  10,
+			currentPage: 7,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"},
+		},
+
+		{
+			name:        "case 221",
+			device:      "desktop",
+			totalPages:  24,
+			currentPage: 11,
+			want:        []string{"...", "7", "8", "9", "10", "11", "12", "13", "14", "..."},
+		},
+
+		{
+			name:        "case 222",
+			device:      "mobile",
+			totalPages:  25,
+			currentPage: 16,
+			want:        []string{"...", "15", "16", "17", "..."},
+		},
+
+		{
+			name:        "case 223",
+			device:      "desktop",
+			totalPages:  24,
+			currentPage: 19,
+			want:        []string{"...", "16", "17", "18", "19", "20", "21", "22", "23", "24"},
+		},
+
+		{
+			name:        "case 224",
+			device:      "mobile",
+			totalPages:  10,
+			currentPage: 1,
+			want:        []string{"1", "2", "3", "..."},
+		},
+
+		{
+			name:        "case 225",
+			device:      "desktop",
+			totalPages:  22,
+			currentPage: 8,
+			want:        []string{"...", "4", "5", "6", "7", "8", "9", "10", "11", "..."},
+		},
+
+		{
+			name:        "case 226",
+			device:      "mobile",
+			totalPages:  9,
+			currentPage: 5,
+			want:        []string{"...", "4", "5", "6", "..."},
+		},
+
+		{
+			name:        "case 227",
+			device:      "mobile",
+			totalPages:  8,
+			currentPage: 1,
+			want:        []string{"1", "2", "3", "..."},
+		},
+
+		{
+			name:        "case 228",
+			device:      "mobile",
+			totalPages:  23,
+			currentPage: 22,
+			want:        []string{"...", "20", "21", "22", "23"},
+		},
+
+		{
+			name:        "case 229",
+			device:      "mobile",
+			totalPages:  22,
+			currentPage: 7,
+			want:        []string{"...", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 230",
+			device:      "mobile",
+			totalPages:  17,
+			currentPage: 5,
+			want:        []string{"...", "4", "5", "6", "..."},
+		},
+
+		{
+			name:        "case 231",
+			device:      "mobile",
+			totalPages:  24,
+			currentPage: 4,
+			want:        []string{"...", "3", "4", "5", "..."},
+		},
+
+		{
+			name:        "case 232",
+			device:      "desktop",
+			totalPages:  23,
+			currentPage: 9,
+			want:        []string{"...", "5", "6", "7", "8", "9", "10", "11", "12", "..."},
+		},
+
+		{
+			name:        "case 233",
+			device:      "desktop",
+			totalPages:  28,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 234",
+			device:      "desktop",
+			totalPages:  16,
+			currentPage: 15,
+			want:        []string{"...", "8", "9", "10", "11", "12", "13", "14", "15", "16"},
+		},
+
+		{
+			name:        "case 235",
+			device:      "desktop",
+			totalPages:  26,
+			currentPage: 13,
+			want:        []string{"...", "9", "10", "11", "12", "13", "14", "15", "16", "..."},
+		},
+
+		{
+			name:        "case 236",
+			device:      "mobile",
+			totalPages:  20,
+			currentPage: 6,
+			want:        []string{"...", "5", "6", "7", "..."},
+		},
+
+		{
+			name:        "case 237",
+			device:      "mobile",
+			totalPages:  22,
+			currentPage: 6,
+			want:        []string{"...", "5", "6", "7", "..."},
+		},
+
+		{
+			name:        "case 238",
+			device:      "desktop",
+			totalPages:  24,
+			currentPage: 14,
+			want:        []string{"...", "10", "11", "12", "13", "14", "15", "16", "17", "..."},
+		},
+
+		{
+			name:        "case 239",
+			device:      "mobile",
+			totalPages:  23,
+			currentPage: 19,
+			want:        []string{"...", "18", "19", "20", "..."},
+		},
+
+		{
+			name:        "case 240",
+			device:      "desktop",
+			totalPages:  19,
+			currentPage: 12,
+			want:        []string{"...", "8", "9", "10", "11", "12", "13", "14", "15", "..."},
+		},
+
+		{
+			name:        "case 241",
+			device:      "desktop",
+			totalPages:  14,
+			currentPage: 1,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 242",
+			device:      "mobile",
+			totalPages:  12,
+			currentPage: 5,
+			want:        []string{"...", "4", "5", "6", "..."},
+		},
+
+		{
+			name:        "case 243",
+			device:      "desktop",
+			totalPages:  12,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 244",
+			device:      "mobile",
+			totalPages:  22,
+			currentPage: 19,
+			want:        []string{"...", "18", "19", "20", "..."},
+		},
+
+		{
+			name:        "case 245",
+			device:      "mobile",
+			totalPages:  18,
+			currentPage: 18,
+			want:        []string{"...", "15", "16", "17", "18"},
+		},
+
+		{
+			name:        "case 246",
+			device:      "mobile",
+			totalPages:  28,
+			currentPage: 6,
+			want:        []string{"...", "5", "6", "7", "..."},
+		},
+
+		{
+			name:        "case 247",
+			device:      "mobile",
+			totalPages:  5,
+			currentPage: 1,
+			want:        []string{"1", "2", "3", "4", "5"},
+		},
+
+		{
+			name:        "case 248",
+			device:      "mobile",
+			totalPages:  15,
+			currentPage: 9,
+			want:        []string{"...", "8", "9", "10", "..."},
+		},
+
+		{
+			name:        "case 249",
+			device:      "desktop",
+			totalPages:  15,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 250",
+			device:      "desktop",
+			totalPages:  29,
+			currentPage: 3,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 251",
+			device:      "mobile",
+			totalPages:  7,
+			currentPage: 1,
+			want:        []string{"1", "2", "3", "..."},
+		},
+
+		{
+			name:        "case 252",
+			device:      "desktop",
+			totalPages:  26,
+			currentPage: 12,
+			want:        []string{"...", "8", "9", "10", "11", "12", "13", "14", "15", "..."},
+		},
+
+		{
+			name:        "case 253",
+			device:      "mobile",
+			totalPages:  12,
+			currentPage: 8,
+			want:        []string{"...", "7", "8", "9", "..."},
+		},
+
+		{
+			name:        "case 254",
+			device:      "desktop",
+			totalPages:  24,
+			currentPage: 8,
+			want:        []string{"...", "4", "5", "6", "7", "8", "9", "10", "11", "..."},
+		},
+
+		{
+			name:        "case 255",
+			device:      "desktop",
+			totalPages:  10,
+			currentPage: 8,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"},
+		},
+
+		{
+			name:        "case 256",
+			device:      "mobile",
+			totalPages:  15,
+			currentPage: 4,
+			want:        []string{"...", "3", "4", "5", "..."},
+		},
+
+		{
+			name:        "case 257",
+			device:      "mobile",
+			totalPages:  24,
+			currentPage: 23,
+			want:        []string{"...", "21", "22", "23", "24"},
+		},
+
+		{
+			name:        "case 258",
+			device:      "desktop",
+			totalPages:  23,
+			currentPage: 17,
+			want:        []string{"...", "13", "14", "15", "16", "17", "18", "19", "20", "..."},
+		},
+
+		{
+			name:        "case 259",
+			device:      "desktop",
+			totalPages:  28,
+			currentPage: 21,
+			want:        []string{"...", "17", "18", "19", "20", "21", "22", "23", "24", "..."},
+		},
+
+		{
+			name:        "case 260",
+			device:      "mobile",
+			totalPages:  19,
+			currentPage: 18,
+			want:        []string{"...", "16", "17", "18", "19"},
+		},
+
+		{
+			name:        "case 261",
+			device:      "desktop",
+			totalPages:  13,
+			currentPage: 11,
+			want:        []string{"...", "5", "6", "7", "8", "9", "10", "11", "12", "13"},
+		},
+
+		{
+			name:        "case 262",
+			device:      "mobile",
+			totalPages:  8,
+			currentPage: 7,
+			want:        []string{"...", "5", "6", "7", "8"},
+		},
+
+		{
+			name:        "case 263",
+			device:      "desktop",
+			totalPages:  28,
+			currentPage: 11,
+			want:        []string{"...", "7", "8", "9", "10", "11", "12", "13", "14", "..."},
+		},
+
+		{
+			name:        "case 264",
+			device:      "desktop",
+			totalPages:  21,
+			currentPage: 3,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 265",
+			device:      "desktop",
+			totalPages:  18,
+			currentPage: 16,
+			want:        []string{"...", "10", "11", "12", "13", "14", "15", "16", "17", "18"},
+		},
+
+		{
+			name:        "case 266",
+			device:      "desktop",
+			totalPages:  14,
+			currentPage: 7,
+			want:        []string{"...", "3", "4", "5", "6", "7", "8", "9", "10", "..."},
+		},
+
+		{
+			name:        "case 267",
+			device:      "mobile",
+			totalPages:  16,
+			currentPage: 12,
+			want:        []string{"...", "11", "12", "13", "..."},
+		},
+
+		{
+			name:        "case 268",
+			device:      "desktop",
+			totalPages:  30,
+			currentPage: 17,
+			want:        []string{"...", "13", "14", "15", "16", "17", "18", "19", "20", "..."},
+		},
+
+		{
+			name:        "case 269",
+			device:      "mobile",
+			totalPages:  13,
+			currentPage: 7,
+			want:        []string{"...", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 270",
+			device:      "mobile",
+			totalPages:  29,
+			currentPage: 6,
+			want:        []string{"...", "5", "6", "7", "..."},
+		},
+
+		{
+			name:        "case 271",
+			device:      "desktop",
+			totalPages:  21,
+			currentPage: 10,
+			want:        []string{"...", "6", "7", "8", "9", "10", "11", "12", "13", "..."},
+		},
+
+		{
+			name:        "case 272",
+			device:      "mobile",
+			totalPages:  14,
+			currentPage: 8,
+			want:        []string{"...", "7", "8", "9", "..."},
+		},
+
+		{
+			name:        "case 273",
+			device:      "desktop",
+			totalPages:  27,
+			currentPage: 14,
+			want:        []string{"...", "10", "11", "12", "13", "14", "15", "16", "17", "..."},
+		},
+
+		{
+			name:        "case 274",
+			device:      "desktop",
+			totalPages:  16,
+			currentPage: 9,
+			want:        []string{"...", "5", "6", "7", "8", "9", "10", "11", "12", "..."},
+		},
+
+		{
+			name:        "case 275",
+			device:      "desktop",
+			totalPages:  14,
+			currentPage: 4,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 276",
+			device:      "mobile",
+			totalPages:  22,
+			currentPage: 16,
+			want:        []string{"...", "15", "16", "17", "..."},
+		},
+
+		{
+			name:        "case 277",
+			device:      "mobile",
+			totalPages:  19,
+			currentPage: 11,
+			want:        []string{"...", "10", "11", "12", "..."},
+		},
+
+		{
+			name:        "case 278",
+			device:      "mobile",
+			totalPages:  18,
+			currentPage: 7,
+			want:        []string{"...", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 279",
+			device:      "mobile",
+			totalPages:  30,
+			currentPage: 8,
+			want:        []string{"...", "7", "8", "9", "..."},
+		},
+
+		{
+			name:        "case 280",
+			device:      "desktop",
+			totalPages:  19,
+			currentPage: 10,
+			want:        []string{"...", "6", "7", "8", "9", "10", "11", "12", "13", "..."},
+		},
+
+		{
+			name:        "case 281",
+			device:      "mobile",
+			totalPages:  20,
+			currentPage: 11,
+			want:        []string{"...", "10", "11", "12", "..."},
+		},
+
+		{
+			name:        "case 282",
+			device:      "mobile",
+			totalPages:  14,
+			currentPage: 13,
+			want:        []string{"...", "11", "12", "13", "14"},
+		},
+
+		{
+			name:        "case 283",
+			device:      "mobile",
+			totalPages:  5,
+			currentPage: 4,
+			want:        []string{"1", "2", "3", "4", "5"},
+		},
+
+		{
+			name:        "case 284",
+			device:      "desktop",
+			totalPages:  30,
+			currentPage: 18,
+			want:        []string{"...", "14", "15", "16", "17", "18", "19", "20", "21", "..."},
+		},
+
+		{
+			name:        "case 285",
+			device:      "desktop",
+			totalPages:  23,
+			currentPage: 4,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 286",
+			device:      "desktop",
+			totalPages:  28,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 287",
+			device:      "desktop",
+			totalPages:  10,
+			currentPage: 7,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"},
+		},
+
+		{
+			name:        "case 288",
+			device:      "mobile",
+			totalPages:  22,
+			currentPage: 16,
+			want:        []string{"...", "15", "16", "17", "..."},
+		},
+
+		{
+			name:        "case 289",
+			device:      "desktop",
+			totalPages:  30,
+			currentPage: 27,
+			want:        []string{"...", "22", "23", "24", "25", "26", "27", "28", "29", "30"},
+		},
+
+		{
+			name:        "case 290",
+			device:      "mobile",
+			totalPages:  16,
+			currentPage: 14,
+			want:        []string{"...", "13", "14", "15", "16"},
+		},
+
+		{
+			name:        "case 291",
+			device:      "mobile",
+			totalPages:  27,
+			currentPage: 26,
+			want:        []string{"...", "24", "25", "26", "27"},
+		},
+
+		{
+			name:        "case 292",
+			device:      "desktop",
+			totalPages:  22,
+			currentPage: 13,
+			want:        []string{"...", "9", "10", "11", "12", "13", "14", "15", "16", "..."},
+		},
+
+		{
+			name:        "case 293",
+			device:      "mobile",
+			totalPages:  8,
+			currentPage: 4,
+			want:        []string{"...", "3", "4", "5", "..."},
+		},
+
+		{
+			name:        "case 294",
+			device:      "mobile",
+			totalPages:  22,
+			currentPage: 20,
+			want:        []string{"...", "19", "20", "21", "22"},
+		},
+
+		{
+			name:        "case 295",
+			device:      "desktop",
+			totalPages:  13,
+			currentPage: 6,
+			want:        []string{"...", "2", "3", "4", "5", "6", "7", "8", "9", "..."},
+		},
+
+		{
+			name:        "case 296",
+			device:      "mobile",
+			totalPages:  14,
+			currentPage: 11,
+			want:        []string{"...", "10", "11", "12", "..."},
+		},
+
+		{
+			name:        "case 297",
+			device:      "desktop",
+			totalPages:  29,
+			currentPage: 21,
+			want:        []string{"...", "17", "18", "19", "20", "21", "22", "23", "24", "..."},
+		},
+
+		{
+			name:        "case 298",
+			device:      "mobile",
+			totalPages:  17,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "..."},
+		},
+
+		{
+			name:        "case 299",
+			device:      "desktop",
+			totalPages:  10,
+			currentPage: 8,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"},
+		},
+
+		{
+			name:        "case 300",
+			device:      "desktop",
+			totalPages:  28,
+			currentPage: 27,
+			want:        []string{"...", "20", "21", "22", "23", "24", "25", "26", "27", "28"},
+		},
+
+		{
+			name:        "case 301",
+			device:      "desktop",
+			totalPages:  17,
+			currentPage: 12,
+			want:        []string{"...", "9", "10", "11", "12", "13", "14", "15", "16", "17"},
+		},
+
+		{
+			name:        "case 302",
+			device:      "mobile",
+			totalPages:  7,
+			currentPage: 1,
+			want:        []string{"1", "2", "3", "..."},
+		},
+
+		{
+			name:        "case 303",
+			device:      "desktop",
+			totalPages:  14,
+			currentPage: 10,
+			want:        []string{"...", "6", "7", "8", "9", "10", "11", "12", "13", "14"},
+		},
+
+		{
+			name:        "case 304",
+			device:      "mobile",
+			totalPages:  26,
+			currentPage: 19,
+			want:        []string{"...", "18", "19", "20", "..."},
+		},
+
+		{
+			name:        "case 305",
+			device:      "desktop",
+			totalPages:  17,
+			currentPage: 12,
+			want:        []string{"...", "9", "10", "11", "12", "13", "14", "15", "16", "17"},
+		},
+
+		{
+			name:        "case 306",
+			device:      "mobile",
+			totalPages:  28,
+			currentPage: 17,
+			want:        []string{"...", "16", "17", "18", "..."},
+		},
+
+		{
+			name:        "case 307",
+			device:      "desktop",
+			totalPages:  21,
+			currentPage: 19,
+			want:        []string{"...", "13", "14", "15", "16", "17", "18", "19", "20", "21"},
+		},
+
+		{
+			name:        "case 308",
+			device:      "mobile",
+			totalPages:  19,
+			currentPage: 4,
+			want:        []string{"...", "3", "4", "5", "..."},
+		},
+
+		{
+			name:        "case 309",
+			device:      "desktop",
+			totalPages:  21,
+			currentPage: 19,
+			want:        []string{"...", "13", "14", "15", "16", "17", "18", "19", "20", "21"},
+		},
+
+		{
+			name:        "case 310",
+			device:      "mobile",
+			totalPages:  5,
+			currentPage: 1,
+			want:        []string{"1", "2", "3", "4", "5"},
+		},
+
+		{
+			name:        "case 311",
+			device:      "mobile",
+			totalPages:  17,
+			currentPage: 9,
+			want:        []string{"...", "8", "9", "10", "..."},
+		},
+
+		{
+			name:        "case 312",
+			device:      "desktop",
+			totalPages:  26,
+			currentPage: 26,
+			want:        []string{"...", "18", "19", "20", "21", "22", "23", "24", "25", "26"},
+		},
+
+		{
+			name:        "case 313",
+			device:      "mobile",
+			totalPages:  9,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "..."},
+		},
+
+		{
+			name:        "case 314",
+			device:      "mobile",
+			totalPages:  29,
+			currentPage: 10,
+			want:        []string{"...", "9", "10", "11", "..."},
+		},
+
+		{
+			name:        "case 315",
+			device:      "mobile",
+			totalPages:  9,
+			currentPage: 9,
+			want:        []string{"...", "6", "7", "8", "9"},
+		},
+
+		{
+			name:        "case 316",
+			device:      "desktop",
+			totalPages:  29,
+			currentPage: 27,
+			want:        []string{"...", "21", "22", "23", "24", "25", "26", "27", "28", "29"},
+		},
+
+		{
+			name:        "case 317",
+			device:      "desktop",
+			totalPages:  20,
+			currentPage: 1,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 318",
+			device:      "mobile",
+			totalPages:  10,
+			currentPage: 9,
+			want:        []string{"...", "7", "8", "9", "10"},
+		},
+
+		{
+			name:        "case 319",
+			device:      "mobile",
+			totalPages:  16,
+			currentPage: 9,
+			want:        []string{"...", "8", "9", "10", "..."},
+		},
+
+		{
+			name:        "case 320",
+			device:      "mobile",
+			totalPages:  19,
+			currentPage: 6,
+			want:        []string{"...", "5", "6", "7", "..."},
+		},
+
+		{
+			name:        "case 321",
+			device:      "desktop",
+			totalPages:  26,
+			currentPage: 25,
+			want:        []string{"...", "18", "19", "20", "21", "22", "23", "24", "25", "26"},
+		},
+
+		{
+			name:        "case 322",
+			device:      "mobile",
+			totalPages:  9,
+			currentPage: 4,
+			want:        []string{"...", "3", "4", "5", "..."},
+		},
+
+		{
+			name:        "case 323",
+			device:      "mobile",
+			totalPages:  7,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "..."},
+		},
+
+		{
+			name:        "case 324",
+			device:      "mobile",
+			totalPages:  26,
+			currentPage: 13,
+			want:        []string{"...", "12", "13", "14", "..."},
+		},
+
+		{
+			name:        "case 325",
+			device:      "desktop",
+			totalPages:  21,
+			currentPage: 12,
+			want:        []string{"...", "8", "9", "10", "11", "12", "13", "14", "15", "..."},
+		},
+
+		{
+			name:        "case 326",
+			device:      "desktop",
+			totalPages:  28,
+			currentPage: 22,
+			want:        []string{"...", "18", "19", "20", "21", "22", "23", "24", "25", "..."},
+		},
+
+		{
+			name:        "case 327",
+			device:      "desktop",
+			totalPages:  13,
+			currentPage: 12,
+			want:        []string{"...", "5", "6", "7", "8", "9", "10", "11", "12", "13"},
+		},
+
+		{
+			name:        "case 328",
+			device:      "mobile",
+			totalPages:  19,
+			currentPage: 16,
+			want:        []string{"...", "15", "16", "17", "..."},
+		},
+
+		{
+			name:        "case 329",
+			device:      "desktop",
+			totalPages:  10,
+			currentPage: 1,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"},
+		},
+
+		{
+			name:        "case 330",
+			device:      "mobile",
+			totalPages:  30,
+			currentPage: 29,
+			want:        []string{"...", "27", "28", "29", "30"},
+		},
+
+		{
+			name:        "case 331",
+			device:      "desktop",
+			totalPages:  19,
+			currentPage: 11,
+			want:        []string{"...", "7", "8", "9", "10", "11", "12", "13", "14", "..."},
+		},
+
+		{
+			name:        "case 332",
+			device:      "mobile",
+			totalPages:  17,
+			currentPage: 7,
+			want:        []string{"...", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 333",
+			device:      "desktop",
+			totalPages:  18,
+			currentPage: 1,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 334",
+			device:      "desktop",
+			totalPages:  26,
+			currentPage: 7,
+			want:        []string{"...", "3", "4", "5", "6", "7", "8", "9", "10", "..."},
+		},
+
+		{
+			name:        "case 335",
+			device:      "desktop",
+			totalPages:  28,
+			currentPage: 23,
+			want:        []string{"...", "20", "21", "22", "23", "24", "25", "26", "27", "28"},
+		},
+
+		{
+			name:        "case 336",
+			device:      "mobile",
+			totalPages:  25,
+			currentPage: 11,
+			want:        []string{"...", "10", "11", "12", "..."},
+		},
+
+		{
+			name:        "case 337",
+			device:      "desktop",
+			totalPages:  29,
+			currentPage: 29,
+			want:        []string{"...", "21", "22", "23", "24", "25", "26", "27", "28", "29"},
+		},
+
+		{
+			name:        "case 338",
+			device:      "mobile",
+			totalPages:  27,
+			currentPage: 11,
+			want:        []string{"...", "10", "11", "12", "..."},
+		},
+
+		{
+			name:        "case 339",
+			device:      "mobile",
+			totalPages:  9,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "..."},
+		},
+
+		{
+			name:        "case 340",
+			device:      "desktop",
+			totalPages:  30,
+			currentPage: 22,
+			want:        []string{"...", "18", "19", "20", "21", "22", "23", "24", "25", "..."},
+		},
+
+		{
+			name:        "case 341",
+			device:      "desktop",
+			totalPages:  30,
+			currentPage: 16,
+			want:        []string{"...", "12", "13", "14", "15", "16", "17", "18", "19", "..."},
+		},
+
+		{
+			name:        "case 342",
+			device:      "mobile",
+			totalPages:  10,
+			currentPage: 5,
+			want:        []string{"...", "4", "5", "6", "..."},
+		},
+
+		{
+			name:        "case 343",
+			device:      "mobile",
+			totalPages:  10,
+			currentPage: 10,
+			want:        []string{"...", "7", "8", "9", "10"},
+		},
+
+		{
+			name:        "case 344",
+			device:      "mobile",
+			totalPages:  9,
+			currentPage: 7,
+			want:        []string{"...", "6", "7", "8", "9"},
+		},
+
+		{
+			name:        "case 345",
+			device:      "desktop",
+			totalPages:  17,
+			currentPage: 15,
+			want:        []string{"...", "9", "10", "11", "12", "13", "14", "15", "16", "17"},
+		},
+
+		{
+			name:        "case 346",
+			device:      "mobile",
+			totalPages:  15,
+			currentPage: 6,
+			want:        []string{"...", "5", "6", "7", "..."},
+		},
+
+		{
+			name:        "case 347",
+			device:      "mobile",
+			totalPages:  23,
+			currentPage: 19,
+			want:        []string{"...", "18", "19", "20", "..."},
+		},
+
+		{
+			name:        "case 348",
+			device:      "mobile",
+			totalPages:  15,
+			currentPage: 15,
+			want:        []string{"...", "12", "13", "14", "15"},
+		},
+
+		{
+			name:        "case 349",
+			device:      "mobile",
+			totalPages:  10,
+			currentPage: 10,
+			want:        []string{"...", "7", "8", "9", "10"},
+		},
+
+		{
+			name:        "case 350",
+			device:      "mobile",
+			totalPages:  19,
+			currentPage: 9,
+			want:        []string{"...", "8", "9", "10", "..."},
+		},
+
+		{
+			name:        "case 351",
+			device:      "desktop",
+			totalPages:  16,
+			currentPage: 11,
+			want:        []string{"...", "8", "9", "10", "11", "12", "13", "14", "15", "16"},
+		},
+
+		{
+			name:        "case 352",
+			device:      "mobile",
+			totalPages:  8,
+			currentPage: 5,
+			want:        []string{"...", "4", "5", "6", "..."},
+		},
+
+		{
+			name:        "case 353",
+			device:      "desktop",
+			totalPages:  27,
+			currentPage: 25,
+			want:        []string{"...", "19", "20", "21", "22", "23", "24", "25", "26", "27"},
+		},
+
+		{
+			name:        "case 354",
+			device:      "desktop",
+			totalPages:  26,
+			currentPage: 23,
+			want:        []string{"...", "18", "19", "20", "21", "22", "23", "24", "25", "26"},
+		},
+
+		{
+			name:        "case 355",
+			device:      "desktop",
+			totalPages:  10,
+			currentPage: 7,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"},
+		},
+
+		{
+			name:        "case 356",
+			device:      "desktop",
+			totalPages:  28,
+			currentPage: 12,
+			want:        []string{"...", "8", "9", "10", "11", "12", "13", "14", "15", "..."},
+		},
+
+		{
+			name:        "case 357",
+			device:      "desktop",
+			totalPages:  18,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 358",
+			device:      "mobile",
+			totalPages:  21,
+			currentPage: 8,
+			want:        []string{"...", "7", "8", "9", "..."},
+		},
+
+		{
+			name:        "case 359",
+			device:      "desktop",
+			totalPages:  17,
+			currentPage: 11,
+			want:        []string{"...", "7", "8", "9", "10", "11", "12", "13", "14", "..."},
+		},
+
+		{
+			name:        "case 360",
+			device:      "mobile",
+			totalPages:  24,
+			currentPage: 11,
+			want:        []string{"...", "10", "11", "12", "..."},
+		},
+
+		{
+			name:        "case 361",
+			device:      "desktop",
+			totalPages:  18,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 362",
+			device:      "mobile",
+			totalPages:  19,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "..."},
+		},
+
+		{
+			name:        "case 363",
+			device:      "mobile",
+			totalPages:  18,
+			currentPage: 1,
+			want:        []string{"1", "2", "3", "..."},
+		},
+
+		{
+			name:        "case 364",
+			device:      "mobile",
+			totalPages:  19,
+			currentPage: 16,
+			want:        []string{"...", "15", "16", "17", "..."},
+		},
+
+		{
+			name:        "case 365",
+			device:      "mobile",
+			totalPages:  29,
+			currentPage: 18,
+			want:        []string{"...", "17", "18", "19", "..."},
+		},
+
+		{
+			name:        "case 366",
+			device:      "mobile",
+			totalPages:  10,
+			currentPage: 5,
+			want:        []string{"...", "4", "5", "6", "..."},
+		},
+
+		{
+			name:        "case 367",
+			device:      "mobile",
+			totalPages:  22,
+			currentPage: 18,
+			want:        []string{"...", "17", "18", "19", "..."},
+		},
+
+		{
+			name:        "case 368",
+			device:      "mobile",
+			totalPages:  7,
+			currentPage: 1,
+			want:        []string{"1", "2", "3", "..."},
+		},
+
+		{
+			name:        "case 369",
+			device:      "mobile",
+			totalPages:  5,
+			currentPage: 3,
+			want:        []string{"1", "2", "3", "4", "5"},
+		},
+
+		{
+			name:        "case 370",
+			device:      "desktop",
+			totalPages:  10,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"},
+		},
+
+		{
+			name:        "case 371",
+			device:      "mobile",
+			totalPages:  21,
+			currentPage: 11,
+			want:        []string{"...", "10", "11", "12", "..."},
+		},
+
+		{
+			name:        "case 372",
+			device:      "desktop",
+			totalPages:  29,
+			currentPage: 29,
+			want:        []string{"...", "21", "22", "23", "24", "25", "26", "27", "28", "29"},
+		},
+
+		{
+			name:        "case 373",
+			device:      "mobile",
+			totalPages:  14,
+			currentPage: 5,
+			want:        []string{"...", "4", "5", "6", "..."},
+		},
+
+		{
+			name:        "case 374",
+			device:      "desktop",
+			totalPages:  23,
+			currentPage: 5,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 375",
+			device:      "desktop",
+			totalPages:  21,
+			currentPage: 6,
+			want:        []string{"...", "2", "3", "4", "5", "6", "7", "8", "9", "..."},
+		},
+
+		{
+			name:        "case 376",
+			device:      "desktop",
+			totalPages:  11,
+			currentPage: 4,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 377",
+			device:      "desktop",
+			totalPages:  26,
+			currentPage: 12,
+			want:        []string{"...", "8", "9", "10", "11", "12", "13", "14", "15", "..."},
+		},
+
+		{
+			name:        "case 378",
+			device:      "mobile",
+			totalPages:  10,
+			currentPage: 7,
+			want:        []string{"...", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 379",
+			device:      "desktop",
+			totalPages:  11,
+			currentPage: 6,
+			want:        []string{"...", "3", "4", "5", "6", "7", "8", "9", "10", "11"},
+		},
+
+		{
+			name:        "case 380",
+			device:      "desktop",
+			totalPages:  14,
+			currentPage: 13,
+			want:        []string{"...", "6", "7", "8", "9", "10", "11", "12", "13", "14"},
+		},
+
+		{
+			name:        "case 381",
+			device:      "desktop",
+			totalPages:  16,
+			currentPage: 13,
+			want:        []string{"...", "8", "9", "10", "11", "12", "13", "14", "15", "16"},
+		},
+
+		{
+			name:        "case 382",
+			device:      "mobile",
+			totalPages:  22,
+			currentPage: 16,
+			want:        []string{"...", "15", "16", "17", "..."},
+		},
+
+		{
+			name:        "case 383",
+			device:      "desktop",
+			totalPages:  11,
+			currentPage: 10,
+			want:        []string{"...", "3", "4", "5", "6", "7", "8", "9", "10", "11"},
+		},
+
+		{
+			name:        "case 384",
+			device:      "desktop",
+			totalPages:  23,
+			currentPage: 17,
+			want:        []string{"...", "13", "14", "15", "16", "17", "18", "19", "20", "..."},
+		},
+
+		{
+			name:        "case 385",
+			device:      "mobile",
+			totalPages:  19,
+			currentPage: 12,
+			want:        []string{"...", "11", "12", "13", "..."},
+		},
+
+		{
+			name:        "case 386",
+			device:      "desktop",
+			totalPages:  12,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 387",
+			device:      "mobile",
+			totalPages:  6,
+			currentPage: 5,
+			want:        []string{"...", "3", "4", "5", "6"},
+		},
+
+		{
+			name:        "case 388",
+			device:      "mobile",
+			totalPages:  19,
+			currentPage: 13,
+			want:        []string{"...", "12", "13", "14", "..."},
+		},
+
+		{
+			name:        "case 389",
+			device:      "desktop",
+			totalPages:  27,
+			currentPage: 24,
+			want:        []string{"...", "19", "20", "21", "22", "23", "24", "25", "26", "27"},
+		},
+
+		{
+			name:        "case 390",
+			device:      "desktop",
+			totalPages:  20,
+			currentPage: 13,
+			want:        []string{"...", "9", "10", "11", "12", "13", "14", "15", "16", "..."},
+		},
+
+		{
+			name:        "case 391",
+			device:      "mobile",
+			totalPages:  12,
+			currentPage: 6,
+			want:        []string{"...", "5", "6", "7", "..."},
+		},
+
+		{
+			name:        "case 392",
+			device:      "desktop",
+			totalPages:  18,
+			currentPage: 4,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 393",
+			device:      "desktop",
+			totalPages:  13,
+			currentPage: 6,
+			want:        []string{"...", "2", "3", "4", "5", "6", "7", "8", "9", "..."},
+		},
+
+		{
+			name:        "case 394",
+			device:      "mobile",
+			totalPages:  28,
+			currentPage: 19,
+			want:        []string{"...", "18", "19", "20", "..."},
+		},
+
+		{
+			name:        "case 395",
+			device:      "desktop",
+			totalPages:  16,
+			currentPage: 4,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 396",
+			device:      "mobile",
+			totalPages:  12,
+			currentPage: 9,
+			want:        []string{"...", "8", "9", "10", "..."},
+		},
+
+		{
+			name:        "case 397",
+			device:      "mobile",
+			totalPages:  7,
+			currentPage: 6,
+			want:        []string{"...", "4", "5", "6", "7"},
+		},
+
+		{
+			name:        "case 398",
+			device:      "desktop",
+			totalPages:  21,
+			currentPage: 20,
+			want:        []string{"...", "13", "14", "15", "16", "17", "18", "19", "20", "21"},
+		},
+
+		{
+			name:        "case 399",
+			device:      "desktop",
+			totalPages:  20,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 400",
+			device:      "desktop",
+			totalPages:  13,
+			currentPage: 4,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 401",
+			device:      "desktop",
+			totalPages:  17,
+			currentPage: 6,
+			want:        []string{"...", "2", "3", "4", "5", "6", "7", "8", "9", "..."},
+		},
+
+		{
+			name:        "case 402",
+			device:      "mobile",
+			totalPages:  22,
+			currentPage: 12,
+			want:        []string{"...", "11", "12", "13", "..."},
+		},
+
+		{
+			name:        "case 403",
+			device:      "mobile",
+			totalPages:  9,
+			currentPage: 8,
+			want:        []string{"...", "6", "7", "8", "9"},
+		},
+
+		{
+			name:        "case 404",
+			device:      "desktop",
+			totalPages:  20,
+			currentPage: 8,
+			want:        []string{"...", "4", "5", "6", "7", "8", "9", "10", "11", "..."},
+		},
+
+		{
+			name:        "case 405",
+			device:      "mobile",
+			totalPages:  15,
+			currentPage: 15,
+			want:        []string{"...", "12", "13", "14", "15"},
+		},
+
+		{
+			name:        "case 406",
+			device:      "desktop",
+			totalPages:  25,
+			currentPage: 20,
+			want:        []string{"...", "17", "18", "19", "20", "21", "22", "23", "24", "25"},
+		},
+
+		{
+			name:        "case 407",
+			device:      "desktop",
+			totalPages:  16,
+			currentPage: 12,
+			want:        []string{"...", "8", "9", "10", "11", "12", "13", "14", "15", "16"},
+		},
+
+		{
+			name:        "case 408",
+			device:      "desktop",
+			totalPages:  15,
+			currentPage: 4,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 409",
+			device:      "desktop",
+			totalPages:  30,
+			currentPage: 15,
+			want:        []string{"...", "11", "12", "13", "14", "15", "16", "17", "18", "..."},
+		},
+
+		{
+			name:        "case 410",
+			device:      "desktop",
+			totalPages:  14,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 411",
+			device:      "desktop",
+			totalPages:  20,
+			currentPage: 17,
+			want:        []string{"...", "12", "13", "14", "15", "16", "17", "18", "19", "20"},
+		},
+
+		{
+			name:        "case 412",
+			device:      "mobile",
+			totalPages:  30,
+			currentPage: 10,
+			want:        []string{"...", "9", "10", "11", "..."},
+		},
+
+		{
+			name:        "case 413",
+			device:      "desktop",
+			totalPages:  12,
+			currentPage: 3,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 414",
+			device:      "desktop",
+			totalPages:  29,
+			currentPage: 15,
+			want:        []string{"...", "11", "12", "13", "14", "15", "16", "17", "18", "..."},
+		},
+
+		{
+			name:        "case 415",
+			device:      "mobile",
+			totalPages:  14,
+			currentPage: 12,
+			want:        []string{"...", "11", "12", "13", "14"},
+		},
+
+		{
+			name:        "case 416",
+			device:      "mobile",
+			totalPages:  30,
+			currentPage: 16,
+			want:        []string{"...", "15", "16", "17", "..."},
+		},
+
+		{
+			name:        "case 417",
+			device:      "mobile",
+			totalPages:  10,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "..."},
+		},
+
+		{
+			name:        "case 418",
+			device:      "desktop",
+			totalPages:  18,
+			currentPage: 3,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 419",
+			device:      "mobile",
+			totalPages:  8,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "..."},
+		},
+
+		{
+			name:        "case 420",
+			device:      "mobile",
+			totalPages:  30,
+			currentPage: 30,
+			want:        []string{"...", "27", "28", "29", "30"},
+		},
+
+		{
+			name:        "case 421",
+			device:      "mobile",
+			totalPages:  26,
+			currentPage: 5,
+			want:        []string{"...", "4", "5", "6", "..."},
+		},
+
+		{
+			name:        "case 422",
+			device:      "desktop",
+			totalPages:  18,
+			currentPage: 6,
+			want:        []string{"...", "2", "3", "4", "5", "6", "7", "8", "9", "..."},
+		},
+
+		{
+			name:        "case 423",
+			device:      "mobile",
+			totalPages:  18,
+			currentPage: 5,
+			want:        []string{"...", "4", "5", "6", "..."},
+		},
+
+		{
+			name:        "case 424",
+			device:      "desktop",
+			totalPages:  11,
+			currentPage: 7,
+			want:        []string{"...", "3", "4", "5", "6", "7", "8", "9", "10", "11"},
+		},
+
+		{
+			name:        "case 425",
+			device:      "mobile",
+			totalPages:  16,
+			currentPage: 14,
+			want:        []string{"...", "13", "14", "15", "16"},
+		},
+
+		{
+			name:        "case 426",
+			device:      "mobile",
+			totalPages:  14,
+			currentPage: 4,
+			want:        []string{"...", "3", "4", "5", "..."},
+		},
+
+		{
+			name:        "case 427",
+			device:      "mobile",
+			totalPages:  17,
+			currentPage: 12,
+			want:        []string{"...", "11", "12", "13", "..."},
+		},
+
+		{
+			name:        "case 428",
+			device:      "desktop",
+			totalPages:  20,
+			currentPage: 10,
+			want:        []string{"...", "6", "7", "8", "9", "10", "11", "12", "13", "..."},
+		},
+
+		{
+			name:        "case 429",
+			device:      "mobile",
+			totalPages:  21,
+			currentPage: 7,
+			want:        []string{"...", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 430",
+			device:      "mobile",
+			totalPages:  5,
+			currentPage: 3,
+			want:        []string{"1", "2", "3", "4", "5"},
+		},
+
+		{
+			name:        "case 431",
+			device:      "mobile",
+			totalPages:  29,
+			currentPage: 17,
+			want:        []string{"...", "16", "17", "18", "..."},
+		},
+
+		{
+			name:        "case 432",
+			device:      "mobile",
+			totalPages:  16,
+			currentPage: 11,
+			want:        []string{"...", "10", "11", "12", "..."},
+		},
+
+		{
+			name:        "case 433",
+			device:      "mobile",
+			totalPages:  11,
+			currentPage: 8,
+			want:        []string{"...", "7", "8", "9", "..."},
+		},
+
+		{
+			name:        "case 434",
+			device:      "mobile",
+			totalPages:  18,
+			currentPage: 5,
+			want:        []string{"...", "4", "5", "6", "..."},
+		},
+
+		{
+			name:        "case 435",
+			device:      "mobile",
+			totalPages:  7,
+			currentPage: 4,
+			want:        []string{"...", "3", "4", "5", "..."},
+		},
+
+		{
+			name:        "case 436",
+			device:      "mobile",
+			totalPages:  7,
+			currentPage: 6,
+			want:        []string{"...", "4", "5", "6", "7"},
+		},
+
+		{
+			name:        "case 437",
+			device:      "mobile",
+			totalPages:  20,
+			currentPage: 6,
+			want:        []string{"...", "5", "6", "7", "..."},
+		},
+
+		{
+			name:        "case 438",
+			device:      "mobile",
+			totalPages:  18,
+			currentPage: 13,
+			want:        []string{"...", "12", "13", "14", "..."},
+		},
+
+		{
+			name:        "case 439",
+			device:      "mobile",
+			totalPages:  11,
+			currentPage: 1,
+			want:        []string{"1", "2", "3", "..."},
+		},
+
+		{
+			name:        "case 440",
+			device:      "mobile",
+			totalPages:  23,
+			currentPage: 7,
+			want:        []string{"...", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 441",
+			device:      "mobile",
+			totalPages:  13,
+			currentPage: 3,
+			want:        []string{"...", "2", "3", "4", "..."},
+		},
+
+		{
+			name:        "case 442",
+			device:      "mobile",
+			totalPages:  10,
+			currentPage: 4,
+			want:        []string{"...", "3", "4", "5", "..."},
+		},
+
+		{
+			name:        "case 443",
+			device:      "mobile",
+			totalPages:  29,
+			currentPage: 21,
+			want:        []string{"...", "20", "21", "22", "..."},
+		},
+
+		{
+			name:        "case 444",
+			device:      "desktop",
+			totalPages:  27,
+			currentPage: 5,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 445",
+			device:      "mobile",
+			totalPages:  15,
+			currentPage: 3,
+			want:        []string{"...", "2", "3", "4", "..."},
+		},
+
+		{
+			name:        "case 446",
+			device:      "mobile",
+			totalPages:  6,
+			currentPage: 5,
+			want:        []string{"...", "3", "4", "5", "6"},
+		},
+
+		{
+			name:        "case 447",
+			device:      "desktop",
+			totalPages:  23,
+			currentPage: 16,
+			want:        []string{"...", "12", "13", "14", "15", "16", "17", "18", "19", "..."},
+		},
+
+		{
+			name:        "case 448",
+			device:      "desktop",
+			totalPages:  23,
+			currentPage: 17,
+			want:        []string{"...", "13", "14", "15", "16", "17", "18", "19", "20", "..."},
+		},
+
+		{
+			name:        "case 449",
+			device:      "desktop",
+			totalPages:  23,
+			currentPage: 12,
+			want:        []string{"...", "8", "9", "10", "11", "12", "13", "14", "15", "..."},
+		},
+
+		{
+			name:        "case 450",
+			device:      "desktop",
+			totalPages:  15,
+			currentPage: 8,
+			want:        []string{"...", "4", "5", "6", "7", "8", "9", "10", "11", "..."},
+		},
+
+		{
+			name:        "case 451",
+			device:      "desktop",
+			totalPages:  10,
+			currentPage: 3,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"},
+		},
+
+		{
+			name:        "case 452",
+			device:      "mobile",
+			totalPages:  7,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "..."},
+		},
+
+		{
+			name:        "case 453",
+			device:      "mobile",
+			totalPages:  21,
+			currentPage: 13,
+			want:        []string{"...", "12", "13", "14", "..."},
+		},
+
+		{
+			name:        "case 454",
+			device:      "desktop",
+			totalPages:  19,
+			currentPage: 19,
+			want:        []string{"...", "11", "12", "13", "14", "15", "16", "17", "18", "19"},
+		},
+
+		{
+			name:        "case 455",
+			device:      "mobile",
+			totalPages:  10,
+			currentPage: 4,
+			want:        []string{"...", "3", "4", "5", "..."},
+		},
+
+		{
+			name:        "case 456",
+			device:      "desktop",
+			totalPages:  11,
+			currentPage: 8,
+			want:        []string{"...", "3", "4", "5", "6", "7", "8", "9", "10", "11"},
+		},
+
+		{
+			name:        "case 457",
+			device:      "mobile",
+			totalPages:  15,
+			currentPage: 12,
+			want:        []string{"...", "11", "12", "13", "..."},
+		},
+
+		{
+			name:        "case 458",
+			device:      "mobile",
+			totalPages:  11,
+			currentPage: 7,
+			want:        []string{"...", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 459",
+			device:      "mobile",
+			totalPages:  8,
+			currentPage: 7,
+			want:        []string{"...", "5", "6", "7", "8"},
+		},
+
+		{
+			name:        "case 460",
+			device:      "mobile",
+			totalPages:  22,
+			currentPage: 21,
+			want:        []string{"...", "19", "20", "21", "22"},
+		},
+
+		{
+			name:        "case 461",
+			device:      "desktop",
+			totalPages:  14,
+			currentPage: 5,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 462",
+			device:      "mobile",
+			totalPages:  9,
+			currentPage: 4,
+			want:        []string{"...", "3", "4", "5", "..."},
+		},
+
+		{
+			name:        "case 463",
+			device:      "mobile",
+			totalPages:  16,
+			currentPage: 9,
+			want:        []string{"...", "8", "9", "10", "..."},
+		},
+
+		{
+			name:        "case 464",
+			device:      "mobile",
+			totalPages:  16,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "..."},
+		},
+
+		{
+			name:        "case 465",
+			device:      "desktop",
+			totalPages:  13,
+			currentPage: 3,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 466",
+			device:      "desktop",
+			totalPages:  10,
+			currentPage: 3,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"},
+		},
+
+		{
+			name:        "case 467",
+			device:      "mobile",
+			totalPages:  13,
+			currentPage: 13,
+			want:        []string{"...", "10", "11", "12", "13"},
+		},
+
+		{
+			name:        "case 468",
+			device:      "mobile",
+			totalPages:  17,
+			currentPage: 8,
+			want:        []string{"...", "7", "8", "9", "..."},
+		},
+
+		{
+			name:        "case 469",
+			device:      "desktop",
+			totalPages:  15,
+			currentPage: 7,
+			want:        []string{"...", "3", "4", "5", "6", "7", "8", "9", "10", "..."},
+		},
+
+		{
+			name:        "case 470",
+			device:      "desktop",
+			totalPages:  17,
+			currentPage: 17,
+			want:        []string{"...", "9", "10", "11", "12", "13", "14", "15", "16", "17"},
+		},
+
+		{
+			name:        "case 471",
+			device:      "mobile",
+			totalPages:  23,
+			currentPage: 9,
+			want:        []string{"...", "8", "9", "10", "..."},
+		},
+
+		{
+			name:        "case 472",
+			device:      "mobile",
+			totalPages:  28,
+			currentPage: 15,
+			want:        []string{"...", "14", "15", "16", "..."},
+		},
+
+		{
+			name:        "case 473",
+			device:      "desktop",
+			totalPages:  18,
+			currentPage: 12,
+			want:        []string{"...", "8", "9", "10", "11", "12", "13", "14", "15", "..."},
+		},
+
+		{
+			name:        "case 474",
+			device:      "mobile",
+			totalPages:  13,
+			currentPage: 5,
+			want:        []string{"...", "4", "5", "6", "..."},
+		},
+
+		{
+			name:        "case 475",
+			device:      "mobile",
+			totalPages:  13,
+			currentPage: 11,
+			want:        []string{"...", "10", "11", "12", "13"},
+		},
+
+		{
+			name:        "case 476",
+			device:      "desktop",
+			totalPages:  10,
+			currentPage: 9,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"},
+		},
+
+		{
+			name:        "case 477",
+			device:      "desktop",
+			totalPages:  17,
+			currentPage: 8,
+			want:        []string{"...", "4", "5", "6", "7", "8", "9", "10", "11", "..."},
+		},
+
+		{
+			name:        "case 478",
+			device:      "mobile",
+			totalPages:  12,
+			currentPage: 5,
+			want:        []string{"...", "4", "5", "6", "..."},
+		},
+
+		{
+			name:        "case 479",
+			device:      "mobile",
+			totalPages:  6,
+			currentPage: 1,
+			want:        []string{"1", "2", "3", "..."},
+		},
+
+		{
+			name:        "case 480",
+			device:      "mobile",
+			totalPages:  12,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "..."},
+		},
+
+		{
+			name:        "case 481",
+			device:      "desktop",
+			totalPages:  14,
+			currentPage: 11,
+			want:        []string{"...", "6", "7", "8", "9", "10", "11", "12", "13", "14"},
+		},
+
+		{
+			name:        "case 482",
+			device:      "desktop",
+			totalPages:  10,
+			currentPage: 10,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"},
+		},
+
+		{
+			name:        "case 483",
+			device:      "desktop",
+			totalPages:  13,
+			currentPage: 9,
+			want:        []string{"...", "5", "6", "7", "8", "9", "10", "11", "12", "13"},
+		},
+
+		{
+			name:        "case 484",
+			device:      "desktop",
+			totalPages:  12,
+			currentPage: 3,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 485",
+			device:      "mobile",
+			totalPages:  20,
+			currentPage: 11,
+			want:        []string{"...", "10", "11", "12", "..."},
+		},
+
+		{
+			name:        "case 486",
+			device:      "mobile",
+			totalPages:  24,
+			currentPage: 3,
+			want:        []string{"...", "2", "3", "4", "..."},
+		},
+
+		{
+			name:        "case 487",
+			device:      "desktop",
+			totalPages:  10,
+			currentPage: 3,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"},
+		},
+
+		{
+			name:        "case 488",
+			device:      "desktop",
+			totalPages:  29,
+			currentPage: 21,
+			want:        []string{"...", "17", "18", "19", "20", "21", "22", "23", "24", "..."},
+		},
+
+		{
+			name:        "case 489",
+			device:      "desktop",
+			totalPages:  28,
+			currentPage: 8,
+			want:        []string{"...", "4", "5", "6", "7", "8", "9", "10", "11", "..."},
+		},
+
+		{
+			name:        "case 490",
+			device:      "desktop",
+			totalPages:  20,
+			currentPage: 4,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 491",
+			device:      "mobile",
+			totalPages:  21,
+			currentPage: 6,
+			want:        []string{"...", "5", "6", "7", "..."},
+		},
+
+		{
+			name:        "case 492",
+			device:      "mobile",
+			totalPages:  8,
+			currentPage: 7,
+			want:        []string{"...", "5", "6", "7", "8"},
+		},
+
+		{
+			name:        "case 493",
+			device:      "desktop",
+			totalPages:  14,
+			currentPage: 14,
+			want:        []string{"...", "6", "7", "8", "9", "10", "11", "12", "13", "14"},
+		},
+
+		{
+			name:        "case 494",
+			device:      "desktop",
+			totalPages:  11,
+			currentPage: 4,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 495",
+			device:      "desktop",
+			totalPages:  30,
+			currentPage: 9,
+			want:        []string{"...", "5", "6", "7", "8", "9", "10", "11", "12", "..."},
+		},
+
+		{
+			name:        "case 496",
+			device:      "desktop",
+			totalPages:  14,
+			currentPage: 12,
+			want:        []string{"...", "6", "7", "8", "9", "10", "11", "12", "13", "14"},
+		},
+
+		{
+			name:        "case 497",
+			device:      "desktop",
+			totalPages:  28,
+			currentPage: 11,
+			want:        []string{"...", "7", "8", "9", "10", "11", "12", "13", "14", "..."},
+		},
+
+		{
+			name:        "case 498",
+			device:      "desktop",
+			totalPages:  21,
+			currentPage: 14,
+			want:        []string{"...", "10", "11", "12", "13", "14", "15", "16", "17", "..."},
+		},
+
+		{
+			name:        "case 499",
+			device:      "desktop",
+			totalPages:  13,
+			currentPage: 4,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 500",
+			device:      "mobile",
+			totalPages:  8,
+			currentPage: 7,
+			want:        []string{"...", "5", "6", "7", "8"},
+		},
+
+		{
+			name:        "case 501",
+			device:      "desktop",
+			totalPages:  29,
+			currentPage: 1,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 502",
+			device:      "desktop",
+			totalPages:  24,
+			currentPage: 20,
+			want:        []string{"...", "16", "17", "18", "19", "20", "21", "22", "23", "24"},
+		},
+
+		{
+			name:        "case 503",
+			device:      "desktop",
+			totalPages:  26,
+			currentPage: 11,
+			want:        []string{"...", "7", "8", "9", "10", "11", "12", "13", "14", "..."},
+		},
+
+		{
+			name:        "case 504",
+			device:      "mobile",
+			totalPages:  5,
+			currentPage: 3,
+			want:        []string{"1", "2", "3", "4", "5"},
+		},
+
+		{
+			name:        "case 505",
+			device:      "desktop",
+			totalPages:  14,
+			currentPage: 7,
+			want:        []string{"...", "3", "4", "5", "6", "7", "8", "9", "10", "..."},
+		},
+
+		{
+			name:        "case 506",
+			device:      "desktop",
+			totalPages:  23,
+			currentPage: 14,
+			want:        []string{"...", "10", "11", "12", "13", "14", "15", "16", "17", "..."},
+		},
+
+		{
+			name:        "case 507",
+			device:      "desktop",
+			totalPages:  30,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 508",
+			device:      "mobile",
+			totalPages:  27,
+			currentPage: 27,
+			want:        []string{"...", "24", "25", "26", "27"},
+		},
+
+		{
+			name:        "case 509",
+			device:      "mobile",
+			totalPages:  26,
+			currentPage: 12,
+			want:        []string{"...", "11", "12", "13", "..."},
+		},
+
+		{
+			name:        "case 510",
+			device:      "mobile",
+			totalPages:  9,
+			currentPage: 7,
+			want:        []string{"...", "6", "7", "8", "9"},
+		},
+
+		{
+			name:        "case 511",
+			device:      "mobile",
+			totalPages:  8,
+			currentPage: 6,
+			want:        []string{"...", "5", "6", "7", "8"},
+		},
+
+		{
+			name:        "case 512",
+			device:      "desktop",
+			totalPages:  26,
+			currentPage: 10,
+			want:        []string{"...", "6", "7", "8", "9", "10", "11", "12", "13", "..."},
+		},
+
+		{
+			name:        "case 513",
+			device:      "mobile",
+			totalPages:  29,
+			currentPage: 21,
+			want:        []string{"...", "20", "21", "22", "..."},
+		},
+
+		{
+			name:        "case 514",
+			device:      "desktop",
+			totalPages:  11,
+			currentPage: 11,
+			want:        []string{"...", "3", "4", "5", "6", "7", "8", "9", "10", "11"},
+		},
+
+		{
+			name:        "case 515",
+			device:      "mobile",
+			totalPages:  29,
+			currentPage: 27,
+			want:        []string{"...", "26", "27", "28", "29"},
+		},
+
+		{
+			name:        "case 516",
+			device:      "desktop",
+			totalPages:  30,
+			currentPage: 11,
+			want:        []string{"...", "7", "8", "9", "10", "11", "12", "13", "14", "..."},
+		},
+
+		{
+			name:        "case 517",
+			device:      "mobile",
+			totalPages:  22,
+			currentPage: 8,
+			want:        []string{"...", "7", "8", "9", "..."},
+		},
+
+		{
+			name:        "case 518",
+			device:      "desktop",
+			totalPages:  30,
+			currentPage: 30,
+			want:        []string{"...", "22", "23", "24", "25", "26", "27", "28", "29", "30"},
+		},
+
+		{
+			name:        "case 519",
+			device:      "mobile",
+			totalPages:  20,
+			currentPage: 5,
+			want:        []string{"...", "4", "5", "6", "..."},
+		},
+
+		{
+			name:        "case 520",
+			device:      "mobile",
+			totalPages:  8,
+			currentPage: 6,
+			want:        []string{"...", "5", "6", "7", "8"},
+		},
+
+		{
+			name:        "case 521",
+			device:      "desktop",
+			totalPages:  20,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 522",
+			device:      "mobile",
+			totalPages:  17,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "..."},
+		},
+
+		{
+			name:        "case 523",
+			device:      "mobile",
+			totalPages:  23,
+			currentPage: 23,
+			want:        []string{"...", "20", "21", "22", "23"},
+		},
+
+		{
+			name:        "case 524",
+			device:      "desktop",
+			totalPages:  13,
+			currentPage: 13,
+			want:        []string{"...", "5", "6", "7", "8", "9", "10", "11", "12", "13"},
+		},
+
+		{
+			name:        "case 525",
+			device:      "mobile",
+			totalPages:  6,
+			currentPage: 4,
+			want:        []string{"...", "3", "4", "5", "6"},
+		},
+
+		{
+			name:        "case 526",
+			device:      "mobile",
+			totalPages:  20,
+			currentPage: 4,
+			want:        []string{"...", "3", "4", "5", "..."},
+		},
+
+		{
+			name:        "case 527",
+			device:      "mobile",
+			totalPages:  18,
+			currentPage: 3,
+			want:        []string{"...", "2", "3", "4", "..."},
+		},
+
+		{
+			name:        "case 528",
+			device:      "desktop",
+			totalPages:  11,
+			currentPage: 9,
+			want:        []string{"...", "3", "4", "5", "6", "7", "8", "9", "10", "11"},
+		},
+
+		{
+			name:        "case 529",
+			device:      "desktop",
+			totalPages:  15,
+			currentPage: 6,
+			want:        []string{"...", "2", "3", "4", "5", "6", "7", "8", "9", "..."},
+		},
+
+		{
+			name:        "case 530",
+			device:      "desktop",
+			totalPages:  22,
+			currentPage: 17,
+			want:        []string{"...", "14", "15", "16", "17", "18", "19", "20", "21", "22"},
+		},
+
+		{
+			name:        "case 531",
+			device:      "mobile",
+			totalPages:  25,
+			currentPage: 18,
+			want:        []string{"...", "17", "18", "19", "..."},
+		},
+
+		{
+			name:        "case 532",
+			device:      "desktop",
+			totalPages:  12,
+			currentPage: 8,
+			want:        []string{"...", "4", "5", "6", "7", "8", "9", "10", "11", "12"},
+		},
+
+		{
+			name:        "case 533",
+			device:      "mobile",
+			totalPages:  28,
+			currentPage: 12,
+			want:        []string{"...", "11", "12", "13", "..."},
+		},
+
+		{
+			name:        "case 534",
+			device:      "mobile",
+			totalPages:  8,
+			currentPage: 1,
+			want:        []string{"1", "2", "3", "..."},
+		},
+
+		{
+			name:        "case 535",
+			device:      "mobile",
+			totalPages:  5,
+			currentPage: 5,
+			want:        []string{"1", "2", "3", "4", "5"},
+		},
+
+		{
+			name:        "case 536",
+			device:      "desktop",
+			totalPages:  15,
+			currentPage: 3,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 537",
+			device:      "desktop",
+			totalPages:  29,
+			currentPage: 18,
+			want:        []string{"...", "14", "15", "16", "17", "18", "19", "20", "21", "..."},
+		},
+
+		{
+			name:        "case 538",
+			device:      "mobile",
+			totalPages:  16,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "..."},
+		},
+
+		{
+			name:        "case 539",
+			device:      "mobile",
+			totalPages:  8,
+			currentPage: 6,
+			want:        []string{"...", "5", "6", "7", "8"},
+		},
+
+		{
+			name:        "case 540",
+			device:      "mobile",
+			totalPages:  28,
+			currentPage: 8,
+			want:        []string{"...", "7", "8", "9", "..."},
+		},
+
+		{
+			name:        "case 541",
+			device:      "desktop",
+			totalPages:  29,
+			currentPage: 22,
+			want:        []string{"...", "18", "19", "20", "21", "22", "23", "24", "25", "..."},
+		},
+
+		{
+			name:        "case 542",
+			device:      "mobile",
+			totalPages:  26,
+			currentPage: 26,
+			want:        []string{"...", "23", "24", "25", "26"},
+		},
+
+		{
+			name:        "case 543",
+			device:      "mobile",
+			totalPages:  9,
+			currentPage: 3,
+			want:        []string{"...", "2", "3", "4", "..."},
+		},
+
+		{
+			name:        "case 544",
+			device:      "desktop",
+			totalPages:  26,
+			currentPage: 23,
+			want:        []string{"...", "18", "19", "20", "21", "22", "23", "24", "25", "26"},
+		},
+
+		{
+			name:        "case 545",
+			device:      "mobile",
+			totalPages:  23,
+			currentPage: 22,
+			want:        []string{"...", "20", "21", "22", "23"},
+		},
+
+		{
+			name:        "case 546",
+			device:      "mobile",
+			totalPages:  13,
+			currentPage: 10,
+			want:        []string{"...", "9", "10", "11", "..."},
+		},
+
+		{
+			name:        "case 547",
+			device:      "mobile",
+			totalPages:  25,
+			currentPage: 25,
+			want:        []string{"...", "22", "23", "24", "25"},
+		},
+
+		{
+			name:        "case 548",
+			device:      "desktop",
+			totalPages:  18,
+			currentPage: 9,
+			want:        []string{"...", "5", "6", "7", "8", "9", "10", "11", "12", "..."},
+		},
+
+		{
+			name:        "case 549",
+			device:      "mobile",
+			totalPages:  18,
+			currentPage: 15,
+			want:        []string{"...", "14", "15", "16", "..."},
+		},
+
+		{
+			name:        "case 550",
+			device:      "mobile",
+			totalPages:  22,
+			currentPage: 8,
+			want:        []string{"...", "7", "8", "9", "..."},
+		},
+
+		{
+			name:        "case 551",
+			device:      "desktop",
+			totalPages:  13,
+			currentPage: 13,
+			want:        []string{"...", "5", "6", "7", "8", "9", "10", "11", "12", "13"},
+		},
+
+		{
+			name:        "case 552",
+			device:      "desktop",
+			totalPages:  17,
+			currentPage: 4,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 553",
+			device:      "mobile",
+			totalPages:  23,
+			currentPage: 8,
+			want:        []string{"...", "7", "8", "9", "..."},
+		},
+
+		{
+			name:        "case 554",
+			device:      "mobile",
+			totalPages:  18,
+			currentPage: 4,
+			want:        []string{"...", "3", "4", "5", "..."},
+		},
+
+		{
+			name:        "case 555",
+			device:      "desktop",
+			totalPages:  28,
+			currentPage: 5,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 556",
+			device:      "mobile",
+			totalPages:  21,
+			currentPage: 7,
+			want:        []string{"...", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 557",
+			device:      "desktop",
+			totalPages:  25,
+			currentPage: 18,
+			want:        []string{"...", "14", "15", "16", "17", "18", "19", "20", "21", "..."},
+		},
+
+		{
+			name:        "case 558",
+			device:      "desktop",
+			totalPages:  10,
+			currentPage: 10,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"},
+		},
+
+		{
+			name:        "case 559",
+			device:      "mobile",
+			totalPages:  27,
+			currentPage: 10,
+			want:        []string{"...", "9", "10", "11", "..."},
+		},
+
+		{
+			name:        "case 560",
+			device:      "desktop",
+			totalPages:  26,
+			currentPage: 8,
+			want:        []string{"...", "4", "5", "6", "7", "8", "9", "10", "11", "..."},
+		},
+
+		{
+			name:        "case 561",
+			device:      "mobile",
+			totalPages:  13,
+			currentPage: 5,
+			want:        []string{"...", "4", "5", "6", "..."},
+		},
+
+		{
+			name:        "case 562",
+			device:      "desktop",
+			totalPages:  10,
+			currentPage: 5,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"},
+		},
+
+		{
+			name:        "case 563",
+			device:      "mobile",
+			totalPages:  10,
+			currentPage: 9,
+			want:        []string{"...", "7", "8", "9", "10"},
+		},
+
+		{
+			name:        "case 564",
+			device:      "desktop",
+			totalPages:  15,
+			currentPage: 7,
+			want:        []string{"...", "3", "4", "5", "6", "7", "8", "9", "10", "..."},
+		},
+
+		{
+			name:        "case 565",
+			device:      "mobile",
+			totalPages:  11,
+			currentPage: 3,
+			want:        []string{"...", "2", "3", "4", "..."},
+		},
+
+		{
+			name:        "case 566",
+			device:      "mobile",
+			totalPages:  10,
+			currentPage: 10,
+			want:        []string{"...", "7", "8", "9", "10"},
+		},
+
+		{
+			name:        "case 567",
+			device:      "mobile",
+			totalPages:  17,
+			currentPage: 10,
+			want:        []string{"...", "9", "10", "11", "..."},
+		},
+
+		{
+			name:        "case 568",
+			device:      "mobile",
+			totalPages:  14,
+			currentPage: 11,
+			want:        []string{"...", "10", "11", "12", "..."},
+		},
+
+		{
+			name:        "case 569",
+			device:      "desktop",
+			totalPages:  25,
+			currentPage: 11,
+			want:        []string{"...", "7", "8", "9", "10", "11", "12", "13", "14", "..."},
+		},
+
+		{
+			name:        "case 570",
+			device:      "mobile",
+			totalPages:  18,
+			currentPage: 5,
+			want:        []string{"...", "4", "5", "6", "..."},
+		},
+
+		{
+			name:        "case 571",
+			device:      "desktop",
+			totalPages:  15,
+			currentPage: 3,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 572",
+			device:      "mobile",
+			totalPages:  8,
+			currentPage: 1,
+			want:        []string{"1", "2", "3", "..."},
+		},
+
+		{
+			name:        "case 573",
+			device:      "mobile",
+			totalPages:  11,
+			currentPage: 11,
+			want:        []string{"...", "8", "9", "10", "11"},
+		},
+
+		{
+			name:        "case 574",
+			device:      "mobile",
+			totalPages:  17,
+			currentPage: 15,
+			want:        []string{"...", "14", "15", "16", "17"},
+		},
+
+		{
+			name:        "case 575",
+			device:      "mobile",
+			totalPages:  18,
+			currentPage: 18,
+			want:        []string{"...", "15", "16", "17", "18"},
+		},
+
+		{
+			name:        "case 576",
+			device:      "mobile",
+			totalPages:  8,
+			currentPage: 5,
+			want:        []string{"...", "4", "5", "6", "..."},
+		},
+
+		{
+			name:        "case 577",
+			device:      "desktop",
+			totalPages:  24,
+			currentPage: 6,
+			want:        []string{"...", "2", "3", "4", "5", "6", "7", "8", "9", "..."},
+		},
+
+		{
+			name:        "case 578",
+			device:      "desktop",
+			totalPages:  17,
+			currentPage: 9,
+			want:        []string{"...", "5", "6", "7", "8", "9", "10", "11", "12", "..."},
+		},
+
+		{
+			name:        "case 579",
+			device:      "mobile",
+			totalPages:  7,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "..."},
+		},
+
+		{
+			name:        "case 580",
+			device:      "desktop",
+			totalPages:  21,
+			currentPage: 13,
+			want:        []string{"...", "9", "10", "11", "12", "13", "14", "15", "16", "..."},
+		},
+
+		{
+			name:        "case 581",
+			device:      "mobile",
+			totalPages:  21,
+			currentPage: 13,
+			want:        []string{"...", "12", "13", "14", "..."},
+		},
+
+		{
+			name:        "case 582",
+			device:      "mobile",
+			totalPages:  19,
+			currentPage: 10,
+			want:        []string{"...", "9", "10", "11", "..."},
+		},
+
+		{
+			name:        "case 583",
+			device:      "mobile",
+			totalPages:  29,
+			currentPage: 18,
+			want:        []string{"...", "17", "18", "19", "..."},
+		},
+
+		{
+			name:        "case 584",
+			device:      "desktop",
+			totalPages:  20,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 585",
+			device:      "desktop",
+			totalPages:  27,
+			currentPage: 24,
+			want:        []string{"...", "19", "20", "21", "22", "23", "24", "25", "26", "27"},
+		},
+
+		{
+			name:        "case 586",
+			device:      "mobile",
+			totalPages:  19,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "..."},
+		},
+
+		{
+			name:        "case 587",
+			device:      "mobile",
+			totalPages:  29,
+			currentPage: 18,
+			want:        []string{"...", "17", "18", "19", "..."},
+		},
+
+		{
+			name:        "case 588",
+			device:      "desktop",
+			totalPages:  24,
+			currentPage: 4,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 589",
+			device:      "desktop",
+			totalPages:  15,
+			currentPage: 15,
+			want:        []string{"...", "7", "8", "9", "10", "11", "12", "13", "14", "15"},
+		},
+
+		{
+			name:        "case 590",
+			device:      "desktop",
+			totalPages:  17,
+			currentPage: 12,
+			want:        []string{"...", "9", "10", "11", "12", "13", "14", "15", "16", "17"},
+		},
+
+		{
+			name:        "case 591",
+			device:      "desktop",
+			totalPages:  23,
+			currentPage: 17,
+			want:        []string{"...", "13", "14", "15", "16", "17", "18", "19", "20", "..."},
+		},
+
+		{
+			name:        "case 592",
+			device:      "desktop",
+			totalPages:  28,
+			currentPage: 27,
+			want:        []string{"...", "20", "21", "22", "23", "24", "25", "26", "27", "28"},
+		},
+
+		{
+			name:        "case 593",
+			device:      "desktop",
+			totalPages:  22,
+			currentPage: 18,
+			want:        []string{"...", "14", "15", "16", "17", "18", "19", "20", "21", "22"},
+		},
+
+		{
+			name:        "case 594",
+			device:      "desktop",
+			totalPages:  12,
+			currentPage: 9,
+			want:        []string{"...", "4", "5", "6", "7", "8", "9", "10", "11", "12"},
+		},
+
+		{
+			name:        "case 595",
+			device:      "desktop",
+			totalPages:  16,
+			currentPage: 15,
+			want:        []string{"...", "8", "9", "10", "11", "12", "13", "14", "15", "16"},
+		},
+
+		{
+			name:        "case 596",
+			device:      "desktop",
+			totalPages:  21,
+			currentPage: 11,
+			want:        []string{"...", "7", "8", "9", "10", "11", "12", "13", "14", "..."},
+		},
+
+		{
+			name:        "case 597",
+			device:      "desktop",
+			totalPages:  20,
+			currentPage: 17,
+			want:        []string{"...", "12", "13", "14", "15", "16", "17", "18", "19", "20"},
+		},
+
+		{
+			name:        "case 598",
+			device:      "desktop",
+			totalPages:  14,
+			currentPage: 6,
+			want:        []string{"...", "2", "3", "4", "5", "6", "7", "8", "9", "..."},
+		},
+
+		{
+			name:        "case 599",
+			device:      "mobile",
+			totalPages:  30,
+			currentPage: 19,
+			want:        []string{"...", "18", "19", "20", "..."},
+		},
+
+		{
+			name:        "case 600",
+			device:      "mobile",
+			totalPages:  24,
+			currentPage: 21,
+			want:        []string{"...", "20", "21", "22", "..."},
+		},
+
+		{
+			name:        "case 601",
+			device:      "mobile",
+			totalPages:  28,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "..."},
+		},
+
+		{
+			name:        "case 602",
+			device:      "mobile",
+			totalPages:  20,
+			currentPage: 11,
+			want:        []string{"...", "10", "11", "12", "..."},
+		},
+
+		{
+			name:        "case 603",
+			device:      "mobile",
+			totalPages:  17,
+			currentPage: 11,
+			want:        []string{"...", "10", "11", "12", "..."},
+		},
+
+		{
+			name:        "case 604",
+			device:      "mobile",
+			totalPages:  26,
+			currentPage: 23,
+			want:        []string{"...", "22", "23", "24", "..."},
+		},
+
+		{
+			name:        "case 605",
+			device:      "mobile",
+			totalPages:  18,
+			currentPage: 12,
+			want:        []string{"...", "11", "12", "13", "..."},
+		},
+
+		{
+			name:        "case 606",
+			device:      "desktop",
+			totalPages:  27,
+			currentPage: 5,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 607",
+			device:      "desktop",
+			totalPages:  14,
+			currentPage: 11,
+			want:        []string{"...", "6", "7", "8", "9", "10", "11", "12", "13", "14"},
+		},
+
+		{
+			name:        "case 608",
+			device:      "desktop",
+			totalPages:  16,
+			currentPage: 3,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 609",
+			device:      "desktop",
+			totalPages:  14,
+			currentPage: 3,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 610",
+			device:      "mobile",
+			totalPages:  6,
+			currentPage: 5,
+			want:        []string{"...", "3", "4", "5", "6"},
+		},
+
+		{
+			name:        "case 611",
+			device:      "desktop",
+			totalPages:  20,
+			currentPage: 12,
+			want:        []string{"...", "8", "9", "10", "11", "12", "13", "14", "15", "..."},
+		},
+
+		{
+			name:        "case 612",
+			device:      "mobile",
+			totalPages:  5,
+			currentPage: 5,
+			want:        []string{"1", "2", "3", "4", "5"},
+		},
+
+		{
+			name:        "case 613",
+			device:      "mobile",
+			totalPages:  28,
+			currentPage: 9,
+			want:        []string{"...", "8", "9", "10", "..."},
+		},
+
+		{
+			name:        "case 614",
+			device:      "mobile",
+			totalPages:  24,
+			currentPage: 12,
+			want:        []string{"...", "11", "12", "13", "..."},
+		},
+
+		{
+			name:        "case 615",
+			device:      "desktop",
+			totalPages:  21,
+			currentPage: 3,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 616",
+			device:      "mobile",
+			totalPages:  15,
+			currentPage: 12,
+			want:        []string{"...", "11", "12", "13", "..."},
+		},
+
+		{
+			name:        "case 617",
+			device:      "mobile",
+			totalPages:  30,
+			currentPage: 21,
+			want:        []string{"...", "20", "21", "22", "..."},
+		},
+
+		{
+			name:        "case 618",
+			device:      "mobile",
+			totalPages:  18,
+			currentPage: 14,
+			want:        []string{"...", "13", "14", "15", "..."},
+		},
+
+		{
+			name:        "case 619",
+			device:      "mobile",
+			totalPages:  29,
+			currentPage: 1,
+			want:        []string{"1", "2", "3", "..."},
+		},
+
+		{
+			name:        "case 620",
+			device:      "desktop",
+			totalPages:  11,
+			currentPage: 8,
+			want:        []string{"...", "3", "4", "5", "6", "7", "8", "9", "10", "11"},
+		},
+
+		{
+			name:        "case 621",
+			device:      "mobile",
+			totalPages:  7,
+			currentPage: 5,
+			want:        []string{"...", "4", "5", "6", "7"},
+		},
+
+		{
+			name:        "case 622",
+			device:      "mobile",
+			totalPages:  26,
+			currentPage: 1,
+			want:        []string{"1", "2", "3", "..."},
+		},
+
+		{
+			name:        "case 623",
+			device:      "desktop",
+			totalPages:  12,
+			currentPage: 4,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 624",
+			device:      "desktop",
+			totalPages:  29,
+			currentPage: 16,
+			want:        []string{"...", "12", "13", "14", "15", "16", "17", "18", "19", "..."},
+		},
+
+		{
+			name:        "case 625",
+			device:      "mobile",
+			totalPages:  24,
+			currentPage: 12,
+			want:        []string{"...", "11", "12", "13", "..."},
+		},
+
+		{
+			name:        "case 626",
+			device:      "desktop",
+			totalPages:  16,
+			currentPage: 13,
+			want:        []string{"...", "8", "9", "10", "11", "12", "13", "14", "15", "16"},
+		},
+
+		{
+			name:        "case 627",
+			device:      "desktop",
+			totalPages:  29,
+			currentPage: 3,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 628",
+			device:      "desktop",
+			totalPages:  29,
+			currentPage: 5,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 629",
+			device:      "mobile",
+			totalPages:  21,
+			currentPage: 15,
+			want:        []string{"...", "14", "15", "16", "..."},
+		},
+
+		{
+			name:        "case 630",
+			device:      "desktop",
+			totalPages:  16,
+			currentPage: 15,
+			want:        []string{"...", "8", "9", "10", "11", "12", "13", "14", "15", "16"},
+		},
+
+		{
+			name:        "case 631",
+			device:      "mobile",
+			totalPages:  11,
+			currentPage: 7,
+			want:        []string{"...", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 632",
+			device:      "mobile",
+			totalPages:  5,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "4", "5"},
+		},
+
+		{
+			name:        "case 633",
+			device:      "desktop",
+			totalPages:  18,
+			currentPage: 14,
+			want:        []string{"...", "10", "11", "12", "13", "14", "15", "16", "17", "18"},
+		},
+
+		{
+			name:        "case 634",
+			device:      "desktop",
+			totalPages:  15,
+			currentPage: 5,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 635",
+			device:      "mobile",
+			totalPages:  6,
+			currentPage: 5,
+			want:        []string{"...", "3", "4", "5", "6"},
+		},
+
+		{
+			name:        "case 636",
+			device:      "desktop",
+			totalPages:  12,
+			currentPage: 4,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 637",
+			device:      "mobile",
+			totalPages:  25,
+			currentPage: 3,
+			want:        []string{"...", "2", "3", "4", "..."},
+		},
+
+		{
+			name:        "case 638",
+			device:      "mobile",
+			totalPages:  29,
+			currentPage: 21,
+			want:        []string{"...", "20", "21", "22", "..."},
+		},
+
+		{
+			name:        "case 639",
+			device:      "mobile",
+			totalPages:  18,
+			currentPage: 11,
+			want:        []string{"...", "10", "11", "12", "..."},
+		},
+
+		{
+			name:        "case 640",
+			device:      "desktop",
+			totalPages:  18,
+			currentPage: 13,
+			want:        []string{"...", "10", "11", "12", "13", "14", "15", "16", "17", "18"},
+		},
+
+		{
+			name:        "case 641",
+			device:      "mobile",
+			totalPages:  7,
+			currentPage: 5,
+			want:        []string{"...", "4", "5", "6", "7"},
+		},
+
+		{
+			name:        "case 642",
+			device:      "desktop",
+			totalPages:  20,
+			currentPage: 6,
+			want:        []string{"...", "2", "3", "4", "5", "6", "7", "8", "9", "..."},
+		},
+
+		{
+			name:        "case 643",
+			device:      "mobile",
+			totalPages:  7,
+			currentPage: 1,
+			want:        []string{"1", "2", "3", "..."},
+		},
+
+		{
+			name:        "case 644",
+			device:      "desktop",
+			totalPages:  14,
+			currentPage: 8,
+			want:        []string{"...", "4", "5", "6", "7", "8", "9", "10", "11", "..."},
+		},
+
+		{
+			name:        "case 645",
+			device:      "desktop",
+			totalPages:  28,
+			currentPage: 19,
+			want:        []string{"...", "15", "16", "17", "18", "19", "20", "21", "22", "..."},
+		},
+
+		{
+			name:        "case 646",
+			device:      "desktop",
+			totalPages:  19,
+			currentPage: 5,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 647",
+			device:      "mobile",
+			totalPages:  24,
+			currentPage: 6,
+			want:        []string{"...", "5", "6", "7", "..."},
+		},
+
+		{
+			name:        "case 648",
+			device:      "mobile",
+			totalPages:  29,
+			currentPage: 12,
+			want:        []string{"...", "11", "12", "13", "..."},
+		},
+
+		{
+			name:        "case 649",
+			device:      "mobile",
+			totalPages:  30,
+			currentPage: 5,
+			want:        []string{"...", "4", "5", "6", "..."},
+		},
+
+		{
+			name:        "case 650",
+			device:      "desktop",
+			totalPages:  17,
+			currentPage: 14,
+			want:        []string{"...", "9", "10", "11", "12", "13", "14", "15", "16", "17"},
+		},
+
+		{
+			name:        "case 651",
+			device:      "mobile",
+			totalPages:  11,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "..."},
+		},
+
+		{
+			name:        "case 652",
+			device:      "desktop",
+			totalPages:  26,
+			currentPage: 4,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 653",
+			device:      "mobile",
+			totalPages:  16,
+			currentPage: 13,
+			want:        []string{"...", "12", "13", "14", "..."},
+		},
+
+		{
+			name:        "case 654",
+			device:      "desktop",
+			totalPages:  29,
+			currentPage: 25,
+			want:        []string{"...", "21", "22", "23", "24", "25", "26", "27", "28", "29"},
+		},
+
+		{
+			name:        "case 655",
+			device:      "mobile",
+			totalPages:  18,
+			currentPage: 3,
+			want:        []string{"...", "2", "3", "4", "..."},
+		},
+
+		{
+			name:        "case 656",
+			device:      "desktop",
+			totalPages:  13,
+			currentPage: 7,
+			want:        []string{"...", "3", "4", "5", "6", "7", "8", "9", "10", "..."},
+		},
+
+		{
+			name:        "case 657",
+			device:      "desktop",
+			totalPages:  19,
+			currentPage: 1,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 658",
+			device:      "desktop",
+			totalPages:  19,
+			currentPage: 7,
+			want:        []string{"...", "3", "4", "5", "6", "7", "8", "9", "10", "..."},
+		},
+
+		{
+			name:        "case 659",
+			device:      "mobile",
+			totalPages:  30,
+			currentPage: 24,
+			want:        []string{"...", "23", "24", "25", "..."},
+		},
+
+		{
+			name:        "case 660",
+			device:      "desktop",
+			totalPages:  24,
+			currentPage: 21,
+			want:        []string{"...", "16", "17", "18", "19", "20", "21", "22", "23", "24"},
+		},
+
+		{
+			name:        "case 661",
+			device:      "mobile",
+			totalPages:  21,
+			currentPage: 15,
+			want:        []string{"...", "14", "15", "16", "..."},
+		},
+
+		{
+			name:        "case 662",
+			device:      "mobile",
+			totalPages:  25,
+			currentPage: 21,
+			want:        []string{"...", "20", "21", "22", "..."},
+		},
+
+		{
+			name:        "case 663",
+			device:      "mobile",
+			totalPages:  28,
+			currentPage: 9,
+			want:        []string{"...", "8", "9", "10", "..."},
+		},
+
+		{
+			name:        "case 664",
+			device:      "desktop",
+			totalPages:  12,
+			currentPage: 12,
+			want:        []string{"...", "4", "5", "6", "7", "8", "9", "10", "11", "12"},
+		},
+
+		{
+			name:        "case 665",
+			device:      "desktop",
+			totalPages:  19,
+			currentPage: 4,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 666",
+			device:      "mobile",
+			totalPages:  6,
+			currentPage: 6,
+			want:        []string{"...", "3", "4", "5", "6"},
+		},
+
+		{
+			name:        "case 667",
+			device:      "mobile",
+			totalPages:  21,
+			currentPage: 7,
+			want:        []string{"...", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 668",
+			device:      "mobile",
+			totalPages:  8,
+			currentPage: 6,
+			want:        []string{"...", "5", "6", "7", "8"},
+		},
+
+		{
+			name:        "case 669",
+			device:      "desktop",
+			totalPages:  14,
+			currentPage: 4,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 670",
+			device:      "mobile",
+			totalPages:  16,
+			currentPage: 5,
+			want:        []string{"...", "4", "5", "6", "..."},
+		},
+
+		{
+			name:        "case 671",
+			device:      "desktop",
+			totalPages:  14,
+			currentPage: 6,
+			want:        []string{"...", "2", "3", "4", "5", "6", "7", "8", "9", "..."},
+		},
+
+		{
+			name:        "case 672",
+			device:      "mobile",
+			totalPages:  17,
+			currentPage: 10,
+			want:        []string{"...", "9", "10", "11", "..."},
+		},
+
+		{
+			name:        "case 673",
+			device:      "desktop",
+			totalPages:  10,
+			currentPage: 4,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"},
+		},
+
+		{
+			name:        "case 674",
+			device:      "mobile",
+			totalPages:  27,
+			currentPage: 17,
+			want:        []string{"...", "16", "17", "18", "..."},
+		},
+
+		{
+			name:        "case 675",
+			device:      "desktop",
+			totalPages:  17,
+			currentPage: 16,
+			want:        []string{"...", "9", "10", "11", "12", "13", "14", "15", "16", "17"},
+		},
+
+		{
+			name:        "case 676",
+			device:      "desktop",
+			totalPages:  15,
+			currentPage: 3,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 677",
+			device:      "desktop",
+			totalPages:  21,
+			currentPage: 20,
+			want:        []string{"...", "13", "14", "15", "16", "17", "18", "19", "20", "21"},
+		},
+
+		{
+			name:        "case 678",
+			device:      "desktop",
+			totalPages:  16,
+			currentPage: 9,
+			want:        []string{"...", "5", "6", "7", "8", "9", "10", "11", "12", "..."},
+		},
+
+		{
+			name:        "case 679",
+			device:      "mobile",
+			totalPages:  15,
+			currentPage: 3,
+			want:        []string{"...", "2", "3", "4", "..."},
+		},
+
+		{
+			name:        "case 680",
+			device:      "desktop",
+			totalPages:  25,
+			currentPage: 11,
+			want:        []string{"...", "7", "8", "9", "10", "11", "12", "13", "14", "..."},
+		},
+
+		{
+			name:        "case 681",
+			device:      "mobile",
+			totalPages:  24,
+			currentPage: 21,
+			want:        []string{"...", "20", "21", "22", "..."},
+		},
+
+		{
+			name:        "case 682",
+			device:      "mobile",
+			totalPages:  26,
+			currentPage: 7,
+			want:        []string{"...", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 683",
+			device:      "desktop",
+			totalPages:  29,
+			currentPage: 11,
+			want:        []string{"...", "7", "8", "9", "10", "11", "12", "13", "14", "..."},
+		},
+
+		{
+			name:        "case 684",
+			device:      "mobile",
+			totalPages:  15,
+			currentPage: 3,
+			want:        []string{"...", "2", "3", "4", "..."},
+		},
+
+		{
+			name:        "case 685",
+			device:      "desktop",
+			totalPages:  23,
+			currentPage: 16,
+			want:        []string{"...", "12", "13", "14", "15", "16", "17", "18", "19", "..."},
+		},
+
+		{
+			name:        "case 686",
+			device:      "mobile",
+			totalPages:  21,
+			currentPage: 4,
+			want:        []string{"...", "3", "4", "5", "..."},
+		},
+
+		{
+			name:        "case 687",
+			device:      "mobile",
+			totalPages:  7,
+			currentPage: 1,
+			want:        []string{"1", "2", "3", "..."},
+		},
+
+		{
+			name:        "case 688",
+			device:      "desktop",
+			totalPages:  19,
+			currentPage: 7,
+			want:        []string{"...", "3", "4", "5", "6", "7", "8", "9", "10", "..."},
+		},
+
+		{
+			name:        "case 689",
+			device:      "desktop",
+			totalPages:  11,
+			currentPage: 3,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 690",
+			device:      "desktop",
+			totalPages:  28,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 691",
+			device:      "mobile",
+			totalPages:  20,
+			currentPage: 5,
+			want:        []string{"...", "4", "5", "6", "..."},
+		},
+
+		{
+			name:        "case 692",
+			device:      "mobile",
+			totalPages:  6,
+			currentPage: 1,
+			want:        []string{"1", "2", "3", "..."},
+		},
+
+		{
+			name:        "case 693",
+			device:      "mobile",
+			totalPages:  9,
+			currentPage: 8,
+			want:        []string{"...", "6", "7", "8", "9"},
+		},
+
+		{
+			name:        "case 694",
+			device:      "desktop",
+			totalPages:  28,
+			currentPage: 27,
+			want:        []string{"...", "20", "21", "22", "23", "24", "25", "26", "27", "28"},
+		},
+
+		{
+			name:        "case 695",
+			device:      "mobile",
+			totalPages:  5,
+			currentPage: 4,
+			want:        []string{"1", "2", "3", "4", "5"},
+		},
+
+		{
+			name:        "case 696",
+			device:      "desktop",
+			totalPages:  17,
+			currentPage: 1,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 697",
+			device:      "mobile",
+			totalPages:  7,
+			currentPage: 4,
+			want:        []string{"...", "3", "4", "5", "..."},
+		},
+
+		{
+			name:        "case 698",
+			device:      "desktop",
+			totalPages:  14,
+			currentPage: 12,
+			want:        []string{"...", "6", "7", "8", "9", "10", "11", "12", "13", "14"},
+		},
+
+		{
+			name:        "case 699",
+			device:      "mobile",
+			totalPages:  9,
+			currentPage: 4,
+			want:        []string{"...", "3", "4", "5", "..."},
+		},
+
+		{
+			name:        "case 700",
+			device:      "desktop",
+			totalPages:  16,
+			currentPage: 5,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 701",
+			device:      "mobile",
+			totalPages:  18,
+			currentPage: 15,
+			want:        []string{"...", "14", "15", "16", "..."},
+		},
+
+		{
+			name:        "case 702",
+			device:      "desktop",
+			totalPages:  22,
+			currentPage: 13,
+			want:        []string{"...", "9", "10", "11", "12", "13", "14", "15", "16", "..."},
+		},
+
+		{
+			name:        "case 703",
+			device:      "mobile",
+			totalPages:  14,
+			currentPage: 9,
+			want:        []string{"...", "8", "9", "10", "..."},
+		},
+
+		{
+			name:        "case 704",
+			device:      "mobile",
+			totalPages:  15,
+			currentPage: 4,
+			want:        []string{"...", "3", "4", "5", "..."},
+		},
+
+		{
+			name:        "case 705",
+			device:      "mobile",
+			totalPages:  27,
+			currentPage: 17,
+			want:        []string{"...", "16", "17", "18", "..."},
+		},
+
+		{
+			name:        "case 706",
+			device:      "desktop",
+			totalPages:  16,
+			currentPage: 12,
+			want:        []string{"...", "8", "9", "10", "11", "12", "13", "14", "15", "16"},
+		},
+
+		{
+			name:        "case 707",
+			device:      "mobile",
+			totalPages:  18,
+			currentPage: 12,
+			want:        []string{"...", "11", "12", "13", "..."},
+		},
+
+		{
+			name:        "case 708",
+			device:      "desktop",
+			totalPages:  23,
+			currentPage: 5,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 709",
+			device:      "desktop",
+			totalPages:  11,
+			currentPage: 9,
+			want:        []string{"...", "3", "4", "5", "6", "7", "8", "9", "10", "11"},
+		},
+
+		{
+			name:        "case 710",
+			device:      "desktop",
+			totalPages:  14,
+			currentPage: 5,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 711",
+			device:      "desktop",
+			totalPages:  28,
+			currentPage: 25,
+			want:        []string{"...", "20", "21", "22", "23", "24", "25", "26", "27", "28"},
+		},
+
+		{
+			name:        "case 712",
+			device:      "mobile",
+			totalPages:  23,
+			currentPage: 21,
+			want:        []string{"...", "20", "21", "22", "23"},
+		},
+
+		{
+			name:        "case 713",
+			device:      "mobile",
+			totalPages:  27,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "..."},
+		},
+
+		{
+			name:        "case 714",
+			device:      "desktop",
+			totalPages:  29,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 715",
+			device:      "mobile",
+			totalPages:  20,
+			currentPage: 10,
+			want:        []string{"...", "9", "10", "11", "..."},
+		},
+
+		{
+			name:        "case 716",
+			device:      "mobile",
+			totalPages:  14,
+			currentPage: 8,
+			want:        []string{"...", "7", "8", "9", "..."},
+		},
+
+		{
+			name:        "case 717",
+			device:      "mobile",
+			totalPages:  9,
+			currentPage: 8,
+			want:        []string{"...", "6", "7", "8", "9"},
+		},
+
+		{
+			name:        "case 718",
+			device:      "mobile",
+			totalPages:  29,
+			currentPage: 27,
+			want:        []string{"...", "26", "27", "28", "29"},
+		},
+
+		{
+			name:        "case 719",
+			device:      "desktop",
+			totalPages:  18,
+			currentPage: 17,
+			want:        []string{"...", "10", "11", "12", "13", "14", "15", "16", "17", "18"},
+		},
+
+		{
+			name:        "case 720",
+			device:      "mobile",
+			totalPages:  23,
+			currentPage: 18,
+			want:        []string{"...", "17", "18", "19", "..."},
+		},
+
+		{
+			name:        "case 721",
+			device:      "mobile",
+			totalPages:  24,
+			currentPage: 12,
+			want:        []string{"...", "11", "12", "13", "..."},
+		},
+
+		{
+			name:        "case 722",
+			device:      "desktop",
+			totalPages:  27,
+			currentPage: 21,
+			want:        []string{"...", "17", "18", "19", "20", "21", "22", "23", "24", "..."},
+		},
+
+		{
+			name:        "case 723",
+			device:      "desktop",
+			totalPages:  13,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 724",
+			device:      "desktop",
+			totalPages:  15,
+			currentPage: 11,
+			want:        []string{"...", "7", "8", "9", "10", "11", "12", "13", "14", "15"},
+		},
+
+		{
+			name:        "case 725",
+			device:      "desktop",
+			totalPages:  21,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 726",
+			device:      "desktop",
+			totalPages:  26,
+			currentPage: 3,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 727",
+			device:      "mobile",
+			totalPages:  17,
+			currentPage: 10,
+			want:        []string{"...", "9", "10", "11", "..."},
+		},
+
+		{
+			name:        "case 728",
+			device:      "mobile",
+			totalPages:  11,
+			currentPage: 5,
+			want:        []string{"...", "4", "5", "6", "..."},
+		},
+
+		{
+			name:        "case 729",
+			device:      "desktop",
+			totalPages:  21,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 730",
+			device:      "mobile",
+			totalPages:  30,
+			currentPage: 24,
+			want:        []string{"...", "23", "24", "25", "..."},
+		},
+
+		{
+			name:        "case 731",
+			device:      "mobile",
+			totalPages:  29,
+			currentPage: 10,
+			want:        []string{"...", "9", "10", "11", "..."},
+		},
+
+		{
+			name:        "case 732",
+			device:      "desktop",
+			totalPages:  10,
+			currentPage: 5,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"},
+		},
+
+		{
+			name:        "case 733",
+			device:      "mobile",
+			totalPages:  28,
+			currentPage: 6,
+			want:        []string{"...", "5", "6", "7", "..."},
+		},
+
+		{
+			name:        "case 734",
+			device:      "desktop",
+			totalPages:  13,
+			currentPage: 5,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 735",
+			device:      "mobile",
+			totalPages:  28,
+			currentPage: 25,
+			want:        []string{"...", "24", "25", "26", "..."},
+		},
+
+		{
+			name:        "case 736",
+			device:      "desktop",
+			totalPages:  26,
+			currentPage: 15,
+			want:        []string{"...", "11", "12", "13", "14", "15", "16", "17", "18", "..."},
+		},
+
+		{
+			name:        "case 737",
+			device:      "desktop",
+			totalPages:  29,
+			currentPage: 15,
+			want:        []string{"...", "11", "12", "13", "14", "15", "16", "17", "18", "..."},
+		},
+
+		{
+			name:        "case 738",
+			device:      "desktop",
+			totalPages:  18,
+			currentPage: 8,
+			want:        []string{"...", "4", "5", "6", "7", "8", "9", "10", "11", "..."},
+		},
+
+		{
+			name:        "case 739",
+			device:      "mobile",
+			totalPages:  25,
+			currentPage: 18,
+			want:        []string{"...", "17", "18", "19", "..."},
+		},
+
+		{
+			name:        "case 740",
+			device:      "mobile",
+			totalPages:  19,
+			currentPage: 12,
+			want:        []string{"...", "11", "12", "13", "..."},
+		},
+
+		{
+			name:        "case 741",
+			device:      "mobile",
+			totalPages:  7,
+			currentPage: 3,
+			want:        []string{"...", "2", "3", "4", "..."},
+		},
+
+		{
+			name:        "case 742",
+			device:      "mobile",
+			totalPages:  25,
+			currentPage: 16,
+			want:        []string{"...", "15", "16", "17", "..."},
+		},
+
+		{
+			name:        "case 743",
+			device:      "desktop",
+			totalPages:  16,
+			currentPage: 5,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 744",
+			device:      "mobile",
+			totalPages:  26,
+			currentPage: 5,
+			want:        []string{"...", "4", "5", "6", "..."},
+		},
+
+		{
+			name:        "case 745",
+			device:      "desktop",
+			totalPages:  18,
+			currentPage: 7,
+			want:        []string{"...", "3", "4", "5", "6", "7", "8", "9", "10", "..."},
+		},
+
+		{
+			name:        "case 746",
+			device:      "desktop",
+			totalPages:  22,
+			currentPage: 21,
+			want:        []string{"...", "14", "15", "16", "17", "18", "19", "20", "21", "22"},
+		},
+
+		{
+			name:        "case 747",
+			device:      "desktop",
+			totalPages:  26,
+			currentPage: 11,
+			want:        []string{"...", "7", "8", "9", "10", "11", "12", "13", "14", "..."},
+		},
+
+		{
+			name:        "case 748",
+			device:      "mobile",
+			totalPages:  16,
+			currentPage: 8,
+			want:        []string{"...", "7", "8", "9", "..."},
+		},
+
+		{
+			name:        "case 749",
+			device:      "mobile",
+			totalPages:  24,
+			currentPage: 15,
+			want:        []string{"...", "14", "15", "16", "..."},
+		},
+
+		{
+			name:        "case 750",
+			device:      "desktop",
+			totalPages:  20,
+			currentPage: 12,
+			want:        []string{"...", "8", "9", "10", "11", "12", "13", "14", "15", "..."},
+		},
+
+		{
+			name:        "case 751",
+			device:      "desktop",
+			totalPages:  13,
+			currentPage: 13,
+			want:        []string{"...", "5", "6", "7", "8", "9", "10", "11", "12", "13"},
+		},
+
+		{
+			name:        "case 752",
+			device:      "desktop",
+			totalPages:  23,
+			currentPage: 19,
+			want:        []string{"...", "15", "16", "17", "18", "19", "20", "21", "22", "23"},
+		},
+
+		{
+			name:        "case 753",
+			device:      "desktop",
+			totalPages:  14,
+			currentPage: 12,
+			want:        []string{"...", "6", "7", "8", "9", "10", "11", "12", "13", "14"},
+		},
+
+		{
+			name:        "case 754",
+			device:      "mobile",
+			totalPages:  28,
+			currentPage: 12,
+			want:        []string{"...", "11", "12", "13", "..."},
+		},
+
+		{
+			name:        "case 755",
+			device:      "desktop",
+			totalPages:  13,
+			currentPage: 12,
+			want:        []string{"...", "5", "6", "7", "8", "9", "10", "11", "12", "13"},
+		},
+
+		{
+			name:        "case 756",
+			device:      "mobile",
+			totalPages:  29,
+			currentPage: 17,
+			want:        []string{"...", "16", "17", "18", "..."},
+		},
+
+		{
+			name:        "case 757",
+			device:      "desktop",
+			totalPages:  30,
+			currentPage: 7,
+			want:        []string{"...", "3", "4", "5", "6", "7", "8", "9", "10", "..."},
+		},
+
+		{
+			name:        "case 758",
+			device:      "mobile",
+			totalPages:  28,
+			currentPage: 13,
+			want:        []string{"...", "12", "13", "14", "..."},
+		},
+
+		{
+			name:        "case 759",
+			device:      "mobile",
+			totalPages:  5,
+			currentPage: 3,
+			want:        []string{"1", "2", "3", "4", "5"},
+		},
+
+		{
+			name:        "case 760",
+			device:      "desktop",
+			totalPages:  14,
+			currentPage: 3,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 761",
+			device:      "desktop",
+			totalPages:  24,
+			currentPage: 3,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 762",
+			device:      "desktop",
+			totalPages:  30,
+			currentPage: 22,
+			want:        []string{"...", "18", "19", "20", "21", "22", "23", "24", "25", "..."},
+		},
+
+		{
+			name:        "case 763",
+			device:      "mobile",
+			totalPages:  8,
+			currentPage: 1,
+			want:        []string{"1", "2", "3", "..."},
+		},
+
+		{
+			name:        "case 764",
+			device:      "mobile",
+			totalPages:  26,
+			currentPage: 11,
+			want:        []string{"...", "10", "11", "12", "..."},
+		},
+
+		{
+			name:        "case 765",
+			device:      "desktop",
+			totalPages:  29,
+			currentPage: 27,
+			want:        []string{"...", "21", "22", "23", "24", "25", "26", "27", "28", "29"},
+		},
+
+		{
+			name:        "case 766",
+			device:      "desktop",
+			totalPages:  13,
+			currentPage: 8,
+			want:        []string{"...", "5", "6", "7", "8", "9", "10", "11", "12", "13"},
+		},
+
+		{
+			name:        "case 767",
+			device:      "desktop",
+			totalPages:  12,
+			currentPage: 4,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 768",
+			device:      "desktop",
+			totalPages:  28,
+			currentPage: 15,
+			want:        []string{"...", "11", "12", "13", "14", "15", "16", "17", "18", "..."},
+		},
+
+		{
+			name:        "case 769",
+			device:      "mobile",
+			totalPages:  20,
+			currentPage: 8,
+			want:        []string{"...", "7", "8", "9", "..."},
+		},
+
+		{
+			name:        "case 770",
+			device:      "desktop",
+			totalPages:  24,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 771",
+			device:      "mobile",
+			totalPages:  10,
+			currentPage: 6,
+			want:        []string{"...", "5", "6", "7", "..."},
+		},
+
+		{
+			name:        "case 772",
+			device:      "desktop",
+			totalPages:  12,
+			currentPage: 7,
+			want:        []string{"...", "4", "5", "6", "7", "8", "9", "10", "11", "12"},
+		},
+
+		{
+			name:        "case 773",
+			device:      "mobile",
+			totalPages:  7,
+			currentPage: 1,
+			want:        []string{"1", "2", "3", "..."},
+		},
+
+		{
+			name:        "case 774",
+			device:      "mobile",
+			totalPages:  30,
+			currentPage: 18,
+			want:        []string{"...", "17", "18", "19", "..."},
+		},
+
+		{
+			name:        "case 775",
+			device:      "desktop",
+			totalPages:  19,
+			currentPage: 13,
+			want:        []string{"...", "9", "10", "11", "12", "13", "14", "15", "16", "..."},
+		},
+
+		{
+			name:        "case 776",
+			device:      "mobile",
+			totalPages:  23,
+			currentPage: 23,
+			want:        []string{"...", "20", "21", "22", "23"},
+		},
+
+		{
+			name:        "case 777",
+			device:      "mobile",
+			totalPages:  26,
+			currentPage: 21,
+			want:        []string{"...", "20", "21", "22", "..."},
+		},
+
+		{
+			name:        "case 778",
+			device:      "desktop",
+			totalPages:  13,
+			currentPage: 6,
+			want:        []string{"...", "2", "3", "4", "5", "6", "7", "8", "9", "..."},
+		},
+
+		{
+			name:        "case 779",
+			device:      "mobile",
+			totalPages:  6,
+			currentPage: 4,
+			want:        []string{"...", "3", "4", "5", "6"},
+		},
+
+		{
+			name:        "case 780",
+			device:      "mobile",
+			totalPages:  10,
+			currentPage: 3,
+			want:        []string{"...", "2", "3", "4", "..."},
+		},
+
+		{
+			name:        "case 781",
+			device:      "mobile",
+			totalPages:  13,
+			currentPage: 12,
+			want:        []string{"...", "10", "11", "12", "13"},
+		},
+
+		{
+			name:        "case 782",
+			device:      "mobile",
+			totalPages:  18,
+			currentPage: 11,
+			want:        []string{"...", "10", "11", "12", "..."},
+		},
+
+		{
+			name:        "case 783",
+			device:      "desktop",
+			totalPages:  14,
+			currentPage: 4,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 784",
+			device:      "desktop",
+			totalPages:  24,
+			currentPage: 6,
+			want:        []string{"...", "2", "3", "4", "5", "6", "7", "8", "9", "..."},
+		},
+
+		{
+			name:        "case 785",
+			device:      "desktop",
+			totalPages:  17,
+			currentPage: 12,
+			want:        []string{"...", "9", "10", "11", "12", "13", "14", "15", "16", "17"},
+		},
+
+		{
+			name:        "case 786",
+			device:      "desktop",
+			totalPages:  16,
+			currentPage: 7,
+			want:        []string{"...", "3", "4", "5", "6", "7", "8", "9", "10", "..."},
+		},
+
+		{
+			name:        "case 787",
+			device:      "desktop",
+			totalPages:  13,
+			currentPage: 7,
+			want:        []string{"...", "3", "4", "5", "6", "7", "8", "9", "10", "..."},
+		},
+
+		{
+			name:        "case 788",
+			device:      "mobile",
+			totalPages:  18,
+			currentPage: 5,
+			want:        []string{"...", "4", "5", "6", "..."},
+		},
+
+		{
+			name:        "case 789",
+			device:      "mobile",
+			totalPages:  24,
+			currentPage: 10,
+			want:        []string{"...", "9", "10", "11", "..."},
+		},
+
+		{
+			name:        "case 790",
+			device:      "desktop",
+			totalPages:  28,
+			currentPage: 14,
+			want:        []string{"...", "10", "11", "12", "13", "14", "15", "16", "17", "..."},
+		},
+
+		{
+			name:        "case 791",
+			device:      "mobile",
+			totalPages:  25,
+			currentPage: 8,
+			want:        []string{"...", "7", "8", "9", "..."},
+		},
+
+		{
+			name:        "case 792",
+			device:      "mobile",
+			totalPages:  19,
+			currentPage: 10,
+			want:        []string{"...", "9", "10", "11", "..."},
+		},
+
+		{
+			name:        "case 793",
+			device:      "desktop",
+			totalPages:  15,
+			currentPage: 3,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 794",
+			device:      "desktop",
+			totalPages:  15,
+			currentPage: 9,
+			want:        []string{"...", "5", "6", "7", "8", "9", "10", "11", "12", "..."},
+		},
+
+		{
+			name:        "case 795",
+			device:      "mobile",
+			totalPages:  25,
+			currentPage: 13,
+			want:        []string{"...", "12", "13", "14", "..."},
+		},
+
+		{
+			name:        "case 796",
+			device:      "mobile",
+			totalPages:  9,
+			currentPage: 1,
+			want:        []string{"1", "2", "3", "..."},
+		},
+
+		{
+			name:        "case 797",
+			device:      "mobile",
+			totalPages:  10,
+			currentPage: 4,
+			want:        []string{"...", "3", "4", "5", "..."},
+		},
+
+		{
+			name:        "case 798",
+			device:      "desktop",
+			totalPages:  11,
+			currentPage: 9,
+			want:        []string{"...", "3", "4", "5", "6", "7", "8", "9", "10", "11"},
+		},
+
+		{
+			name:        "case 799",
+			device:      "mobile",
+			totalPages:  21,
+			currentPage: 21,
+			want:        []string{"...", "18", "19", "20", "21"},
+		},
+
+		{
+			name:        "case 800",
+			device:      "desktop",
+			totalPages:  23,
+			currentPage: 3,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 801",
+			device:      "desktop",
+			totalPages:  30,
+			currentPage: 16,
+			want:        []string{"...", "12", "13", "14", "15", "16", "17", "18", "19", "..."},
+		},
+
+		{
+			name:        "case 802",
+			device:      "mobile",
+			totalPages:  12,
+			currentPage: 6,
+			want:        []string{"...", "5", "6", "7", "..."},
+		},
+
+		{
+			name:        "case 803",
+			device:      "desktop",
+			totalPages:  26,
+			currentPage: 23,
+			want:        []string{"...", "18", "19", "20", "21", "22", "23", "24", "25", "26"},
+		},
+
+		{
+			name:        "case 804",
+			device:      "mobile",
+			totalPages:  26,
+			currentPage: 26,
+			want:        []string{"...", "23", "24", "25", "26"},
+		},
+
+		{
+			name:        "case 805",
+			device:      "mobile",
+			totalPages:  7,
+			currentPage: 3,
+			want:        []string{"...", "2", "3", "4", "..."},
+		},
+
+		{
+			name:        "case 806",
+			device:      "desktop",
+			totalPages:  25,
+			currentPage: 7,
+			want:        []string{"...", "3", "4", "5", "6", "7", "8", "9", "10", "..."},
+		},
+
+		{
+			name:        "case 807",
+			device:      "desktop",
+			totalPages:  24,
+			currentPage: 7,
+			want:        []string{"...", "3", "4", "5", "6", "7", "8", "9", "10", "..."},
+		},
+
+		{
+			name:        "case 808",
+			device:      "mobile",
+			totalPages:  19,
+			currentPage: 16,
+			want:        []string{"...", "15", "16", "17", "..."},
+		},
+
+		{
+			name:        "case 809",
+			device:      "desktop",
+			totalPages:  24,
+			currentPage: 7,
+			want:        []string{"...", "3", "4", "5", "6", "7", "8", "9", "10", "..."},
+		},
+
+		{
+			name:        "case 810",
+			device:      "desktop",
+			totalPages:  26,
+			currentPage: 17,
+			want:        []string{"...", "13", "14", "15", "16", "17", "18", "19", "20", "..."},
+		},
+
+		{
+			name:        "case 811",
+			device:      "mobile",
+			totalPages:  30,
+			currentPage: 10,
+			want:        []string{"...", "9", "10", "11", "..."},
+		},
+
+		{
+			name:        "case 812",
+			device:      "desktop",
+			totalPages:  21,
+			currentPage: 7,
+			want:        []string{"...", "3", "4", "5", "6", "7", "8", "9", "10", "..."},
+		},
+
+		{
+			name:        "case 813",
+			device:      "mobile",
+			totalPages:  14,
+			currentPage: 11,
+			want:        []string{"...", "10", "11", "12", "..."},
+		},
+
+		{
+			name:        "case 814",
+			device:      "mobile",
+			totalPages:  21,
+			currentPage: 16,
+			want:        []string{"...", "15", "16", "17", "..."},
+		},
+
+		{
+			name:        "case 815",
+			device:      "mobile",
+			totalPages:  29,
+			currentPage: 21,
+			want:        []string{"...", "20", "21", "22", "..."},
+		},
+
+		{
+			name:        "case 816",
+			device:      "mobile",
+			totalPages:  19,
+			currentPage: 18,
+			want:        []string{"...", "16", "17", "18", "19"},
+		},
+
+		{
+			name:        "case 817",
+			device:      "desktop",
+			totalPages:  16,
+			currentPage: 12,
+			want:        []string{"...", "8", "9", "10", "11", "12", "13", "14", "15", "16"},
+		},
+
+		{
+			name:        "case 818",
+			device:      "mobile",
+			totalPages:  12,
+			currentPage: 6,
+			want:        []string{"...", "5", "6", "7", "..."},
+		},
+
+		{
+			name:        "case 819",
+			device:      "mobile",
+			totalPages:  9,
+			currentPage: 3,
+			want:        []string{"...", "2", "3", "4", "..."},
+		},
+
+		{
+			name:        "case 820",
+			device:      "desktop",
+			totalPages:  21,
+			currentPage: 3,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 821",
+			device:      "desktop",
+			totalPages:  28,
+			currentPage: 1,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 822",
+			device:      "desktop",
+			totalPages:  23,
+			currentPage: 9,
+			want:        []string{"...", "5", "6", "7", "8", "9", "10", "11", "12", "..."},
+		},
+
+		{
+			name:        "case 823",
+			device:      "mobile",
+			totalPages:  29,
+			currentPage: 28,
+			want:        []string{"...", "26", "27", "28", "29"},
+		},
+
+		{
+			name:        "case 824",
+			device:      "mobile",
+			totalPages:  22,
+			currentPage: 11,
+			want:        []string{"...", "10", "11", "12", "..."},
+		},
+
+		{
+			name:        "case 825",
+			device:      "mobile",
+			totalPages:  14,
+			currentPage: 14,
+			want:        []string{"...", "11", "12", "13", "14"},
+		},
+
+		{
+			name:        "case 826",
+			device:      "mobile",
+			totalPages:  16,
+			currentPage: 14,
+			want:        []string{"...", "13", "14", "15", "16"},
+		},
+
+		{
+			name:        "case 827",
+			device:      "mobile",
+			totalPages:  14,
+			currentPage: 5,
+			want:        []string{"...", "4", "5", "6", "..."},
+		},
+
+		{
+			name:        "case 828",
+			device:      "mobile",
+			totalPages:  16,
+			currentPage: 10,
+			want:        []string{"...", "9", "10", "11", "..."},
+		},
+
+		{
+			name:        "case 829",
+			device:      "mobile",
+			totalPages:  18,
+			currentPage: 16,
+			want:        []string{"...", "15", "16", "17", "18"},
+		},
+
+		{
+			name:        "case 830",
+			device:      "mobile",
+			totalPages:  13,
+			currentPage: 8,
+			want:        []string{"...", "7", "8", "9", "..."},
+		},
+
+		{
+			name:        "case 831",
+			device:      "mobile",
+			totalPages:  24,
+			currentPage: 9,
+			want:        []string{"...", "8", "9", "10", "..."},
+		},
+
+		{
+			name:        "case 832",
+			device:      "desktop",
+			totalPages:  30,
+			currentPage: 6,
+			want:        []string{"...", "2", "3", "4", "5", "6", "7", "8", "9", "..."},
+		},
+
+		{
+			name:        "case 833",
+			device:      "desktop",
+			totalPages:  23,
+			currentPage: 8,
+			want:        []string{"...", "4", "5", "6", "7", "8", "9", "10", "11", "..."},
+		},
+
+		{
+			name:        "case 834",
+			device:      "desktop",
+			totalPages:  23,
+			currentPage: 3,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 835",
+			device:      "desktop",
+			totalPages:  12,
+			currentPage: 8,
+			want:        []string{"...", "4", "5", "6", "7", "8", "9", "10", "11", "12"},
+		},
+
+		{
+			name:        "case 836",
+			device:      "mobile",
+			totalPages:  30,
+			currentPage: 19,
+			want:        []string{"...", "18", "19", "20", "..."},
+		},
+
+		{
+			name:        "case 837",
+			device:      "mobile",
+			totalPages:  21,
+			currentPage: 15,
+			want:        []string{"...", "14", "15", "16", "..."},
+		},
+
+		{
+			name:        "case 838",
+			device:      "mobile",
+			totalPages:  27,
+			currentPage: 4,
+			want:        []string{"...", "3", "4", "5", "..."},
+		},
+
+		{
+			name:        "case 839",
+			device:      "mobile",
+			totalPages:  30,
+			currentPage: 22,
+			want:        []string{"...", "21", "22", "23", "..."},
+		},
+
+		{
+			name:        "case 840",
+			device:      "mobile",
+			totalPages:  18,
+			currentPage: 18,
+			want:        []string{"...", "15", "16", "17", "18"},
+		},
+
+		{
+			name:        "case 841",
+			device:      "mobile",
+			totalPages:  17,
+			currentPage: 8,
+			want:        []string{"...", "7", "8", "9", "..."},
+		},
+
+		{
+			name:        "case 842",
+			device:      "mobile",
+			totalPages:  24,
+			currentPage: 23,
+			want:        []string{"...", "21", "22", "23", "24"},
+		},
+
+		{
+			name:        "case 843",
+			device:      "desktop",
+			totalPages:  23,
+			currentPage: 18,
+			want:        []string{"...", "15", "16", "17", "18", "19", "20", "21", "22", "23"},
+		},
+
+		{
+			name:        "case 844",
+			device:      "desktop",
+			totalPages:  29,
+			currentPage: 11,
+			want:        []string{"...", "7", "8", "9", "10", "11", "12", "13", "14", "..."},
+		},
+
+		{
+			name:        "case 845",
+			device:      "mobile",
+			totalPages:  24,
+			currentPage: 17,
+			want:        []string{"...", "16", "17", "18", "..."},
+		},
+
+		{
+			name:        "case 846",
+			device:      "desktop",
+			totalPages:  12,
+			currentPage: 9,
+			want:        []string{"...", "4", "5", "6", "7", "8", "9", "10", "11", "12"},
+		},
+
+		{
+			name:        "case 847",
+			device:      "mobile",
+			totalPages:  25,
+			currentPage: 12,
+			want:        []string{"...", "11", "12", "13", "..."},
+		},
+
+		{
+			name:        "case 848",
+			device:      "mobile",
+			totalPages:  26,
+			currentPage: 3,
+			want:        []string{"...", "2", "3", "4", "..."},
+		},
+
+		{
+			name:        "case 849",
+			device:      "desktop",
+			totalPages:  29,
+			currentPage: 25,
+			want:        []string{"...", "21", "22", "23", "24", "25", "26", "27", "28", "29"},
+		},
+
+		{
+			name:        "case 850",
+			device:      "mobile",
+			totalPages:  14,
+			currentPage: 10,
+			want:        []string{"...", "9", "10", "11", "..."},
+		},
+
+		{
+			name:        "case 851",
+			device:      "mobile",
+			totalPages:  24,
+			currentPage: 14,
+			want:        []string{"...", "13", "14", "15", "..."},
+		},
+
+		{
+			name:        "case 852",
+			device:      "mobile",
+			totalPages:  15,
+			currentPage: 3,
+			want:        []string{"...", "2", "3", "4", "..."},
+		},
+
+		{
+			name:        "case 853",
+			device:      "desktop",
+			totalPages:  23,
+			currentPage: 20,
+			want:        []string{"...", "15", "16", "17", "18", "19", "20", "21", "22", "23"},
+		},
+
+		{
+			name:        "case 854",
+			device:      "mobile",
+			totalPages:  23,
+			currentPage: 16,
+			want:        []string{"...", "15", "16", "17", "..."},
+		},
+
+		{
+			name:        "case 855",
+			device:      "desktop",
+			totalPages:  23,
+			currentPage: 20,
+			want:        []string{"...", "15", "16", "17", "18", "19", "20", "21", "22", "23"},
+		},
+
+		{
+			name:        "case 856",
+			device:      "desktop",
+			totalPages:  24,
+			currentPage: 12,
+			want:        []string{"...", "8", "9", "10", "11", "12", "13", "14", "15", "..."},
+		},
+
+		{
+			name:        "case 857",
+			device:      "mobile",
+			totalPages:  19,
+			currentPage: 6,
+			want:        []string{"...", "5", "6", "7", "..."},
+		},
+
+		{
+			name:        "case 858",
+			device:      "mobile",
+			totalPages:  28,
+			currentPage: 6,
+			want:        []string{"...", "5", "6", "7", "..."},
+		},
+
+		{
+			name:        "case 859",
+			device:      "mobile",
+			totalPages:  22,
+			currentPage: 15,
+			want:        []string{"...", "14", "15", "16", "..."},
+		},
+
+		{
+			name:        "case 860",
+			device:      "desktop",
+			totalPages:  22,
+			currentPage: 22,
+			want:        []string{"...", "14", "15", "16", "17", "18", "19", "20", "21", "22"},
+		},
+
+		{
+			name:        "case 861",
+			device:      "mobile",
+			totalPages:  20,
+			currentPage: 20,
+			want:        []string{"...", "17", "18", "19", "20"},
+		},
+
+		{
+			name:        "case 862",
+			device:      "mobile",
+			totalPages:  21,
+			currentPage: 4,
+			want:        []string{"...", "3", "4", "5", "..."},
+		},
+
+		{
+			name:        "case 863",
+			device:      "desktop",
+			totalPages:  28,
+			currentPage: 15,
+			want:        []string{"...", "11", "12", "13", "14", "15", "16", "17", "18", "..."},
+		},
+
+		{
+			name:        "case 864",
+			device:      "mobile",
+			totalPages:  27,
+			currentPage: 4,
+			want:        []string{"...", "3", "4", "5", "..."},
+		},
+
+		{
+			name:        "case 865",
+			device:      "mobile",
+			totalPages:  16,
+			currentPage: 6,
+			want:        []string{"...", "5", "6", "7", "..."},
+		},
+
+		{
+			name:        "case 866",
+			device:      "desktop",
+			totalPages:  21,
+			currentPage: 15,
+			want:        []string{"...", "11", "12", "13", "14", "15", "16", "17", "18", "..."},
+		},
+
+		{
+			name:        "case 867",
+			device:      "mobile",
+			totalPages:  19,
+			currentPage: 1,
+			want:        []string{"1", "2", "3", "..."},
+		},
+
+		{
+			name:        "case 868",
+			device:      "desktop",
+			totalPages:  15,
+			currentPage: 3,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 869",
+			device:      "mobile",
+			totalPages:  18,
+			currentPage: 12,
+			want:        []string{"...", "11", "12", "13", "..."},
+		},
+
+		{
+			name:        "case 870",
+			device:      "desktop",
+			totalPages:  28,
+			currentPage: 10,
+			want:        []string{"...", "6", "7", "8", "9", "10", "11", "12", "13", "..."},
+		},
+
+		{
+			name:        "case 871",
+			device:      "mobile",
+			totalPages:  11,
+			currentPage: 5,
+			want:        []string{"...", "4", "5", "6", "..."},
+		},
+
+		{
+			name:        "case 872",
+			device:      "mobile",
+			totalPages:  22,
+			currentPage: 22,
+			want:        []string{"...", "19", "20", "21", "22"},
+		},
+
+		{
+			name:        "case 873",
+			device:      "mobile",
+			totalPages:  9,
+			currentPage: 6,
+			want:        []string{"...", "5", "6", "7", "..."},
+		},
+
+		{
+			name:        "case 874",
+			device:      "mobile",
+			totalPages:  6,
+			currentPage: 6,
+			want:        []string{"...", "3", "4", "5", "6"},
+		},
+
+		{
+			name:        "case 875",
+			device:      "desktop",
+			totalPages:  30,
+			currentPage: 5,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 876",
+			device:      "desktop",
+			totalPages:  24,
+			currentPage: 13,
+			want:        []string{"...", "9", "10", "11", "12", "13", "14", "15", "16", "..."},
+		},
+
+		{
+			name:        "case 877",
+			device:      "desktop",
+			totalPages:  27,
+			currentPage: 26,
+			want:        []string{"...", "19", "20", "21", "22", "23", "24", "25", "26", "27"},
+		},
+
+		{
+			name:        "case 878",
+			device:      "mobile",
+			totalPages:  26,
+			currentPage: 14,
+			want:        []string{"...", "13", "14", "15", "..."},
+		},
+
+		{
+			name:        "case 879",
+			device:      "desktop",
+			totalPages:  30,
+			currentPage: 17,
+			want:        []string{"...", "13", "14", "15", "16", "17", "18", "19", "20", "..."},
+		},
+
+		{
+			name:        "case 880",
+			device:      "mobile",
+			totalPages:  18,
+			currentPage: 9,
+			want:        []string{"...", "8", "9", "10", "..."},
+		},
+
+		{
+			name:        "case 881",
+			device:      "mobile",
+			totalPages:  7,
+			currentPage: 5,
+			want:        []string{"...", "4", "5", "6", "7"},
+		},
+
+		{
+			name:        "case 882",
+			device:      "desktop",
+			totalPages:  23,
+			currentPage: 19,
+			want:        []string{"...", "15", "16", "17", "18", "19", "20", "21", "22", "23"},
+		},
+
+		{
+			name:        "case 883",
+			device:      "mobile",
+			totalPages:  16,
+			currentPage: 13,
+			want:        []string{"...", "12", "13", "14", "..."},
+		},
+
+		{
+			name:        "case 884",
+			device:      "desktop",
+			totalPages:  24,
+			currentPage: 13,
+			want:        []string{"...", "9", "10", "11", "12", "13", "14", "15", "16", "..."},
+		},
+
+		{
+			name:        "case 885",
+			device:      "mobile",
+			totalPages:  29,
+			currentPage: 7,
+			want:        []string{"...", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 886",
+			device:      "desktop",
+			totalPages:  20,
+			currentPage: 1,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 887",
+			device:      "mobile",
+			totalPages:  15,
+			currentPage: 6,
+			want:        []string{"...", "5", "6", "7", "..."},
+		},
+
+		{
+			name:        "case 888",
+			device:      "desktop",
+			totalPages:  29,
+			currentPage: 27,
+			want:        []string{"...", "21", "22", "23", "24", "25", "26", "27", "28", "29"},
+		},
+
+		{
+			name:        "case 889",
+			device:      "desktop",
+			totalPages:  29,
+			currentPage: 8,
+			want:        []string{"...", "4", "5", "6", "7", "8", "9", "10", "11", "..."},
+		},
+
+		{
+			name:        "case 890",
+			device:      "mobile",
+			totalPages:  18,
+			currentPage: 18,
+			want:        []string{"...", "15", "16", "17", "18"},
+		},
+
+		{
+			name:        "case 891",
+			device:      "mobile",
+			totalPages:  11,
+			currentPage: 8,
+			want:        []string{"...", "7", "8", "9", "..."},
+		},
+
+		{
+			name:        "case 892",
+			device:      "mobile",
+			totalPages:  20,
+			currentPage: 10,
+			want:        []string{"...", "9", "10", "11", "..."},
+		},
+
+		{
+			name:        "case 893",
+			device:      "mobile",
+			totalPages:  17,
+			currentPage: 13,
+			want:        []string{"...", "12", "13", "14", "..."},
+		},
+
+		{
+			name:        "case 894",
+			device:      "desktop",
+			totalPages:  12,
+			currentPage: 5,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 895",
+			device:      "desktop",
+			totalPages:  30,
+			currentPage: 10,
+			want:        []string{"...", "6", "7", "8", "9", "10", "11", "12", "13", "..."},
+		},
+
+		{
+			name:        "case 896",
+			device:      "mobile",
+			totalPages:  24,
+			currentPage: 24,
+			want:        []string{"...", "21", "22", "23", "24"},
+		},
+
+		{
+			name:        "case 897",
+			device:      "mobile",
+			totalPages:  20,
+			currentPage: 1,
+			want:        []string{"1", "2", "3", "..."},
+		},
+
+		{
+			name:        "case 898",
+			device:      "mobile",
+			totalPages:  30,
+			currentPage: 16,
+			want:        []string{"...", "15", "16", "17", "..."},
+		},
+
+		{
+			name:        "case 899",
+			device:      "desktop",
+			totalPages:  10,
+			currentPage: 8,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"},
+		},
+
+		{
+			name:        "case 900",
+			device:      "desktop",
+			totalPages:  19,
+			currentPage: 10,
+			want:        []string{"...", "6", "7", "8", "9", "10", "11", "12", "13", "..."},
+		},
+
+		{
+			name:        "case 901",
+			device:      "desktop",
+			totalPages:  27,
+			currentPage: 18,
+			want:        []string{"...", "14", "15", "16", "17", "18", "19", "20", "21", "..."},
+		},
+
+		{
+			name:        "case 902",
+			device:      "mobile",
+			totalPages:  23,
+			currentPage: 14,
+			want:        []string{"...", "13", "14", "15", "..."},
+		},
+
+		{
+			name:        "case 903",
+			device:      "mobile",
+			totalPages:  30,
+			currentPage: 29,
+			want:        []string{"...", "27", "28", "29", "30"},
+		},
+
+		{
+			name:        "case 904",
+			device:      "mobile",
+			totalPages:  29,
+			currentPage: 28,
+			want:        []string{"...", "26", "27", "28", "29"},
+		},
+
+		{
+			name:        "case 905",
+			device:      "mobile",
+			totalPages:  13,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "..."},
+		},
+
+		{
+			name:        "case 906",
+			device:      "desktop",
+			totalPages:  18,
+			currentPage: 13,
+			want:        []string{"...", "10", "11", "12", "13", "14", "15", "16", "17", "18"},
+		},
+
+		{
+			name:        "case 907",
+			device:      "mobile",
+			totalPages:  13,
+			currentPage: 12,
+			want:        []string{"...", "10", "11", "12", "13"},
+		},
+
+		{
+			name:        "case 908",
+			device:      "desktop",
+			totalPages:  25,
+			currentPage: 10,
+			want:        []string{"...", "6", "7", "8", "9", "10", "11", "12", "13", "..."},
+		},
+
+		{
+			name:        "case 909",
+			device:      "mobile",
+			totalPages:  25,
+			currentPage: 21,
+			want:        []string{"...", "20", "21", "22", "..."},
+		},
+
+		{
+			name:        "case 910",
+			device:      "mobile",
+			totalPages:  28,
+			currentPage: 25,
+			want:        []string{"...", "24", "25", "26", "..."},
+		},
+
+		{
+			name:        "case 911",
+			device:      "desktop",
+			totalPages:  28,
+			currentPage: 24,
+			want:        []string{"...", "20", "21", "22", "23", "24", "25", "26", "27", "28"},
+		},
+
+		{
+			name:        "case 912",
+			device:      "mobile",
+			totalPages:  12,
+			currentPage: 12,
+			want:        []string{"...", "9", "10", "11", "12"},
+		},
+
+		{
+			name:        "case 913",
+			device:      "desktop",
+			totalPages:  10,
+			currentPage: 8,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"},
+		},
+
+		{
+			name:        "case 914",
+			device:      "desktop",
+			totalPages:  23,
+			currentPage: 15,
+			want:        []string{"...", "11", "12", "13", "14", "15", "16", "17", "18", "..."},
+		},
+
+		{
+			name:        "case 915",
+			device:      "desktop",
+			totalPages:  13,
+			currentPage: 10,
+			want:        []string{"...", "5", "6", "7", "8", "9", "10", "11", "12", "13"},
+		},
+
+		{
+			name:        "case 916",
+			device:      "mobile",
+			totalPages:  8,
+			currentPage: 3,
+			want:        []string{"...", "2", "3", "4", "..."},
+		},
+
+		{
+			name:        "case 917",
+			device:      "desktop",
+			totalPages:  21,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 918",
+			device:      "desktop",
+			totalPages:  12,
+			currentPage: 1,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 919",
+			device:      "desktop",
+			totalPages:  29,
+			currentPage: 1,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 920",
+			device:      "desktop",
+			totalPages:  20,
+			currentPage: 10,
+			want:        []string{"...", "6", "7", "8", "9", "10", "11", "12", "13", "..."},
+		},
+
+		{
+			name:        "case 921",
+			device:      "mobile",
+			totalPages:  17,
+			currentPage: 10,
+			want:        []string{"...", "9", "10", "11", "..."},
+		},
+
+		{
+			name:        "case 922",
+			device:      "mobile",
+			totalPages:  19,
+			currentPage: 15,
+			want:        []string{"...", "14", "15", "16", "..."},
+		},
+
+		{
+			name:        "case 923",
+			device:      "desktop",
+			totalPages:  21,
+			currentPage: 3,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 924",
+			device:      "mobile",
+			totalPages:  25,
+			currentPage: 15,
+			want:        []string{"...", "14", "15", "16", "..."},
+		},
+
+		{
+			name:        "case 925",
+			device:      "desktop",
+			totalPages:  10,
+			currentPage: 7,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"},
+		},
+
+		{
+			name:        "case 926",
+			device:      "mobile",
+			totalPages:  14,
+			currentPage: 9,
+			want:        []string{"...", "8", "9", "10", "..."},
+		},
+
+		{
+			name:        "case 927",
+			device:      "desktop",
+			totalPages:  12,
+			currentPage: 12,
+			want:        []string{"...", "4", "5", "6", "7", "8", "9", "10", "11", "12"},
+		},
+
+		{
+			name:        "case 928",
+			device:      "mobile",
+			totalPages:  16,
+			currentPage: 14,
+			want:        []string{"...", "13", "14", "15", "16"},
+		},
+
+		{
+			name:        "case 929",
+			device:      "mobile",
+			totalPages:  26,
+			currentPage: 10,
+			want:        []string{"...", "9", "10", "11", "..."},
+		},
+
+		{
+			name:        "case 930",
+			device:      "desktop",
+			totalPages:  30,
+			currentPage: 25,
+			want:        []string{"...", "22", "23", "24", "25", "26", "27", "28", "29", "30"},
+		},
+
+		{
+			name:        "case 931",
+			device:      "desktop",
+			totalPages:  10,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"},
+		},
+
+		{
+			name:        "case 932",
+			device:      "desktop",
+			totalPages:  22,
+			currentPage: 1,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 933",
+			device:      "desktop",
+			totalPages:  13,
+			currentPage: 7,
+			want:        []string{"...", "3", "4", "5", "6", "7", "8", "9", "10", "..."},
+		},
+
+		{
+			name:        "case 934",
+			device:      "desktop",
+			totalPages:  23,
+			currentPage: 10,
+			want:        []string{"...", "6", "7", "8", "9", "10", "11", "12", "13", "..."},
+		},
+
+		{
+			name:        "case 935",
+			device:      "mobile",
+			totalPages:  23,
+			currentPage: 19,
+			want:        []string{"...", "18", "19", "20", "..."},
+		},
+
+		{
+			name:        "case 936",
+			device:      "desktop",
+			totalPages:  15,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 937",
+			device:      "desktop",
+			totalPages:  13,
+			currentPage: 4,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 938",
+			device:      "mobile",
+			totalPages:  15,
+			currentPage: 6,
+			want:        []string{"...", "5", "6", "7", "..."},
+		},
+
+		{
+			name:        "case 939",
+			device:      "mobile",
+			totalPages:  13,
+			currentPage: 12,
+			want:        []string{"...", "10", "11", "12", "13"},
+		},
+
+		{
+			name:        "case 940",
+			device:      "mobile",
+			totalPages:  12,
+			currentPage: 1,
+			want:        []string{"1", "2", "3", "..."},
+		},
+
+		{
+			name:        "case 941",
+			device:      "mobile",
+			totalPages:  12,
+			currentPage: 11,
+			want:        []string{"...", "9", "10", "11", "12"},
+		},
+
+		{
+			name:        "case 942",
+			device:      "desktop",
+			totalPages:  26,
+			currentPage: 10,
+			want:        []string{"...", "6", "7", "8", "9", "10", "11", "12", "13", "..."},
+		},
+
+		{
+			name:        "case 943",
+			device:      "mobile",
+			totalPages:  6,
+			currentPage: 4,
+			want:        []string{"...", "3", "4", "5", "6"},
+		},
+
+		{
+			name:        "case 944",
+			device:      "mobile",
+			totalPages:  6,
+			currentPage: 5,
+			want:        []string{"...", "3", "4", "5", "6"},
+		},
+
+		{
+			name:        "case 945",
+			device:      "mobile",
+			totalPages:  17,
+			currentPage: 3,
+			want:        []string{"...", "2", "3", "4", "..."},
+		},
+
+		{
+			name:        "case 946",
+			device:      "desktop",
+			totalPages:  26,
+			currentPage: 11,
+			want:        []string{"...", "7", "8", "9", "10", "11", "12", "13", "14", "..."},
+		},
+
+		{
+			name:        "case 947",
+			device:      "desktop",
+			totalPages:  30,
+			currentPage: 26,
+			want:        []string{"...", "22", "23", "24", "25", "26", "27", "28", "29", "30"},
+		},
+
+		{
+			name:        "case 948",
+			device:      "mobile",
+			totalPages:  9,
+			currentPage: 7,
+			want:        []string{"...", "6", "7", "8", "9"},
+		},
+
+		{
+			name:        "case 949",
+			device:      "desktop",
+			totalPages:  18,
+			currentPage: 10,
+			want:        []string{"...", "6", "7", "8", "9", "10", "11", "12", "13", "..."},
+		},
+
+		{
+			name:        "case 950",
+			device:      "desktop",
+			totalPages:  19,
+			currentPage: 8,
+			want:        []string{"...", "4", "5", "6", "7", "8", "9", "10", "11", "..."},
+		},
+
+		{
+			name:        "case 951",
+			device:      "mobile",
+			totalPages:  25,
+			currentPage: 3,
+			want:        []string{"...", "2", "3", "4", "..."},
+		},
+
+		{
+			name:        "case 952",
+			device:      "desktop",
+			totalPages:  13,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 953",
+			device:      "desktop",
+			totalPages:  17,
+			currentPage: 6,
+			want:        []string{"...", "2", "3", "4", "5", "6", "7", "8", "9", "..."},
+		},
+
+		{
+			name:        "case 954",
+			device:      "desktop",
+			totalPages:  24,
+			currentPage: 1,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 955",
+			device:      "mobile",
+			totalPages:  6,
+			currentPage: 4,
+			want:        []string{"...", "3", "4", "5", "6"},
+		},
+
+		{
+			name:        "case 956",
+			device:      "mobile",
+			totalPages:  10,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "..."},
+		},
+
+		{
+			name:        "case 957",
+			device:      "mobile",
+			totalPages:  11,
+			currentPage: 1,
+			want:        []string{"1", "2", "3", "..."},
+		},
+
+		{
+			name:        "case 958",
+			device:      "desktop",
+			totalPages:  12,
+			currentPage: 6,
+			want:        []string{"...", "2", "3", "4", "5", "6", "7", "8", "9", "..."},
+		},
+
+		{
+			name:        "case 959",
+			device:      "desktop",
+			totalPages:  30,
+			currentPage: 22,
+			want:        []string{"...", "18", "19", "20", "21", "22", "23", "24", "25", "..."},
+		},
+
+		{
+			name:        "case 960",
+			device:      "desktop",
+			totalPages:  27,
+			currentPage: 26,
+			want:        []string{"...", "19", "20", "21", "22", "23", "24", "25", "26", "27"},
+		},
+
+		{
+			name:        "case 961",
+			device:      "desktop",
+			totalPages:  10,
+			currentPage: 4,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"},
+		},
+
+		{
+			name:        "case 962",
+			device:      "desktop",
+			totalPages:  16,
+			currentPage: 4,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 963",
+			device:      "mobile",
+			totalPages:  7,
+			currentPage: 6,
+			want:        []string{"...", "4", "5", "6", "7"},
+		},
+
+		{
+			name:        "case 964",
+			device:      "desktop",
+			totalPages:  23,
+			currentPage: 12,
+			want:        []string{"...", "8", "9", "10", "11", "12", "13", "14", "15", "..."},
+		},
+
+		{
+			name:        "case 965",
+			device:      "mobile",
+			totalPages:  15,
+			currentPage: 12,
+			want:        []string{"...", "11", "12", "13", "..."},
+		},
+
+		{
+			name:        "case 966",
+			device:      "mobile",
+			totalPages:  19,
+			currentPage: 11,
+			want:        []string{"...", "10", "11", "12", "..."},
+		},
+
+		{
+			name:        "case 967",
+			device:      "mobile",
+			totalPages:  16,
+			currentPage: 14,
+			want:        []string{"...", "13", "14", "15", "16"},
+		},
+
+		{
+			name:        "case 968",
+			device:      "mobile",
+			totalPages:  8,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "..."},
+		},
+
+		{
+			name:        "case 969",
+			device:      "mobile",
+			totalPages:  15,
+			currentPage: 10,
+			want:        []string{"...", "9", "10", "11", "..."},
+		},
+
+		{
+			name:        "case 970",
+			device:      "desktop",
+			totalPages:  15,
+			currentPage: 10,
+			want:        []string{"...", "7", "8", "9", "10", "11", "12", "13", "14", "15"},
+		},
+
+		{
+			name:        "case 971",
+			device:      "mobile",
+			totalPages:  21,
+			currentPage: 10,
+			want:        []string{"...", "9", "10", "11", "..."},
+		},
+
+		{
+			name:        "case 972",
+			device:      "mobile",
+			totalPages:  10,
+			currentPage: 2,
+			want:        []string{"1", "2", "3", "..."},
+		},
+
+		{
+			name:        "case 973",
+			device:      "desktop",
+			totalPages:  18,
+			currentPage: 4,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 974",
+			device:      "mobile",
+			totalPages:  30,
+			currentPage: 16,
+			want:        []string{"...", "15", "16", "17", "..."},
+		},
+
+		{
+			name:        "case 975",
+			device:      "desktop",
+			totalPages:  19,
+			currentPage: 3,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 976",
+			device:      "mobile",
+			totalPages:  20,
+			currentPage: 14,
+			want:        []string{"...", "13", "14", "15", "..."},
+		},
+
+		{
+			name:        "case 977",
+			device:      "desktop",
+			totalPages:  13,
+			currentPage: 13,
+			want:        []string{"...", "5", "6", "7", "8", "9", "10", "11", "12", "13"},
+		},
+
+		{
+			name:        "case 978",
+			device:      "desktop",
+			totalPages:  10,
+			currentPage: 7,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"},
+		},
+
+		{
+			name:        "case 979",
+			device:      "desktop",
+			totalPages:  24,
+			currentPage: 11,
+			want:        []string{"...", "7", "8", "9", "10", "11", "12", "13", "14", "..."},
+		},
+
+		{
+			name:        "case 980",
+			device:      "desktop",
+			totalPages:  11,
+			currentPage: 5,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 981",
+			device:      "mobile",
+			totalPages:  5,
+			currentPage: 3,
+			want:        []string{"1", "2", "3", "4", "5"},
+		},
+
+		{
+			name:        "case 982",
+			device:      "mobile",
+			totalPages:  5,
+			currentPage: 1,
+			want:        []string{"1", "2", "3", "4", "5"},
+		},
+
+		{
+			name:        "case 983",
+			device:      "desktop",
+			totalPages:  22,
+			currentPage: 7,
+			want:        []string{"...", "3", "4", "5", "6", "7", "8", "9", "10", "..."},
+		},
+
+		{
+			name:        "case 984",
+			device:      "desktop",
+			totalPages:  29,
+			currentPage: 7,
+			want:        []string{"...", "3", "4", "5", "6", "7", "8", "9", "10", "..."},
+		},
+
+		{
+			name:        "case 985",
+			device:      "mobile",
+			totalPages:  11,
+			currentPage: 4,
+			want:        []string{"...", "3", "4", "5", "..."},
+		},
+
+		{
+			name:        "case 986",
+			device:      "mobile",
+			totalPages:  22,
+			currentPage: 5,
+			want:        []string{"...", "4", "5", "6", "..."},
+		},
+
+		{
+			name:        "case 987",
+			device:      "mobile",
+			totalPages:  15,
+			currentPage: 13,
+			want:        []string{"...", "12", "13", "14", "15"},
+		},
+
+		{
+			name:        "case 988",
+			device:      "mobile",
+			totalPages:  28,
+			currentPage: 11,
+			want:        []string{"...", "10", "11", "12", "..."},
+		},
+
+		{
+			name:        "case 989",
+			device:      "desktop",
+			totalPages:  15,
+			currentPage: 7,
+			want:        []string{"...", "3", "4", "5", "6", "7", "8", "9", "10", "..."},
+		},
+
+		{
+			name:        "case 990",
+			device:      "desktop",
+			totalPages:  18,
+			currentPage: 7,
+			want:        []string{"...", "3", "4", "5", "6", "7", "8", "9", "10", "..."},
+		},
+
+		{
+			name:        "case 991",
+			device:      "desktop",
+			totalPages:  30,
+			currentPage: 9,
+			want:        []string{"...", "5", "6", "7", "8", "9", "10", "11", "12", "..."},
+		},
+
+		{
+			name:        "case 992",
+			device:      "desktop",
+			totalPages:  18,
+			currentPage: 7,
+			want:        []string{"...", "3", "4", "5", "6", "7", "8", "9", "10", "..."},
+		},
+
+		{
+			name:        "case 993",
+			device:      "desktop",
+			totalPages:  14,
+			currentPage: 6,
+			want:        []string{"...", "2", "3", "4", "5", "6", "7", "8", "9", "..."},
+		},
+
+		{
+			name:        "case 994",
+			device:      "desktop",
+			totalPages:  26,
+			currentPage: 3,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 995",
+			device:      "desktop",
+			totalPages:  21,
+			currentPage: 1,
+			want:        []string{"1", "2", "3", "4", "5", "6", "7", "8", "..."},
+		},
+
+		{
+			name:        "case 996",
+			device:      "mobile",
+			totalPages:  7,
+			currentPage: 4,
+			want:        []string{"...", "3", "4", "5", "..."},
+		},
+
+		{
+			name:        "case 997",
+			device:      "mobile",
+			totalPages:  17,
+			currentPage: 15,
+			want:        []string{"...", "14", "15", "16", "17"},
+		},
+
+		{
+			name:        "case 998",
+			device:      "mobile",
+			totalPages:  9,
+			currentPage: 9,
+			want:        []string{"...", "6", "7", "8", "9"},
+		},
+
+		{
+			name:        "case 999",
+			device:      "mobile",
+			totalPages:  10,
+			currentPage: 3,
+			want:        []string{"...", "2", "3", "4", "..."},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var maxDisplay int
+			if tt.device == "mobile" {
+				maxDisplay = 5
+			} else {
+				maxDisplay = 10
+			}
+			got := routing.GeneratePagination(tt.currentPage, tt.totalPages, maxDisplay)
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("GeneratePagination() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
