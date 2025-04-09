@@ -1,7 +1,9 @@
 package conneroh
 
 import (
+	"fmt"
 	"net/http"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -18,10 +20,55 @@ const (
 	maxSearchRoutines = 10
 )
 
+var (
+	home = views.Home(
+		&gen.AllPosts,
+		&gen.AllProjects,
+		&gen.AllTags,
+	)
+	posts = views.List(
+		routing.PluralTargetPost,
+		&gen.AllPosts,
+		&gen.AllProjects,
+		&gen.AllTags,
+		"",
+		1,
+		postPages,
+	)
+	postPages = len(gen.AllPosts) / routing.MaxListLargeItems
+	projects  = views.List(
+		routing.PluralTargetProject,
+		&gen.AllPosts,
+		&gen.AllProjects,
+		&gen.AllTags,
+		"",
+		1,
+		postPages,
+	)
+	projectPages = len(gen.AllProjects) / routing.MaxListLargeItems
+	tags         = views.List(
+		routing.PluralTargetTag,
+		&gen.AllPosts,
+		&gen.AllProjects,
+		&gen.AllTags,
+		"",
+		1,
+		tagPages,
+	)
+	tagPages = len(gen.AllTags) / routing.MaxListLargeItems
+
+	listMap = map[routing.PluralTarget]int{
+		routing.PluralTargetPost:    routing.MaxListLargeItems,
+		routing.PluralTargetProject: routing.MaxListLargeItems,
+		routing.PluralTargetTag:     routing.MaxListSmallItems,
+	}
+)
+
 func filterPosts(
 	posts []*gen.Post,
 	query string,
-) []*gen.Post {
+	page int,
+) ([]*gen.Post, int) {
 	p := pool.New().WithMaxGoroutines(maxSearchRoutines)
 	filtered := make([]*gen.Post, 0)
 	for _, post := range posts {
@@ -33,13 +80,20 @@ func filterPosts(
 		})
 	}
 	p.Wait()
-	return filtered
+	// Sort results to ensure consistent pagination
+	sort.Slice(filtered, func(i, j int) bool {
+		return filtered[i].Title < filtered[j].Title
+	})
+
+	// Paginate the filtered results
+	return paginate(filtered, page, routing.PluralTargetProject)
 }
 
 func filterProjects(
 	projects []*gen.Project,
 	query string,
-) []*gen.Project {
+	page int,
+) ([]*gen.Project, int) {
 	p := pool.New().WithMaxGoroutines(maxSearchRoutines)
 	filtered := make([]*gen.Project, 0)
 	for _, project := range projects {
@@ -51,32 +105,85 @@ func filterProjects(
 		})
 	}
 	p.Wait()
-	return filtered
+	// Sort results to ensure consistent pagination
+	sort.Slice(filtered, func(i, j int) bool {
+		return filtered[i].Title < filtered[j].Title
+	})
+
+	// Paginate the filtered results
+	return paginate(filtered, page, routing.PluralTargetProject)
 }
 
 func filterTags(
 	tags []*gen.Tag,
 	query string,
-) []*gen.Tag {
+	page int,
+) ([]*gen.Tag, int) {
 	p := pool.New().WithMaxGoroutines(maxSearchRoutines)
+
 	filtered := make([]*gen.Tag, 0)
+
 	for _, tag := range tags {
 		tag := tag
 		p.Go(func() {
-			if strings.Contains(tag.Title, query) {
+			if strings.Contains(strings.ToLower(tag.Title), strings.ToLower(query)) {
 				filtered = append(filtered, tag)
 			}
 		})
 	}
 	p.Wait()
-	return filtered
+
+	// Sort results to ensure consistent pagination
+	sort.Slice(filtered, func(i, j int) bool {
+		return filtered[i].Title < filtered[j].Title
+	})
+
+	// Paginate the filtered results
+	return paginate(filtered, page, routing.PluralTargetTag)
 }
 
-func searchHandler(
+func paginate[T any](
+	items []T,
+	page int,
 	target routing.PluralTarget,
-	pages int,
+) ([]T, int) {
+	if len(items) == 0 {
+		return []T{}, 0
+	}
+
+	// Get the page size based on the target type
+	pageSize := listMap[target]
+	if pageSize <= 0 {
+		panic(fmt.Sprintf("invalid page size for target %s", target))
+	}
+
+	// Calculate total number of pages
+	totalPages := (len(items) + pageSize - 1) / pageSize
+
+	// Validate page number
+	if page < 1 {
+		page = 1
+	} else if page > totalPages {
+		page = totalPages
+	}
+
+	// Calculate start and end indices for the current page
+	startIndex := (page - 1) * pageSize
+	endIndex := min(startIndex+pageSize, len(items))
+
+	// Return the paginated subset and the total page count
+	if startIndex < len(items) {
+		return items[startIndex:endIndex], totalPages
+	}
+
+	return []T{}, totalPages
+}
+
+func listHandler(
+	target routing.PluralTarget,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		header := r.Header.Get(hx.HdrRequest)
 		query := r.URL.Query().Get("search")
 		pageStr := r.URL.Query().Get("page")
 		if pageStr == "" {
@@ -86,29 +193,72 @@ func searchHandler(
 		if err != nil {
 			return
 		}
-
-		header := r.Header.Get(hx.HdrTriggerName)
 		switch target {
 		case routing.PluralTargetPost:
-			filtered := filterPosts(gen.AllPosts, query)
+			filtered, totalPages := filterPosts(gen.AllPosts, query, page)
 			if header == "" {
-				templ.Handler(layouts.Page(views.List(target, &filtered, nil, nil, query, page, pages))).ServeHTTP(w, r)
+				templ.Handler(layouts.Page(views.List(
+					target,
+					&filtered,
+					nil,
+					nil,
+					query,
+					page,
+					totalPages,
+				))).ServeHTTP(w, r)
 			} else {
-				templ.Handler(views.Results(target, &filtered, nil, nil)).ServeHTTP(w, r)
+				templ.Handler(views.Results(
+					target,
+					&filtered,
+					nil,
+					nil,
+					page,
+					totalPages,
+				)).ServeHTTP(w, r)
 			}
 		case routing.PluralTargetProject:
-			filtered := filterProjects(gen.AllProjects, query)
+			filtered, totalPages := filterProjects(gen.AllProjects, query, page)
 			if header == "" {
-				templ.Handler(layouts.Page(views.List(target, nil, &filtered, nil, query, page, pages))).ServeHTTP(w, r)
+				templ.Handler(layouts.Page(views.List(
+					target,
+					nil,
+					&filtered,
+					nil,
+					query,
+					page,
+					totalPages,
+				))).ServeHTTP(w, r)
 			} else {
-				templ.Handler(views.Results(target, nil, &filtered, nil)).ServeHTTP(w, r)
+				templ.Handler(views.Results(
+					target,
+					nil,
+					&filtered,
+					nil,
+					page,
+					totalPages,
+				)).ServeHTTP(w, r)
 			}
 		case routing.PluralTargetTag:
-			filtered := filterTags(gen.AllTags, query)
+			filtered, totalPages := filterTags(gen.AllTags, query, page)
 			if header == "" {
-				templ.Handler(layouts.Page(views.List(target, nil, nil, &filtered, query, page, pages))).ServeHTTP(w, r)
+				templ.Handler(layouts.Page(views.List(
+					target,
+					nil,
+					nil,
+					&filtered,
+					query,
+					page,
+					totalPages,
+				))).ServeHTTP(w, r)
 			} else {
-				templ.Handler(views.Results(target, nil, nil, &filtered)).ServeHTTP(w, r)
+				templ.Handler(views.Results(
+					target,
+					nil,
+					nil,
+					&filtered,
+					page,
+					totalPages,
+				)).ServeHTTP(w, r)
 			}
 		}
 	}

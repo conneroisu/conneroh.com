@@ -14,44 +14,6 @@ import (
 	"github.com/conneroisu/conneroh.com/internal/routing"
 )
 
-var (
-	home = views.Home(
-		&gen.AllPosts,
-		&gen.AllProjects,
-		&gen.AllTags,
-	)
-	posts = views.List(
-		routing.PluralTargetPost,
-		&gen.AllPosts,
-		&gen.AllProjects,
-		&gen.AllTags,
-		"",
-		1,
-		postPages,
-	)
-	postPages = len(gen.AllPosts) / routing.MaxListLargeItems
-	projects  = views.List(
-		routing.PluralTargetProject,
-		&gen.AllPosts,
-		&gen.AllProjects,
-		&gen.AllTags,
-		"",
-		1,
-		len(gen.AllProjects)/routing.MaxListLargeItems,
-	)
-	projectPages = len(gen.AllProjects) / routing.MaxListLargeItems
-	tags         = views.List(
-		routing.PluralTargetTag,
-		&gen.AllPosts,
-		&gen.AllProjects,
-		&gen.AllTags,
-		"",
-		1,
-		len(gen.AllTags)/routing.MaxListLargeItems,
-	)
-	tagPages = len(gen.AllTags) / routing.MaxListLargeItems
-)
-
 // AddRoutes adds all routes to the router.
 func AddRoutes(
 	_ context.Context,
@@ -83,7 +45,10 @@ func AddRoutes(
 	h.Handle(
 		"GET /morph/posts",
 		templ.Handler(layouts.Morpher(posts)))
-	h.Handle("GET /search/posts", searchHandler(routing.PluralTargetPost, postPages))
+	h.Handle(
+		"GET /search/posts",
+		listHandler(routing.PluralTargetPost))
+
 	h.Handle(
 		"GET /projects",
 		templ.Handler(layouts.Page(projects)))
@@ -92,7 +57,7 @@ func AddRoutes(
 		templ.Handler(layouts.Morpher(projects)))
 	h.Handle(
 		"GET /search/projects",
-		searchHandler(routing.PluralTargetProject, projectPages))
+		listHandler(routing.PluralTargetProject))
 
 	h.Handle(
 		"GET /tags",
@@ -102,7 +67,7 @@ func AddRoutes(
 		templ.Handler(layouts.Morpher(tags)))
 	h.Handle(
 		"GET /search/tags",
-		searchHandler(routing.PluralTargetTag, tagPages))
+		listHandler(routing.PluralTargetTag))
 
 	for _, p := range gen.AllPosts {
 		h.Handle(

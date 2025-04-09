@@ -19,11 +19,11 @@ templ search(
 			class={ twerge.It("relative") }
 		>
 			<input
-				id={ fmt.Sprintf("search-%s", target) }
+				id="search"
 				class={ twerge.It("text-white border-gray-600 rounded-md focus:outline-none bg-gray-700 border focus:ring-blue-500 w-full focus:ring-2 pr-4 py-2 pl-10") }
 				placeholder={ fmt.Sprintf("Search %s...", target) }
 				hx-get={ fmt.Sprintf("/search/%s", target) }
-				hx-target={ fmt.Sprintf("#list-%s", target) }
+				hx-target="#listi"
 				value={ query }
 				name="search"
 				hx-push-url="true"
@@ -90,17 +90,98 @@ templ List(
 			target,
 			query,
 		)
-		@pagination(page, pageCount, target)
 		@Results(
 			target,
 			posts,
 			projects,
 			tags,
+			page,
+			pageCount,
 		)
 	</div>
 }
 
 templ pagination(page, pageCount int, target routing.PluralTarget) {
+	if pageCount > 1 {
+		<div class={ twerge.It("flex justify-center items-center mt-8 space-x-2") }>
+			@previousPageButton(page, target)
+			// Page numbers
+			for i := 1; i <= pageCount; i++ {
+				if i == page {
+					<span class={ twerge.It("px-3 py-2 rounded-md bg-blue-600 text-white font-medium") }>
+						{ strconv.Itoa(i) }
+					</span>
+				} else if i <= routing.MaxPageNumber {
+					<a
+						hx-get={ fmt.Sprintf("/search/%s?page=%d", target, i) }
+						hx-target="#listi"
+						hx-include="[name='search']"
+						hx-swap="outerHTML"
+						hx-push-url="true"
+						class={ twerge.It("px-3 py-2 rounded-md border border-gray-700 bg-gray-800 text-gray-300 hover:bg-gray-700 transition-colors") }
+					>
+						{ strconv.Itoa(i) }
+					</a>
+				} else if i == 4 && page > 5 || i == pageCount-3 && page < pageCount-4 {
+					<span class={ twerge.It("px-2 text-gray-500") }>...</span>
+				}
+			}
+			@nextPageButton(page, pageCount, target)
+		</div>
+	}
+}
+
+templ previousPageButton(
+	page int,
+	target routing.PluralTarget,
+) {
+	// Previous page button
+	if page > 1 {
+		<a
+			hx-get={ fmt.Sprintf("/search/%s?page=%d", target, page-1) }
+			hx-target="#listi"
+			hx-swap="outerHTML"
+			hx-push-url="true"
+			hx-include="[name='search']"
+			class={ twerge.It("px-3 py-2 rounded-md border border-gray-700 bg-gray-800 text-gray-300 hover:bg-gray-700 transition-colors") }
+			aria-label="Previous page"
+		>
+			<span aria-hidden="true">←</span>
+			<span class={ twerge.It("sr-only") }>Previous</span>
+		</a>
+	} else {
+		<span class={ twerge.It("px-3 py-2 rounded-md border border-gray-700 bg-gray-900 text-gray-500 cursor-not-allowed") }>
+			<span aria-hidden="true">←</span>
+			<span class={ twerge.It("sr-only") }>Previous</span>
+		</span>
+	}
+}
+
+templ nextPageButton(
+	page, pageCount int,
+	target routing.PluralTarget,
+) {
+	// Next page button
+	if page < pageCount {
+		<a
+			href={ templ.SafeURL(fmt.Sprintf("/%s?page=%d", target, page+1)) }
+			hx-get={ fmt.Sprintf("/search/%s?page=%d", target, page+1) }
+			hx-target="#listi"
+			hx-include="[name='search']"
+			hx-swap="outerHTML"
+			hx-push-url="true"
+			class={ twerge.It("px-3 py-2 rounded-md border border-gray-700 bg-gray-800 text-gray-300 hover:bg-gray-700 transition-colors") }
+			aria-label="Next page"
+		>
+			<span aria-hidden="true">→</span>
+			<span class={ twerge.It("sr-only") }>Next</span>
+		</a>
+	} else {
+		<span class={ twerge.It("px-3 py-2 rounded-md border border-gray-700 bg-gray-900 text-gray-500 cursor-not-allowed") }>
+			<span aria-hidden="true">→</span>
+			<span class={ twerge.It("sr-only") }>Next</span>
+		</span>
+	}
 }
 
 templ Results(
@@ -108,25 +189,36 @@ templ Results(
 	posts *[]*gen.Post,
 	projects *[]*gen.Project,
 	tags *[]*gen.Tag,
+	page, pageCount int,
 ) {
 	<div
-		id={ fmt.Sprintf("list-%s", target) }
-		class={ twerge.It("md:grid-cols-2 lg:grid-cols-3 gap-6 grid grid-cols-1") }
+		id="listi"
 	>
-		switch target {
-			case routing.PluralTargetPost:
-				for _, post := range *posts {
-					@listPostItem(post)
-				}
-			case routing.PluralTargetProject:
-				for _, project := range *projects {
-					@listProjectItem(project)
-				}
-			case routing.PluralTargetTag:
-				for _, tag := range *tags {
-					@listTagItem(tag)
-				}
-		}
+		@pagination(page, pageCount, target)
+		<div
+			class={ twerge.It("md:grid-cols-2 lg:grid-cols-3 gap-6 grid grid-cols-1") }
+		>
+			switch target {
+				case routing.PluralTargetPost:
+					for i, post := range *posts {
+						if i <= routing.MaxListLargeItems {
+							@listPostItem(post)
+						}
+					}
+				case routing.PluralTargetProject:
+					for i, project := range *projects {
+						if i <= routing.MaxListLargeItems {
+							@listProjectItem(project)
+						}
+					}
+				case routing.PluralTargetTag:
+					for i, tag := range *tags {
+						if i <= routing.MaxListSmallItems {
+							@listTagItem(tag)
+						}
+					}
+			}
+		</div>
 	</div>
 }
 

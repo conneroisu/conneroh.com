@@ -14,6 +14,13 @@ const (
 	EmbedLength = 768
 )
 
+var (
+	_ Embeddable = (*Post)(nil)
+	_ Embeddable = (*Project)(nil)
+	_ Embeddable = (*Tag)(nil)
+	_ Embeddable = (*Employment)(nil)
+)
+
 // CustomTime allows us to customize the YAML time parsing
 type CustomTime struct {
 	time.Time
@@ -39,6 +46,9 @@ func (ct *CustomTime) UnmarshalYAML(value *yaml.Node) error {
 }
 
 type (
+	Embeddable interface {
+		GetEmb() *Embedded
+	}
 	// Post is a post with all its projects and tags.
 	Post struct {
 		Embedded
@@ -80,14 +90,12 @@ type (
 		Projects        []*Project    `yaml:"-" structgen:"ProjectSlugs"`
 		Employments     []*Employment `yaml:"-" structgen:"EmploymentSlugs"`
 	}
-
-	// TODO: integrate or remove this (planned to allow for better sorting)
-	// // Parsed is a parsed struct.
-	// Parsed struct {
-	// 	Embedded
-	// 	Weight int `yaml:"weight"`
-	// }
 )
+
+// GetEmb returns the embedding struct itself.
+func (emb *Embedded) GetEmb() *Embedded {
+	return emb
+}
 
 // New creates a new instance of the given type.
 func New[
