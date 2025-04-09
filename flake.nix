@@ -277,7 +277,7 @@
         name = "conneroh.com";
         fly-name = "conneroh-com";
         fly-name-dev = "conneroh-com-dev";
-        vendorHash = "sha256-FIgmQHcIr9+8iKAL2IOsR4ydliRXtBVoWf6Ru2Dwf7M=";
+        vendorHash = "sha256-q8DdU/gtavaHYX8XKHdH5BNtO+3N86IWwxCIYQp9Fs0=";
         created = "now";
         tag = "latest";
         version = self.shortRev or "dirty";
