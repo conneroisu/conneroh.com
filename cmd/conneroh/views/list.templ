@@ -36,6 +36,7 @@ templ search(
 				hx-trigger="keyup changed delay:300ms"
 				hx-swap="outerHTML"
 				hx-indicator="#search-indicator"
+				aria-label="Local Search"
 			/>
 			<div
 				class={ twerge.It("text-gray-500 absolute left-3 top-2.5") }
@@ -250,6 +251,7 @@ templ Results(
 templ listProjectItem(project *gen.Project) {
 	<div
 		class={ twerge.It("transition-all flex transform hover:-translate-y-3 duration-300 rounded-lg overflow-hidden flex-col h-full bg-gray-800 hover:shadow-lg p-6 shadow-md") }
+		aria-label={ project.Title }
 	>
 		<a
 			hx-target="#bodiody"
@@ -325,6 +327,7 @@ templ listTagItem(tag *gen.Tag) {
 		hx-push-url={ tag.PagePath() }
 		class={ twerge.It("p-6 rounded-lg overflow-hidden bg-gray-800 shadow-md hover:shadow-lg duration-300 transform transition-all hover:-translate-y-1") }
 		preload="mouseover"
+		aria-label={ tag.Title }
 	>
 		<div
 			class={ twerge.It("flex items-center justify-between mb-3 p-6") }
@@ -364,6 +367,7 @@ templ listPostItem(post *gen.Post) {
 		x-transition:enter={ twerge.It("duration-200 transition ease-out") }
 		x-transition:enter-start={ twerge.It("translate-y-4 opacity-0 transform") }
 		x-transition:enter-end={ twerge.It("transform translate-y-0 opacity-100") }
+		aria-label={ post.Title }
 	>
 		<a
 			hx-target="#bodiody"

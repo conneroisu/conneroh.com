@@ -48,7 +48,6 @@ templ search() {
 							placeholder="Search site..."
 							aria-label="Search"
 							@keydown.escape="isSearchOpen = false"
-							@keydown.enter="if (searchResults.length > 0) window.location.href = searchResults[0].url"
 						/>
 						<div
 							class={ twerge.It("text-gray-500 absolute left-3 top-2.5") }

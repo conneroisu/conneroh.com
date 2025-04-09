@@ -25,16 +25,19 @@ templ Home(
 					class={ twerge.It("lg:w-1/2 mb-10 lg:mb-0") }
 				>
 					<h1
+						aria-label="Name"
 						class={ twerge.It("text-white text-4xl font-bold lg:text-6xl mb-4 leading-tight md:text-5xl") }
 					>
 						Conner Ohnesorge
 					</h1>
 					<p
+						aria-label="About Me"
 						class={ twerge.It("text-xl text-gray-300 mb-8 max-w-md") }
 					>
 						Electrical Engineer & Software Developer specialized in creating robust, scalable, and elegant solutions.
 					</p>
 					<p
+						aria-label="Education"
 						class={ twerge.It("text-xl text-gray-300 mb-8 max-w-md") }
 					>
 						Electrical Engineering Bachelors Degree and Minor in Computer Science from
@@ -49,12 +52,14 @@ templ Home(
 						class={ twerge.It("flex flex-wrap gap-4") }
 					>
 						<a
+							aria-label="View Projects"
 							href="#projects"
 							class={ twerge.It("py-3 font-medium px-6 rounded-md hover:opacity-90 transition-opacity bg-white text-gray-900") }
 						>
 							View Projects
 						</a>
 						<a
+							aria-label="Contact Me"
 							href="#contact"
 							class={ twerge.It("py-3 border font-medium px-6 transition-colors hover:bg-gray-800 border-gray-600 text-gray-300 rounded-md") }
 						>
@@ -74,6 +79,7 @@ templ Home(
 							<img
 								src="/dist/hero.jpeg"
 								alt="me"
+								aria-label="Photo of Me"
 								class={ twerge.It("bg-blue-600 rounded-full relative shadow-lg mx-auto") }
 							/>
 						</div>
@@ -236,6 +242,7 @@ templ Home(
 				for i, post := range *fullPosts {
 					if i < 4 {
 						<div
+							aria-label={ post.Title }
 							class={ twerge.It("rounded-lg shadow-md transition-transform bg-gray-800 overflow-hidden hover:scale-105 hover:shadow-lg duration-300") }
 						>
 							<a
@@ -378,6 +385,7 @@ templ Home(
 						hx-get={ fmt.Sprintf("/morph/tag/%s", tag.Slug) }
 						preload="mouseover"
 						class={ twerge.It("p-6 text-center hover:shadow-md block rounded-lg transition-shadow bg-gray-900") }
+						aria-label={ tag.Title }
 					>
 						<div
 							class={ twerge.It("items-center flex mb-4 justify-center h-12 w-12 mx-auto bg-blue-900 rounded-full") }
@@ -398,6 +406,7 @@ templ Home(
 	<section
 		id="contact"
 		class={ twerge.It("bg-gray-900 py-16") }
+		aria-label="Contact"
 	>
 		<div
 			class={ twerge.It("container px-4 mx-auto") }
