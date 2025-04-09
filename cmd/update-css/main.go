@@ -26,7 +26,7 @@ func genCSS(ctx context.Context) error {
 			&gen.AllTags,
 		)).Render(ctx, io.Discard)
 		_ = layouts.Page(views.List(
-			routing.PluralTargetPost,
+			routing.PostPluralPath,
 			&gen.AllPosts,
 			&gen.AllProjects,
 			&gen.AllTags,
@@ -35,7 +35,7 @@ func genCSS(ctx context.Context) error {
 			10,
 		)).Render(ctx, io.Discard)
 		_ = layouts.Page(views.List(
-			routing.PluralTargetProject,
+			routing.ProjectPluralPath,
 			&gen.AllPosts,
 			&gen.AllProjects,
 			&gen.AllTags,
@@ -44,7 +44,7 @@ func genCSS(ctx context.Context) error {
 			10,
 		)).Render(ctx, io.Discard)
 		_ = layouts.Page(views.List(
-			routing.PluralTargetTag,
+			routing.TagsPluralPath,
 			&gen.AllPosts,
 			&gen.AllProjects,
 			&gen.AllTags,

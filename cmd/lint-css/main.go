@@ -40,7 +40,7 @@ func run(ctx context.Context, dirPath string) error {
 			&gen.AllTags,
 		)).Render(ctx, io.Discard)
 		_ = layouts.Page(views.List(
-			routing.PluralTargetPost,
+			routing.PostPluralPath,
 			&gen.AllPosts,
 			&gen.AllProjects,
 			&gen.AllTags,
@@ -49,7 +49,7 @@ func run(ctx context.Context, dirPath string) error {
 			10,
 		)).Render(ctx, io.Discard)
 		_ = layouts.Page(views.List(
-			routing.PluralTargetProject,
+			routing.ProjectPluralPath,
 			&gen.AllPosts,
 			&gen.AllProjects,
 			&gen.AllTags,
@@ -58,7 +58,7 @@ func run(ctx context.Context, dirPath string) error {
 			10,
 		)).Render(ctx, io.Discard)
 		_ = layouts.Page(views.List(
-			routing.PluralTargetTag,
+			routing.TagsPluralPath,
 			&gen.AllPosts,
 			&gen.AllProjects,
 			&gen.AllTags,

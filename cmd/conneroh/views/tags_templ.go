@@ -374,7 +374,7 @@ func Tag(
 			return templ_7745c5c3_Err
 		}
 		templ_7745c5c3_Err = List(
-			routing.PluralTargetPost,
+			routing.PostPluralPath,
 			&tag.Posts,
 			nil, nil,
 			"",
@@ -388,7 +388,7 @@ func Tag(
 			return templ_7745c5c3_Err
 		}
 		templ_7745c5c3_Err = List(
-			routing.PluralTargetProject,
+			routing.ProjectPluralPath,
 			nil,
 			&tag.Projects,
 			nil,
@@ -402,7 +402,7 @@ func Tag(
 			return templ_7745c5c3_Err
 		}
 		templ_7745c5c3_Err = List(
-			routing.PluralTargetTag,
+			routing.TagsPluralPath,
 			nil, nil,
 			&tag.Tags,
 			"", 0, 0,

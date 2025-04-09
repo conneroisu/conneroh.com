@@ -23,7 +23,7 @@ const (
 )
 
 func search(
-	target routing.PluralTarget,
+	target routing.PluralPath,
 	query string,
 ) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
@@ -309,7 +309,7 @@ func search(
 }
 
 func List(
-	target routing.PluralTarget,
+	target routing.PluralPath,
 	posts *[]*gen.Post,
 	projects *[]*gen.Project,
 	tags *[]*gen.Tag,
@@ -421,7 +421,7 @@ func List(
 }
 
 // Main pagination component
-func pagination(page, pageCount int, target routing.PluralTarget) templ.Component {
+func pagination(page, pageCount int, target routing.PluralPath) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -543,7 +543,7 @@ func pagination(page, pageCount int, target routing.PluralTarget) templ.Componen
 }
 
 // Helper to render pagination numbers based on device (mobile or desktop)
-func renderPageNumbers(page, pageCount int, target routing.PluralTarget, maxPageNumber int) templ.Component {
+func renderPageNumbers(page, pageCount int, target routing.PluralPath, maxPageNumber int) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -575,7 +575,7 @@ func renderPageNumbers(page, pageCount int, target routing.PluralTarget, maxPage
 }
 
 // Reusable page button component
-func pageButton(pageNum string, currentPage int, target routing.PluralTarget) templ.Component {
+func pageButton(pageNum string, currentPage int, target routing.PluralPath) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -696,7 +696,7 @@ func pageButton(pageNum string, currentPage int, target routing.PluralTarget) te
 }
 
 // Previous page button
-func previousPageButton(currentPage int, target routing.PluralTarget) templ.Component {
+func previousPageButton(currentPage int, target routing.PluralPath) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -798,7 +798,7 @@ func previousPageButton(currentPage int, target routing.PluralTarget) templ.Comp
 }
 
 // Next page button
-func nextPageButton(currentPage, pageCount int, target routing.PluralTarget) templ.Component {
+func nextPageButton(currentPage, pageCount int, target routing.PluralPath) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -900,7 +900,7 @@ func nextPageButton(currentPage, pageCount int, target routing.PluralTarget) tem
 }
 
 func Results(
-	target routing.PluralTarget,
+	target routing.PluralPath,
 	posts *[]*gen.Post,
 	projects *[]*gen.Project,
 	tags *[]*gen.Tag,
@@ -983,7 +983,7 @@ func Results(
 			return templ_7745c5c3_Err
 		}
 		switch target {
-		case routing.PluralTargetPost:
+		case routing.PostPluralPath:
 			for i, post := range *posts {
 				if i < routing.MaxListLargeItems {
 					templ_7745c5c3_Err = listPostItem(post).Render(ctx, templ_7745c5c3_Buffer)
@@ -992,7 +992,7 @@ func Results(
 					}
 				}
 			}
-		case routing.PluralTargetProject:
+		case routing.ProjectPluralPath:
 			for i, project := range *projects {
 				if i < routing.MaxListLargeItems {
 					templ_7745c5c3_Err = listProjectItem(project).Render(ctx, templ_7745c5c3_Buffer)
@@ -1001,7 +1001,7 @@ func Results(
 					}
 				}
 			}
-		case routing.PluralTargetTag:
+		case routing.TagsPluralPath:
 			for i, tag := range *tags {
 				if i < routing.MaxListSmallItems {
 					templ_7745c5c3_Err = listTagItem(tag).Render(ctx, templ_7745c5c3_Buffer)

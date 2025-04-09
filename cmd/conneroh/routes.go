@@ -47,7 +47,7 @@ func AddRoutes(
 		templ.Handler(layouts.Morpher(posts)))
 	h.Handle(
 		"GET /search/posts",
-		listHandler(routing.PluralTargetPost))
+		listHandler(routing.PostPluralPath))
 
 	h.Handle(
 		"GET /projects",
@@ -57,7 +57,7 @@ func AddRoutes(
 		templ.Handler(layouts.Morpher(projects)))
 	h.Handle(
 		"GET /search/projects",
-		listHandler(routing.PluralTargetProject))
+		listHandler(routing.ProjectPluralPath))
 
 	h.Handle(
 		"GET /tags",
@@ -67,7 +67,7 @@ func AddRoutes(
 		templ.Handler(layouts.Morpher(tags)))
 	h.Handle(
 		"GET /search/tags",
-		listHandler(routing.PluralTargetTag))
+		listHandler(routing.TagsPluralPath))
 
 	for _, p := range gen.AllPosts {
 		h.Handle(

@@ -72,7 +72,7 @@ templ Tag(
 			// Posts Tab
 			<div x-show="activeTab === 'posts'">
 				@List(
-					routing.PluralTargetPost,
+					routing.PostPluralPath,
 					&tag.Posts,
 					nil, nil,
 					"",
@@ -82,7 +82,7 @@ templ Tag(
 			// Projects Tab
 			<div x-show="activeTab === 'projects'" x-cloak>
 				@List(
-					routing.PluralTargetProject,
+					routing.ProjectPluralPath,
 					nil,
 					&tag.Projects,
 					nil,
@@ -95,7 +95,7 @@ templ Tag(
 				x-cloak
 			>
 				@List(
-					routing.PluralTargetTag,
+					routing.TagsPluralPath,
 					nil, nil,
 					&tag.Tags,
 					"", 0, 0,

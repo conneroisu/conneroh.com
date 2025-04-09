@@ -15,7 +15,7 @@ const (
 )
 
 templ search(
-	target routing.PluralTarget,
+	target routing.PluralPath,
 	query string,
 ) {
 	<div
@@ -76,7 +76,7 @@ templ search(
 }
 
 templ List(
-	target routing.PluralTarget,
+	target routing.PluralPath,
 	posts *[]*gen.Post,
 	projects *[]*gen.Project,
 	tags *[]*gen.Tag,
@@ -108,7 +108,7 @@ templ List(
 }
 
 // Main pagination component
-templ pagination(page, pageCount int, target routing.PluralTarget) {
+templ pagination(page, pageCount int, target routing.PluralPath) {
 	if pageCount > 1 {
 		<div class={ twerge.It("flex justify-center items-center mt-8 space-x-2") }>
 			@previousPageButton(page, target)
@@ -124,14 +124,14 @@ templ pagination(page, pageCount int, target routing.PluralTarget) {
 }
 
 // Helper to render pagination numbers based on device (mobile or desktop)
-templ renderPageNumbers(page, pageCount int, target routing.PluralTarget, maxPageNumber int) {
+templ renderPageNumbers(page, pageCount int, target routing.PluralPath, maxPageNumber int) {
 	for _, pageNum := range routing.GeneratePagination(page, pageCount, routing.MaxMobilePageNumber) {
 		@pageButton(pageNum, page, target)
 	}
 }
 
 // Reusable page button component
-templ pageButton(pageNum string, currentPage int, target routing.PluralTarget) {
+templ pageButton(pageNum string, currentPage int, target routing.PluralPath) {
 	if pageNum == strconv.Itoa(currentPage) {
 		<span class={ twerge.It(activeBtnStyle) }>
 			{ pageNum }
@@ -157,7 +157,7 @@ templ pageButton(pageNum string, currentPage int, target routing.PluralTarget) {
 }
 
 // Previous page button
-templ previousPageButton(currentPage int, target routing.PluralTarget) {
+templ previousPageButton(currentPage int, target routing.PluralPath) {
 	if currentPage > 1 {
 		<a
 			hx-get={ fmt.Sprintf("/search/%s?page=%d", target, currentPage-1) }
@@ -181,7 +181,7 @@ templ previousPageButton(currentPage int, target routing.PluralTarget) {
 }
 
 // Next page button
-templ nextPageButton(currentPage, pageCount int, target routing.PluralTarget) {
+templ nextPageButton(currentPage, pageCount int, target routing.PluralPath) {
 	if currentPage < pageCount {
 		<a
 			hx-get={ fmt.Sprintf("/search/%s?page=%d", target, currentPage+1) }
@@ -205,7 +205,7 @@ templ nextPageButton(currentPage, pageCount int, target routing.PluralTarget) {
 }
 
 templ Results(
-	target routing.PluralTarget,
+	target routing.PluralPath,
 	posts *[]*gen.Post,
 	projects *[]*gen.Project,
 	tags *[]*gen.Tag,
@@ -223,19 +223,19 @@ templ Results(
 			class={ twerge.It("md:grid-cols-2 lg:grid-cols-3 gap-6 grid grid-cols-1") }
 		>
 			switch target {
-				case routing.PluralTargetPost:
+				case routing.PostPluralPath:
 					for i, post := range *posts {
 						if i < routing.MaxListLargeItems {
 							@listPostItem(post)
 						}
 					}
-				case routing.PluralTargetProject:
+				case routing.ProjectPluralPath:
 					for i, project := range *projects {
 						if i < routing.MaxListLargeItems {
 							@listProjectItem(project)
 						}
 					}
-				case routing.PluralTargetTag:
+				case routing.TagsPluralPath:
 					for i, tag := range *tags {
 						if i < routing.MaxListSmallItems {
 							@listTagItem(tag)

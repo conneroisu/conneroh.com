@@ -28,7 +28,7 @@ var (
 		&gen.AllTags,
 	)
 	posts = views.List(
-		routing.PluralTargetPost,
+		routing.PostPluralPath,
 		&gen.AllPosts,
 		&gen.AllProjects,
 		&gen.AllTags,
@@ -38,7 +38,7 @@ var (
 	)
 	postPages = len(gen.AllPosts) / routing.MaxListLargeItems
 	projects  = views.List(
-		routing.PluralTargetProject,
+		routing.ProjectPluralPath,
 		&gen.AllPosts,
 		&gen.AllProjects,
 		&gen.AllTags,
@@ -48,7 +48,7 @@ var (
 	)
 	projectPages = len(gen.AllProjects) / routing.MaxListLargeItems
 	tags         = views.List(
-		routing.PluralTargetTag,
+		routing.TagsPluralPath,
 		&gen.AllPosts,
 		&gen.AllProjects,
 		&gen.AllTags,
@@ -58,10 +58,10 @@ var (
 	)
 	tagPages = len(gen.AllTags) / routing.MaxListLargeItems
 
-	listMap = map[routing.PluralTarget]int{
-		routing.PluralTargetPost:    routing.MaxListLargeItems,
-		routing.PluralTargetProject: routing.MaxListLargeItems,
-		routing.PluralTargetTag:     routing.MaxListSmallItems,
+	listMap = map[routing.PluralPath]int{
+		routing.PostPluralPath:    routing.MaxListLargeItems,
+		routing.ProjectPluralPath: routing.MaxListLargeItems,
+		routing.TagsPluralPath:    routing.MaxListSmallItems,
 	}
 )
 
@@ -87,7 +87,7 @@ func filterPosts(
 	})
 
 	// Paginate the filtered results
-	return paginate(filtered, page, routing.PluralTargetProject)
+	return paginate(filtered, page, routing.ProjectPluralPath)
 }
 
 func filterProjects(
@@ -112,7 +112,7 @@ func filterProjects(
 	})
 
 	// Paginate the filtered results
-	return paginate(filtered, page, routing.PluralTargetProject)
+	return paginate(filtered, page, routing.ProjectPluralPath)
 }
 
 func filterTags(
@@ -140,13 +140,13 @@ func filterTags(
 	})
 
 	// Paginate the filtered results
-	return paginate(filtered, page, routing.PluralTargetTag)
+	return paginate(filtered, page, routing.TagsPluralPath)
 }
 
 func paginate[T any](
 	items []T,
 	page int,
-	target routing.PluralTarget,
+	target routing.PluralPath,
 ) ([]T, int) {
 	if len(items) == 0 {
 		return []T{}, 0
@@ -184,7 +184,7 @@ func paginate[T any](
 }
 
 func listHandler(
-	target routing.PluralTarget,
+	target routing.PluralPath,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		header := r.Header.Get(hx.HdrRequest)
@@ -198,7 +198,7 @@ func listHandler(
 			return
 		}
 		switch target {
-		case routing.PluralTargetPost:
+		case routing.PostPluralPath:
 			filtered, totalPages := filterPosts(gen.AllPosts, query, page)
 			if header == "" {
 				templ.Handler(layouts.Page(views.List(
@@ -220,7 +220,7 @@ func listHandler(
 					totalPages,
 				)).ServeHTTP(w, r)
 			}
-		case routing.PluralTargetProject:
+		case routing.ProjectPluralPath:
 			filtered, totalPages := filterProjects(gen.AllProjects, query, page)
 			if header == "" {
 				templ.Handler(layouts.Page(views.List(
@@ -242,7 +242,7 @@ func listHandler(
 					totalPages,
 				)).ServeHTTP(w, r)
 			}
-		case routing.PluralTargetTag:
+		case routing.TagsPluralPath:
 			filtered, totalPages := filterTags(gen.AllTags, query, page)
 			if header == "" {
 				templ.Handler(layouts.Page(views.List(
