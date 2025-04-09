@@ -195,7 +195,6 @@
               nixd
               statix
               deadnix
-              inputs.bun2nix.defaultPackage.${pkgs.system}.bin
 
               # Go Tools
               go_1_24
@@ -220,6 +219,7 @@
               bun
               nodePackages.typescript-language-server
               nodePackages.prettier
+              inputs.bun2nix.defaultPackage.${pkgs.system}.bin
 
               # Infra
               flyctl

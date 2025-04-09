@@ -144,6 +144,7 @@ templ pageButton(pageNum string, currentPage int, target routing.PluralPath) {
 		} else {
 			<a
 				hx-get={ fmt.Sprintf("/search/%s?page=%s", target, pageNum) }
+				name="pager"
 				hx-target="#listi"
 				hx-include="[name='search']"
 				hx-swap="outerHTML"
@@ -254,8 +255,8 @@ templ listProjectItem(project *gen.Project) {
 			hx-target="#bodiody"
 			hx-swap="outerHTML"
 			hx-trigger="click"
-			hx-get={ fmt.Sprintf("/morph/project/%s", project.Slug) }
-			hx-push-url={ fmt.Sprintf("/project/%s", project.Slug) }
+			hx-get={ project.MorphPath() }
+			hx-push-url={ project.PagePath() }
 			class={ twerge.It("cursor-pointer h-full") }
 			preload="mouseover"
 		>
@@ -368,8 +369,8 @@ templ listPostItem(post *gen.Post) {
 			hx-target="#bodiody"
 			hx-swap="outerHTML"
 			hx-trigger="click"
-			hx-get={ fmt.Sprintf("/morph/post/%s", post.Slug) }
-			hx-push-url={ fmt.Sprintf("/post/%s", post.Slug) }
+			hx-get={ post.MorphPath() }
+			hx-push-url={ post.PagePath() }
 			class={ twerge.It("block cursor-pointer") }
 			preload="mouseover"
 		>

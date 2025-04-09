@@ -9,50 +9,6 @@ templ search() {
 			isSearchOpen: false,
 			searchQuery: '',
 			searchResults: [],
-			isLoading: false,
-			showResults: false,
-
-			async search() {
-				if (this.searchQuery.trim().length < 2) {
-					this.searchResults = [];
-					this.showResults = false;
-					return;
-				}
-				
-				this.isLoading = true;
-				this.showResults = true;
-				
-				// Simulate search results for demonstration
-				// In a real app, you would make an API call here
-				await new Promise(resolve => setTimeout(resolve, 300));
-				
-				// Sample search logic - would be replaced with actual API call
-				this.searchResults = [
-					{ type: 'post', title: 'Modern Frontend with HTMX', url: '/post/modern-frontend-htmx-alpine' },
-					{ type: 'project', title: 'Project 2', url: '/project/project-2' },
-					{ type: 'tag', title: 'Programming Languages', url: '/tag/programming-languages-go' }
-				].filter(item => 
-					item.title.toLowerCase().includes(this.searchQuery.toLowerCase())
-				);
-				
-				this.isLoading = false;
-			},
-			
-			// Initialize search when opened
-			init() {
-				this.$watch('isSearchOpen', (value) => {
-					if (value && this.$refs.searchInput) {
-						setTimeout(() => {
-							this.$refs.searchInput.focus();
-						}, 100);
-					}
-				});
-				
-				// Initialize search when typing
-				this.$watch('searchQuery', () => {
-					this.search();
-				});
-			}
 		}"
 	>
 		// Desktop search
@@ -116,8 +72,7 @@ templ search() {
 				>
 					// Loading indicator
 					<div
-						x-show="isLoading"
-						class={ twerge.It("text-center p-4 text-gray-400") }
+						class={ twerge.It("text-center p-4 text-gray-400  htmx-indicator") }
 					>
 						<svg
 							class={ twerge.It("w-5 mx-auto animate-spin h-5") }
