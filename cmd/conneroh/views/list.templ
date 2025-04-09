@@ -112,13 +112,11 @@ templ pagination(page, pageCount int, target routing.PluralTarget) {
 	if pageCount > 1 {
 		<div class={ twerge.It("flex justify-center items-center mt-8 space-x-2") }>
 			@previousPageButton(page, target)
-			// Desktop pagination (show all pages)
 			<div class={ twerge.It("hidden md:flex space-x-2") }>
-				@renderPageNumbers(page, pageCount, target, false)
+				@renderPageNumbers(page, pageCount, target, routing.MaxDesktopPageNumber)
 			</div>
-			// Mobile pagination (limited with ellipsis)
 			<div class={ twerge.It("flex md:hidden space-x-2") }>
-				@renderPageNumbers(page, pageCount, target, true)
+				@renderPageNumbers(page, pageCount, target, routing.MaxMobilePageNumber)
 			</div>
 			@nextPageButton(page, pageCount, target)
 		</div>
@@ -126,15 +124,9 @@ templ pagination(page, pageCount int, target routing.PluralTarget) {
 }
 
 // Helper to render pagination numbers based on device (mobile or desktop)
-templ renderPageNumbers(page, pageCount int, target routing.PluralTarget, isMobile bool) {
-	if isMobile {
-		for _, pageNum := range routing.GeneratePagination(page, pageCount, routing.MaxMobilePageNumber) {
-			@pageButton(pageNum, page, target)
-		}
-	} else {
-		for _, pageNum := range routing.GeneratePagination(page, pageCount, routing.MaxDesktopPageNumber) {
-			@pageButton(pageNum, page, target)
-		}
+templ renderPageNumbers(page, pageCount int, target routing.PluralTarget, maxPageNumber int) {
+	for _, pageNum := range routing.GeneratePagination(page, pageCount, routing.MaxMobilePageNumber) {
+		@pageButton(pageNum, page, target)
 	}
 }
 
@@ -179,7 +171,10 @@ templ previousPageButton(currentPage int, target routing.PluralTarget) {
 			@icon("chevron-left", templ.Attributes{})
 		</a>
 	} else {
-		<span class={ twerge.It(inactiveBtnStyle + " opacity-50 flex items-center") } aria-disabled="true">
+		<span
+			class={ twerge.It(inactiveBtnStyle + " opacity-50 flex items-center") }
+			aria-disabled="true"
+		>
 			@icon("chevron-left", templ.Attributes{})
 		</span>
 	}
@@ -200,7 +195,10 @@ templ nextPageButton(currentPage, pageCount int, target routing.PluralTarget) {
 			@icon("chevron-right", templ.Attributes{})
 		</a>
 	} else {
-		<span class={ twerge.It(inactiveBtnStyle + " opacity-50 flex items-center") } aria-disabled="true">
+		<span
+			class={ twerge.It(inactiveBtnStyle + " opacity-50 flex items-center") }
+			aria-disabled="true"
+		>
 			@icon("chevron-right", templ.Attributes{})
 		</span>
 	}
@@ -227,19 +225,19 @@ templ Results(
 			switch target {
 				case routing.PluralTargetPost:
 					for i, post := range *posts {
-						if i <= routing.MaxListLargeItems {
+						if i < routing.MaxListLargeItems {
 							@listPostItem(post)
 						}
 					}
 				case routing.PluralTargetProject:
 					for i, project := range *projects {
-						if i <= routing.MaxListLargeItems {
+						if i < routing.MaxListLargeItems {
 							@listProjectItem(project)
 						}
 					}
 				case routing.PluralTargetTag:
 					for i, tag := range *tags {
-						if i <= routing.MaxListSmallItems {
+						if i < routing.MaxListSmallItems {
 							@listTagItem(tag)
 						}
 					}
@@ -328,38 +326,34 @@ templ listTagItem(tag *gen.Tag) {
 		preload="mouseover"
 	>
 		<div
-			class={ twerge.It("p-6") }
+			class={ twerge.It("flex items-center justify-between mb-3 p-6") }
 		>
+			<h2
+				class={ twerge.It("text-xl font-semibold text-white") }
+			>
+				{ tag.Title }
+			</h2>
 			<div
-				class={ twerge.It("flex items-center justify-between mb-3") }
+				class={ twerge.It("rounded-full flex h-8 justify-center items-center bg-gray-700 w-8") }
 			>
-				<h2
-					class={ twerge.It("text-xl font-semibold text-white") }
-				>
-					{ tag.Title }
-				</h2>
-				<div
-					class={ twerge.It("rounded-full flex h-8 justify-center items-center bg-gray-700 w-8") }
-				>
-					@icon(tag.Icon, templ.Attributes{"class": "stoke-white"})
-				</div>
+				@icon(tag.Icon, templ.Attributes{"class": "stoke-white"})
 			</div>
-			<div
-				class={ twerge.It("mb-4 line-clamp-2 text-gray-300") }
-			>
-				{ tag.Description }
-			</div>
-			<span
-				class={ twerge.It("bg-red-500 py-1 text-gray-200 bottom-0 left-0 px-2 absolute text-xs rounded-tr-md") }
-			>
-				{ strconv.Itoa(len(tag.Posts)) } posts
-			</span>
-			<span
-				class={ twerge.It("right-0 px-2 text-gray-200 text-xs bottom-0 rounded-tl-md bg-blue-500 py-1 absolute") }
-			>
-				{ strconv.Itoa(len(tag.Projects)) } projects
-			</span>
 		</div>
+		<div
+			class={ twerge.It("mb-4 line-clamp-2 text-gray-300") }
+		>
+			{ tag.Description }
+		</div>
+		<span
+			class={ twerge.It("bg-red-500 py-1 text-gray-200 bottom-0 left-0 px-2 absolute text-xs rounded-tr-md") }
+		>
+			{ strconv.Itoa(len(tag.Posts)) } posts
+		</span>
+		<span
+			class={ twerge.It("right-0 px-2 text-gray-200 text-xs bottom-0 rounded-tl-md bg-blue-500 py-1 absolute") }
+		>
+			{ strconv.Itoa(len(tag.Projects)) } projects
+		</span>
 	</a>
 }
 

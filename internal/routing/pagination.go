@@ -6,9 +6,9 @@ import (
 
 const (
 	// MaxListLargeItems is the maximum number of items in a list view.
-	MaxListLargeItems = 10
+	MaxListLargeItems = 9
 	// MaxListSmallItems is the maximum number of items in a list view.
-	MaxListSmallItems = 10
+	MaxListSmallItems = 27
 
 	// MaxMobilePageNumber is the maximum number of pages to display before ... is shown.
 	MaxMobilePageNumber = 5

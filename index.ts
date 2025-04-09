@@ -14,27 +14,7 @@ window.Alpine = Alpine;
 
 Alpine.plugin(intersect);
 Alpine.start();
-import htmx from "htmx.org";
 
-htmx.logAll();
+// import htmx from "htmx.org";
 //
-// /** 
-//  * Each Time One Clickes on the Search Input this Function is ran 
-//  **/
-// function searchInit() {
-// }
-//
-// function searchDown() {
-// }
-//
-// function searchUp() {
-// }
-//
-// function searchEnter() {
-// }
-//
-// function searchRight() {
-// }
-//
-// function searchLeft() {
-// }
+// htmx.logAll();
