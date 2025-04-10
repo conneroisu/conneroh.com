@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
 	"github.com/conneroisu/conneroh.com/internal/hx"
+	"github.com/conneroisu/conneroh.com/internal/routing"
 	"github.com/conneroisu/twerge"
+	"strconv"
 )
 
 templ icon(
@@ -56,4 +58,98 @@ templ TagControl(
 			</a>
 		</div>
 	</div>
+}
+
+// Main pagination component
+templ pagination(page, pageCount int, target routing.PluralPath) {
+	<div class={ twerge.It("flex justify-center items-center mt-8 space-x-2") }>
+		@previousPageButton(page, target)
+		<div class={ twerge.It("hidden md:flex space-x-2") }>
+			@renderPageNumbers(page, pageCount, target, routing.MaxDesktopPageNumber)
+		</div>
+		<div class={ twerge.It("flex md:hidden space-x-2") }>
+			@renderPageNumbers(page, pageCount, target, routing.MaxMobilePageNumber)
+		</div>
+		@nextPageButton(page, pageCount, target)
+	</div>
+}
+
+// Helper to render pagination numbers based on device (mobile or desktop)
+templ renderPageNumbers(page, pageCount int, target routing.PluralPath, maxPageNumber int) {
+	for _, pageNum := range routing.GeneratePagination(page, pageCount, routing.MaxMobilePageNumber) {
+		@pageButton(pageNum, page, target)
+	}
+}
+
+// Reusable page button component
+templ pageButton(pageNum string, currentPage int, target routing.PluralPath) {
+	if pageNum == strconv.Itoa(currentPage) {
+		<span class={ twerge.It(activeBtnStyle) }>
+			{ pageNum }
+		</span>
+	} else {
+		if pageNum == "..." {
+			@icon("ellipsis", templ.Attributes{
+				"class": twerge.It(ellipsisStyle),
+			})
+		} else {
+			<a
+				hx-get={ fmt.Sprintf("/search/%s?page=%s", target, pageNum) }
+				name="pager"
+				hx-target="#listi"
+				hx-include="[name='search']"
+				hx-push-url="true"
+				class={ twerge.It(inactiveBtnStyle) }
+			>
+				{ pageNum }
+			</a>
+		}
+	}
+}
+
+// Previous page button
+templ previousPageButton(currentPage int, target routing.PluralPath) {
+	if currentPage > 1 {
+		<a
+			hx-get={ fmt.Sprintf("/search/%s?page=%d", target, currentPage-1) }
+			hx-target="#listi"
+			hx-include="[name='search']"
+			hx-push-url="true"
+			class={ twerge.It(inactiveBtnStyle + " flex items-center") }
+			aria-label="Previous page"
+		>
+			@icon("chevron-left", templ.Attributes{})
+		</a>
+	} else {
+		<span
+			class={ twerge.It(inactiveBtnStyle + " opacity-50 flex items-center") }
+			aria-disabled="true"
+		>
+			@icon("chevron-left", templ.Attributes{})
+		</span>
+	}
+}
+
+// Next page button
+templ nextPageButton(currentPage, pageCount int, target routing.PluralPath) {
+	if currentPage < pageCount {
+		<a
+			hx-get={ fmt.Sprintf("/search/%s?page=%d", target, currentPage+1) }
+			hx-target="#listi"
+			hx-include="[name='search']"
+			hx-swap="innerHTML"
+			hx-push-url="true"
+			class={ twerge.It(inactiveBtnStyle + " flex items-center") }
+			aria-label="Next page"
+		>
+			@icon("chevron-right", templ.Attributes{})
+		</a>
+	} else {
+		<span
+			class={ twerge.It(inactiveBtnStyle + " opacity-50 flex items-center") }
+			aria-disabled="true"
+		>
+			@icon("chevron-right", templ.Attributes{})
+		</span>
+	}
 }

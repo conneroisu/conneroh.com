@@ -6,8 +6,8 @@ import (
 	"strconv"
 )
 
-// SearchPage is the full search results page
-templ SearchPage(query string, results []layouts.SearchResult) {
+// Search is the full search results page
+templ Search(query string, results []layouts.SearchResult) {
 	<div class={ twerge.It("py-8 px-4 max-w-6xl mx-auto") }>
 		<h1 class={ twerge.It("text-3xl font-bold mb-2 text-white") }>
 			Search Results for "{ query }"
@@ -36,85 +36,18 @@ templ SearchPage(query string, results []layouts.SearchResult) {
 		} else {
 			// Group results by type
 			<div class={ twerge.It("grid gap-8 lg:grid-cols-2") }>
-				// Posts section
-				@resultSection("Posts", "post", results)
-				// Projects section
-				@resultSection("Projects", "project", results)
-				// Tags section
-				@resultSection("Tags", "tag", results)
+				// // Posts section
+				// @resultSection("Posts", "post", results)
+				// // Projects section
+				// @resultSection("Projects", "project", results)
+				// // Tags section
+				// @resultSection("Tags", "tag", results)
 			</div>
 		}
 	</div>
 }
 
-// Shows a section of search results filtered by type
-templ resultSection(title string, resultType string, results []layouts.SearchResult) {
-	// Filter results by type
-	<div>
-		<h2 class={ twerge.It("text-xl font-semibold mb-4 text-white") }>
-			{ title }
-		</h2>
-		<ul class={ twerge.It("space-y-2") }>
-			for _, result := range results {
-				if result.Type == resultType {
-					<li class={ twerge.It("bg-gray-800 rounded-lg shadow-sm overflow-hidden") }>
-						<a
-							href={ templ.SafeURL(result.URL) }
-							class={ twerge.It("hover:bg-gray-700 p-4 block transition-all") }
-						>
-							<div class={ twerge.It("flex items-center") }>
-								// Icon based on result type
-								<div class={ twerge.It("w-10 h-10 mr-4 flex-shrink-0 bg-blue-900 text-blue-300 flex items-center justify-center rounded-full") }>
-									if result.Type == "post" {
-										<svg
-											xmlns="http://www.w3.org/2000/svg"
-											class={ twerge.It("w-5 h-5") }
-											fill="none"
-											viewBox="0 0 24 24"
-											stroke="currentColor"
-										>
-											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1M19 20a2 2 0 002-2V8a2 2 0 00-2-2h-5a2 2 0 00-2 2v12a2 2 0 002 2h5z"></path>
-										</svg>
-									} else if result.Type == "project" {
-										<svg
-											xmlns="http://www.w3.org/2000/svg"
-											class={ twerge.It("w-5 h-5") }
-											fill="none"
-											viewBox="0 0 24 24"
-											stroke="currentColor"
-										>
-											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-										</svg>
-									} else if result.Type == "tag" {
-										<svg
-											xmlns="http://www.w3.org/2000/svg"
-											class={ twerge.It("w-5 h-5") }
-											fill="none"
-											viewBox="0 0 24 24"
-											stroke="currentColor"
-										>
-											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
-										</svg>
-									}
-								</div>
-								<div>
-									<p class={ twerge.It("text-white font-medium") }>
-										{ result.Title }
-									</p>
-								</div>
-							</div>
-						</a>
-					</li>
-				}
-			}
-			// If no results for this type
-			if countResultsByType(resultType, results) == 0 {
-				<li class={ twerge.It("p-4 text-gray-400 text-center bg-gray-800/50 rounded-lg") }>
-					No matching { resultType }s found
-				</li>
-			}
-		</ul>
-	</div>
+templ resultItem() {
 }
 
 // Helper function to count results by type
