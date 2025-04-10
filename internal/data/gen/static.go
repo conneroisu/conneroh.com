@@ -170,7 +170,9 @@ func Defaults(emb *Embedded) error {
 }
 
 // Validate validate the given embedding.
-func Validate(emb *Embedded) error {
+func Validate(
+	emb *Embedded,
+) error {
 	if emb.Title == "" {
 		return eris.Wrapf(
 			ErrValueMissing,

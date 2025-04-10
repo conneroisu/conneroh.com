@@ -44,7 +44,7 @@ type Converter interface {
 func NewRenderer(
 	ctx context.Context,
 	pCtx parser.Context,
-	client *credited.AWSClient,
+	client credited.AWSClient,
 ) *DefaultRenderer {
 	return &DefaultRenderer{
 		Markdown: goldmark.New(goldmark.WithParserOptions(
@@ -175,7 +175,7 @@ type resolver struct {
 }
 
 // newResolver creates a new wikilink resolver.
-func newResolver(ctx context.Context, client *credited.AWSClient) *resolver {
+func newResolver(ctx context.Context, client credited.AWSClient) *resolver {
 	return &resolver{client: client, Ctx: ctx}
 }
 

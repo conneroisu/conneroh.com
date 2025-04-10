@@ -9,7 +9,6 @@ import (
 	"log/slog"
 	"os"
 	"path/filepath"
-	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -452,15 +451,14 @@ func parse(
 
 				// Calculate hash
 				hash := cache.Hash(body)
-				path := pathify(filePath)
-				slug := slugify(filePath)
+				asset := assets.NewAsset(filePath, body)
 
 				mu.Lock()
 				// Check if file has changed
 				cachedHash, exists := cacheObj.Hashes[filePath]
 				if exists && cachedHash == hash {
 					// File hasn't changed
-					ignoredSlugs = append(ignoredSlugs, slug)
+					ignoredSlugs = append(ignoredSlugs, asset.Slug)
 					atomic.AddInt32(&skipped, 1)
 					if *debug {
 						slog.Debug("skipped unchanged file", "path", filePath)
@@ -469,9 +467,9 @@ func parse(
 					// File is new or has changed
 					cacheObj.Hashes[filePath] = hash
 					parsedAssets = append(parsedAssets, assets.Asset{
-						Path: path,
+						Path: asset.Path,
 						Data: body,
-						Slug: slug,
+						Slug: asset.Slug,
 					})
 					atomic.AddInt32(&processed, 1)
 					if *debug {
@@ -503,7 +501,7 @@ func parse(
 
 func actualizeAssets(
 	ctx context.Context,
-	client *credited.AWSClient,
+	client credited.AWSClient,
 	assets []assets.Asset,
 ) error {
 	amount := len(assets)
@@ -605,36 +603,4 @@ func realizeMD[T gen.Post | gen.Project | gen.Tag](
 	}
 
 	return gen.New[T](&emb), nil
-}
-
-func slugify(s string) string {
-	var path string
-	var ok bool
-	path, ok = strings.CutPrefix(s, assetsLoc)
-	if ok {
-		return path
-	}
-	return strings.TrimSuffix(pathify(s), filepath.Ext(s))
-}
-
-func pathify(s string) string {
-	var path string
-	var ok bool
-	path, ok = strings.CutPrefix(s, postsLoc)
-	if ok {
-		return path
-	}
-	path, ok = strings.CutPrefix(s, projectsLoc)
-	if ok {
-		return path
-	}
-	path, ok = strings.CutPrefix(s, tagsLoc)
-	if ok {
-		return path
-	}
-	path, ok = strings.CutPrefix(s, assetsLoc)
-	if ok {
-		return path
-	}
-	return s // Return original path instead of panicking
 }

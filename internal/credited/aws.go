@@ -14,11 +14,17 @@ const (
 	awsBaseURLVar     = "AWS_ENDPOINT_URL_S3"
 )
 
-// AWSClient is a wrapper for the AWS S3 client.
-type AWSClient struct{ *s3.Client }
+// AWSClient is an interface for AWS clients.
+type AWSClient interface {
+	GetObject(ctx context.Context, params *s3.GetObjectInput, optFns ...func(*s3.Options)) (*s3.GetObjectOutput, error)
+	PutObject(ctx context.Context, params *s3.PutObjectInput, optFns ...func(*s3.Options)) (*s3.PutObjectOutput, error)
+}
+
+// DefaultAWSClient is a wrapper for the AWS S3 client.
+type DefaultAWSClient struct{ *s3.Client }
 
 // NewAWSClient creates a new AWSClient.
-func NewAWSClient(getenv func(string) string) (*AWSClient, error) {
+func NewAWSClient(getenv func(string) string) (AWSClient, error) {
 	credHandler, err := newCredHandler(getenv)
 	if err != nil {
 		return nil, err
@@ -31,7 +37,7 @@ func NewAWSClient(getenv func(string) string) (*AWSClient, error) {
 			awsBaseURLVar,
 		)
 	}
-	return &AWSClient{
+	return &DefaultAWSClient{
 		Client: s3.NewFromConfig(aws.Config{
 			Region:       "auto",
 			BaseEndpoint: aws.String(baseURL),

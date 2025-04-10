@@ -7,10 +7,20 @@ import (
 	"log/slog"
 	"mime"
 	"path/filepath"
+	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/conneroisu/conneroh.com/internal/credited"
+)
+
+const (
+	hashFile    = "config.json"
+	vaultLoc    = "internal/data/docs/"
+	assetsLoc   = "internal/data/docs/assets/"
+	postsLoc    = "internal/data/docs/posts/"
+	tagsLoc     = "internal/data/docs/tags/"
+	projectsLoc = "internal/data/docs/projects/"
 )
 
 // Asset is a struct for embedding assets.
@@ -18,6 +28,15 @@ type Asset struct {
 	Slug string
 	Path string
 	Data []byte
+}
+
+// NewAsset creates a new asset.
+func NewAsset(path string, data []byte) *Asset {
+	return &Asset{
+		Slug: slugify(path),
+		Path: pathify(path),
+		Data: data,
+	}
 }
 
 // URL returns the url of the asset.
@@ -31,7 +50,7 @@ func (a *Asset) URL() string {
 // Upload uploads the asset to S3.
 func (a *Asset) Upload(
 	ctx context.Context,
-	client *credited.AWSClient,
+	client credited.AWSClient,
 ) error {
 	extension := filepath.Ext(a.Path)
 	if extension == "" {
@@ -53,4 +72,36 @@ func (a *Asset) Upload(
 	}
 
 	return nil
+}
+
+func slugify(s string) string {
+	var path string
+	var ok bool
+	path, ok = strings.CutPrefix(s, assetsLoc)
+	if ok {
+		return path
+	}
+	return strings.TrimSuffix(pathify(s), filepath.Ext(s))
+}
+
+func pathify(s string) string {
+	var path string
+	var ok bool
+	path, ok = strings.CutPrefix(s, postsLoc)
+	if ok {
+		return path
+	}
+	path, ok = strings.CutPrefix(s, projectsLoc)
+	if ok {
+		return path
+	}
+	path, ok = strings.CutPrefix(s, tagsLoc)
+	if ok {
+		return path
+	}
+	path, ok = strings.CutPrefix(s, assetsLoc)
+	if ok {
+		return path
+	}
+	return s // Return original path instead of panicking
 }
