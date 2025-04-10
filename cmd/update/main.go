@@ -70,7 +70,16 @@ func SetFileSystem(fs afero.Fs) {
 func main() {
 	flag.Parse()
 	ctx := context.Background()
-	if err := run(ctx, os.Getenv); err != nil {
+
+	awsClient, err := credited.NewAWSClient(os.Getenv)
+	if err != nil {
+		panic(err)
+	}
+	ollama, err := credited.NewOllamaClient(os.Getenv)
+	if err != nil {
+		panic(err)
+	}
+	if err := run(ctx, awsClient, ollama); err != nil {
 		slog.Error("error", slog.String("err", err.Error()))
 		os.Exit(1)
 	}
@@ -78,7 +87,8 @@ func main() {
 
 func run(
 	outerCtx context.Context,
-	getenv func(string) string,
+	awsClient credited.AWSClient,
+	ollama *credited.OllamaClient,
 ) (err error) {
 	ctx, cancel := context.WithCancel(outerCtx)
 	defer cancel()
@@ -96,14 +106,6 @@ func run(
 				*cwd,
 			)
 		}
-	}
-	awsClient, err := credited.NewAWSClient(getenv)
-	if err != nil {
-		return err
-	}
-	ollama, err := credited.NewOllamaClient(getenv)
-	if err != nil {
-		return err
 	}
 	objCache, err := loadCache(hashFile)
 	if err != nil {
