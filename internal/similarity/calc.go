@@ -1,10 +1,15 @@
 package similarity
 
-import "gonum.org/v1/gonum/mat"
+import (
+	"sync"
+
+	"gonum.org/v1/gonum/mat"
+)
 
 // Calculator is a struct that can be used to calculate similarity between two strings.
 type Calculator struct {
 	biFuncs []biFuncCoefficient
+	workers int
 }
 
 // Option is a function that can be used to configure a Calculator
@@ -28,14 +33,82 @@ func NewCalculator(opts ...Option) *Calculator {
 
 // Similarity calculates the similarity between two strings.
 func (c *Calculator) Similarity(qVec, iVec []float64) (sim float64, err error) {
-	var val float64
 	qVecMat := mat.NewVecDense(len(qVec), qVec)
 	iVecMat := mat.NewVecDense(len(iVec), iVec)
-	for _, biFunc := range c.biFuncs {
-		val, err = biFunc.handler(qVecMat, iVecMat)
-		sim += biFunc.coefficient * val
+
+	// If workers is not set or is set to 1, use sequential processing
+	if c.workers <= 1 {
+		var val float64
+		for _, biFunc := range c.biFuncs {
+			val, err = biFunc.handler(qVecMat, iVecMat)
+			if err != nil {
+				return 0, err
+			}
+			sim += biFunc.coefficient * val
+		}
+		return sim, nil
 	}
-	return val, err
+
+	// Use parallel processing with workers
+	results := make(chan float64, len(c.biFuncs))
+	errCh := make(chan error, len(c.biFuncs))
+
+	// Create a work queue
+	jobs := make(chan int, len(c.biFuncs))
+	for i := range c.biFuncs {
+		jobs <- i
+	}
+	close(jobs)
+
+	// Create worker pool
+	var wg sync.WaitGroup
+	numWorkers := min(c.workers, len(c.biFuncs))
+	for range numWorkers {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for jobIndex := range jobs {
+				biFunc := c.biFuncs[jobIndex]
+				val, err := biFunc.handler(qVecMat, iVecMat)
+				if err != nil {
+					errCh <- err
+					return
+				}
+				results <- biFunc.coefficient * val
+			}
+		}()
+	}
+
+	// Wait for all workers to finish
+	go func() {
+		wg.Wait()
+		close(results)
+		close(errCh)
+	}()
+
+	// Check for errors
+	select {
+	case err := <-errCh:
+		if err != nil {
+			return 0, err
+		}
+	default:
+		// No errors
+	}
+
+	// Sum up the results
+	for res := range results {
+		sim += res
+	}
+
+	return sim, nil
+}
+
+// WithWorkers sets the number of workers to use for the calculation.
+func WithWorkers(workers int) Option {
+	return func(c *Calculator) {
+		c.workers = workers
+	}
 }
 
 // WithSimilarityDotMatrix sets the similarity function to use with a

@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	// EmbedLength is the length of the embedding.
+	// EmbedLength is the length of the full embedding.
 	EmbedLength = 768
 )
 
@@ -21,10 +21,8 @@ var (
 	_ Embeddable = (*Employment)(nil)
 )
 
-// CustomTime allows us to customize the YAML time parsing
-type CustomTime struct {
-	time.Time
-}
+// CustomTime allows us to customize the YAML time parsing.
+type CustomTime struct{ time.Time }
 
 // UnmarshalYAML implements the yaml.Unmarshaler interface
 func (ct *CustomTime) UnmarshalYAML(value *yaml.Node) error {
@@ -148,10 +146,10 @@ func New[
 }
 
 var (
-	// ErrValueMissing is returned when a value is missing
+	// ErrValueMissing is returned when a value is missing.
 	ErrValueMissing = eris.Errorf("missing value")
 
-	// ErrValueInvalid is returned when the slug is invalid
+	// ErrValueInvalid is returned when the slug is invalid.
 	ErrValueInvalid = eris.Errorf("invalid value")
 )
 
@@ -221,4 +219,9 @@ func Validate(emb *Embedded) error {
 		)
 	}
 	return nil
+}
+
+// GetTitle returns the title of the embedding.
+func (emb *Embedded) GetTitle() string {
+	return emb.Title
 }

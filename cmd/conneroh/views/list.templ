@@ -110,18 +110,16 @@ templ List(
 
 // Main pagination component
 templ pagination(page, pageCount int, target routing.PluralPath) {
-	if pageCount > 1 {
-		<div class={ twerge.It("flex justify-center items-center mt-8 space-x-2") }>
-			@previousPageButton(page, target)
-			<div class={ twerge.It("hidden md:flex space-x-2") }>
-				@renderPageNumbers(page, pageCount, target, routing.MaxDesktopPageNumber)
-			</div>
-			<div class={ twerge.It("flex md:hidden space-x-2") }>
-				@renderPageNumbers(page, pageCount, target, routing.MaxMobilePageNumber)
-			</div>
-			@nextPageButton(page, pageCount, target)
+	<div class={ twerge.It("flex justify-center items-center mt-8 space-x-2") }>
+		@previousPageButton(page, target)
+		<div class={ twerge.It("hidden md:flex space-x-2") }>
+			@renderPageNumbers(page, pageCount, target, routing.MaxDesktopPageNumber)
 		</div>
-	}
+		<div class={ twerge.It("flex md:hidden space-x-2") }>
+			@renderPageNumbers(page, pageCount, target, routing.MaxMobilePageNumber)
+		</div>
+		@nextPageButton(page, pageCount, target)
+	</div>
 }
 
 // Helper to render pagination numbers based on device (mobile or desktop)

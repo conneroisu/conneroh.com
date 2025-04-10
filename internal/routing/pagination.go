@@ -21,16 +21,14 @@ const (
 
 // GeneratePagination generates a pagination list of page numbers.
 func GeneratePagination(currentPage, totalPages, maxDisplay int) []string {
+	result := make([]string, 0)
 	if totalPages <= maxDisplay {
 		// Show all pages if total fits within maxDisplay
-		result := make([]string, totalPages)
 		for i := 1; i <= totalPages; i++ {
-			result[i-1] = strconv.Itoa(i)
+			result = append(result, strconv.Itoa(i))
 		}
 		return result
 	}
-
-	result := []string{}
 
 	// Near the start
 	if currentPage <= maxDisplay/2 {

@@ -1,12 +1,11 @@
 package conneroh
 
 import (
-	"fmt"
-	"log/slog"
 	"net/http"
 	"sort"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/a-h/templ"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/layouts"
@@ -36,7 +35,7 @@ var (
 		1,
 		postPages,
 	)
-	postPages = len(gen.AllPosts) / routing.MaxListLargeItems
+	postPages = (len(gen.AllPosts) + routing.MaxListLargeItems - 1) / routing.MaxListLargeItems
 	projects  = views.List(
 		routing.ProjectPluralPath,
 		&gen.AllPosts,
@@ -46,7 +45,7 @@ var (
 		1,
 		projectPages,
 	)
-	projectPages = len(gen.AllProjects) / routing.MaxListLargeItems
+	projectPages = (len(gen.AllProjects) + routing.MaxListLargeItems - 1) / routing.MaxListLargeItems
 	tags         = views.List(
 		routing.TagsPluralPath,
 		&gen.AllPosts,
@@ -56,131 +55,66 @@ var (
 		1,
 		tagPages,
 	)
-	tagPages = len(gen.AllTags) / routing.MaxListLargeItems
-
-	listMap = map[routing.PluralPath]int{
-		routing.PostPluralPath:    routing.MaxListLargeItems,
-		routing.ProjectPluralPath: routing.MaxListLargeItems,
-		routing.TagsPluralPath:    routing.MaxListSmallItems,
-	}
+	tagPages = (len(gen.AllTags) + routing.MaxListLargeItems - 1) / routing.MaxListLargeItems
 )
 
-func filterPosts(
-	posts []*gen.Post,
+func filter[T any](
+	items []T,
 	query string,
 	page int,
-) ([]*gen.Post, int) {
+	pageSize int,
+	titleGetter func(T) string,
+) ([]T, int) {
 	p := pool.New().WithMaxGoroutines(maxSearchRoutines)
-	filtered := make([]*gen.Post, 0)
-	for _, post := range posts {
-		post := post
+
+	// Use a mutex to safely collect results
+	var mu sync.Mutex
+	filtered := make([]T, 0)
+
+	for i := range items {
+		item := items[i]
 		p.Go(func() {
-			if strings.Contains(post.Title, query) {
-				filtered = append(filtered, post)
+			title := titleGetter(item)
+			if strings.Contains(strings.ToLower(title), strings.ToLower(query)) {
+				mu.Lock()
+				filtered = append(filtered, item)
+				mu.Unlock()
 			}
 		})
 	}
-	p.Wait()
-	// Sort results to ensure consistent pagination
-	sort.Slice(filtered, func(i, j int) bool {
-		return filtered[i].Title < filtered[j].Title
-	})
 
-	// Paginate the filtered results
-	return paginate(filtered, page, routing.ProjectPluralPath)
-}
-
-func filterProjects(
-	projects []*gen.Project,
-	query string,
-	page int,
-) ([]*gen.Project, int) {
-	p := pool.New().WithMaxGoroutines(maxSearchRoutines)
-	filtered := make([]*gen.Project, 0)
-	for _, project := range projects {
-		project := project
-		p.Go(func() {
-			if strings.Contains(project.Title, query) {
-				filtered = append(filtered, project)
-			}
-		})
-	}
-	p.Wait()
-	// Sort results to ensure consistent pagination
-	sort.Slice(filtered, func(i, j int) bool {
-		return filtered[i].Title < filtered[j].Title
-	})
-
-	// Paginate the filtered results
-	return paginate(filtered, page, routing.ProjectPluralPath)
-}
-
-func filterTags(
-	tags []*gen.Tag,
-	query string,
-	page int,
-) ([]*gen.Tag, int) {
-	p := pool.New().WithMaxGoroutines(maxSearchRoutines)
-
-	filtered := make([]*gen.Tag, 0)
-
-	for _, tag := range tags {
-		tag := tag
-		p.Go(func() {
-			if strings.Contains(strings.ToLower(tag.Title), strings.ToLower(query)) {
-				filtered = append(filtered, tag)
-			}
-		})
-	}
 	p.Wait()
 
 	// Sort results to ensure consistent pagination
 	sort.Slice(filtered, func(i, j int) bool {
-		return filtered[i].Title < filtered[j].Title
+		return titleGetter(filtered[i]) < titleGetter(filtered[j])
 	})
 
 	// Paginate the filtered results
-	return paginate(filtered, page, routing.TagsPluralPath)
+	return paginate(filtered, page, pageSize)
 }
 
 func paginate[T any](
 	items []T,
 	page int,
-	target routing.PluralPath,
+	pageSize int,
 ) ([]T, int) {
-	if len(items) == 0 {
+	if len(items) == 0 || pageSize <= 0 {
 		return []T{}, 0
 	}
 
-	// Get the page size based on the target type
-	pageSize := listMap[target]
-	if pageSize <= 0 {
-		panic(fmt.Sprintf("invalid page size for target %s", target))
-	}
-
-	// Calculate total number of pages
+	// Calculate total number of pages (use exact division with ceiling)
 	totalPages := (len(items) + pageSize - 1) / pageSize
-	slog.Info("total pages", "totalPages", totalPages, "items", len(items))
 
-	// Validate page number
-	if page < 1 {
-		page = 1
-	} else if page > totalPages {
-		page = totalPages
-	}
+	page = max(1, page)
+	page = min(page, totalPages)
 
 	// Calculate start and end indices for the current page
 	startIndex := (page - 1) * pageSize
-	slog.Info("start index", "startIndex", startIndex)
 	endIndex := min(startIndex+pageSize, len(items))
-	slog.Info("end index", "endIndex", endIndex)
 
 	// Return the paginated subset and the total page count
-	if startIndex < len(items) {
-		return items[startIndex:endIndex], totalPages
-	}
-
-	return []T{}, totalPages
+	return items[startIndex:endIndex], totalPages
 }
 
 func listHandler(
@@ -199,7 +133,9 @@ func listHandler(
 		}
 		switch target {
 		case routing.PostPluralPath:
-			filtered, totalPages := filterPosts(gen.AllPosts, query, page)
+			filtered, totalPages := filter(gen.AllPosts, query, page, routing.MaxListLargeItems, func(post *gen.Post) string {
+				return post.Title
+			})
 			if header == "" {
 				templ.Handler(layouts.Page(views.List(
 					target,
@@ -221,7 +157,9 @@ func listHandler(
 				)).ServeHTTP(w, r)
 			}
 		case routing.ProjectPluralPath:
-			filtered, totalPages := filterProjects(gen.AllProjects, query, page)
+			filtered, totalPages := filter(gen.AllProjects, query, page, routing.MaxListLargeItems, func(project *gen.Project) string {
+				return project.Title
+			})
 			if header == "" {
 				templ.Handler(layouts.Page(views.List(
 					target,
@@ -243,7 +181,9 @@ func listHandler(
 				)).ServeHTTP(w, r)
 			}
 		case routing.TagsPluralPath:
-			filtered, totalPages := filterTags(gen.AllTags, query, page)
+			filtered, totalPages := filter(gen.AllTags, query, page, routing.MaxListSmallItems, func(tag *gen.Tag) string {
+				return tag.Title
+			})
 			if header == "" {
 				templ.Handler(layouts.Page(views.List(
 					target,
