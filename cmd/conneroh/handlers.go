@@ -207,3 +207,12 @@ func listHandler(
 		}
 	}
 }
+
+func globalSearchHandler(
+	posts []*gen.Post,
+	projects []*gen.Project,
+	tags []*gen.Tag,
+) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+	}
+}
