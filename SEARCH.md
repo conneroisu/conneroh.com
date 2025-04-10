@@ -1,4 +1,5 @@
 
 
 - [x] Live HTMX Search
-- [ ] Pagination
+- [x] Pagination
+- [ ] Global Search

@@ -188,15 +188,14 @@ func run(
 					"error", result.err)
 				continue
 			}
-
 			slog.Info("parsed location",
 				"location", result.location,
 				"assets", len(result.assets),
 				"ignored", len(result.ignored))
-
 			// Start actualization early if not assets
 			if result.location != assetsLoc {
 				actualizationStarted++
+				// TODO: Add limit to concurrent actualizations
 				go startActualization(ctx, ollama, mdParser, result, actualizeResultCh)
 			}
 
