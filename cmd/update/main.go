@@ -368,7 +368,7 @@ func actualize[T gen.Post | gen.Tag | gen.Project](
 	eg.SetLimit(*workers)
 
 	// Create result slice with appropriate capacity
-	parsedItems := make([]*T, amount)
+	parsedItems := make([]*T, 0)
 
 	// Process each asset using errgroup
 	for i, content := range contents {
@@ -384,7 +384,7 @@ func actualize[T gen.Post | gen.Tag | gen.Project](
 				)
 			}
 
-			parsedItems[index] = realized
+			parsedItems = append(parsedItems, realized)
 			return nil
 		})
 	}
