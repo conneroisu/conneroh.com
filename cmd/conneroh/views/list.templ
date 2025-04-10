@@ -148,6 +148,11 @@ templ Results(
 				}
 		}
 	</div>
+	<div
+		class={ twerge.It("py-2 px-4 container mx-auto") }
+	>
+		@pagination(page, pageCount, target)
+	</div>
 }
 
 templ listProjectItem(project *gen.Project) {
