@@ -115,14 +115,14 @@ templ previousPageButton(currentPage int, target routing.PluralPath) {
 			class={ twerge.It(inactiveBtnStyle + " flex items-center") }
 			aria-label="Previous page"
 		>
-			@icon("chevron-left", templ.Attributes{})
+			{ "<" }
 		</a>
 	} else {
 		<span
 			class={ twerge.It(inactiveBtnStyle + " opacity-50 flex items-center") }
 			aria-disabled="true"
 		>
-			@icon("chevron-left", templ.Attributes{})
+			{ "<" }
 		</span>
 	}
 }
@@ -139,14 +139,14 @@ templ nextPageButton(currentPage, pageCount int, target routing.PluralPath) {
 			class={ twerge.It(inactiveBtnStyle + " flex items-center") }
 			aria-label="Next page"
 		>
-			@icon("chevron-right", templ.Attributes{})
+			{ ">" }
 		</a>
 	} else {
 		<span
 			class={ twerge.It(inactiveBtnStyle + " opacity-50 flex items-center") }
 			aria-disabled="true"
 		>
-			@icon("chevron-right", templ.Attributes{})
+			{ ">" }
 		</span>
 	}
 }

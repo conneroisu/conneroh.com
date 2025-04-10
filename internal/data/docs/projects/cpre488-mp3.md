@@ -14,10 +14,11 @@ tags:
   - ideologies/device-drivers
   - protocol/uart
   - protocol/usb
+banner_path: projects/mp3.png
 created_at: 2025-03-27T14:13:10.000-06:00
 description: Mini-project 3 for CPRE488
 title: CPRE488-mp3
-updated_at: 2025-04-10T12:17:23.000-06:00
+updated_at: 2025-04-10T13:13:06.000-06:00
 ---
 
 # cpre488-mp3
