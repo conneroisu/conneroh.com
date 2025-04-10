@@ -25,7 +25,7 @@ import (
 )
 
 const (
-	hashFile    = "config.json"
+	hashFile    = ".config.json"
 	vaultLoc    = "internal/data/docs/"
 	assetsLoc   = "internal/data/docs/assets/"
 	postsLoc    = "internal/data/docs/posts/"
