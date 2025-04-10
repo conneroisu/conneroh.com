@@ -36,12 +36,11 @@ func AddRoutes(
 		"GET /favicon.ico",
 		func(w http.ResponseWriter, _ *http.Request) {
 			_, _ = w.Write(static.Favicon)
-		},
-	)
+		})
 	h.HandleFunc(
 		"GET /api/search",
-		globalSearchHandler(gen.AllPosts, gen.AllProjects, gen.AllTags),
-	)
+		globalSearchHandler(gen.AllPosts, gen.AllProjects, gen.AllTags))
+
 	h.Handle(
 		"GET /posts",
 		templ.Handler(layouts.Page(posts)))
