@@ -180,19 +180,3 @@ func slicesEqual[T comparable](a, b []T) bool {
 	}
 	return true
 }
-
-// Helper max function (for Go versions < 1.21)
-func max(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
-}
-
-// Helper min function (for Go versions < 1.21)
-func min(a, b int) int {
-	if a > b {
-		return b
-	}
-	return a
-}
