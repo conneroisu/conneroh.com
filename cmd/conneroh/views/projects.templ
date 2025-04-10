@@ -1,7 +1,6 @@
 package views
 
 import (
-	"fmt"
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
 	"github.com/conneroisu/twerge"
 )
@@ -25,15 +24,10 @@ templ Project(
 			</h1>
 			if len(project.Tags) > 0 {
 				<div
-					class={ twerge.It("gap-2 mb-6 flex flex-wrap") }
+					class={ twerge.It("gap-2 mb-6 flex-row flex") }
 				>
 					for _, tag := range project.Tags {
-						<a
-							href={ templ.SafeURL(fmt.Sprintf("/tag/%s", tag.Slug)) }
-							class={ twerge.It("rounded-full hover:bg-blue-800 font-medium px-3 py-1 text-sm transition-colors text-blue-200 bg-blue-900 inline-block") }
-						>
-							{ tag.Slug }
-						</a>
+						@TagControl(tag)
 					}
 				</div>
 			}

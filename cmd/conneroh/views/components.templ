@@ -36,17 +36,14 @@ templ TagControl(
 	tag *gen.Tag,
 ) {
 	<div
-		x-data="{ open: false }"
-		x-on:mouseover="open = true"
-		x-on:mouseleave="open = false"
-		class={ twerge.It("w-full text-blue-200 px-3 items-center flex-row flex text-sm bg-blue-900 transition-colors py-1 hover:bg-blue-800 justify-between font-medium h-8 rounded-full hover:underline") }
+		class={ twerge.It("text-blue-200 px-3 items-center flex-row flex text-sm bg-blue-900 transition-colors py-1 hover:bg-blue-800 justify-between font-medium h-8 rounded-full hover:underline") }
 		hx-get={ tag.MorphPath() }
 		hx-target={ hx.Bodiody.Sel }
 		hx-push-url={ tag.PagePath() }
 		preload="mouseover"
 	>
 		<div
-			class={ twerge.It("items-center flex") }
+			class={ twerge.It("items-center flex pr-3") }
 		>
 			@icon(tag.Icon, templ.Attributes{"x-show": "open", "x-transition": ""})
 		</div>
