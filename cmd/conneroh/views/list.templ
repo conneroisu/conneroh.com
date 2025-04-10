@@ -152,7 +152,7 @@ templ Results(
 
 templ listProjectItem(project *gen.Project) {
 	<div
-		class={ twerge.It("transition-all flex transform hover:-translate-y-3 duration-300 rounded-lg overflow-hidden flex-col h-full bg-gray-800 hover:shadow-lg p-6 shadow-md") }
+		class={ twerge.It("transition-all flex transform hover:-translate-y-3 duration-300 overflow-hidden flex-col h-full bg-gray-800 hover:shadow-lg shadow-md rounded-lg") }
 		aria-label={ project.Title }
 	>
 		<a
@@ -162,11 +162,13 @@ templ listProjectItem(project *gen.Project) {
 			class={ twerge.It("cursor-pointer h-full") }
 			preload="mouseover"
 		>
-			@image(
-				project.BannerPath,
-				project.Title,
-				twerge.It("w-full h-48 object-cover"),
-			)
+			<div class={ twerge.It("relative w-full") }>
+				@image(
+					project.BannerPath,
+					project.Title,
+					twerge.It("w-full h-48 object-cover"),
+				)
+			</div>
 			<div
 				class={ twerge.It("flex-grow flex-col flex p-6") }
 			>
@@ -182,24 +184,44 @@ templ listProjectItem(project *gen.Project) {
 				</p>
 				<div
 					class={ twerge.It("grid flex-wrap gap-2 mb-4 grid-cols-2") }
-					x-data="{ po_open: false }"
+					x-data="{ allTags: false }"
 				>
 					for i, tag := range project.Tags {
 						if i < 8 {
 							@TagControl(tag)
 						} else {
-							@icon("ellipsis", templ.Attributes{
-								"class":           twerge.It("w-full text-blue-200 px-3 items-center flex-row flex text-sm bg-blue-900 transition-colors py-1 hover:bg-blue-800 justify-between font-medium h-8 rounded-full hover:underline"),
-								"x-on:mouseover":  "po_open = true",
-								"x-on:mouseleave": "po_open = false",
-								"x-on:click":      "po_open = !po-open",
-							})
+							<div x-show="allTags">
+								@TagControl(tag)
+							</div>
 						}
+					}
+					if len(project.Tags) > 8 {
+						<button
+							type="button"
+							class={ twerge.It("w-full text-blue-200 px-3 items-center flex-row flex text-sm bg-blue-900 transition-colors py-1 hover:bg-blue-800 justify-between font-medium h-8 rounded-full hover:underline") }
+							x-on:click.stop="allTags = !allTags"
+							x-show="!allTags"
+						>
+							@icon("ellipsis", templ.Attributes{})
+							<span>Show More</span>
+						</button>
+						<button
+							type="button"
+							class={ twerge.It("w-full text-blue-200 px-3 items-center flex-row flex text-sm bg-blue-900 transition-colors py-1 hover:bg-blue-800 justify-between font-medium h-8 rounded-full hover:underline") }
+							x-on:click.stop="allTags = !allTags"
+							x-show="allTags"
+						>
+							@icon("minus", templ.Attributes{})
+							<span>Show less</span>
+						</button>
 					}
 				</div>
 			</div>
 			<a
-				class={ twerge.It("left-0 flex bottom-5 font-medium hover:underline items-center right-0 text-sm justify-center text-blue-400 absolute") }
+				class={ twerge.It("left-0 flex bottom-3 font-medium hover:underline items-center right-0 text-sm justify-center text-blue-400 absolute") }
+				hx-target={ hx.Bodiody.Sel }
+				hx-get={ project.MorphPath() }
+				hx-push-url={ project.PagePath() }
 			>
 				Read More
 				@icon("arrow-right", templ.Attributes{})
@@ -261,7 +283,7 @@ templ listTagItem(tag *gen.Tag) {
 
 templ listPostItem(post *gen.Post) {
 	<div
-		class={ twerge.It("p-6 rounded-lg overflow-hidden bg-gray-800 shadow-md hover:shadow-lg duration-300 transform transition-all hover:-translate-y-1") }
+		class={ twerge.It("rounded-lg overflow-hidden bg-gray-800 shadow-md hover:shadow-lg duration-300 transform transition-all hover:-translate-y-1") }
 		x-transition:enter={ twerge.It("duration-200 transition ease-out") }
 		x-transition:enter-start={ twerge.It("translate-y-4 opacity-0 transform") }
 		x-transition:enter-end={ twerge.It("transform translate-y-0 opacity-100") }
@@ -269,9 +291,9 @@ templ listPostItem(post *gen.Post) {
 	>
 		<a
 			hx-target={ hx.Bodiody.Sel }
-			hx-get={ post.MorphPath() }
+			hx-get={ post.PagePath() }
 			hx-push-url={ post.PagePath() }
-			class={ twerge.It("block cursor-pointer") }
+			class={ twerge.It("cursor-pointer") }
 			preload="mouseover"
 		>
 			@image(
@@ -313,7 +335,7 @@ templ listPostItem(post *gen.Post) {
 							x-show="!allTags"
 						>
 							@icon("ellipsis", templ.Attributes{})
-							<span>Show more tags ({ strconv.Itoa(len(post.Tags) - 8) })</span>
+							<span>({ strconv.Itoa(len(post.Tags) - 8) }) More</span>
 						</button>
 						<button
 							type="button"

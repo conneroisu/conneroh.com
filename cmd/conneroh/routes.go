@@ -74,22 +74,21 @@ func AddRoutes(
 	for _, p := range gen.AllPosts {
 		h.Handle(
 			fmt.Sprintf("GET /post/%s", p.Slug),
-			templ.Handler(layouts.Page(views.Post(
-				p,
-				&gen.AllPosts,
-				&gen.AllProjects,
-				&gen.AllTags,
-			))),
+			routing.MorphableHandler(
+				layouts.Page(views.Post(
+					p,
+					&gen.AllPosts,
+					&gen.AllProjects,
+					&gen.AllTags,
+				)),
+				views.Post(
+					p,
+					&gen.AllPosts,
+					&gen.AllProjects,
+					&gen.AllTags,
+				),
+			),
 		)
-		h.Handle(fmt.Sprintf(
-			"GET /morph/post/%s",
-			p.Slug,
-		), templ.Handler(views.Post(
-			p,
-			&gen.AllPosts,
-			&gen.AllProjects,
-			&gen.AllTags,
-		)))
 	}
 	for _, p := range gen.AllProjects {
 		h.Handle(

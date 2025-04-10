@@ -194,9 +194,9 @@ func TagControl(
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var11 string
-		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/morph/tag/%s", tag.Slug))
+		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(tag.MorphPath())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/components.templ`, Line: 43, Col: 49}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/components.templ`, Line: 43, Col: 26}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 		if templ_7745c5c3_Err != nil {
@@ -220,9 +220,9 @@ func TagControl(
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var13 string
-		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/tag/%s", tag.Slug))
+		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(tag.PagePath())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/components.templ`, Line: 45, Col: 48}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/components.templ`, Line: 45, Col: 30}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 		if templ_7745c5c3_Err != nil {

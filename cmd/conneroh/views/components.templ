@@ -40,9 +40,9 @@ templ TagControl(
 		x-on:mouseover="open = true"
 		x-on:mouseleave="open = false"
 		class={ twerge.It("w-full text-blue-200 px-3 items-center flex-row flex text-sm bg-blue-900 transition-colors py-1 hover:bg-blue-800 justify-between font-medium h-8 rounded-full hover:underline") }
-		hx-get={ fmt.Sprintf("/morph/tag/%s", tag.Slug) }
+		hx-get={ tag.MorphPath() }
 		hx-target={ hx.Bodiody.Sel }
-		hx-push-url={ fmt.Sprintf("/tag/%s", tag.Slug) }
+		hx-push-url={ tag.PagePath() }
 		preload="mouseover"
 	>
 		<div
