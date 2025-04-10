@@ -2,7 +2,12 @@ package assets
 
 import (
 	"bytes"
+	"context"
+	"fmt"
+	"io"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/conneroisu/conneroh.com/internal/credited"
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
 	mathjax "github.com/litao91/goldmark-mathjax"
@@ -21,18 +26,27 @@ import (
 	"go.abhg.dev/goldmark/wikilink"
 )
 
-// MDParser is a markdown parser that supports wikilinks.
-type MDParser struct {
-	goldmark.Markdown
-	pCtx parser.Context
+type awsClient interface {
+	GetObject(ctx context.Context, params *s3.GetObjectInput, optFns ...func(*s3.Options)) (*s3.GetObjectOutput, error)
 }
 
-// NewMDParser creates a new markdown parser.
-func NewMDParser(
+// Renderer is a markdown parser/renderer.
+type Renderer interface {
+	Convert(Asset) (gen.Embedded, error)
+}
+
+// Converter is a markdown parser.
+type Converter interface {
+	Convert(source []byte, writer io.Writer, opts ...parser.ParseOption) error
+}
+
+// NewRenderer creates a new markdown parser.
+func NewRenderer(
+	ctx context.Context,
 	pCtx parser.Context,
 	client *credited.AWSClient,
-) *MDParser {
-	return &MDParser{
+) *DefaultRenderer {
+	return &DefaultRenderer{
 		Markdown: goldmark.New(goldmark.WithParserOptions(
 			parser.WithAutoHeadingID(),
 			parser.WithAttribute(),
@@ -44,7 +58,7 @@ func NewMDParser(
 			),
 			goldmark.WithExtensions(
 				&wikilink.Extender{
-					Resolver: newResolver(client),
+					Resolver: newResolver(ctx, client),
 				},
 				extension.GFM,
 				extension.Footnote,
@@ -85,13 +99,19 @@ func NewMDParser(
 	}
 }
 
+// DefaultRenderer is a markdown parser that supports wikilinks.
+type DefaultRenderer struct {
+	Markdown Converter
+	pCtx     parser.Context
+}
+
 // Convert converts the provided markdown to HTML.
-func (m *MDParser) Convert(
-	asset Asset,
-) (emb gen.Embedded, err error) {
+func (m *DefaultRenderer) Convert(asset Asset) (gen.Embedded, error) {
 	var (
 		buf      = bytes.NewBufferString("")
 		metadata *frontmatter.Data
+		emb      gen.Embedded
+		err      error
 	)
 	err = m.Markdown.Convert(asset.Data, buf, parser.WithContext(m.pCtx))
 	if err != nil {
@@ -145,4 +165,37 @@ func (m *MDParser) Convert(
 		)
 	}
 	return emb, nil
+}
+
+// resolver is a wikilink.Resolver that resolves pages and media referenced by
+// wikilinks to their destinations.
+type resolver struct {
+	Ctx    context.Context
+	client awsClient
+}
+
+// newResolver creates a new wikilink resolver.
+func newResolver(ctx context.Context, client *credited.AWSClient) *resolver {
+	return &resolver{client: client, Ctx: ctx}
+}
+
+// ResolveWikilink returns the address of the page that the provided
+// wikilink points to. The destination will be URL-escaped before
+// being placed into a link.
+func (r *resolver) ResolveWikilink(n *wikilink.Node) ([]byte, error) {
+	var (
+		err       error
+		targetStr = string(n.Target)
+	)
+	_, err = r.client.GetObject(r.Ctx, &s3.GetObjectInput{
+		Bucket: aws.String("conneroh"),
+		Key:    aws.String(targetStr),
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to get object(%s): %w", targetStr, err)
+	}
+	return fmt.Appendf(nil,
+		"https://conneroh.fly.storage.tigris.dev/%s",
+		targetStr,
+	), nil
 }

@@ -117,23 +117,19 @@
           format = {
             exec = ''
               cd $(git rev-parse --show-toplevel)
-
               ${pkgs.go}/bin/go fmt ./...
-
               ${pkgs.git}/bin/git ls-files \
                 --others \
                 --exclude-standard \
                 --cached \
                 -- '*.js' '*.ts' '*.css' '*.md' '*.json' \
                 | xargs prettier --write
-
               ${pkgs.golines}/bin/golines \
                 -l \
                 -w \
                 --max-len=80 \
                 --shorten-comments \
                 --ignored-dirs=.direnv .
-
               cd -
             '';
             description = "Format code files";

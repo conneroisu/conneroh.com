@@ -115,7 +115,6 @@ func run(
 			slog.Info("visited post", "url", url)
 			return nil
 		})
-
 	}
 	err = eg.Wait()
 	if err != nil {

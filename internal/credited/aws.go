@@ -69,7 +69,6 @@ func newCredHandler(getEnv func(string) string) (*credHandler, error) {
 		id:  id,
 		key: key,
 	}, nil
-
 }
 
 // Retrieve returns the credentials for the bucket.

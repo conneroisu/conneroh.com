@@ -43,7 +43,7 @@ func (c *Calculator) Similarity(qVec, iVec []float64) (sim float64, err error) {
 //
 // $$a \cdot b=\sum_{i=1}^{n} a_{i} b_{i}$$
 //
-// It adds the similarity dot matrix to the comparision functions with the given
+// It adds the similarity dot matrix to the comparison functions with the given
 // coefficient.
 func WithSimilarityDotMatrix(coefficient float64) Option {
 	return func(c *Calculator) {
@@ -70,7 +70,7 @@ func WithEuclideanDistance(coefficient float64) Option {
 //
 // $$d(x, y) = |x_1 - y_1| + |x_2 - y_2| + ... + |x_n - y_n|$$
 //
-// It adds the manhatten distance to the comparision functions with the given
+// It adds the manhatten distance to the comparison functions with the given
 // coefficient.
 func WithManhattanDistance(coefficient float64) Option {
 	return func(c *Calculator) {
@@ -85,7 +85,7 @@ func WithManhattanDistance(coefficient float64) Option {
 //
 // $$J(A, B)=\frac{|A \cap B|}{|A \cup B|}$$
 //
-// It adds the jaccard similarity to the comparision functions with the given
+// It adds the jaccard similarity to the comparison functions with the given
 // coefficient.
 func WithJaccardSimilarity(coefficient float64) Option {
 	return func(c *Calculator) {
@@ -101,7 +101,7 @@ func WithJaccardSimilarity(coefficient float64) Option {
 //
 // $$r=\frac{\sum\left(x_{i}-\bar{x}\right)\left(y_{i}-\bar{y}\right)}{\sqrt{\sum\left(x_{i}-\bar{x}\right)^{2} \sum\left(y_{i}-\bar{y}\right)^{2}}}$$
 //
-// It adds the pearson correlation to the comparision functions with the given
+// It adds the pearson correlation to the comparison functions with the given
 // coefficient.
 func WithPearsonCorrelation(coefficient float64) Option {
 	return func(c *Calculator) {

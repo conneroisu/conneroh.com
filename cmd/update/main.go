@@ -95,7 +95,7 @@ func run(
 	if err != nil {
 		return err
 	}
-	mdParser := assets.NewMDParser(parser.NewContext(), awsClient)
+	mdParser := assets.NewRenderer(ctx, parser.NewContext(), awsClient)
 
 	// Log cache stats
 	slog.Info("cache loaded", "entries", len(objCache.Hashes))
@@ -179,7 +179,6 @@ func run(
 	// Process events until everything is complete
 	// Exit condition: parsing is done and all actualizations are complete
 	for !parseComplete || actualizationComplete != actualizationStarted || actualizationStarted <= 0 {
-
 		// Process all available events
 		select {
 		case result := <-parseResultCh:
@@ -289,7 +288,7 @@ func run(
 func startActualization(
 	ctx context.Context,
 	ollama *credited.OllamaClient,
-	mdParser *assets.MDParser,
+	mdParser *assets.DefaultRenderer,
 	result parseResult,
 	resultCh chan<- actualizeResult,
 ) {
@@ -339,7 +338,7 @@ func startActualization(
 func actualize[T gen.Post | gen.Tag | gen.Project](
 	ctx context.Context,
 	ollama *credited.OllamaClient,
-	mdParser *assets.MDParser,
+	mdParser *assets.DefaultRenderer,
 	contents []assets.Asset,
 	ignored []string,
 ) ([]*T, error) {
@@ -356,7 +355,7 @@ func actualize[T gen.Post | gen.Tag | gen.Project](
 	eg.SetLimit(*workers)
 
 	// Create result slice with appropriate capacity
-	parsedItems := make([]*T, amount)
+	parsedItems := make([]*T, 0)
 
 	// Process each asset using errgroup
 	for i, content := range contents {
@@ -578,7 +577,7 @@ func rememberMD[T gen.Post | gen.Project | gen.Tag](ignored []string) []*T {
 func realizeMD[T gen.Post | gen.Project | gen.Tag](
 	ctx context.Context,
 	ollama *credited.OllamaClient,
-	mdParser *assets.MDParser,
+	mdParser *assets.DefaultRenderer,
 	parsed assets.Asset,
 ) (*T, error) {
 	var (
