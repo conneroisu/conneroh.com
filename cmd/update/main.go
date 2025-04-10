@@ -5,15 +5,14 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"io/fs"
 	"log/slog"
 	"os"
-	"path/filepath"
 	"sync"
 	"sync/atomic"
 	"time"
 
 	"github.com/rotisserie/eris"
+	"github.com/spf13/afero"
 
 	"github.com/conneroisu/conneroh.com/internal/assets"
 	"github.com/conneroisu/conneroh.com/internal/cache"
@@ -55,6 +54,19 @@ type actualizeResult struct {
 	err         error
 }
 
+// AppFS is the application filesystem
+var AppFS afero.Fs
+
+func init() {
+	// By default use the OS filesystem
+	AppFS = afero.NewOsFs()
+}
+
+// SetFileSystem allows overriding the default file system for testing
+func SetFileSystem(fs afero.Fs) {
+	AppFS = fs
+}
+
 func main() {
 	flag.Parse()
 	ctx := context.Background()
@@ -73,6 +85,9 @@ func run(
 
 	start := time.Now()
 	if *cwd != "" {
+		// Use afero for directory changes if needed
+		// Note: We can't fully abstract this part with afero since the working directory
+		// affects the entire process, not just file operations
 		err = os.Chdir(*cwd)
 		if err != nil {
 			return eris.Wrapf(
@@ -90,7 +105,7 @@ func run(
 	if err != nil {
 		return err
 	}
-	objCache, err := cache.LoadCache(hashFile)
+	objCache, err := loadCache(hashFile)
 	if err != nil {
 		return err
 	}
@@ -105,7 +120,7 @@ func run(
 		slog.Info("saving cache",
 			"entries", len(objCache.Hashes),
 			"duration", time.Since(start).String())
-		err = objCache.Close()
+		err = saveCache(objCache, hashFile)
 		if err != nil {
 			err = eris.Wrap(
 				err,
@@ -353,7 +368,7 @@ func actualize[T gen.Post | gen.Tag | gen.Project](
 	eg.SetLimit(*workers)
 
 	// Create result slice with appropriate capacity
-	parsedItems := make([]*T, 0)
+	parsedItems := make([]*T, amount)
 
 	// Process each asset using errgroup
 	for i, content := range contents {
@@ -393,6 +408,7 @@ func actualize[T gen.Post | gen.Tag | gen.Project](
 	return parsedItems, nil
 }
 
+// Modified parse function to use afero
 func parse(
 	cacheObj *cache.Cache,
 	loc string,
@@ -407,20 +423,17 @@ func parse(
 		skipped   int32
 	)
 
-	// First, collect all file paths
-	err = filepath.WalkDir(
-		loc,
-		func(fPath string, d fs.DirEntry, err error) error {
-			if err != nil {
-				return err
-			}
-			if d.IsDir() {
-				return nil
-			}
+	// First, collect all file paths using afero
+	err = afero.Walk(AppFS, loc, func(fPath string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if !info.IsDir() {
 			filePaths = append(filePaths, fPath)
-			return nil
-		},
-	)
+		}
+		return nil
+	})
+
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to walk fsPath (%s): %w", loc, err)
 	}
@@ -441,8 +454,8 @@ func parse(
 	for range *workers {
 		eg.Go(func() error {
 			for filePath := range filesCh {
-				// Read file
-				body, err := os.ReadFile(filePath)
+				// Read file using afero
+				body, err := afero.ReadFile(AppFS, filePath)
 				if err != nil {
 					slog.Error("failed to read file", "path", filePath, "error", err)
 					continue // Skip failed files but don't abort the entire process
@@ -496,6 +509,49 @@ func parse(
 		"skipped", skipped)
 
 	return parsedAssets, ignoredSlugs, nil
+}
+
+// Modified cache loading function to use afero
+func loadCache(filename string) (*cache.Cache, error) {
+	exists, err := afero.Exists(AppFS, filename)
+	if err != nil {
+		return nil, eris.Wrapf(err, "failed to check if cache file exists: %s", filename)
+	}
+
+	cacheObj := &cache.Cache{
+		Hashes: make(map[string]string),
+	}
+
+	if !exists {
+		return cacheObj, nil
+	}
+
+	data, err := afero.ReadFile(AppFS, filename)
+	if err != nil {
+		return nil, eris.Wrapf(err, "failed to read cache file: %s", filename)
+	}
+
+	err = cacheObj.Unmarshal(data)
+	if err != nil {
+		return nil, eris.Wrapf(err, "failed to unmarshal cache file: %s", filename)
+	}
+
+	return cacheObj, nil
+}
+
+// Modified cache saving function to use afero
+func saveCache(cacheObj *cache.Cache, filename string) error {
+	data, err := cacheObj.Marshal()
+	if err != nil {
+		return eris.Wrapf(err, "failed to marshal cache")
+	}
+
+	err = afero.WriteFile(AppFS, filename, data, 0644)
+	if err != nil {
+		return eris.Wrapf(err, "failed to write cache file: %s", filename)
+	}
+
+	return nil
 }
 
 func actualizeAssets(

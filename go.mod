@@ -14,6 +14,7 @@ require (
 	github.com/quail-ink/goldmark-enclave v0.1.5
 	github.com/rotisserie/eris v0.5.4
 	github.com/sourcegraph/conc v0.3.0
+	github.com/spf13/afero v1.14.0
 	github.com/yuin/goldmark v1.7.8
 	github.com/yuin/goldmark-highlighting/v2 v2.0.0-20230729083705-37449abec8cc
 	go.abhg.dev/goldmark/anchor v0.1.1
@@ -21,7 +22,7 @@ require (
 	go.abhg.dev/goldmark/hashtag v0.3.1
 	go.abhg.dev/goldmark/mermaid v0.5.0
 	go.abhg.dev/goldmark/wikilink v0.6.0
-	golang.org/x/sync v0.11.0
+	golang.org/x/sync v0.12.0
 	gonum.org/v1/gonum v0.16.0
 	gopkg.in/yaml.v3 v3.0.1
 )
@@ -47,4 +48,5 @@ require (
 	github.com/rivo/uniseg v0.4.7 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.9.0 // indirect
+	golang.org/x/text v0.23.0 // indirect
 )

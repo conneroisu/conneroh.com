@@ -52,3 +52,13 @@ func LoadCache(hashFilePath string) (*Cache, error) {
 
 	return &cache, nil
 }
+
+// Marshal returns the JSON representation of the cache object.
+func (c *Cache) Marshal() ([]byte, error) {
+	return json.Marshal(c)
+}
+
+// Unmarshal unmarshals the JSON representation of the cache object.
+func (c *Cache) Unmarshal(data []byte) error {
+	return json.Unmarshal(data, c)
+}
