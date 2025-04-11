@@ -6,30 +6,17 @@ import (
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
 )
 
-// SingleTarget is the target of a single view.
+// PluralPath is the target of a plural view.
 // string
-type SingleTarget = string
+type PluralPath = string
 
 const (
-	// SingleTargetPost is the target of a single post view.
-	SingleTargetPost SingleTarget = "post"
-	// SingleTargetProject is the target of a single project view.
-	SingleTargetProject SingleTarget = "project"
-	// SingleTargetTag is the target of a single tag view.
-	SingleTargetTag SingleTarget = "tag"
-)
-
-// PluralTarget is the target of a plural view.
-// string
-type PluralTarget = string
-
-const (
-	// PluralTargetPost is the target of a plural post view.
-	PluralTargetPost PluralTarget = "posts"
-	// PluralTargetProject is the target of a plural project view.
-	PluralTargetProject PluralTarget = "projects"
-	// PluralTargetTag is the target of a plural tag view.
-	PluralTargetTag PluralTarget = "tags"
+	// PostPluralPath is the target of a plural post view.
+	PostPluralPath PluralPath = "posts"
+	// ProjectPluralPath is the target of a plural project view.
+	ProjectPluralPath PluralPath = "projects"
+	// TagsPluralPath is the target of a plural tag view.
+	TagsPluralPath PluralPath = "tags"
 )
 
 // GetPostURL returns the URL for a post.

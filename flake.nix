@@ -81,6 +81,11 @@
           };
           generate-reload = {
             exec = ''
+              function gen_css() {
+                ${pkgs.templ}/bin/templ generate --log-level error
+                go run $REPO_ROOT/cmd/update-css --cwd $REPO_ROOT
+                ${pkgs.tailwindcss}/bin/tailwindcss -m -i ./input.css -o ./cmd/conneroh/_static/dist/style.css --cwd $REPO_ROOT
+              }
               export REPO_ROOT=$(git rev-parse --show-toplevel) # needed
               cd $REPO_ROOT
               if ${hasher}/bin/hasher -dir "$REPO_ROOT/cmd/conneroh/views" -v -exclude "*_templ.go"; then
@@ -91,12 +96,15 @@
                   echo "Changes detected in docs, running update script..."
                   ${pkgs.doppler}/bin/doppler run -- ${pkgs.go}/bin/go run $REPO_ROOT/cmd/update --cwd $REPO_ROOT
                 fi
+                if ${hasher}/bin/hasher -dir "$REPO_ROOT/cmd/conneroh/components" -v -exclude "*_templ.go"; then
+                  echo ""
+                else
+                  echo "Changes detected in components, running update script..."
+                  gen_css
+                fi
               else
                 echo "Changes detected in templates, running update script..."
-                ${pkgs.templ}/bin/templ generate --log-level error
-                go run $REPO_ROOT/cmd/update-css --cwd $REPO_ROOT
-                ${pkgs.templ}/bin/templ generate --log-level error
-                ${pkgs.tailwindcss}/bin/tailwindcss -m -i ./input.css -o ./cmd/conneroh/_static/dist/style.css --cwd $REPO_ROOT
+                gen_css
               fi
               cd -
             '';
@@ -118,23 +126,19 @@
           format = {
             exec = ''
               cd $(git rev-parse --show-toplevel)
-
               ${pkgs.go}/bin/go fmt ./...
-
               ${pkgs.git}/bin/git ls-files \
                 --others \
                 --exclude-standard \
                 --cached \
                 -- '*.js' '*.ts' '*.css' '*.md' '*.json' \
                 | xargs prettier --write
-
               ${pkgs.golines}/bin/golines \
                 -l \
                 -w \
                 --max-len=80 \
                 --shorten-comments \
                 --ignored-dirs=.direnv .
-
               cd -
             '';
             description = "Format code files";
@@ -188,6 +192,9 @@
               )
               scripts
             )}
+
+            echo "Git Status:"
+            ${pkgs.git}/bin/git status
           '';
           packages = with pkgs;
             [
@@ -196,7 +203,6 @@
               nixd
               statix
               deadnix
-              inputs.bun2nix.defaultPackage.${pkgs.system}.bin
 
               # Go Tools
               go_1_24
@@ -221,6 +227,7 @@
               bun
               nodePackages.typescript-language-server
               nodePackages.prettier
+              inputs.bun2nix.defaultPackage.${pkgs.system}.bin
 
               # Infra
               flyctl
@@ -253,21 +260,22 @@
                 # macOS-specific dependencies
                 libiconv
               ])
-            ++ pkgs.lib.optionals pkgs.stdenv.isLinux [
-              # Linux-specific dependencies
-              chromium # Chromium browser
-              xorg.libXcomposite # X11 Composite extension - needed by browsers
-              xorg.libXdamage # X11 Damage extension - needed by browsers
-              xorg.libXfixes # X11 Fixes extension - needed by browsers
-              xorg.libXrandr # X11 RandR extension - needed by browsers
-              xorg.libX11 # X11 client-side library
-              xorg.libxcb # X11 C Bindings library
-              mesa # OpenGL implementation
-              alsa-lib # Audio library
-              nss # Network Security Services
-              nspr # NetScape Portable Runtime
-              pango # Text layout and rendering
-            ]
+            ++ (with pkgs;
+              lib.optionals stdenv.isLinux [
+                # Linux-specific dependencies
+                chromium # Chromium browser
+                xorg.libXcomposite # X11 Composite extension - needed by browsers
+                xorg.libXdamage # X11 Damage extension - needed by browsers
+                xorg.libXfixes # X11 Fixes extension - needed by browsers
+                xorg.libXrandr # X11 RandR extension - needed by browsers
+                xorg.libX11 # X11 client-side library
+                xorg.libxcb # X11 C Bindings library
+                mesa # OpenGL implementation
+                alsa-lib # Audio library
+                nss # Network Security Services
+                nspr # NetScape Portable Runtime
+                pango # Text layout and rendering
+              ])
             # Add the generated script packages
             ++ scriptPackages;
         };
@@ -277,7 +285,7 @@
         name = "conneroh.com";
         fly-name = "conneroh-com";
         fly-name-dev = "conneroh-com-dev";
-        vendorHash = "sha256-cYtMPdhz2sz1WGS/kHqs7DumCy+pNYaGbpNKAI43Wb4=";
+        vendorHash = "sha256-zjiWSoAowfIt56dbbdl8x0MXa/rZflqZEXdyZXcDY04=";
         created = "now";
         tag = "latest";
         version = self.shortRev or "dirty";

@@ -9,8 +9,8 @@ tags:
   - ide/code-composer
 created_at: 2025-03-28T19:48:41.000-06:00
 description: Embedded C programming. Interrupt handling. Memory mapped I/O in the context of an application. Elementary embedded design flow/methodology. Timers, scheduling, resource allocation, optimization, state machine based controllers, real time constraints within the context of an application. Applications laboratory exercises with embedded devices class taken at Iowa State University.
-title: CPRE 288
-updated_at: 2025-03-28T20:08:06.000-06:00
+title: CPRE288
+updated_at: 2025-04-07T18:43:20.000-06:00
 ---
 
 # CPRE 288

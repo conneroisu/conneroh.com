@@ -1,7 +1,7 @@
 package views
 
 import (
-	"fmt"
+	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
 	"github.com/conneroisu/twerge"
 )
@@ -13,72 +13,74 @@ templ Project(
 	fullTags *[]*gen.Tag,
 ) {
 	<div
-		class={ twerge.It("container mx-auto px-4 py-8 max-w-4xl") }
+		class={ twerge.It("px-4 container mx-auto py-8") }
 	>
-		<header
+		<div
 			class={ twerge.It("mb-8") }
 		>
 			<h1
-				class={ twerge.It("text-4xl font-bold text-white mb-4") }
+				class={ twerge.It("font-bold text-white mb-4 text-4xl") }
 			>
 				{ project.Title }
 			</h1>
 			if len(project.Tags) > 0 {
 				<div
-					class={ twerge.It("flex flex-wrap gap-2 mb-6") }
+					class={ twerge.It("mb-6 flex-row flex gap-2") }
 				>
 					for _, tag := range project.Tags {
-						<a
-							href={ templ.SafeURL(fmt.Sprintf("/tag/%s", tag.Slug)) }
-							class={ twerge.It("inline-block px-3 py-1 text-sm font-medium rounded-full bg-blue-100 bg-blue-900 text-blue-200 hover:bg-blue-800 transition-colors") }
-						>
-							{ tag.Slug }
-						</a>
+						@components.TagControl(tag)
 					}
 				</div>
 			}
-		</header>
+		</div>
+		if project.BannerPath != "" {
+			@components.Image(
+				project.BannerPath,
+				project.Title,
+				twerge.It("w-full md:h-96 object-center rounded-lg object-cover shadow-md mb-8 h-64"),
+			)
+		}
 		<div
-			class={ twerge.It("bg-gray-800 rounded-lg shadow-lg overflow-hidden p-6 mb-8") }
+			class={ twerge.It("bg-gray-800 rounded-lg mb-8 overflow-hidden p-6 shadow-lg") }
 		>
 			<div
-				class={ twerge.It("border-b border-gray-700 pb-4 mb-4") }
+				class={ twerge.It("pb-4 mb-4 border-b border-gray-700") }
 			>
 				<h2
-					class={ twerge.It("text-2xl font-semibold text-white") }
+					class={ twerge.It("font-semibold text-white text-2xl") }
 				>
 					About this project
 				</h2>
 				<div
-					class={ twerge.It("w-16 h-1 bg-blue-500 mt-2") }
+					class={ twerge.It("h-1 bg-blue-500 mt-2 w-16") }
 				></div>
 			</div>
 			<div
 				class={ twerge.It("max-w-none") }
 			>
 				<p
-					class={ twerge.It("text-gray-300 leading-relaxed whitespace-pre-line") }
+					class={ twerge.It("leading-relaxed whitespace-pre-line text-gray-300") }
 				>
 					{ project.Description }
 				</p>
 				<div
-					class={ twerge.It("mt-6 flex items-center text-sm text-gray-400") }
+					class={ twerge.It("items-center text-sm text-gray-400 mt-6 flex") }
 				>
-					@icon("calendar", templ.Attributes{})
+					@components.Icon("calendar", templ.Attributes{})
 					<span>Created: { project.CreatedAt.Format("Jan 2, 2006") }</span>
 				</div>
 			</div>
 		</div>
 		<div
-			class={ twerge.It("bg-gray-800 rounded-lg shadow-lg overflow-hidden p-6 mb-8") }
+			class={ twerge.It("bg-gray-800 rounded-lg mb-8 overflow-hidden p-6 shadow-lg") }
 		>
 			<h2
-				class={ twerge.It("text-2xl font-semibold text-white mb-4") }
+				class={ twerge.It("text-white mb-4 text-2xl font-semibold") }
 			>
 				Content
 			</h2>
 			<div
-				class={ twerge.It("mt-6 mb-4 my-4 my-4 my-2 my-6 max-w-none text-gray-300 leading-relaxed") }
+				class={ twerge.It("max-w-none my-6 text-gray-300 leading-relaxed") }
 			>
 				<article>
 					@templ.Raw(project.Content)
@@ -95,7 +97,7 @@ templ Project(
 					Related Posts
 				</h2>
 				<div
-					class={ twerge.It("grid grid-cols-1 md:grid-cols-2 gap-6") }
+					class={ twerge.It("gap-6 grid grid-cols-1 md:grid-cols-2") }
 				>
 					for _, post := range project.Posts {
 						<div
@@ -113,12 +115,12 @@ templ Project(
 							</p>
 							<a
 								href={ templ.SafeURL("/post/" + post.Slug) }
-								class={ twerge.It("text-blue-400 hover:underline text-sm font-medium flex items-center") }
+								class={ twerge.It("font-medium flex items-center text-blue-400 hover:underline text-sm") }
 							>
 								Read Post
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
-									class={ twerge.It("h-4 w-4 ml-1") }
+									class={ twerge.It("ml-1 h-4 w-4") }
 									viewBox="0 0 20 20"
 									fill="currentColor"
 								>

@@ -177,9 +177,9 @@
         "tailwindcss" = "../@tailwindcss/cli/dist/index.mjs";
       };
       pkg = fetchurl {
-        name = "@tailwindcss/cli@4.1.1";
-        url = "https://registry.npmjs.org/@tailwindcss/cli/-/cli-4.1.1.tgz";
-        hash = "sha256-Dp1sZ0Ze7y7XRGsJyVca9n7/sRsTSD+DlMBcpIuRW8s=";
+        name = "@tailwindcss/cli@4.1.3";
+        url = "https://registry.npmjs.org/@tailwindcss/cli/-/cli-4.1.3.tgz";
+        hash = "sha256-If9p+QJQP0NKQqTYKLcJ4XRgbAq7567zgDVyFjjTq8c=";
       };
     };
     "@tailwindcss/node" = {
@@ -187,9 +187,9 @@
       binaries = {
       };
       pkg = fetchurl {
-        name = "@tailwindcss/node@4.1.1";
-        url = "https://registry.npmjs.org/@tailwindcss/node/-/node-4.1.1.tgz";
-        hash = "sha256-tB5VG8iAQyz3KAS3WFUIiEX8O11mdPzv1h23EyqNztw=";
+        name = "@tailwindcss/node@4.1.3";
+        url = "https://registry.npmjs.org/@tailwindcss/node/-/node-4.1.3.tgz";
+        hash = "sha256-HcbCe7PeeJiEl3pMDQimif6r8NRpoPCTl5onsPzBTfw=";
       };
     };
     "@tailwindcss/oxide" = {
@@ -197,9 +197,9 @@
       binaries = {
       };
       pkg = fetchurl {
-        name = "@tailwindcss/oxide@4.1.1";
-        url = "https://registry.npmjs.org/@tailwindcss/oxide/-/oxide-4.1.1.tgz";
-        hash = "sha256-cBnd7r5h/GGJJ46JNVbb+3CZWmMvf1MljilovGSslMQ=";
+        name = "@tailwindcss/oxide@4.1.3";
+        url = "https://registry.npmjs.org/@tailwindcss/oxide/-/oxide-4.1.3.tgz";
+        hash = "sha256-WXG2denX6p/edEiPaulalq4AxkfVz7STZ5hhN/qqQIQ=";
       };
     };
     "@tailwindcss/oxide-android-arm64" = {
@@ -207,9 +207,9 @@
       binaries = {
       };
       pkg = fetchurl {
-        name = "@tailwindcss/oxide-android-arm64@4.1.1";
-        url = "https://registry.npmjs.org/@tailwindcss/oxide-android-arm64/-/oxide-android-arm64-4.1.1.tgz";
-        hash = "sha256-pIHyWWcKCe+JiwA2E72aqy5igo5ErLx3tzgBppf22z4=";
+        name = "@tailwindcss/oxide-android-arm64@4.1.3";
+        url = "https://registry.npmjs.org/@tailwindcss/oxide-android-arm64/-/oxide-android-arm64-4.1.3.tgz";
+        hash = "sha256-PPaI0jaDXb4K6pKlsXzU1ENBARCY2Kz6HvZSCqWLkPY=";
       };
     };
     "@tailwindcss/oxide-darwin-arm64" = {
@@ -217,9 +217,9 @@
       binaries = {
       };
       pkg = fetchurl {
-        name = "@tailwindcss/oxide-darwin-arm64@4.1.1";
-        url = "https://registry.npmjs.org/@tailwindcss/oxide-darwin-arm64/-/oxide-darwin-arm64-4.1.1.tgz";
-        hash = "sha256-1kXrP2JN9PGFSiO23FuWIX8VWUykM5ohkNp0Hwtfn0g=";
+        name = "@tailwindcss/oxide-darwin-arm64@4.1.3";
+        url = "https://registry.npmjs.org/@tailwindcss/oxide-darwin-arm64/-/oxide-darwin-arm64-4.1.3.tgz";
+        hash = "sha256-5dHqNUK/r5pj1LFByhXa1p6lqp3OiZOjDVdc1VklLRA=";
       };
     };
     "@tailwindcss/oxide-darwin-x64" = {
@@ -227,9 +227,9 @@
       binaries = {
       };
       pkg = fetchurl {
-        name = "@tailwindcss/oxide-darwin-x64@4.1.1";
-        url = "https://registry.npmjs.org/@tailwindcss/oxide-darwin-x64/-/oxide-darwin-x64-4.1.1.tgz";
-        hash = "sha256-UyUejgWCMQ5mxHce64JIvKDHUNDOtAiVsspmGPuSXVk=";
+        name = "@tailwindcss/oxide-darwin-x64@4.1.3";
+        url = "https://registry.npmjs.org/@tailwindcss/oxide-darwin-x64/-/oxide-darwin-x64-4.1.3.tgz";
+        hash = "sha256-8YMTri8GhfbmVtlG2GwsKcSzPRXTChb7oEuipc9+rjE=";
       };
     };
     "@tailwindcss/oxide-freebsd-x64" = {
@@ -237,9 +237,9 @@
       binaries = {
       };
       pkg = fetchurl {
-        name = "@tailwindcss/oxide-freebsd-x64@4.1.1";
-        url = "https://registry.npmjs.org/@tailwindcss/oxide-freebsd-x64/-/oxide-freebsd-x64-4.1.1.tgz";
-        hash = "sha256-DRESN4ezzq38C7pGmGdijCv5s5dZvlqP9Kkhw+Yx+rs=";
+        name = "@tailwindcss/oxide-freebsd-x64@4.1.3";
+        url = "https://registry.npmjs.org/@tailwindcss/oxide-freebsd-x64/-/oxide-freebsd-x64-4.1.3.tgz";
+        hash = "sha256-OAluVFvo6iK1IAYFm6fMsWs175+xMe9Wt9hnd2M57n4=";
       };
     };
     "@tailwindcss/oxide-linux-arm-gnueabihf" = {
@@ -247,9 +247,9 @@
       binaries = {
       };
       pkg = fetchurl {
-        name = "@tailwindcss/oxide-linux-arm-gnueabihf@4.1.1";
-        url = "https://registry.npmjs.org/@tailwindcss/oxide-linux-arm-gnueabihf/-/oxide-linux-arm-gnueabihf-4.1.1.tgz";
-        hash = "sha256-wlkvERiNCIlQ5/0XwgAbJQXTowoCjd3g4V3MekP3pZI=";
+        name = "@tailwindcss/oxide-linux-arm-gnueabihf@4.1.3";
+        url = "https://registry.npmjs.org/@tailwindcss/oxide-linux-arm-gnueabihf/-/oxide-linux-arm-gnueabihf-4.1.3.tgz";
+        hash = "sha256-CntN3CwK0Gx/RLl4ELVneVCUKY1QpJFygUNJ+uYX62I=";
       };
     };
     "@tailwindcss/oxide-linux-arm64-gnu" = {
@@ -257,9 +257,9 @@
       binaries = {
       };
       pkg = fetchurl {
-        name = "@tailwindcss/oxide-linux-arm64-gnu@4.1.1";
-        url = "https://registry.npmjs.org/@tailwindcss/oxide-linux-arm64-gnu/-/oxide-linux-arm64-gnu-4.1.1.tgz";
-        hash = "sha256-vkk8WkX/K7W1bRq4TnJVm+TV+3OihzDajHiHJwQk1Ns=";
+        name = "@tailwindcss/oxide-linux-arm64-gnu@4.1.3";
+        url = "https://registry.npmjs.org/@tailwindcss/oxide-linux-arm64-gnu/-/oxide-linux-arm64-gnu-4.1.3.tgz";
+        hash = "sha256-pfnI/OPORRd/CRqOLN5WMYlN4EKC64l6XL2yyOtozcY=";
       };
     };
     "@tailwindcss/oxide-linux-arm64-musl" = {
@@ -267,9 +267,9 @@
       binaries = {
       };
       pkg = fetchurl {
-        name = "@tailwindcss/oxide-linux-arm64-musl@4.1.1";
-        url = "https://registry.npmjs.org/@tailwindcss/oxide-linux-arm64-musl/-/oxide-linux-arm64-musl-4.1.1.tgz";
-        hash = "sha256-MHFELawnaVrirKq3oixQ227bg+U5BgHYY6r70knI+SY=";
+        name = "@tailwindcss/oxide-linux-arm64-musl@4.1.3";
+        url = "https://registry.npmjs.org/@tailwindcss/oxide-linux-arm64-musl/-/oxide-linux-arm64-musl-4.1.3.tgz";
+        hash = "sha256-oG8/CCw5VeBgFfRBP6HXq1QAIWUSX7xE+OYMa+sZXqw=";
       };
     };
     "@tailwindcss/oxide-linux-x64-gnu" = {
@@ -277,9 +277,9 @@
       binaries = {
       };
       pkg = fetchurl {
-        name = "@tailwindcss/oxide-linux-x64-gnu@4.1.1";
-        url = "https://registry.npmjs.org/@tailwindcss/oxide-linux-x64-gnu/-/oxide-linux-x64-gnu-4.1.1.tgz";
-        hash = "sha256-VT6n0pkNVjL094TaYKOIPvtv+uRpyR5sVvm10FbpCPw=";
+        name = "@tailwindcss/oxide-linux-x64-gnu@4.1.3";
+        url = "https://registry.npmjs.org/@tailwindcss/oxide-linux-x64-gnu/-/oxide-linux-x64-gnu-4.1.3.tgz";
+        hash = "sha256-t8r94AmUyjAKuF2ZGTelt0au/ils6y5So95+2C0jhgo=";
       };
     };
     "@tailwindcss/oxide-linux-x64-musl" = {
@@ -287,9 +287,9 @@
       binaries = {
       };
       pkg = fetchurl {
-        name = "@tailwindcss/oxide-linux-x64-musl@4.1.1";
-        url = "https://registry.npmjs.org/@tailwindcss/oxide-linux-x64-musl/-/oxide-linux-x64-musl-4.1.1.tgz";
-        hash = "sha256-l5FBX8tl+DfkgpdRL9kjXyTeSUqOUHdIfpY2bMFHwPY=";
+        name = "@tailwindcss/oxide-linux-x64-musl@4.1.3";
+        url = "https://registry.npmjs.org/@tailwindcss/oxide-linux-x64-musl/-/oxide-linux-x64-musl-4.1.3.tgz";
+        hash = "sha256-z7y2T0+8AeoPGEmYH7iVSiRMdrsPcHIXUEFpw+4e1Xo=";
       };
     };
     "@tailwindcss/oxide-win32-arm64-msvc" = {
@@ -297,9 +297,9 @@
       binaries = {
       };
       pkg = fetchurl {
-        name = "@tailwindcss/oxide-win32-arm64-msvc@4.1.1";
-        url = "https://registry.npmjs.org/@tailwindcss/oxide-win32-arm64-msvc/-/oxide-win32-arm64-msvc-4.1.1.tgz";
-        hash = "sha256-3LzC3+1y4H8YSwuh+uZG40Igm388LwapM3esid6gutI=";
+        name = "@tailwindcss/oxide-win32-arm64-msvc@4.1.3";
+        url = "https://registry.npmjs.org/@tailwindcss/oxide-win32-arm64-msvc/-/oxide-win32-arm64-msvc-4.1.3.tgz";
+        hash = "sha256-srrYcWONgaPIuXLvM3HhXTklC3YWLE2Gb209wDr+E0o=";
       };
     };
     "@tailwindcss/oxide-win32-x64-msvc" = {
@@ -307,9 +307,9 @@
       binaries = {
       };
       pkg = fetchurl {
-        name = "@tailwindcss/oxide-win32-x64-msvc@4.1.1";
-        url = "https://registry.npmjs.org/@tailwindcss/oxide-win32-x64-msvc/-/oxide-win32-x64-msvc-4.1.1.tgz";
-        hash = "sha256-vYy2lXv2R+KSFqzbwFnlYqQznRpFDz921ddE5Wde/QM=";
+        name = "@tailwindcss/oxide-win32-x64-msvc@4.1.3";
+        url = "https://registry.npmjs.org/@tailwindcss/oxide-win32-x64-msvc/-/oxide-win32-x64-msvc-4.1.3.tgz";
+        hash = "sha256-9YaykHAiezigoRlyZGeUPkk4EIAI4xkRvaRoyJRxCuA=";
       };
     };
     "@types/alpinejs" = {
@@ -337,9 +337,9 @@
       binaries = {
       };
       pkg = fetchurl {
-        name = "@types/bun@1.2.8";
-        url = "https://registry.npmjs.org/@types/bun/-/bun-1.2.8.tgz";
-        hash = "sha256-vz372Hy5vT+siYOMbNIMBkGanVsKiWdYCmJn3lh+ylg=";
+        name = "@types/bun@1.2.9";
+        url = "https://registry.npmjs.org/@types/bun/-/bun-1.2.9.tgz";
+        hash = "sha256-676RZuumPabwPPYxsxXk87DmRsnz1bB/4GFOg0iXUVc=";
       };
     };
     "@types/mathjax" = {
@@ -417,9 +417,9 @@
       binaries = {
       };
       pkg = fetchurl {
-        name = "bun-types@1.2.7";
-        url = "https://registry.npmjs.org/bun-types/-/bun-types-1.2.7.tgz";
-        hash = "sha256-kYHniRENsAWG2lQG7Tj6xPPaiS6Bsa87uRwRvwsSDCY=";
+        name = "bun-types@1.2.9";
+        url = "https://registry.npmjs.org/bun-types/-/bun-types-1.2.9.tgz";
+        hash = "sha256-0yWVHVa+c0pdHtrZdc6wHT7SXgQyeTiR8uYXd7GVpdA=";
       };
     };
     "caniuse-lite" = {
@@ -427,9 +427,9 @@
       binaries = {
       };
       pkg = fetchurl {
-        name = "caniuse-lite@1.0.30001707";
-        url = "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001707.tgz";
-        hash = "sha256-YbWMwCx687HRkZ2BxVLbZ+Bicktz6YM1qrdFUNHfp6s=";
+        name = "caniuse-lite@1.0.30001713";
+        url = "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001713.tgz";
+        hash = "sha256-xCfiOkGjX842sj7iFRloZcy84qREzvkDDCHkrPc9HWA=";
       };
     };
     "detect-libc" = {
@@ -719,9 +719,9 @@
       binaries = {
       };
       pkg = fetchurl {
-        name = "tailwindcss@4.1.1";
-        url = "https://registry.npmjs.org/tailwindcss/-/tailwindcss-4.1.1.tgz";
-        hash = "sha256-1QWvAm1zLIA7DkMp5HJaT/gjdUqQKkouDesLk9POu2s=";
+        name = "tailwindcss@4.1.3";
+        url = "https://registry.npmjs.org/tailwindcss/-/tailwindcss-4.1.3.tgz";
+        hash = "sha256-C8GQMwaG6quO9mKBc/YHXBv+ZZpjT7qCl2XPK6Zv4O4=";
       };
     };
     "tapable" = {

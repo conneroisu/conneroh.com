@@ -5,16 +5,15 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"io/fs"
+	"log"
 	"log/slog"
 	"os"
-	"path/filepath"
-	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
 
 	"github.com/rotisserie/eris"
+	"github.com/spf13/afero"
 
 	"github.com/conneroisu/conneroh.com/internal/assets"
 	"github.com/conneroisu/conneroh.com/internal/cache"
@@ -26,7 +25,7 @@ import (
 )
 
 const (
-	hashFile    = "config.json"
+	hashFile    = ".config.json"
 	vaultLoc    = "internal/data/docs/"
 	assetsLoc   = "internal/data/docs/assets/"
 	postsLoc    = "internal/data/docs/posts/"
@@ -56,10 +55,32 @@ type actualizeResult struct {
 	err         error
 }
 
+// AppFS is the application filesystem
+var AppFS afero.Fs
+
+func init() {
+	// By default use the OS filesystem
+	AppFS = afero.NewOsFs()
+}
+
+// SetFileSystem allows overriding the default file system for testing
+func SetFileSystem(fs afero.Fs) {
+	AppFS = fs
+}
+
 func main() {
 	flag.Parse()
 	ctx := context.Background()
-	if err := run(ctx, os.Getenv); err != nil {
+
+	awsClient, err := credited.NewAWSClient(os.Getenv)
+	if err != nil {
+		panic(err)
+	}
+	ollama, err := credited.NewOllamaClient(os.Getenv)
+	if err != nil {
+		panic(err)
+	}
+	if err := run(ctx, awsClient, ollama); err != nil {
 		slog.Error("error", slog.String("err", err.Error()))
 		os.Exit(1)
 	}
@@ -67,13 +88,17 @@ func main() {
 
 func run(
 	outerCtx context.Context,
-	getenv func(string) string,
+	awsClient credited.AWSClient,
+	ollama *credited.OllamaClient,
 ) (err error) {
 	ctx, cancel := context.WithCancel(outerCtx)
 	defer cancel()
 
 	start := time.Now()
 	if *cwd != "" {
+		// Use afero for directory changes if needed
+		// Note: We can't fully abstract this part with afero since the working directory
+		// affects the entire process, not just file operations
 		err = os.Chdir(*cwd)
 		if err != nil {
 			return eris.Wrapf(
@@ -83,19 +108,11 @@ func run(
 			)
 		}
 	}
-	awsClient, err := credited.NewAWSClient(getenv)
+	objCache, err := loadCache(hashFile)
 	if err != nil {
 		return err
 	}
-	ollama, err := credited.NewOllamaClient(getenv)
-	if err != nil {
-		return err
-	}
-	objCache, err := cache.LoadCache(hashFile)
-	if err != nil {
-		return err
-	}
-	mdParser := assets.NewMDParser(parser.NewContext(), awsClient)
+	mdParser := assets.NewRenderer(ctx, parser.NewContext(), awsClient)
 
 	// Log cache stats
 	slog.Info("cache loaded", "entries", len(objCache.Hashes))
@@ -106,7 +123,7 @@ func run(
 		slog.Info("saving cache",
 			"entries", len(objCache.Hashes),
 			"duration", time.Since(start).String())
-		err = objCache.Close()
+		err = saveCache(objCache, hashFile)
 		if err != nil {
 			err = eris.Wrap(
 				err,
@@ -179,7 +196,6 @@ func run(
 	// Process events until everything is complete
 	// Exit condition: parsing is done and all actualizations are complete
 	for !parseComplete || actualizationComplete != actualizationStarted || actualizationStarted <= 0 {
-
 		// Process all available events
 		select {
 		case result := <-parseResultCh:
@@ -190,15 +206,14 @@ func run(
 					"error", result.err)
 				continue
 			}
-
 			slog.Info("parsed location",
 				"location", result.location,
 				"assets", len(result.assets),
 				"ignored", len(result.ignored))
-
 			// Start actualization early if not assets
 			if result.location != assetsLoc {
 				actualizationStarted++
+				// TODO: Add limit to concurrent actualizations
 				go startActualization(ctx, ollama, mdParser, result, actualizeResultCh)
 			}
 
@@ -289,7 +304,7 @@ func run(
 func startActualization(
 	ctx context.Context,
 	ollama *credited.OllamaClient,
-	mdParser *assets.MDParser,
+	mdParser *assets.DefaultRenderer,
 	result parseResult,
 	resultCh chan<- actualizeResult,
 ) {
@@ -339,7 +354,7 @@ func startActualization(
 func actualize[T gen.Post | gen.Tag | gen.Project](
 	ctx context.Context,
 	ollama *credited.OllamaClient,
-	mdParser *assets.MDParser,
+	mdParser *assets.DefaultRenderer,
 	contents []assets.Asset,
 	ignored []string,
 ) ([]*T, error) {
@@ -356,7 +371,7 @@ func actualize[T gen.Post | gen.Tag | gen.Project](
 	eg.SetLimit(*workers)
 
 	// Create result slice with appropriate capacity
-	parsedItems := make([]*T, amount)
+	parsedItems := make([]*T, 0)
 
 	// Process each asset using errgroup
 	for i, content := range contents {
@@ -372,7 +387,7 @@ func actualize[T gen.Post | gen.Tag | gen.Project](
 				)
 			}
 
-			parsedItems[index] = realized
+			parsedItems = append(parsedItems, realized)
 			return nil
 		})
 	}
@@ -396,6 +411,7 @@ func actualize[T gen.Post | gen.Tag | gen.Project](
 	return parsedItems, nil
 }
 
+// Modified parse function to use afero
 func parse(
 	cacheObj *cache.Cache,
 	loc string,
@@ -410,20 +426,17 @@ func parse(
 		skipped   int32
 	)
 
-	// First, collect all file paths
-	err = filepath.WalkDir(
-		loc,
-		func(fPath string, d fs.DirEntry, err error) error {
-			if err != nil {
-				return err
-			}
-			if d.IsDir() {
-				return nil
-			}
+	// First, collect all file paths using afero
+	err = afero.Walk(AppFS, loc, func(fPath string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if !info.IsDir() {
 			filePaths = append(filePaths, fPath)
-			return nil
-		},
-	)
+		}
+		return nil
+	})
+
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to walk fsPath (%s): %w", loc, err)
 	}
@@ -444,8 +457,8 @@ func parse(
 	for range *workers {
 		eg.Go(func() error {
 			for filePath := range filesCh {
-				// Read file
-				body, err := os.ReadFile(filePath)
+				// Read file using afero
+				body, err := afero.ReadFile(AppFS, filePath)
 				if err != nil {
 					slog.Error("failed to read file", "path", filePath, "error", err)
 					continue // Skip failed files but don't abort the entire process
@@ -453,15 +466,14 @@ func parse(
 
 				// Calculate hash
 				hash := cache.Hash(body)
-				path := pathify(filePath)
-				slug := slugify(filePath)
+				asset := assets.NewAsset(filePath, body)
 
 				mu.Lock()
 				// Check if file has changed
 				cachedHash, exists := cacheObj.Hashes[filePath]
 				if exists && cachedHash == hash {
 					// File hasn't changed
-					ignoredSlugs = append(ignoredSlugs, slug)
+					ignoredSlugs = append(ignoredSlugs, asset.Slug)
 					atomic.AddInt32(&skipped, 1)
 					if *debug {
 						slog.Debug("skipped unchanged file", "path", filePath)
@@ -470,9 +482,9 @@ func parse(
 					// File is new or has changed
 					cacheObj.Hashes[filePath] = hash
 					parsedAssets = append(parsedAssets, assets.Asset{
-						Path: path,
+						Path: asset.Path,
 						Data: body,
-						Slug: slug,
+						Slug: asset.Slug,
 					})
 					atomic.AddInt32(&processed, 1)
 					if *debug {
@@ -502,9 +514,52 @@ func parse(
 	return parsedAssets, ignoredSlugs, nil
 }
 
+// Modified cache loading function to use afero
+func loadCache(filename string) (*cache.Cache, error) {
+	exists, err := afero.Exists(AppFS, filename)
+	if err != nil {
+		return nil, eris.Wrapf(err, "failed to check if cache file exists: %s", filename)
+	}
+
+	cacheObj := &cache.Cache{
+		Hashes: make(map[string]string),
+	}
+
+	if !exists {
+		return cacheObj, nil
+	}
+
+	data, err := afero.ReadFile(AppFS, filename)
+	if err != nil {
+		return nil, eris.Wrapf(err, "failed to read cache file: %s", filename)
+	}
+
+	err = cacheObj.Unmarshal(data)
+	if err != nil {
+		return nil, eris.Wrapf(err, "failed to unmarshal cache file: %s", filename)
+	}
+
+	return cacheObj, nil
+}
+
+// Modified cache saving function to use afero
+func saveCache(cacheObj *cache.Cache, filename string) error {
+	data, err := cacheObj.Marshal()
+	if err != nil {
+		return eris.Wrapf(err, "failed to marshal cache")
+	}
+
+	err = afero.WriteFile(AppFS, filename, data, 0644)
+	if err != nil {
+		return eris.Wrapf(err, "failed to write cache file: %s", filename)
+	}
+
+	return nil
+}
+
 func actualizeAssets(
 	ctx context.Context,
-	client *credited.AWSClient,
+	client credited.AWSClient,
 	assets []assets.Asset,
 ) error {
 	amount := len(assets)
@@ -578,13 +633,20 @@ func rememberMD[T gen.Post | gen.Project | gen.Tag](ignored []string) []*T {
 func realizeMD[T gen.Post | gen.Project | gen.Tag](
 	ctx context.Context,
 	ollama *credited.OllamaClient,
-	mdParser *assets.MDParser,
+	mdParser *assets.DefaultRenderer,
 	parsed assets.Asset,
 ) (*T, error) {
 	var (
 		emb gen.Embedded
 		err error
 	)
+	defer func() {
+		if rec := recover(); rec != nil {
+			log.Printf("Recovered from panic in %s: %v", parsed.Path, err)
+			err = eris.Errorf("Recovered from panic in %s: %v", parsed.Path, rec)
+			fmt.Println("DFSFSDFSFDSFDSFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSFSDF")
+		}
+	}()
 
 	// Convert markdown to HTML
 	emb, err = mdParser.Convert(parsed)
@@ -606,36 +668,4 @@ func realizeMD[T gen.Post | gen.Project | gen.Tag](
 	}
 
 	return gen.New[T](&emb), nil
-}
-
-func slugify(s string) string {
-	var path string
-	var ok bool
-	path, ok = strings.CutPrefix(s, assetsLoc)
-	if ok {
-		return path
-	}
-	return strings.TrimSuffix(pathify(s), filepath.Ext(s))
-}
-
-func pathify(s string) string {
-	var path string
-	var ok bool
-	path, ok = strings.CutPrefix(s, postsLoc)
-	if ok {
-		return path
-	}
-	path, ok = strings.CutPrefix(s, projectsLoc)
-	if ok {
-		return path
-	}
-	path, ok = strings.CutPrefix(s, tagsLoc)
-	if ok {
-		return path
-	}
-	path, ok = strings.CutPrefix(s, assetsLoc)
-	if ok {
-		return path
-	}
-	return s // Return original path instead of panicking
 }

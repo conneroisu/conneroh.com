@@ -1,6 +1,7 @@
 ---
 id: cpre281
 aliases:
+  - CPRE281
   - CPRE 281
 tags:
   - ide/modelsim
@@ -9,7 +10,7 @@ tags:
 created_at: 2025-03-28T19:47:43.000-06:00
 description: This is a class taken at Iowa State University.
 title: CPRE281
-updated_at: 2025-04-05T06:10:19.000-06:00
+updated_at: 2025-04-07T18:42:08.000-06:00
 ---
 
 # CPRE 281

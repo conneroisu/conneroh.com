@@ -7,8 +7,10 @@ tags:
 created_at: 2025-03-28T19:17:07.000-06:00
 description: A high-performance, cost-effective AI decision-making library written in pure Go.
 title: semantic-router-go
-updated_at: 2025-03-28T20:07:30.000-06:00
+updated_at: 2025-04-07T19:33:19.000-06:00
 ---
+Github: [https://github.com/conneroisu/semanticrouter-go](https://github.com/conneroisu/semanticrouter-go)
+Github Pages: [https://conneroisu.github.io/semanticrouter-go/](https://conneroisu.github.io/semanticrouter-go/)
 
 # semanticrouter-go
 

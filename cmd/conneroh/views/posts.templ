@@ -2,6 +2,7 @@ package views
 
 import (
 	"fmt"
+	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
 	"github.com/conneroisu/twerge"
 )
@@ -14,18 +15,18 @@ templ Post(
 	fullTags *[]*gen.Tag,
 ) {
 	<article
-		class={ twerge.It("container mx-auto px-4 py-8 max-w-3xl") }
+		class={ twerge.It("px-4 container mx-auto py-8") }
 	>
 		<div
 			class={ twerge.It("mb-8") }
 		>
 			<h1
-				class={ twerge.It("text-4xl font-bold text-white mb-4") }
+				class={ twerge.It("font-bold text-white mb-4 text-4xl") }
 			>
 				{ post.Title }
 			</h1>
 			<div
-				class={ twerge.It("flex items-center text-gray-400 mb-6") }
+				class={ twerge.It("mb-6 flex items-center text-gray-400") }
 			>
 				<time>
 					{ post.CreatedAt.Format("Jan 2, 2006") }
@@ -43,32 +44,32 @@ templ Post(
 				for _, tag := range post.Tags {
 					<a
 						href={ templ.SafeURL(fmt.Sprintf("/tag/%s", tag.Slug)) }
-						class={ twerge.It("inline-block px-3 py-1 text-sm font-medium rounded-full bg-blue-900 text-blue-200 hover:bg-blue-200 hover:bg-blue-800 transition-colors") }
+						class={ twerge.It("px-3 font-medium text-sm py-1 inline-block hover:bg-blue-800 text-blue-200 bg-blue-900 rounded-full transition-colors") }
 					>
 						{ tag.Slug }
 					</a>
 				}
 			</div>
 			if post.BannerPath != "" {
-				@image(
+				@components.Image(
 					post.BannerPath,
 					post.Title,
-					twerge.It("w-full h-64 md:h-96 object-cover object-center rounded-lg shadow-md mb-8"),
+					twerge.It("w-full md:h-96 object-center rounded-lg object-cover shadow-md mb-8 h-64"),
 				)
 			}
 		</div>
 		<div
-			class={ twerge.It("bg-gray-800 rounded-lg shadow-lg overflow-hidden p-6 mb-8") }
+			class={ twerge.It("bg-gray-800 rounded-lg mb-8 overflow-hidden p-6 shadow-lg") }
 		>
 			<div
-				class={ twerge.It("mt-6 mb-4 my-4 my-4 my-2 my-6 max-w-none text-gray-300 leading-relaxed") }
+				class={ twerge.It("max-w-none my-6 text-gray-300 leading-relaxed") }
 			>
 				@templ.Raw(post.Content)
 			</div>
 		</div>
 		if len(post.Projects) > 0 {
 			<div
-				class={ twerge.It("mt-12 border-t border-gray-700 pt-8") }
+				class={ twerge.It("pt-8 mt-12 border-t border-gray-700") }
 			>
 				<h2
 					class={ twerge.It("text-2xl font-bold text-white mb-4") }
@@ -80,23 +81,21 @@ templ Post(
 				>
 					for _, project := range post.Projects {
 						<a
-							hx-get={ fmt.Sprintf("/morph/project/%s", project.Slug) }
-							hx-push-url={ fmt.Sprintf("/project/%s", project.Slug) }
+							hx-get={ project.PagePath() }
+							hx-push-url={ project.PagePath() }
 							hx-target="#bodiody"
-							hx-swap="outerHTML"
-							hx-trigger="click"
 							hx-indicator="#bodiody"
 							preload="mouseover"
-							class={ twerge.It("flex items-center p-4 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors") }
+							class={ twerge.It("rounded-lg bg-gray-800 hover:bg-gray-700 flex transition-colors items-center p-4") }
 						>
 							<div>
 								<h3
-									class={ twerge.It("font-medium text-white") }
+									class={ twerge.It("text-white font-medium") }
 								>
 									{ project.Slug }
 								</h3>
 								<p
-									class={ twerge.It("text-gray-400 text-sm line-clamp-2") }
+									class={ twerge.It("line-clamp-2 text-gray-400 text-sm") }
 								>
 									{ project.Description }
 								</p>

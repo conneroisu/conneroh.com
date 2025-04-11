@@ -9,6 +9,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/layouts"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/views"
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
@@ -26,35 +27,34 @@ func genCSS(ctx context.Context) error {
 			&gen.AllTags,
 		)).Render(ctx, io.Discard)
 		_ = layouts.Page(views.List(
-			routing.PluralTargetPost,
+			routing.PostPluralPath,
 			&gen.AllPosts,
 			&gen.AllProjects,
 			&gen.AllTags,
-			nil,
-			nil,
-			nil,
+			"",
+			1,
+			10,
 		)).Render(ctx, io.Discard)
 		_ = layouts.Page(views.List(
-			routing.PluralTargetProject,
+			routing.ProjectPluralPath,
 			&gen.AllPosts,
 			&gen.AllProjects,
 			&gen.AllTags,
-			nil,
-			nil,
-			nil,
+			"",
+			1,
+			10,
 		)).Render(ctx, io.Discard)
 		_ = layouts.Page(views.List(
-			routing.PluralTargetTag,
+			routing.TagsPluralPath,
 			&gen.AllPosts,
 			&gen.AllProjects,
 			&gen.AllTags,
-			nil,
-			nil,
-			nil,
+			"",
+			1,
+			10,
 		)).Render(ctx, io.Discard)
-		_ = views.TagControl(
+		_ = components.TagControl(
 			&gen.Tag{},
-			"#list-project",
 		).Render(ctx, io.Discard)
 		_ = layouts.Page(views.Post(
 			gen.AllPosts[0],
@@ -74,16 +74,12 @@ func genCSS(ctx context.Context) error {
 			&gen.AllProjects,
 			&gen.AllTags,
 		)).Render(ctx, io.Discard)
-		_ = views.TagControl(
-			&gen.Tag{},
-			"#list-project",
-		).Render(ctx, io.Discard)
-		_ = layouts.Morpher(views.Post(
+		_ = views.Post(
 			gen.AllPosts[0],
 			&gen.AllPosts,
 			&gen.AllProjects,
 			&gen.AllTags,
-		)).Render(ctx, io.Discard)
+		).Render(ctx, io.Discard)
 		_ = layouts.Layout("hello").Render(ctx, io.Discard)
 	)
 	content := twerge.GenerateClassMapCode("css")

@@ -47,3 +47,6 @@ projects:
   - [related-project-slug] # Optional
 ---
 ```
+
+<existing-tags>
+</existing-tags>
