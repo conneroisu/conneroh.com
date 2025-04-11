@@ -1,6 +1,10 @@
 package routing_test
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/conneroisu/conneroh.com/internal/routing"
+)
 
 func TestPaginate(t *testing.T) {
 	tests := []struct {
@@ -151,7 +155,7 @@ func TestPaginate(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotItems, gotPages := Paginate(tt.items, tt.page, tt.pageSize)
+			gotItems, gotPages := routing.Paginate(tt.items, tt.page, tt.pageSize)
 
 			// Check if total pages count is correct
 			if gotPages != tt.expectedPages {
