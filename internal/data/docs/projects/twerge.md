@@ -1,16 +1,15 @@
 ---
 id: twerge
 aliases:
-  - Introduction to Twerge
   - Introduction
 tags:
   - vcs/git
   - programming-language/go
   - ideologies/open-source
 created_at: 2025-04-11T13:54:12.000-06:00
-description: Introduction to Twerge
-title: Introduction to Twerge
-updated_at: 2025-04-11T13:55:28.000-06:00
+description: Twerge is a Go library designed to enhance your experience working with Tailwind CSS in Go applications. The name "Twerge" comes from "Tailwind + Merge".
+title: Twerge
+updated_at: 2025-04-11T14:08:44.000-06:00
 ---
 
 Github: [https://github.com/conneroisu/twerge](https://github.com/conneroisu/twerge)
