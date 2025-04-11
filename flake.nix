@@ -192,6 +192,9 @@
               )
               scripts
             )}
+
+            echo "Git Status:"
+            ${pkgs.git}/bin/git status
           '';
           packages = with pkgs;
             [
