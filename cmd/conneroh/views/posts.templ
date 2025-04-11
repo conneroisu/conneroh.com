@@ -15,7 +15,7 @@ templ Post(
 	fullTags *[]*gen.Tag,
 ) {
 	<article
-		class={ twerge.It("py-8 px-4 container mx-auto") }
+		class={ twerge.It("px-4 container mx-auto py-8") }
 	>
 		<div
 			class={ twerge.It("mb-8") }
@@ -26,7 +26,7 @@ templ Post(
 				{ post.Title }
 			</h1>
 			<div
-				class={ twerge.It("items-center text-gray-400 mb-6 flex") }
+				class={ twerge.It("mb-6 flex items-center text-gray-400") }
 			>
 				<time>
 					{ post.CreatedAt.Format("Jan 2, 2006") }
@@ -44,7 +44,7 @@ templ Post(
 				for _, tag := range post.Tags {
 					<a
 						href={ templ.SafeURL(fmt.Sprintf("/tag/%s", tag.Slug)) }
-						class={ twerge.It("bg-blue-900 text-blue-200 px-3 font-medium py-1 rounded-full inline-block text-sm transition-colors hover:bg-blue-800") }
+						class={ twerge.It("px-3 font-medium text-sm py-1 inline-block hover:bg-blue-800 text-blue-200 bg-blue-900 rounded-full transition-colors") }
 					>
 						{ tag.Slug }
 					</a>
@@ -54,15 +54,15 @@ templ Post(
 				@components.Image(
 					post.BannerPath,
 					post.Title,
-					twerge.It("w-full h-64 md:h-96 object-cover object-center rounded-lg shadow-md mb-8"),
+					twerge.It("w-full md:h-96 object-center rounded-lg object-cover shadow-md mb-8 h-64"),
 				)
 			}
 		</div>
 		<div
-			class={ twerge.It("shadow-lg rounded-lg bg-gray-800 mb-8 p-6 overflow-hidden") }
+			class={ twerge.It("bg-gray-800 rounded-lg mb-8 overflow-hidden p-6 shadow-lg") }
 		>
 			<div
-				class={ twerge.It("leading-relaxed max-w-none my-6 text-gray-300") }
+				class={ twerge.It("max-w-none my-6 text-gray-300 leading-relaxed") }
 			>
 				@templ.Raw(post.Content)
 			</div>
@@ -77,7 +77,7 @@ templ Post(
 					Related Projects
 				</h2>
 				<div
-					class={ twerge.It("gap-4 grid grid-cols-1 md:grid-cols-2") }
+					class={ twerge.It("grid grid-cols-1 md:grid-cols-2 gap-4") }
 				>
 					for _, project := range post.Projects {
 						<a
@@ -86,7 +86,7 @@ templ Post(
 							hx-target="#bodiody"
 							hx-indicator="#bodiody"
 							preload="mouseover"
-							class={ twerge.It("items-center bg-gray-800 transition-colors flex rounded-lg p-4 hover:bg-gray-700") }
+							class={ twerge.It("rounded-lg bg-gray-800 hover:bg-gray-700 flex transition-colors items-center p-4") }
 						>
 							<div>
 								<h3
@@ -95,7 +95,7 @@ templ Post(
 									{ project.Slug }
 								</h3>
 								<p
-									class={ twerge.It("text-gray-400 text-sm line-clamp-2") }
+									class={ twerge.It("line-clamp-2 text-gray-400 text-sm") }
 								>
 									{ project.Description }
 								</p>

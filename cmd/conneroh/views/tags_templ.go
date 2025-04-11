@@ -43,7 +43,7 @@ func Tag(
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		var templ_7745c5c3_Var2 = []any{twerge.It("py-8 px-4 container mx-auto")}
+		var templ_7745c5c3_Var2 = []any{twerge.It("px-4 container mx-auto py-8")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var2...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -89,7 +89,7 @@ func Tag(
 		}
 		templ_7745c5c3_Err = components.Icon(tag.Icon, templ.Attributes{
 			"style": "width: 4em; height: 4em;",
-			"class": twerge.It("inline-block p-4"),
+			"class": twerge.It("p-4 inline-block"),
 		}).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -129,7 +129,7 @@ func Tag(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var9 = []any{twerge.It("max-w-2xl mx-auto text-xl text-gray-300")}
+		var templ_7745c5c3_Var9 = []any{twerge.It("text-xl text-gray-300 max-w-2xl mx-auto")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var9...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -186,7 +186,7 @@ func Tag(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var14 = []any{twerge.It("mb-6 border-b border-gray-700")}
+		var templ_7745c5c3_Var14 = []any{twerge.It("border-b border-gray-700 mb-6")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var14...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -230,7 +230,7 @@ func Tag(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var18 = []any{twerge.It("py-4 border-b-2 px-1 sm:text-base text-sm font-medium")}
+		var templ_7745c5c3_Var18 = []any{twerge.It("px-1 sm:text-base text-sm font-medium py-4 border-b-2")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var18...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -278,7 +278,7 @@ func Tag(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var22 = []any{twerge.It("py-4 border-b-2 px-1 sm:text-base text-sm font-medium")}
+		var templ_7745c5c3_Var22 = []any{twerge.It("px-1 sm:text-base text-sm font-medium py-4 border-b-2")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var22...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -326,7 +326,7 @@ func Tag(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var26 = []any{twerge.It("py-4 border-b-2 px-1 sm:text-base text-sm font-medium")}
+		var templ_7745c5c3_Var26 = []any{twerge.It("px-1 sm:text-base text-sm font-medium py-4 border-b-2")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var26...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

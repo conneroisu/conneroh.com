@@ -9,9 +9,9 @@ import (
 )
 
 const (
-	activeBtnStyle   = "px-3 py-2 rounded-md bg-blue-600 text-white font-medium"
-	inactiveBtnStyle = "px-3 py-2 rounded-md border border-gray-700 bg-gray-800 text-gray-300 hover:bg-gray-700 transition-colors"
-	ellipsisStyle    = "px-2 py-1 text-gray-400"
+	activeBtnStyle   = "bg-blue-600 font-medium px-3 py-2 text-white rounded-md"
+	inactiveBtnStyle = "px-3 bg-gray-800 transition-colors rounded-md border py-2 border-gray-700 text-gray-300 hover:bg-gray-700"
+	ellipsisStyle    = "text-gray-400 px-2 py-1"
 )
 
 templ List(
@@ -24,10 +24,10 @@ templ List(
 	pageCount int,
 ) {
 	<div
-		class={ twerge.It("py-8 px-4 container mx-auto") }
+		class={ twerge.It("px-4 container mx-auto py-8") }
 	>
 		<h1
-			class={ twerge.It("text-white text-3xl font-bold mb-6") }
+			class={ twerge.It("text-3xl font-bold mb-6 text-white") }
 		>
 			Search { target }
 		</h1>
@@ -55,14 +55,14 @@ templ search(
 	query string,
 ) {
 	<div
-		class={ twerge.It("p-3 border-gray-700 border-b") }
+		class={ twerge.It("border-gray-700 border-b p-3") }
 	>
 		<div
 			class={ twerge.It("relative") }
 		>
 			<input
 				id="search"
-				class={ twerge.It("text-white border-gray-600 rounded-md focus:outline-none bg-gray-700 border focus:ring-blue-500 w-full focus:ring-2 pr-4 py-2 pl-10") }
+				class={ twerge.It("w-full focus:outline-none border rounded-md pr-4 py-2 pl-10 bg-gray-700 text-white focus:ring-2 border-gray-600 focus:ring-blue-500") }
 				placeholder={ fmt.Sprintf("Search %s...", target) }
 				hx-get={ fmt.Sprintf("/search/%s", target) }
 				hx-target="#listi"
@@ -80,7 +80,7 @@ templ search(
 			</div>
 			<div
 				id="search-indicator"
-				class={ twerge.It("htmx-indicator absolute right-3 top-2.5 text-blue-500") }
+				class={ twerge.It("htmx-indicator top-2.5 text-blue-500 absolute right-3") }
 			>
 				<svg
 					class={ twerge.It("animate-spin h-5 w-5") }
@@ -119,12 +119,12 @@ templ Results(
 	page, pageCount int,
 ) {
 	<div
-		class={ twerge.It("py-2 px-4 container mx-auto") }
+		class={ twerge.It("px-4 container mx-auto py-2") }
 	>
 		@components.Pagination(page, pageCount, target)
 	</div>
 	<div
-		class={ twerge.It("md:grid-cols-2 lg:grid-cols-3 gap-6 grid grid-cols-1") }
+		class={ twerge.It("grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 grid") }
 	>
 		switch target {
 			case routing.PostPluralPath:
@@ -136,19 +136,24 @@ templ Results(
 			case routing.ProjectPluralPath:
 				for i, project := range *projects {
 					if i < routing.MaxListLargeItems {
-						@components.ProjectItem(project)
+						@components.ProjectItem(project,
+							templ.Attributes{
+								"class": twerge.It("bg-gray-800 transition-all flex transform hover:-translate-y-3 flex-col shadow-md rounded-lg hover:shadow-lg duration-300 overflow-hidden h-full"),
+							})
 					}
 				}
 			case routing.TagsPluralPath:
 				for i, tag := range *tags {
 					if i < routing.MaxListSmallItems {
-						@components.TagItem(tag)
+						@components.TagItem(tag, templ.Attributes{
+							"class": twerge.It("p-6 rounded-lg overflow-hidden bg-gray-800 shadow-md hover:shadow-lg duration-300 transform transition-all hover:-translate-y-1"),
+						})
 					}
 				}
 		}
 	</div>
 	<div
-		class={ twerge.It("py-2 px-4 container mx-auto") }
+		class={ twerge.It("px-4 container mx-auto py-2") }
 	>
 		@components.Pagination(page, pageCount, target)
 	</div>

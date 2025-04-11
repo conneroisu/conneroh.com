@@ -42,7 +42,7 @@ func Post(
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		var templ_7745c5c3_Var2 = []any{twerge.It("py-8 px-4 container mx-auto")}
+		var templ_7745c5c3_Var2 = []any{twerge.It("px-4 container mx-auto py-8")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var2...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -121,7 +121,7 @@ func Post(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var9 = []any{twerge.It("items-center text-gray-400 mb-6 flex")}
+		var templ_7745c5c3_Var9 = []any{twerge.It("mb-6 flex items-center text-gray-400")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var9...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -214,7 +214,7 @@ func Post(
 			return templ_7745c5c3_Err
 		}
 		for _, tag := range post.Tags {
-			var templ_7745c5c3_Var17 = []any{twerge.It("bg-blue-900 text-blue-200 px-3 font-medium py-1 rounded-full inline-block text-sm transition-colors hover:bg-blue-800")}
+			var templ_7745c5c3_Var17 = []any{twerge.It("px-3 font-medium text-sm py-1 inline-block hover:bg-blue-800 text-blue-200 bg-blue-900 rounded-full transition-colors")}
 			templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var17...)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -267,7 +267,7 @@ func Post(
 			templ_7745c5c3_Err = components.Image(
 				post.BannerPath,
 				post.Title,
-				twerge.It("w-full h-64 md:h-96 object-cover object-center rounded-lg shadow-md mb-8"),
+				twerge.It("w-full md:h-96 object-center rounded-lg object-cover shadow-md mb-8 h-64"),
 			).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -277,7 +277,7 @@ func Post(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var21 = []any{twerge.It("shadow-lg rounded-lg bg-gray-800 mb-8 p-6 overflow-hidden")}
+		var templ_7745c5c3_Var21 = []any{twerge.It("bg-gray-800 rounded-lg mb-8 overflow-hidden p-6 shadow-lg")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var21...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -299,7 +299,7 @@ func Post(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var23 = []any{twerge.It("leading-relaxed max-w-none my-6 text-gray-300")}
+		var templ_7745c5c3_Var23 = []any{twerge.It("max-w-none my-6 text-gray-300 leading-relaxed")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var23...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -374,7 +374,7 @@ func Post(
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var29 = []any{twerge.It("gap-4 grid grid-cols-1 md:grid-cols-2")}
+			var templ_7745c5c3_Var29 = []any{twerge.It("grid grid-cols-1 md:grid-cols-2 gap-4")}
 			templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var29...)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -397,7 +397,7 @@ func Post(
 				return templ_7745c5c3_Err
 			}
 			for _, project := range post.Projects {
-				var templ_7745c5c3_Var31 = []any{twerge.It("items-center bg-gray-800 transition-colors flex rounded-lg p-4 hover:bg-gray-700")}
+				var templ_7745c5c3_Var31 = []any{twerge.It("rounded-lg bg-gray-800 hover:bg-gray-700 flex transition-colors items-center p-4")}
 				templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var31...)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -480,7 +480,7 @@ func Post(
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var38 = []any{twerge.It("text-gray-400 text-sm line-clamp-2")}
+				var templ_7745c5c3_Var38 = []any{twerge.It("line-clamp-2 text-gray-400 text-sm")}
 				templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var38...)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err

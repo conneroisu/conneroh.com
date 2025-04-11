@@ -19,7 +19,7 @@ templ header() {
 				x-data="{ isMenuOpen: false }"
 			>
 				<div
-					class={ twerge.It("h-16 flex items-center justify-between") }
+					class={ twerge.It("justify-between h-16 flex items-center") }
 				>
 					// Left side: Logo and navigation links
 					<div
@@ -27,12 +27,12 @@ templ header() {
 					>
 						// Mobile menu button
 						@components.Icon("menu", templ.Attributes{
-							"class":  twerge.It("rounded-md focus:outline-none sm:hidden hover:text-white text-gray-300 p-2 mr-2 hover:bg-gray-700"),
+							"class":  twerge.It("p-2 focus:outline-none sm:hidden hover:text-white hover:bg-gray-700 rounded-md text-gray-300 mr-2"),
 							"@click": "isMenuOpen = !isMenuOpen",
 						})
 						// Logo - visible on all screens
 						<a
-							class={ twerge.It("text-xl font-bold text-white cursor-pointer pr-4") }
+							class={ twerge.It("text-white cursor-pointer pr-4 text-xl font-bold") }
 							hx-get="/morph/home"
 							hx-push-url="/"
 							hx-target="#bodiody"
@@ -46,7 +46,7 @@ templ header() {
 							preload="mouseover"
 						>
 							<a
-								class={ twerge.It("cursor-pointer text-gray-300 hover:text-white") }
+								class={ twerge.It("hover:text-white cursor-pointer text-gray-300") }
 								hx-target="#bodiody"
 								hx-get="/projects"
 								hx-push-url="true"
@@ -55,7 +55,7 @@ templ header() {
 								Projects
 							</a>
 							<a
-								class={ twerge.It("cursor-pointer text-gray-300 hover:text-white") }
+								class={ twerge.It("hover:text-white cursor-pointer text-gray-300") }
 								hx-target="#bodiody"
 								hx-get="/posts"
 								hx-push-url="true"
@@ -64,7 +64,7 @@ templ header() {
 								Posts
 							</a>
 							<a
-								class={ twerge.It("cursor-pointer text-gray-300 hover:text-white") }
+								class={ twerge.It("hover:text-white cursor-pointer text-gray-300") }
 								hx-target="#bodiody"
 								hx-get="/tags"
 								hx-push-url="true"
@@ -81,7 +81,7 @@ templ header() {
 				<div
 					x-show="isMenuOpen"
 					class={ twerge.It("pb-4 space-y-1 sm:hidden pt-2") }
-					x-transition:enter="duration-200 transition ease-out"
+					x-transition:enter="transition ease-out duration-200"
 					x-transition:enter-start="opacity-0 transform -translate-y-2"
 					x-transition:enter-end="transform translate-y-0 opacity-100"
 					x-transition:leave="transition ease-in duration-150"
@@ -89,7 +89,7 @@ templ header() {
 					x-transition:leave-end="opacity-0 transform -translate-y-2"
 				>
 					<a
-						class={ twerge.It("hover:bg-gray-700 hover:text-white font-medium pl-3 text-base pr-4 block py-2 text-gray-300") }
+						class={ twerge.It("text-base text-gray-300 hover:bg-gray-700 hover:text-white pl-3 pr-4 block py-2 font-medium") }
 						hx-target="#bodiody"
 						hx-get="/projects"
 						hx-push-url="true"
@@ -99,7 +99,7 @@ templ header() {
 						Projects
 					</a>
 					<a
-						class={ twerge.It("hover:bg-gray-700 hover:text-white font-medium pl-3 text-base pr-4 block py-2 text-gray-300") }
+						class={ twerge.It("text-base text-gray-300 hover:bg-gray-700 hover:text-white pl-3 pr-4 block py-2 font-medium") }
 						hx-target="#bodiody"
 						hx-get="/posts"
 						hx-push-url="/posts"
@@ -109,7 +109,7 @@ templ header() {
 						Posts
 					</a>
 					<a
-						class={ twerge.It("hover:bg-gray-700 hover:text-white font-medium pl-3 text-base pr-4 block py-2 text-gray-300") }
+						class={ twerge.It("text-base text-gray-300 hover:bg-gray-700 hover:text-white pl-3 pr-4 block py-2 font-medium") }
 						hx-target="#bodiody"
 						hx-get="/tags"
 						hx-push-url="true"
@@ -148,7 +148,7 @@ templ search() {
 		>
 			<button
 				@click="isSearchOpen = !isSearchOpen"
-				class={ twerge.It("text-gray-300 rounded-md p-2 transition-colors hover:text-white hover:bg-gray-700") }
+				class={ twerge.It("p-2 transition-colors hover:text-white hover:bg-gray-700 text-gray-300 rounded-md") }
 			>
 				@components.Icon("search", templ.Attributes{})
 			</button>
@@ -156,8 +156,8 @@ templ search() {
 			<div
 				x-show="isSearchOpen"
 				@click.away="isSearchOpen = false"
-				class={ twerge.It("mt-2 top-full w-80 absolute overflow-hidden shadow-lg rounded-lg z-30 right-0 bg-gray-800") }
-				x-transition:enter="duration-200 transition ease-out"
+				class={ twerge.It("overflow-hidden shadow-lg mt-2 top-full absolute rounded-lg w-80 right-0 z-30 bg-gray-800") }
+				x-transition:enter="transition ease-out duration-200"
 				x-transition:enter-start="opacity-0 scale-95"
 				x-transition:enter-end="opacity-100 scale-100"
 				x-transition:leave="transition ease-in duration-150"
@@ -166,7 +166,7 @@ templ search() {
 			>
 				// Search input
 				<div
-					class={ twerge.It("p-3 border-gray-700 border-b") }
+					class={ twerge.It("border-gray-700 border-b p-3") }
 				>
 					<div
 						class={ twerge.It("relative") }
@@ -179,7 +179,7 @@ templ search() {
 							hx-vals="js:{q: searchQuery}"
 							hx-target="#search-results-container"
 							hx-indicator="#loading-indicator"
-							class={ twerge.It("focus:ring-blue-500 rounded-md focus:outline-none bg-gray-700 pl-10 focus:ring-2 border-gray-600 pr-4 w-full py-2 text-white border") }
+							class={ twerge.It("border border-gray-600 py-2 focus:ring-blue-500 focus:ring-2 pr-4 focus:outline-none rounded-md bg-gray-700 text-white w-full pl-10") }
 							type="search"
 							placeholder="Search site..."
 							aria-label="Search"
@@ -208,7 +208,7 @@ templ search() {
 					// Loading indicator
 					<div
 						id="loading-indicator"
-						class={ twerge.It("text-center p-4 text-gray-400 htmx-indicator") }
+						class={ twerge.It("htmx-indicator text-center p-4 text-gray-400") }
 					>
 						<svg
 							class={ twerge.It("w-5 mx-auto animate-spin h-5") }
@@ -244,7 +244,7 @@ templ search() {
 		// Mobile search toggle button
 		<button
 			@click="isSearchOpen = !isSearchOpen"
-			class={ twerge.It("text-gray-300 hover:text-white focus:outline-none md:hidden") }
+			class={ twerge.It("md:hidden text-gray-300 hover:text-white focus:outline-none") }
 		>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
@@ -275,8 +275,8 @@ templ search() {
 		// Mobile search panel
 		<div
 			x-show="isSearchOpen"
-			class={ twerge.It("z-50 fixed inset-0 md:hidden pb-4 px-4 bg-gray-900 pt-16") }
-			x-transition:enter="duration-200 transition ease-out"
+			class={ twerge.It("md:hidden px-4 fixed inset-0 z-50 bg-gray-900 pt-16 pb-4") }
+			x-transition:enter="transition ease-out duration-200"
 			x-transition:enter-start="opacity-0"
 			x-transition:enter-end="opacity-100"
 			x-transition:leave="transition ease-in duration-150"
@@ -303,7 +303,7 @@ templ search() {
 			>Search</h2>
 			// Mobile search input
 			<div
-				class={ twerge.It("mb-4 relative") }
+				class={ twerge.It("relative mb-4") }
 			>
 				<input
 					x-ref="mobileSearchInput"
@@ -313,7 +313,7 @@ templ search() {
 					hx-vals="js:{q: searchQuery, mobile: true}"
 					hx-target="#mobile-search-results-container"
 					hx-indicator="#mobile-loading-indicator"
-					class={ twerge.It("pr-4 bg-gray-800 focus:ring-2 focus:outline-none text-white border w-full py-3 pl-10 rounded-lg border-gray-600 focus:ring-blue-500") }
+					class={ twerge.It("pr-4 border bg-gray-800 rounded-lg focus:outline-none py-3 pl-10 focus:ring-blue-500 w-full focus:ring-2 text-white border-gray-600") }
 					type="search"
 					placeholder="Search site..."
 					aria-label="Search"
@@ -340,7 +340,7 @@ templ search() {
 				// Loading indicator
 				<div
 					id="mobile-loading-indicator"
-					class={ twerge.It("py-8 text-center text-gray-400 htmx-indicator") }
+					class={ twerge.It("htmx-indicator py-8 text-center text-gray-400") }
 				>
 					<svg
 						class={ twerge.It("h-8 w-8 mx-auto mb-2 animate-spin") }

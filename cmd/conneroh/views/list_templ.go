@@ -17,9 +17,9 @@ import (
 )
 
 const (
-	activeBtnStyle   = "px-3 py-2 rounded-md bg-blue-600 text-white font-medium"
-	inactiveBtnStyle = "px-3 py-2 rounded-md border border-gray-700 bg-gray-800 text-gray-300 hover:bg-gray-700 transition-colors"
-	ellipsisStyle    = "px-2 py-1 text-gray-400"
+	activeBtnStyle   = "bg-blue-600 font-medium px-3 py-2 text-white rounded-md"
+	inactiveBtnStyle = "px-3 bg-gray-800 transition-colors rounded-md border py-2 border-gray-700 text-gray-300 hover:bg-gray-700"
+	ellipsisStyle    = "text-gray-400 px-2 py-1"
 )
 
 func List(
@@ -51,7 +51,7 @@ func List(
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		var templ_7745c5c3_Var2 = []any{twerge.It("py-8 px-4 container mx-auto")}
+		var templ_7745c5c3_Var2 = []any{twerge.It("px-4 container mx-auto py-8")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var2...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -73,7 +73,7 @@ func List(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var4 = []any{twerge.It("text-white text-3xl font-bold mb-6")}
+		var templ_7745c5c3_Var4 = []any{twerge.It("text-3xl font-bold mb-6 text-white")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var4...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -162,7 +162,7 @@ func search(
 			templ_7745c5c3_Var7 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		var templ_7745c5c3_Var8 = []any{twerge.It("p-3 border-gray-700 border-b")}
+		var templ_7745c5c3_Var8 = []any{twerge.It("border-gray-700 border-b p-3")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var8...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -206,7 +206,7 @@ func search(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var12 = []any{twerge.It("text-white border-gray-600 rounded-md focus:outline-none bg-gray-700 border focus:ring-blue-500 w-full focus:ring-2 pr-4 py-2 pl-10")}
+		var templ_7745c5c3_Var12 = []any{twerge.It("w-full focus:outline-none border rounded-md pr-4 py-2 pl-10 bg-gray-700 text-white focus:ring-2 border-gray-600 focus:ring-blue-500")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var12...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -297,7 +297,7 @@ func search(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var19 = []any{twerge.It("htmx-indicator absolute right-3 top-2.5 text-blue-500")}
+		var templ_7745c5c3_Var19 = []any{twerge.It("htmx-indicator top-2.5 text-blue-500 absolute right-3")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var19...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -451,7 +451,7 @@ func Results(
 			templ_7745c5c3_Var30 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		var templ_7745c5c3_Var31 = []any{twerge.It("py-2 px-4 container mx-auto")}
+		var templ_7745c5c3_Var31 = []any{twerge.It("px-4 container mx-auto py-2")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var31...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -481,7 +481,7 @@ func Results(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var33 = []any{twerge.It("md:grid-cols-2 lg:grid-cols-3 gap-6 grid grid-cols-1")}
+		var templ_7745c5c3_Var33 = []any{twerge.It("grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 grid")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var33...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -516,7 +516,10 @@ func Results(
 		case routing.ProjectPluralPath:
 			for i, project := range *projects {
 				if i < routing.MaxListLargeItems {
-					templ_7745c5c3_Err = components.ProjectItem(project).Render(ctx, templ_7745c5c3_Buffer)
+					templ_7745c5c3_Err = components.ProjectItem(project,
+						templ.Attributes{
+							"class": twerge.It("bg-gray-800 transition-all flex transform hover:-translate-y-3 flex-col shadow-md rounded-lg hover:shadow-lg duration-300 overflow-hidden h-full"),
+						}).Render(ctx, templ_7745c5c3_Buffer)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
@@ -525,7 +528,9 @@ func Results(
 		case routing.TagsPluralPath:
 			for i, tag := range *tags {
 				if i < routing.MaxListSmallItems {
-					templ_7745c5c3_Err = components.TagItem(tag).Render(ctx, templ_7745c5c3_Buffer)
+					templ_7745c5c3_Err = components.TagItem(tag, templ.Attributes{
+						"class": twerge.It("p-6 rounded-lg overflow-hidden bg-gray-800 shadow-md hover:shadow-lg duration-300 transform transition-all hover:-translate-y-1"),
+					}).Render(ctx, templ_7745c5c3_Buffer)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
@@ -536,7 +541,7 @@ func Results(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var35 = []any{twerge.It("py-2 px-4 container mx-auto")}
+		var templ_7745c5c3_Var35 = []any{twerge.It("px-4 container mx-auto py-2")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var35...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

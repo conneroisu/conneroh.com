@@ -18,9 +18,9 @@ import (
 )
 
 const (
-	activeBtnStyle   = "px-3 py-2 rounded-md bg-blue-600 text-white font-medium"
-	inactiveBtnStyle = "px-3 py-2 rounded-md border border-gray-700 bg-gray-800 text-gray-300 hover:bg-gray-700 transition-colors"
-	ellipsisStyle    = "px-2 py-1 text-gray-400"
+	activeBtnStyle   = "bg-blue-600 font-medium px-3 py-2 text-white rounded-md"
+	inactiveBtnStyle = "px-3 bg-gray-800 transition-colors rounded-md border py-2 border-gray-700 text-gray-300 hover:bg-gray-700"
+	ellipsisStyle    = "text-gray-400 px-2 py-1"
 )
 
 func Icon(
@@ -177,7 +177,7 @@ func TagControl(
 			templ_7745c5c3_Var8 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		var templ_7745c5c3_Var9 = []any{twerge.It("text-blue-200 px-3 items-center flex-row flex text-sm bg-blue-900 transition-colors py-1 hover:bg-blue-800 justify-between font-medium h-8 rounded-full hover:underline")}
+		var templ_7745c5c3_Var9 = []any{twerge.It("hover:bg-blue-800 flex font-medium text-blue-200 px-3 py-1 flex-row text-sm hover:underline rounded-full h-8 items-center transition-colors justify-between bg-blue-900")}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var9...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

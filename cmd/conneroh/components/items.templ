@@ -7,10 +7,10 @@ import (
 	"strconv"
 )
 
-templ ProjectItem(project *gen.Project) {
+templ ProjectItem(project *gen.Project, attrs templ.Attributes) {
 	<div
-		class={ twerge.It("transition-all flex transform hover:-translate-y-3 duration-300 overflow-hidden flex-col h-full bg-gray-800 hover:shadow-lg shadow-md rounded-lg") }
 		aria-label={ project.Title }
+		{ attrs... }
 	>
 		<a
 			hx-target={ hx.Bodiody.Sel }
@@ -27,20 +27,20 @@ templ ProjectItem(project *gen.Project) {
 				)
 			</div>
 			<div
-				class={ twerge.It("flex-grow flex-col flex p-6") }
+				class={ twerge.It("flex-grow flex p-6 flex-col") }
 			>
 				<h2
-					class={ twerge.It("text-white line-clamp-2 mb-3 text-xl hover:underline font-semibold") }
+					class={ twerge.It("mb-3 text-xl hover:underline font-semibold text-white line-clamp-2") }
 				>
 					{ project.Title }
 				</h2>
 				<p
-					class={ twerge.It("mb-4 line-clamp-2 text-gray-300") }
+					class={ twerge.It("text-gray-300 mb-4 line-clamp-2") }
 				>
 					{ project.Description }
 				</p>
 				<div
-					class={ twerge.It("grid flex-wrap gap-2 mb-4 grid-cols-2") }
+					class={ twerge.It("mb-4 grid-cols-2 grid flex-wrap gap-2") }
 					x-data="{ allTags: false }"
 				>
 					for i, tag := range project.Tags {
@@ -55,7 +55,7 @@ templ ProjectItem(project *gen.Project) {
 					if len(project.Tags) > 8 {
 						<button
 							type="button"
-							class={ twerge.It("w-full text-blue-200 px-3 items-center flex-row flex text-sm bg-blue-900 transition-colors py-1 hover:bg-blue-800 justify-between font-medium h-8 rounded-full hover:underline") }
+							class={ twerge.It("text-sm px-3 items-center flex hover:underline bg-blue-900 w-full transition-colors py-1 hover:bg-blue-800 h-8 flex-row rounded-full text-blue-200 justify-between font-medium") }
 							x-on:click.stop="allTags = !allTags"
 							x-show="!allTags"
 						>
@@ -64,7 +64,7 @@ templ ProjectItem(project *gen.Project) {
 						</button>
 						<button
 							type="button"
-							class={ twerge.It("w-full text-blue-200 px-3 items-center flex-row flex text-sm bg-blue-900 transition-colors py-1 hover:bg-blue-800 justify-between font-medium h-8 rounded-full hover:underline") }
+							class={ twerge.It("text-sm px-3 items-center flex hover:underline bg-blue-900 w-full transition-colors py-1 hover:bg-blue-800 h-8 flex-row rounded-full text-blue-200 justify-between font-medium") }
 							x-on:click.stop="allTags = !allTags"
 							x-show="allTags"
 						>
@@ -74,22 +74,13 @@ templ ProjectItem(project *gen.Project) {
 					}
 				</div>
 			</div>
-			<a
-				class={ twerge.It("left-0 flex bottom-3 font-medium hover:underline items-center right-0 text-sm justify-center text-blue-400 absolute") }
-				hx-target={ hx.Bodiody.Sel }
-				hx-get={ project.PagePath() }
-				hx-push-url={ project.PagePath() }
-			>
-				Read More
-				@Icon("arrow-right", templ.Attributes{})
-			</a>
 			<span
-				class={ twerge.It("bg-red-500 py-1 text-gray-200 bottom-0 left-0 px-2 absolute text-xs rounded-tr-md") }
+				class={ twerge.It("text-xs bg-red-500 py-1 bottom-0 px-2 rounded-tr-md text-gray-200 left-0 absolute") }
 			>
 				{ strconv.Itoa(len(project.Posts)) } posts
 			</span>
 			<span
-				class={ twerge.It("right-0 px-2 text-gray-200 text-xs bottom-0 rounded-tl-md bg-blue-500 py-1 absolute") }
+				class={ twerge.It("px-2 text-gray-200 bottom-0 py-1 right-0 text-xs rounded-tl-md bg-blue-500 absolute") }
 			>
 				{ strconv.Itoa(len(project.Tags)) } tags
 			</span>
@@ -97,41 +88,41 @@ templ ProjectItem(project *gen.Project) {
 	</div>
 }
 
-templ TagItem(tag *gen.Tag) {
+templ TagItem(tag *gen.Tag, attrs templ.Attributes) {
 	<a
 		hx-target={ hx.Bodiody.Sel }
 		hx-get={ tag.PagePath() }
 		hx-push-url={ tag.PagePath() }
-		class={ twerge.It("p-6 rounded-lg overflow-hidden bg-gray-800 shadow-md hover:shadow-lg duration-300 transform transition-all hover:-translate-y-1") }
 		preload="mouseover"
 		aria-label={ tag.Title }
+		{ attrs... }
 	>
 		<div
-			class={ twerge.It("flex items-center justify-between mb-3 p-6") }
+			class={ twerge.It("items-center justify-between mb-3 flex p-6") }
 		>
 			<h2
-				class={ twerge.It("text-xl font-semibold text-white") }
+				class={ twerge.It("font-semibold text-white text-xl") }
 			>
 				{ tag.Title }
 			</h2>
 			<div
-				class={ twerge.It("rounded-full flex h-8 justify-center items-center bg-gray-700 w-8") }
+				class={ twerge.It("rounded-full h-8 justify-center items-center flex w-8 bg-gray-700") }
 			>
 				@Icon(tag.Icon, templ.Attributes{"class": "stoke-white"})
 			</div>
 		</div>
 		<div
-			class={ twerge.It("mb-4 line-clamp-2 text-gray-300") }
+			class={ twerge.It("text-gray-300 mb-4 line-clamp-2") }
 		>
 			{ tag.Description }
 		</div>
 		<span
-			class={ twerge.It("bg-red-500 py-1 text-gray-200 bottom-0 left-0 px-2 absolute text-xs rounded-tr-md") }
+			class={ twerge.It("text-xs bg-red-500 py-1 bottom-0 px-2 rounded-tr-md text-gray-200 left-0 absolute") }
 		>
 			{ strconv.Itoa(len(tag.Posts)) } posts
 		</span>
 		<span
-			class={ twerge.It("right-0 px-2 text-gray-200 text-xs bottom-0 rounded-tl-md bg-blue-500 py-1 absolute") }
+			class={ twerge.It("px-2 text-gray-200 bottom-0 py-1 right-0 text-xs rounded-tl-md bg-blue-500 absolute") }
 		>
 			{ strconv.Itoa(len(tag.Projects)) } projects
 		</span>
@@ -140,9 +131,9 @@ templ TagItem(tag *gen.Tag) {
 
 templ PostItem(post *gen.Post) {
 	<div
-		class={ twerge.It("rounded-lg overflow-hidden bg-gray-800 shadow-md hover:shadow-lg duration-300 transform transition-all hover:-translate-y-1") }
-		x-transition:enter={ twerge.It("duration-200 transition ease-out") }
-		x-transition:enter-start={ twerge.It("translate-y-4 opacity-0 transform") }
+		class={ twerge.It("overflow-hidden bg-gray-800 transform rounded-lg transition-all hover:shadow-lg duration-300 shadow-md hover:-translate-y-1") }
+		x-transition:enter={ twerge.It("transition ease-out duration-200") }
+		x-transition:enter-start={ twerge.It("transform translate-y-4 opacity-0") }
 		x-transition:enter-end={ twerge.It("transform translate-y-0 opacity-100") }
 		aria-label={ post.Title }
 	>
@@ -162,17 +153,17 @@ templ PostItem(post *gen.Post) {
 				class={ twerge.It("p-6") }
 			>
 				<h2
-					class={ twerge.It("text-white line-clamp-2 mb-3 text-xl hover:underline font-semibold") }
+					class={ twerge.It("mb-3 text-xl hover:underline font-semibold text-white line-clamp-2") }
 				>
 					{ post.Title }
 				</h2>
 				<p
-					class={ twerge.It("mb-4 line-clamp-2 text-gray-300") }
+					class={ twerge.It("text-gray-300 mb-4 line-clamp-2") }
 				>
 					{ post.Description }
 				</p>
 				<div
-					class={ twerge.It("grid flex-wrap gap-2 mb-4 grid-cols-2") }
+					class={ twerge.It("mb-4 grid-cols-2 grid flex-wrap gap-2") }
 					x-data="{ allTags: false }"
 				>
 					for i, tag := range post.Tags {
@@ -187,7 +178,7 @@ templ PostItem(post *gen.Post) {
 					if len(post.Tags) > 8 {
 						<button
 							type="button"
-							class={ twerge.It("w-full text-blue-200 px-3 items-center flex-row flex text-sm bg-blue-900 transition-colors py-1 hover:bg-blue-800 justify-between font-medium h-8 rounded-full hover:underline") }
+							class={ twerge.It("text-sm px-3 items-center flex hover:underline bg-blue-900 w-full transition-colors py-1 hover:bg-blue-800 h-8 flex-row rounded-full text-blue-200 justify-between font-medium") }
 							x-on:click.stop="allTags = !allTags"
 							x-show="!allTags"
 						>
@@ -196,7 +187,7 @@ templ PostItem(post *gen.Post) {
 						</button>
 						<button
 							type="button"
-							class={ twerge.It("w-full text-blue-200 px-3 items-center flex-row flex text-sm bg-blue-900 transition-colors py-1 hover:bg-blue-800 justify-between font-medium h-8 rounded-full hover:underline") }
+							class={ twerge.It("text-sm px-3 items-center flex hover:underline bg-blue-900 w-full transition-colors py-1 hover:bg-blue-800 h-8 flex-row rounded-full text-blue-200 justify-between font-medium") }
 							x-on:click.stop="allTags = !allTags"
 							x-show="allTags"
 						>
@@ -206,19 +197,13 @@ templ PostItem(post *gen.Post) {
 					}
 				</div>
 			</div>
-			<a
-				class={ twerge.It("left-0 flex bottom-5 font-medium hover:underline items-center right-0 text-sm justify-center text-blue-400 absolute") }
-			>
-				Read More
-				@Icon("arrow-right", templ.Attributes{})
-			</a>
 			<span
-				class={ twerge.It("bg-red-500 py-1 text-gray-200 bottom-0 left-0 px-2 absolute text-xs rounded-tr-md") }
+				class={ twerge.It("text-xs bg-red-500 py-1 bottom-0 px-2 rounded-tr-md text-gray-200 left-0 absolute") }
 			>
 				{ strconv.Itoa(len(post.Tags)) } tags | { strconv.Itoa(len(post.Projects)) } projects
 			</span>
 			<div
-				class={ twerge.It("rounded-tl-md px-2 text-xs py-1 text-white absolute right-0 bottom-0 bg-blue-500") }
+				class={ twerge.It("py-1 absolute right-0 bg-blue-500 rounded-tl-md px-2 text-xs text-white bottom-0") }
 			>
 				{ post.CreatedAt.Format("Jan 02, 2006") }
 			</div>

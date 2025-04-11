@@ -81,6 +81,11 @@
           };
           generate-reload = {
             exec = ''
+              function gen_css() {
+                ${pkgs.templ}/bin/templ generate --log-level error
+                go run $REPO_ROOT/cmd/update-css --cwd $REPO_ROOT
+                ${pkgs.tailwindcss}/bin/tailwindcss -m -i ./input.css -o ./cmd/conneroh/_static/dist/style.css --cwd $REPO_ROOT
+              }
               export REPO_ROOT=$(git rev-parse --show-toplevel) # needed
               cd $REPO_ROOT
               if ${hasher}/bin/hasher -dir "$REPO_ROOT/cmd/conneroh/views" -v -exclude "*_templ.go"; then
@@ -91,11 +96,15 @@
                   echo "Changes detected in docs, running update script..."
                   ${pkgs.doppler}/bin/doppler run -- ${pkgs.go}/bin/go run $REPO_ROOT/cmd/update --cwd $REPO_ROOT
                 fi
+                if ${hasher}/bin/hasher -dir "$REPO_ROOT/cmd/conneroh/components" -v -exclude "*_templ.go"; then
+                  echo ""
+                else
+                  echo "Changes detected in components, running update script..."
+                  gen_css
+                fi
               else
                 echo "Changes detected in templates, running update script..."
-                ${pkgs.templ}/bin/templ generate --log-level error
-                go run $REPO_ROOT/cmd/update-css --cwd $REPO_ROOT
-                ${pkgs.tailwindcss}/bin/tailwindcss -m -i ./input.css -o ./cmd/conneroh/_static/dist/style.css --cwd $REPO_ROOT
+                gen_css
               fi
               cd -
             '';
