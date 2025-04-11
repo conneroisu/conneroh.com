@@ -113,8 +113,8 @@ templ Home(
 					Featured Projects
 				</h2>
 				<a
-					hx-get="/morph/projects"
-					hx-push-url="/projects"
+					hx-get="/projects"
+					hx-push-url="true"
 					hx-target={ hx.Bodiody.Sel }
 					preload="mouseover"
 					class={ twerge.It("font-medium flex items-center text-blue-400 hover:underline text-lg") }
@@ -220,8 +220,8 @@ templ Home(
 					Recent Posts
 				</h2>
 				<a
-					hx-get="/morph/posts"
-					hx-push-url="/posts"
+					hx-get="/posts"
+					hx-push-url="true"
 					hx-target={ hx.Bodiody.Sel }
 					class={ twerge.It("font-medium flex items-center text-blue-400 hover:underline text-lg") }
 					preload="mouseover"
@@ -240,8 +240,8 @@ templ Home(
 							class={ twerge.It("rounded-lg shadow-md transition-transform bg-gray-800 overflow-hidden hover:scale-105 hover:shadow-lg duration-300") }
 						>
 							<a
-								hx-get={ fmt.Sprintf("/morph/post/%s", post.Slug) }
-								hx-push-url={ fmt.Sprintf("/post/%s", post.Slug) }
+								hx-get={ post.PagePath() }
+								hx-push-url="true"
 								hx-swap="innerHTML"
 								hx-target={ hx.Bodiody.Sel }
 								preload="mouseover"
@@ -296,8 +296,8 @@ templ Home(
 									>
 										for _, tag := range post.Tags {
 											<a
-												hx-get={ fmt.Sprintf("/morph/tag/%s", tag.Slug) }
-												hx-push-url={ fmt.Sprintf("/tag/%s", tag.Slug) }
+												hx-get={ tag.PagePath() }
+												hx-push-url="true"
 												hx-target={ hx.Bodiody.Sel }
 												preload="mouseover"
 												class={ twerge.It("py-1 rounded-md px-2 bg-green-900 transition-colors text-xs hover:bg-green-800 text-green-200") }
@@ -307,8 +307,8 @@ templ Home(
 										}
 									</div>
 									<a
-										hx-get={ fmt.Sprintf("/morph/post/%s", post.Slug) }
-										hx-push-url={ fmt.Sprintf("/post/%s", post.Slug) }
+										hx-get={ post.PagePath() }
+										hx-push-url="true"
 										hx-target={ hx.Bodiody.Sel }
 										preload="mouseover"
 										class={ twerge.It("font-medium flex items-center text-blue-400 hover:underline text-sm") }
@@ -366,8 +366,8 @@ templ Home(
 				for _, tag := range *fullTags {
 					<a
 						hx-target={ hx.Bodiody.Sel }
-						hx-push-url={ fmt.Sprintf("/tag/%s", tag.Slug) }
-						hx-get={ fmt.Sprintf("/morph/tag/%s", tag.Slug) }
+						hx-push-url="true"
+						hx-get={ tag.PagePath() }
 						preload="mouseover"
 						class={ twerge.It("p-6 text-center hover:shadow-md block rounded-lg transition-shadow bg-gray-900") }
 						aria-label={ tag.Title }

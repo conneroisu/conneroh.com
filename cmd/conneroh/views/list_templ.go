@@ -650,9 +650,9 @@ func listProjectItem(project *gen.Project) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var43 string
-		templ_7745c5c3_Var43, templ_7745c5c3_Err = templ.JoinStringErrs(project.MorphPath())
+		templ_7745c5c3_Var43, templ_7745c5c3_Err = templ.JoinStringErrs(project.PagePath())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/list.templ`, Line: 165, Col: 31}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/list.templ`, Line: 165, Col: 30}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var43))
 		if templ_7745c5c3_Err != nil {
@@ -959,9 +959,9 @@ func listProjectItem(project *gen.Project) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var65 string
-		templ_7745c5c3_Var65, templ_7745c5c3_Err = templ.JoinStringErrs(project.MorphPath())
+		templ_7745c5c3_Var65, templ_7745c5c3_Err = templ.JoinStringErrs(project.PagePath())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/list.templ`, Line: 228, Col: 32}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/list.templ`, Line: 228, Col: 31}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var65))
 		if templ_7745c5c3_Err != nil {
@@ -1110,9 +1110,9 @@ func listTagItem(tag *gen.Tag) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var76 string
-		templ_7745c5c3_Var76, templ_7745c5c3_Err = templ.JoinStringErrs(tag.MorphPath())
+		templ_7745c5c3_Var76, templ_7745c5c3_Err = templ.JoinStringErrs(tag.PagePath())
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/list.templ`, Line: 251, Col: 26}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/list.templ`, Line: 251, Col: 25}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var76))
 		if templ_7745c5c3_Err != nil {

@@ -406,9 +406,9 @@ func Post(
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var32 string
-				templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/morph/project/%s", project.Slug))
+				templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.JoinStringErrs(project.PagePath())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 83, Col: 62}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 83, Col: 34}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var32))
 				if templ_7745c5c3_Err != nil {
@@ -419,9 +419,9 @@ func Post(
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var33 string
-				templ_7745c5c3_Var33, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/project/%s", project.Slug))
+				templ_7745c5c3_Var33, templ_7745c5c3_Err = templ.JoinStringErrs(project.PagePath())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 84, Col: 61}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 84, Col: 39}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var33))
 				if templ_7745c5c3_Err != nil {

@@ -43,30 +43,21 @@ func AddRoutes(
 
 	h.Handle(
 		"GET /posts",
-		templ.Handler(layouts.Page(posts)))
-	h.Handle(
-		"GET /morph/posts",
-		templ.Handler(posts))
+		routing.MorphableHandler(layouts.Page(posts), posts))
 	h.Handle(
 		"GET /search/posts",
 		listHandler(routing.PostPluralPath))
 
 	h.Handle(
 		"GET /projects",
-		templ.Handler(layouts.Page(projects)))
-	h.Handle(
-		"GET /morph/projects",
-		templ.Handler(projects))
+		routing.MorphableHandler(layouts.Page(projects), projects))
 	h.Handle(
 		"GET /search/projects",
 		listHandler(routing.ProjectPluralPath))
 
 	h.Handle(
 		"GET /tags",
-		templ.Handler(layouts.Page(tags)))
-	h.Handle(
-		"GET /morph/tags",
-		templ.Handler(tags))
+		routing.MorphableHandler(layouts.Page(tags), tags))
 	h.Handle(
 		"GET /search/tags",
 		listHandler(routing.TagsPluralPath))
@@ -93,41 +84,39 @@ func AddRoutes(
 	for _, p := range gen.AllProjects {
 		h.Handle(
 			fmt.Sprintf("GET /project/%s", p.Slug),
-			templ.Handler(layouts.Page(views.Project(
-				p,
-				&gen.AllPosts,
-				&gen.AllProjects,
-				&gen.AllTags,
-			))),
-		)
-		h.Handle(
-			fmt.Sprintf("GET /morph/project/%s", p.Slug),
-			templ.Handler(views.Project(
-				p,
-				&gen.AllPosts,
-				&gen.AllProjects,
-				&gen.AllTags,
-			)),
+			routing.MorphableHandler(
+				layouts.Page(views.Project(
+					p,
+					&gen.AllPosts,
+					&gen.AllProjects,
+					&gen.AllTags,
+				)),
+				views.Project(
+					p,
+					&gen.AllPosts,
+					&gen.AllProjects,
+					&gen.AllTags,
+				),
+			),
 		)
 	}
 	for _, t := range gen.AllTags {
 		h.Handle(
 			fmt.Sprintf("GET /tag/%s", t.Slug),
-			templ.Handler(layouts.Page(views.Tag(
-				t,
-				&gen.AllPosts,
-				&gen.AllProjects,
-				&gen.AllTags,
-			))),
-		)
-		h.Handle(
-			fmt.Sprintf("GET /morph/tag/%s", t.Slug),
-			templ.Handler(views.Tag(
-				t,
-				&gen.AllPosts,
-				&gen.AllProjects,
-				&gen.AllTags,
-			)),
+			routing.MorphableHandler(
+				layouts.Page(views.Tag(
+					t,
+					&gen.AllPosts,
+					&gen.AllProjects,
+					&gen.AllTags,
+				)),
+				views.Tag(
+					t,
+					&gen.AllPosts,
+					&gen.AllProjects,
+					&gen.AllTags,
+				),
+			),
 		)
 	}
 

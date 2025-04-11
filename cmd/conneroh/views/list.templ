@@ -162,7 +162,7 @@ templ listProjectItem(project *gen.Project) {
 	>
 		<a
 			hx-target={ hx.Bodiody.Sel }
-			hx-get={ project.MorphPath() }
+			hx-get={ project.PagePath() }
 			hx-push-url={ project.PagePath() }
 			class={ twerge.It("cursor-pointer h-full") }
 			preload="mouseover"
@@ -225,7 +225,7 @@ templ listProjectItem(project *gen.Project) {
 			<a
 				class={ twerge.It("left-0 flex bottom-3 font-medium hover:underline items-center right-0 text-sm justify-center text-blue-400 absolute") }
 				hx-target={ hx.Bodiody.Sel }
-				hx-get={ project.MorphPath() }
+				hx-get={ project.PagePath() }
 				hx-push-url={ project.PagePath() }
 			>
 				Read More
@@ -248,7 +248,7 @@ templ listProjectItem(project *gen.Project) {
 templ listTagItem(tag *gen.Tag) {
 	<a
 		hx-target={ hx.Bodiody.Sel }
-		hx-get={ tag.MorphPath() }
+		hx-get={ tag.PagePath() }
 		hx-push-url={ tag.PagePath() }
 		class={ twerge.It("p-6 rounded-lg overflow-hidden bg-gray-800 shadow-md hover:shadow-lg duration-300 transform transition-all hover:-translate-y-1") }
 		preload="mouseover"

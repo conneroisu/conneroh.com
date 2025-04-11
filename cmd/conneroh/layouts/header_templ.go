@@ -198,7 +198,7 @@ func header() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "\" hx-target=\"#bodiody\" hx-get=\"/morph/projects\" hx-push-url=\"/projects\">Projects</a> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "\" hx-target=\"#bodiody\" hx-get=\"/projects\" hx-push-url=\"true\" hx-push-url=\"/projects\">Projects</a> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -220,7 +220,7 @@ func header() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "\" hx-target=\"#bodiody\" hx-get=\"/morph/posts\" hx-push-url=\"/posts\" preload=\"mouseover\">Posts</a> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "\" hx-target=\"#bodiody\" hx-get=\"/posts\" hx-push-url=\"true\" preload=\"mouseover\">Posts</a> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -242,7 +242,7 @@ func header() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "\" hx-target=\"#bodiody\" hx-get=\"/morph/tags\" hx-push-url=\"/tags\" preload=\"mouseover\">Tags</a></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "\" hx-target=\"#bodiody\" hx-get=\"/tags\" hx-push-url=\"true\" preload=\"mouseover\">Tags</a></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -294,7 +294,7 @@ func header() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "\" hx-target=\"#bodiody\" hx-get=\"/morph/projects\" hx-push-url=\"/projects\" @click=\"isMenuOpen = false\" preload=\"ontouchstart\">Projects</a> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "\" hx-target=\"#bodiody\" hx-get=\"/projects\" hx-push-url=\"true\" @click=\"isMenuOpen = false\" preload=\"ontouchstart\">Projects</a> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -316,7 +316,7 @@ func header() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "\" hx-target=\"#bodiody\" hx-get=\"/morph/posts\" hx-push-url=\"/posts\" @click=\"isMenuOpen = false\" preload=\"ontouchstart\">Posts</a> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "\" hx-target=\"#bodiody\" hx-get=\"/posts\" hx-push-url=\"/posts\" @click=\"isMenuOpen = false\" preload=\"ontouchstart\">Posts</a> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -338,7 +338,7 @@ func header() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "\" hx-target=\"#bodiody\" hx-get=\"/morph/tags\" hx-push-url=\"/tags\" @click=\"isMenuOpen = false\" preload=\"ontouchstart\">Tags</a></div></div></nav></header>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "\" hx-target=\"#bodiody\" hx-get=\"/tags\" hx-push-url=\"true\" @click=\"isMenuOpen = false\" preload=\"ontouchstart\">Tags</a></div></div></nav></header>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -377,7 +377,7 @@ func icon(
 		var templ_7745c5c3_Var29 string
 		templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("https://conneroh.fly.storage.tigris.dev/svg/%s.svg", id))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/layouts/header.templ`, Line: 130, Col: 77}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/layouts/header.templ`, Line: 131, Col: 77}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var29))
 		if templ_7745c5c3_Err != nil {
@@ -1233,7 +1233,7 @@ func searchResults(query string, results []SearchResult, isMobile bool) templ.Co
 				var templ_7745c5c3_Var102 string
 				templ_7745c5c3_Var102, templ_7745c5c3_Err = templ.JoinStringErrs(query)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/layouts/header.templ`, Line: 393, Col: 34}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/layouts/header.templ`, Line: 394, Col: 34}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var102))
 				if templ_7745c5c3_Err != nil {
@@ -1295,7 +1295,7 @@ func searchResults(query string, results []SearchResult, isMobile bool) templ.Co
 				var templ_7745c5c3_Var107 string
 				templ_7745c5c3_Var107, templ_7745c5c3_Err = templ.JoinStringErrs(query)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/layouts/header.templ`, Line: 400, Col: 33}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/layouts/header.templ`, Line: 401, Col: 33}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var107))
 				if templ_7745c5c3_Err != nil {
@@ -1391,7 +1391,7 @@ func searchResults(query string, results []SearchResult, isMobile bool) templ.Co
 					var templ_7745c5c3_Var115 string
 					templ_7745c5c3_Var115, templ_7745c5c3_Err = templ.JoinStringErrs(result.URL)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/layouts/header.templ`, Line: 414, Col: 27}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/layouts/header.templ`, Line: 415, Col: 27}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var115))
 					if templ_7745c5c3_Err != nil {
@@ -1404,7 +1404,7 @@ func searchResults(query string, results []SearchResult, isMobile bool) templ.Co
 					var templ_7745c5c3_Var116 string
 					templ_7745c5c3_Var116, templ_7745c5c3_Err = templ.JoinStringErrs(hx.Bodiody.Sel)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/layouts/header.templ`, Line: 415, Col: 34}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/layouts/header.templ`, Line: 416, Col: 34}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var116))
 					if templ_7745c5c3_Err != nil {
@@ -1570,7 +1570,7 @@ func searchResults(query string, results []SearchResult, isMobile bool) templ.Co
 					var templ_7745c5c3_Var130 string
 					templ_7745c5c3_Var130, templ_7745c5c3_Err = templ.JoinStringErrs(result.Title)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/layouts/header.templ`, Line: 456, Col: 25}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/layouts/header.templ`, Line: 457, Col: 25}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var130))
 					if templ_7745c5c3_Err != nil {
@@ -1605,7 +1605,7 @@ func searchResults(query string, results []SearchResult, isMobile bool) templ.Co
 					var templ_7745c5c3_Var133 string
 					templ_7745c5c3_Var133, templ_7745c5c3_Err = templ.JoinStringErrs(capitalize(result.Type))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/layouts/header.templ`, Line: 459, Col: 36}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/layouts/header.templ`, Line: 460, Col: 36}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var133))
 					if templ_7745c5c3_Err != nil {
@@ -1654,7 +1654,7 @@ func searchResults(query string, results []SearchResult, isMobile bool) templ.Co
 				var templ_7745c5c3_Var137 string
 				templ_7745c5c3_Var137, templ_7745c5c3_Err = templ.JoinStringErrs("/search?q=" + url.QueryEscape(query))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/layouts/header.templ`, Line: 470, Col: 52}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/layouts/header.templ`, Line: 471, Col: 52}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var137))
 				if templ_7745c5c3_Err != nil {
@@ -1667,7 +1667,7 @@ func searchResults(query string, results []SearchResult, isMobile bool) templ.Co
 				var templ_7745c5c3_Var138 string
 				templ_7745c5c3_Var138, templ_7745c5c3_Err = templ.JoinStringErrs(hx.Bodiody.Sel)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/layouts/header.templ`, Line: 471, Col: 32}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/layouts/header.templ`, Line: 472, Col: 32}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var138))
 				if templ_7745c5c3_Err != nil {
@@ -1734,7 +1734,7 @@ func searchResults(query string, results []SearchResult, isMobile bool) templ.Co
 					var templ_7745c5c3_Var143 string
 					templ_7745c5c3_Var143, templ_7745c5c3_Err = templ.JoinStringErrs(result.URL)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/layouts/header.templ`, Line: 489, Col: 27}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/layouts/header.templ`, Line: 490, Col: 27}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var143))
 					if templ_7745c5c3_Err != nil {
@@ -1900,7 +1900,7 @@ func searchResults(query string, results []SearchResult, isMobile bool) templ.Co
 					var templ_7745c5c3_Var157 string
 					templ_7745c5c3_Var157, templ_7745c5c3_Err = templ.JoinStringErrs(result.Title)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/layouts/header.templ`, Line: 530, Col: 25}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/layouts/header.templ`, Line: 531, Col: 25}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var157))
 					if templ_7745c5c3_Err != nil {
@@ -1935,7 +1935,7 @@ func searchResults(query string, results []SearchResult, isMobile bool) templ.Co
 					var templ_7745c5c3_Var160 string
 					templ_7745c5c3_Var160, templ_7745c5c3_Err = templ.JoinStringErrs(capitalize(result.Type))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/layouts/header.templ`, Line: 533, Col: 36}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/layouts/header.templ`, Line: 534, Col: 36}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var160))
 					if templ_7745c5c3_Err != nil {
@@ -1984,7 +1984,7 @@ func searchResults(query string, results []SearchResult, isMobile bool) templ.Co
 				var templ_7745c5c3_Var164 string
 				templ_7745c5c3_Var164, templ_7745c5c3_Err = templ.JoinStringErrs("/search?q=" + url.QueryEscape(query))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/layouts/header.templ`, Line: 544, Col: 52}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/layouts/header.templ`, Line: 545, Col: 52}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var164))
 				if templ_7745c5c3_Err != nil {

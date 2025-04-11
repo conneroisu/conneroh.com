@@ -47,7 +47,6 @@ type (
 	// Embeddable is an interface for embedding content.
 	Embeddable interface {
 		GetEmb() *Embedded
-		MorphPath() string
 		PagePath() string
 	}
 	// Post is a post with all its projects and tags.
@@ -96,26 +95,6 @@ type (
 // GetEmb returns the embedding struct itself.
 func (emb *Embedded) GetEmb() *Embedded {
 	return emb
-}
-
-// MorphPath returns the path to the post morph page.
-func (emb *Post) MorphPath() string {
-	return "/morph/post/" + emb.Slug
-}
-
-// MorphPath returns the path to the project morph page.
-func (emb *Project) MorphPath() string {
-	return "/morph/project/" + emb.Slug
-}
-
-// MorphPath returns the path to the tag morph page.
-func (emb *Tag) MorphPath() string {
-	return "/morph/tag/" + emb.Slug
-}
-
-// MorphPath returns the path to the employment morph page.
-func (emb *Employment) MorphPath() string {
-	return "/morph/employment/" + emb.Slug
 }
 
 // PagePath returns the path to the post page.

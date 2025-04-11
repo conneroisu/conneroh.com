@@ -9,13 +9,13 @@ import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
 import (
-	"github.com/conneroisu/conneroh.com/cmd/conneroh/layouts"
+	"github.com/conneroisu/conneroh.com/internal/data/gen"
 	"github.com/conneroisu/twerge"
 	"strconv"
 )
 
 // Search is the full search results page
-func Search(query string, results []layouts.SearchResult) templ.Component {
+func Search(query string, results []gen.Embeddable) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -251,42 +251,6 @@ func Search(query string, results []layouts.SearchResult) templ.Component {
 		}
 		return nil
 	})
-}
-
-func resultItem() templ.Component {
-	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
-		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
-		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
-			return templ_7745c5c3_CtxErr
-		}
-		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
-		if !templ_7745c5c3_IsBuffer {
-			defer func() {
-				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
-				if templ_7745c5c3_Err == nil {
-					templ_7745c5c3_Err = templ_7745c5c3_BufErr
-				}
-			}()
-		}
-		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var20 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var20 == nil {
-			templ_7745c5c3_Var20 = templ.NopComponent
-		}
-		ctx = templ.ClearChildren(ctx)
-		return nil
-	})
-}
-
-// Helper function to count results by type
-func countResultsByType(resultType string, results []layouts.SearchResult) int {
-	count := 0
-	for _, result := range results {
-		if result.Type == resultType {
-			count++
-		}
-	}
-	return count
 }
 
 var _ = templruntime.GeneratedTemplate

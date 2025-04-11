@@ -47,7 +47,8 @@ templ header() {
 							<a
 								class={ twerge.It("cursor-pointer text-gray-300 hover:text-white") }
 								hx-target="#bodiody"
-								hx-get="/morph/projects"
+								hx-get="/projects"
+								hx-push-url="true"
 								hx-push-url="/projects"
 							>
 								Projects
@@ -55,8 +56,8 @@ templ header() {
 							<a
 								class={ twerge.It("cursor-pointer text-gray-300 hover:text-white") }
 								hx-target="#bodiody"
-								hx-get="/morph/posts"
-								hx-push-url="/posts"
+								hx-get="/posts"
+								hx-push-url="true"
 								preload="mouseover"
 							>
 								Posts
@@ -64,8 +65,8 @@ templ header() {
 							<a
 								class={ twerge.It("cursor-pointer text-gray-300 hover:text-white") }
 								hx-target="#bodiody"
-								hx-get="/morph/tags"
-								hx-push-url="/tags"
+								hx-get="/tags"
+								hx-push-url="true"
 								preload="mouseover"
 							>
 								Tags
@@ -89,8 +90,8 @@ templ header() {
 					<a
 						class={ twerge.It("hover:bg-gray-700 hover:text-white font-medium pl-3 text-base pr-4 block py-2 text-gray-300") }
 						hx-target="#bodiody"
-						hx-get="/morph/projects"
-						hx-push-url="/projects"
+						hx-get="/projects"
+						hx-push-url="true"
 						@click="isMenuOpen = false"
 						preload="ontouchstart"
 					>
@@ -99,7 +100,7 @@ templ header() {
 					<a
 						class={ twerge.It("hover:bg-gray-700 hover:text-white font-medium pl-3 text-base pr-4 block py-2 text-gray-300") }
 						hx-target="#bodiody"
-						hx-get="/morph/posts"
+						hx-get="/posts"
 						hx-push-url="/posts"
 						@click="isMenuOpen = false"
 						preload="ontouchstart"
@@ -109,8 +110,8 @@ templ header() {
 					<a
 						class={ twerge.It("hover:bg-gray-700 hover:text-white font-medium pl-3 text-base pr-4 block py-2 text-gray-300") }
 						hx-target="#bodiody"
-						hx-get="/morph/tags"
-						hx-push-url="/tags"
+						hx-get="/tags"
+						hx-push-url="true"
 						@click="isMenuOpen = false"
 						preload="ontouchstart"
 					>

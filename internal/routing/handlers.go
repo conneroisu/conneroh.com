@@ -14,9 +14,9 @@ func MorphableHandler(
 	morph templ.Component,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		header := r.Header.Get(hx.HdrRequest)
+		var header = r.Header.Get(hx.HdrRequest)
 		if header == "" {
-			templ.Handler(full).ServeHTTP(w, r)
+			templ.Handler(full).ServeHTTPStreamed(w, r)
 		} else {
 			templ.Handler(morph).ServeHTTP(w, r)
 		}
