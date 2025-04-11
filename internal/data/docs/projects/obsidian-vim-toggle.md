@@ -11,7 +11,7 @@ banner_path: projects/vim-toggle.png
 created_at: 2025-03-27T14:13:11.000-06:00
 description: Obsidian plugin to toggle between vim and normal mode.
 title: vim-toggle
-updated_at: 2025-04-11T14:43:11.000-06:00
+updated_at: 2025-04-11T15:28:28.000-06:00
 ---
 
 Github: [link](https://github.com/conneroisu/vim-toggle)
@@ -30,9 +30,9 @@ Toggle between vim and normal mode.
 
 # Wondering what vi/vim is?
 
-[ ### Vim in 100 Seconds - YouTube https://www.youtube.com › watch ](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&ved=2ahUKEwjM4-3Es6v8AhW1KX0KHYH4Bs8QtwJ6BAgOEAI&url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3D-txKSRn0qeA&usg=AOvVaw0opUAcd4wCUwrJmBWm0zox)
+[Vim in 100 Seconds - YouTube https://www.youtube.com › watch ](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&ved=2ahUKEwjM4-3Es6v8AhW1KX0KHYH4Bs8QtwJ6BAgOEAI&url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3D-txKSRn0qeA&usg=AOvVaw0opUAcd4wCUwrJmBWm0zox)
 
-[ ### Understanding Vi and Vim (Vi IMproved) in 10 Minutes https://www.youtube.com › watch ](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&ved=2ahUKEwjM4-3Es6v8AhW1KX0KHYH4Bs8QtwJ6BAgQEAI&url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dnbph7RYWhwM&usg=AOvVaw0WsJDH24HqQHumDJS09xYX)
+[Understanding Vi and Vim (Vi IMproved) in 10 Minutes https://www.youtube.com › watch ](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&ved=2ahUKEwjM4-3Es6v8AhW1KX0KHYH4Bs8QtwJ6BAgQEAI&url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dnbph7RYWhwM&usg=AOvVaw0WsJDH24HqQHumDJS09xYX)
 
 # The Basics
 
