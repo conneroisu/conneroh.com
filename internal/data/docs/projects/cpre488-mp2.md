@@ -16,7 +16,7 @@ banner_path: projects/mp2.png
 created_at: 2025-03-27T14:13:10.000-06:00
 description: The third Project from CPRE488 at Iowa State University
 title: CPRE488 MP2
-updated_at: 2025-04-11T08:25:21.000-06:00
+updated_at: 2025-04-11T15:57:35.000-06:00
 ---
 
 # CPRE488 MP2
@@ -662,11 +662,19 @@ As the zoom increased past the 85% threshold, only a small segment of the top of
 
 ![[projects/cpre488-mp2/pip_fun.png]]
 
-For that reason, I figured that using the horizontal and vertical scaler cores could help align the output video resolution. However, I was unsure as to how to properly sequence the core configurations as there was a lack of relative documentation. Looking at the AMD forums, it seemed that many people experiencing similar artifacts blamed unaligned VDMA writes or bandwidth bottlenecks. In an attempt to address the VDMA issues, I tried to dynamically reconfigure the VDMA such that it could scale the non-1080p output of the zoom core to 1080p for the HDMI. I also tried allowing for unaligned VDMA reads and writes. Neither of these worked. I also wanted to try increasing the sample rate of the hardware pipeline to 2 or more pixels per clock, but I ran out of time before I could test this hypothesis.
+For that reason, I figured that using the horizontal and vertical scaler cores could help align the output video resolution.
 
-In the end, I was able to perform a digital zoom in some way, as seen (barely) in the following image:
+However, I was unsure as to how to properly sequence the core configurations as there was a lack of relative documentation.
 
-![[projects/cpre488-mp2/embaressing.png]]
+Looking at the AMD forums, it seemed that many people experiencing similar artifacts blamed unaligned VDMA writes or bandwidth bottlenecks.
+
+In an attempt to address the VDMA issues, I tried to dynamically reconfigure the VDMA such that it could scale the non-1080p output of the zoom core to 1080p for the HDMI.
+
+I also tried allowing for unaligned VDMA reads and writes.
+
+Neither of these worked. I also wanted to try increasing the sample rate of the hardware pipeline to 2 or more pixels per clock, but I ran out of time before I could test this hypothesis.
+
+In the end, I was able to perform a digital zoom in some way.
 
 ### Sobel Edge Detector
 

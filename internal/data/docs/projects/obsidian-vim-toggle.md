@@ -11,7 +11,7 @@ banner_path: projects/vim-toggle.png
 created_at: 2025-03-27T14:13:11.000-06:00
 description: Obsidian plugin to toggle between vim and normal mode.
 title: vim-toggle
-updated_at: 2025-04-11T15:28:28.000-06:00
+updated_at: 2025-04-11T15:46:49.000-06:00
 ---
 
 Github: [link](https://github.com/conneroisu/vim-toggle)
@@ -64,4 +64,4 @@ To install this plugin manually, you'll need to download the source code from th
 
 # Use Case
 
-Writting inside of obsidian canvas mode can be alittle tedious using vim mode cause of the constant inserting, this plugin allows for the user to evade these difficulties by switching to regular typing from vim mode temporarily.
+Writting inside of obsidian canvas mode can be feel alittle tedious using vim mode cause of the constant inserting, this plugin allows for the user to evade these difficulties by switching to regular typing from vim mode temporarily.
