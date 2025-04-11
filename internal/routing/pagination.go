@@ -19,6 +19,30 @@ const (
 	Ellipsis = "..."
 )
 
+// Paginate paginates a list of items.
+func Paginate[T any](
+	items []T,
+	page int,
+	pageSize int,
+) ([]T, int) {
+	if len(items) == 0 || pageSize <= 0 {
+		return []T{}, 0
+	}
+
+	// Calculate total number of pages (use exact division with ceiling)
+	totalPages := (len(items) + pageSize - 1) / pageSize
+
+	page = max(1, page)
+	page = min(page, totalPages)
+
+	// Calculate start and end indices for the current page
+	startIndex := (page - 1) * pageSize
+	endIndex := min(startIndex+pageSize, len(items))
+
+	// Return the paginated subset and the total page count
+	return items[startIndex:endIndex], totalPages
+}
+
 // GeneratePagination generates a pagination list of page numbers.
 func GeneratePagination(currentPage, totalPages, maxDisplay int) []string {
 	result := make([]string, 0)

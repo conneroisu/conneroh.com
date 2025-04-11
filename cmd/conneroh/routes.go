@@ -6,7 +6,6 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/a-h/templ"
 	static "github.com/conneroisu/conneroh.com/cmd/conneroh/_static"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/layouts"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/views"
@@ -24,11 +23,11 @@ func AddRoutes(
 
 	h.Handle(
 		"/{$}",
-		templ.Handler(layouts.Page(home)),
+		routing.MorphableHandler(
+			layouts.Page(home),
+			home,
+		),
 	)
-	h.Handle(
-		"GET /morph/home",
-		templ.Handler(home))
 	h.Handle(
 		"GET /dist/",
 		http.FileServer(http.FS(static.Dist)))

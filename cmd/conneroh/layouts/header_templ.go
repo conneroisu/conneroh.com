@@ -155,7 +155,7 @@ func header() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\" hx-get=\"/morph/home\" hx-push-url=\"/\" hx-target=\"#bodiody\" aria-label=\"Back to Home\">Conner Ohnesorge</a>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\" hx-get=\"/\" hx-push-url=\"/\" hx-target=\"#bodiody\" aria-label=\"Back to Home\">Conner Ohnesorge</a>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

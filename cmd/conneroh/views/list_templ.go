@@ -119,7 +119,7 @@ func List(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = Results(
+		templ_7745c5c3_Err = ListResults(
 			target,
 			posts,
 			projects,
@@ -263,7 +263,7 @@ func search(
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "\" name=\"search\" hx-push-url=\"true\" hx-trigger=\"keyup changed delay:300ms\" hx-indicator=\"#search-indicator\" aria-label=\"Local Search\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "\" maxLength=\"100\" name=\"search\" hx-push-url=\"true\" hx-trigger=\"keyup changed delay:300ms\" hx-indicator=\"#search-indicator\" aria-label=\"Local Search\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -397,7 +397,7 @@ func search(
 		var templ_7745c5c3_Var28 string
 		templ_7745c5c3_Var28, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("list-suggest-%s", target))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/list.templ`, Line: 108, Col: 46}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/list.templ`, Line: 109, Col: 46}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var28))
 		if templ_7745c5c3_Err != nil {
@@ -424,7 +424,7 @@ func search(
 	})
 }
 
-func Results(
+func ListResults(
 	target routing.PluralPath,
 	posts *[]*gen.Post,
 	projects *[]*gen.Project,

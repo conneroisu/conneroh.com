@@ -38,7 +38,7 @@ templ List(
 		<div
 			id="listi"
 		>
-			@Results(
+			@ListResults(
 				target,
 				posts,
 				projects,
@@ -67,6 +67,7 @@ templ search(
 				hx-get={ fmt.Sprintf("/search/%s", target) }
 				hx-target="#listi"
 				value={ query }
+				maxLength="100"
 				name="search"
 				hx-push-url="true"
 				hx-trigger="keyup changed delay:300ms"
@@ -111,7 +112,7 @@ templ search(
 	</div>
 }
 
-templ Results(
+templ ListResults(
 	target routing.PluralPath,
 	posts *[]*gen.Post,
 	projects *[]*gen.Project,

@@ -58,6 +58,105 @@ var (
 	tagPages = (len(gen.AllTags) + routing.MaxListLargeItems - 1) / routing.MaxListLargeItems
 )
 
+func listHandler(
+	target routing.PluralPath,
+) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		header := r.Header.Get(hx.HdrRequest)
+		query := r.URL.Query().Get("search")
+		pageStr := r.URL.Query().Get("page")
+		if pageStr == "" {
+			pageStr = "1"
+		}
+		page, err := strconv.Atoi(pageStr)
+		if err != nil {
+			return
+		}
+		switch target {
+		case routing.PostPluralPath:
+			filtered, totalPages := filter(gen.AllPosts, query, page, routing.MaxListLargeItems, func(post *gen.Post) string {
+				return post.Title
+			})
+			if header == "" {
+				templ.Handler(layouts.Page(views.List(
+					target,
+					&filtered,
+					nil,
+					nil,
+					query,
+					page,
+					totalPages,
+				))).ServeHTTP(w, r)
+			} else {
+				templ.Handler(views.ListResults(
+					target,
+					&filtered,
+					nil,
+					nil,
+					page,
+					totalPages,
+				)).ServeHTTP(w, r)
+			}
+		case routing.ProjectPluralPath:
+			filtered, totalPages := filter(gen.AllProjects, query, page, routing.MaxListLargeItems, func(project *gen.Project) string {
+				return project.Title
+			})
+			if header == "" {
+				templ.Handler(layouts.Page(views.List(
+					target,
+					nil,
+					&filtered,
+					nil,
+					query,
+					page,
+					totalPages,
+				))).ServeHTTP(w, r)
+			} else {
+				templ.Handler(views.ListResults(
+					target,
+					nil,
+					&filtered,
+					nil,
+					page,
+					totalPages,
+				)).ServeHTTP(w, r)
+			}
+		case routing.TagsPluralPath:
+			filtered, totalPages := filter(gen.AllTags, query, page, routing.MaxListSmallItems, func(tag *gen.Tag) string {
+				return tag.Title
+			})
+			if header == "" {
+				templ.Handler(layouts.Page(views.List(
+					target,
+					nil,
+					nil,
+					&filtered,
+					query,
+					page,
+					totalPages,
+				))).ServeHTTP(w, r)
+			} else {
+				templ.Handler(views.ListResults(
+					target,
+					nil,
+					nil,
+					&filtered,
+					page,
+					totalPages,
+				)).ServeHTTP(w, r)
+			}
+		}
+	}
+}
+
+func globalSearchHandler(
+	posts []*gen.Post,
+	projects []*gen.Project,
+	tags []*gen.Tag,
+) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+	}
+}
 func filter[T any](
 	items []T,
 	query string,
@@ -91,128 +190,5 @@ func filter[T any](
 	})
 
 	// Paginate the filtered results
-	return paginate(filtered, page, pageSize)
-}
-
-func paginate[T any](
-	items []T,
-	page int,
-	pageSize int,
-) ([]T, int) {
-	if len(items) == 0 || pageSize <= 0 {
-		return []T{}, 0
-	}
-
-	// Calculate total number of pages (use exact division with ceiling)
-	totalPages := (len(items) + pageSize - 1) / pageSize
-
-	page = max(1, page)
-	page = min(page, totalPages)
-
-	// Calculate start and end indices for the current page
-	startIndex := (page - 1) * pageSize
-	endIndex := min(startIndex+pageSize, len(items))
-
-	// Return the paginated subset and the total page count
-	return items[startIndex:endIndex], totalPages
-}
-
-func listHandler(
-	target routing.PluralPath,
-) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		header := r.Header.Get(hx.HdrRequest)
-		query := r.URL.Query().Get("search")
-		pageStr := r.URL.Query().Get("page")
-		if pageStr == "" {
-			pageStr = "1"
-		}
-		page, err := strconv.Atoi(pageStr)
-		if err != nil {
-			return
-		}
-		switch target {
-		case routing.PostPluralPath:
-			filtered, totalPages := filter(gen.AllPosts, query, page, routing.MaxListLargeItems, func(post *gen.Post) string {
-				return post.Title
-			})
-			if header == "" {
-				templ.Handler(layouts.Page(views.List(
-					target,
-					&filtered,
-					nil,
-					nil,
-					query,
-					page,
-					totalPages,
-				))).ServeHTTP(w, r)
-			} else {
-				templ.Handler(views.Results(
-					target,
-					&filtered,
-					nil,
-					nil,
-					page,
-					totalPages,
-				)).ServeHTTP(w, r)
-			}
-		case routing.ProjectPluralPath:
-			filtered, totalPages := filter(gen.AllProjects, query, page, routing.MaxListLargeItems, func(project *gen.Project) string {
-				return project.Title
-			})
-			if header == "" {
-				templ.Handler(layouts.Page(views.List(
-					target,
-					nil,
-					&filtered,
-					nil,
-					query,
-					page,
-					totalPages,
-				))).ServeHTTP(w, r)
-			} else {
-				templ.Handler(views.Results(
-					target,
-					nil,
-					&filtered,
-					nil,
-					page,
-					totalPages,
-				)).ServeHTTP(w, r)
-			}
-		case routing.TagsPluralPath:
-			filtered, totalPages := filter(gen.AllTags, query, page, routing.MaxListSmallItems, func(tag *gen.Tag) string {
-				return tag.Title
-			})
-			if header == "" {
-				templ.Handler(layouts.Page(views.List(
-					target,
-					nil,
-					nil,
-					&filtered,
-					query,
-					page,
-					totalPages,
-				))).ServeHTTP(w, r)
-			} else {
-				templ.Handler(views.Results(
-					target,
-					nil,
-					nil,
-					&filtered,
-					page,
-					totalPages,
-				)).ServeHTTP(w, r)
-			}
-		}
-	}
-}
-
-func globalSearchHandler(
-	posts []*gen.Post,
-	projects []*gen.Project,
-	tags []*gen.Tag,
-) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-	}
+	return routing.Paginate(filtered, page, pageSize)
 }
