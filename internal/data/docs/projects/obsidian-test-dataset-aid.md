@@ -2,12 +2,15 @@
 id: obsidian-test-dataset-aid
 aliases:
   - Text Dataset Aid Obsidian Plugin
-tags: []
+tags:
+  - ide/obsidian
+  - programming-language/javascript
+  - programming-language/typescript
 banner_path: projects/obsidian-text-dataset-aid/203184536-9199f720-a03b-423b-9bf6-81a68c7fbd28.png
 created_at: 2025-03-27T14:13:11.000-06:00
 description: A plugin to aid in creating text datasets for language models in Obsidian.
 title: Text Dataset Aid Obsidian Plugin
-updated_at: 2025-04-03T19:10:17.000-06:00
+updated_at: 2025-04-11T15:10:39.000-06:00
 ---
 
 Github: [link](https://github.com/conneroisu/Text-Dataset-Aid-Plugin)
