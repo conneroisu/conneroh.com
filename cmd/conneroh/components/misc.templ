@@ -45,7 +45,8 @@ templ TagControl(
 		class={ twerge.It("hover:bg-blue-800 flex font-medium text-blue-200 px-3 py-1 flex-row text-sm hover:underline rounded-full h-8 items-center transition-colors justify-between bg-blue-900") }
 		hx-get={ tag.PagePath() }
 		hx-target={ hx.Bodiody.Sel }
-		hx-push-url={ tag.PagePath() }
+		hx-push-url="true"
+		hx-on:click="event.stopPropagation()"
 		preload="mouseover"
 	>
 		<div

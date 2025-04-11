@@ -130,7 +130,9 @@ templ Results(
 			case routing.PostPluralPath:
 				for i, post := range *posts {
 					if i < routing.MaxListLargeItems {
-						@components.PostItem(post)
+						@components.PostItem(post, templ.Attributes{
+							"class": twerge.It("overflow-hidden bg-gray-800 transform rounded-lg transition-all hover:shadow-lg duration-300 shadow-md hover:-translate-y-1 cursor-pointer"),
+						})
 					}
 				}
 			case routing.ProjectPluralPath:

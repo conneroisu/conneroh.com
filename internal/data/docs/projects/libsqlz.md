@@ -6,10 +6,11 @@ tags:
   - programming-language/zig
   - programming-language/c
   - programming-language/rust
+banner_path: projects/libsqlz.png
 created_at: 2025-03-27T14:13:10.000-06:00
 description: libsqlz is a libsql sdk library written in Zig.
 title: libsqlz
-updated_at: 2025-03-30T08:13:10.000-06:00
+updated_at: 2025-04-11T08:03:07.000-06:00
 ---
 
 # libsqlz

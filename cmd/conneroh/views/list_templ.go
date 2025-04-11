@@ -507,7 +507,9 @@ func Results(
 		case routing.PostPluralPath:
 			for i, post := range *posts {
 				if i < routing.MaxListLargeItems {
-					templ_7745c5c3_Err = components.PostItem(post).Render(ctx, templ_7745c5c3_Buffer)
+					templ_7745c5c3_Err = components.PostItem(post, templ.Attributes{
+						"class": twerge.It("overflow-hidden bg-gray-800 transform rounded-lg transition-all hover:shadow-lg duration-300 shadow-md hover:-translate-y-1 cursor-pointer"),
+					}).Render(ctx, templ_7745c5c3_Buffer)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}

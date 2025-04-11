@@ -563,7 +563,7 @@ func Home(
 			if i < 6 {
 				templ_7745c5c3_Err = components.ProjectItem(project,
 					templ.Attributes{
-						"class": twerge.It("bg-gray-900 transition-all flex transform hover:-translate-y-3 flex-col shadow-md rounded-lg hover:shadow-lg duration-300 overflow-hidden h-full"),
+						"class": twerge.It("bg-gray-900 transition-all flex transform hover:-translate-y-3 flex-col shadow-md rounded-lg hover:shadow-lg duration-300 overflow-hidden h-full cursor-pointer"),
 					}).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -721,7 +721,9 @@ func Home(
 		}
 		for i, post := range *fullPosts {
 			if i < 4 {
-				templ_7745c5c3_Err = components.PostItem(post).Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = components.PostItem(post, templ.Attributes{
+					"class": twerge.It("overflow-hidden bg-gray-800 transform rounded-lg transition-all hover:shadow-lg duration-300 shadow-md hover:-translate-y-1 cursor-pointer"),
+				}).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -831,7 +833,7 @@ func Home(
 		var templ_7745c5c3_Var71 string
 		templ_7745c5c3_Var71, templ_7745c5c3_Err = templ.JoinStringErrs(hx.Bodiody.Sel)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/home.templ`, Line: 191, Col: 31}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/home.templ`, Line: 193, Col: 31}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var71))
 		if templ_7745c5c3_Err != nil {
