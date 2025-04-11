@@ -2,6 +2,7 @@ package views
 
 import (
 	"fmt"
+	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
 	"github.com/conneroisu/conneroh.com/internal/routing"
 	"github.com/conneroisu/twerge"
@@ -20,7 +21,7 @@ templ Tag(
 		<header
 			class={ twerge.It("mb-12 text-center") }
 		>
-			@icon(tag.Icon, templ.Attributes{
+			@components.Icon(tag.Icon, templ.Attributes{
 				"style": "width: 4em; height: 4em;",
 				"class": twerge.It("inline-block p-4"),
 			})

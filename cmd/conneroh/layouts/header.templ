@@ -2,6 +2,7 @@ package layouts
 
 import (
 	"fmt"
+	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
 	"github.com/conneroisu/conneroh.com/internal/hx"
 	"github.com/conneroisu/twerge"
 	"net/url"
@@ -25,7 +26,7 @@ templ header() {
 						class={ twerge.It("items-center flex") }
 					>
 						// Mobile menu button
-						@icon("menu", templ.Attributes{
+						@components.Icon("menu", templ.Attributes{
 							"class":  twerge.It("rounded-md focus:outline-none sm:hidden hover:text-white text-gray-300 p-2 mr-2 hover:bg-gray-700"),
 							"@click": "isMenuOpen = !isMenuOpen",
 						})
@@ -123,7 +124,7 @@ templ header() {
 	</header>
 }
 
-templ icon(
+templ Icon(
 	id string,
 	attrs templ.Attributes,
 ) {
@@ -149,7 +150,7 @@ templ search() {
 				@click="isSearchOpen = !isSearchOpen"
 				class={ twerge.It("text-gray-300 rounded-md p-2 transition-colors hover:text-white hover:bg-gray-700") }
 			>
-				@icon("search", templ.Attributes{})
+				@components.Icon("search", templ.Attributes{})
 			</button>
 			// Search dropdown
 			<div

@@ -2,6 +2,7 @@ package views
 
 import (
 	"fmt"
+	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
 	"github.com/conneroisu/twerge"
 )
@@ -50,7 +51,7 @@ templ Post(
 				}
 			</div>
 			if post.BannerPath != "" {
-				@image(
+				@components.Image(
 					post.BannerPath,
 					post.Title,
 					twerge.It("w-full h-64 md:h-96 object-cover object-center rounded-lg shadow-md mb-8"),

@@ -2,6 +2,7 @@ package views
 
 import (
 	"fmt"
+	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
 	"github.com/conneroisu/conneroh.com/internal/hx"
 	"github.com/conneroisu/twerge"
@@ -120,7 +121,7 @@ templ Home(
 					class={ twerge.It("font-medium flex items-center text-blue-400 hover:underline text-lg") }
 				>
 					View All Projects
-					@icon("arrow-right", templ.Attributes{})
+					@components.Icon("arrow-right", templ.Attributes{})
 				</a>
 			</div>
 			<div
@@ -143,7 +144,7 @@ templ Home(
 									class={ twerge.It("justify-center overflow-hidden h-48 bg-gray-700 flex items-center") }
 								>
 									if project.BannerPath != "" {
-										@image(
+										@components.Image(
 											project.BannerPath,
 											fmt.Sprintf("banner-%s", project.Slug),
 											twerge.It("w-full h-full object-cover"),
@@ -194,7 +195,7 @@ templ Home(
 										class={ twerge.It("font-medium flex items-center text-blue-400 hover:underline text-sm") }
 									>
 										View Project
-										@icon("arrow-right", templ.Attributes{})
+										@components.Icon("arrow-right", templ.Attributes{})
 									</a>
 								</div>
 							</a>
@@ -227,7 +228,7 @@ templ Home(
 					preload="mouseover"
 				>
 					View All Posts
-					@icon("arrow-right", templ.Attributes{})
+					@components.Icon("arrow-right", templ.Attributes{})
 				</a>
 			</div>
 			<div
@@ -252,7 +253,7 @@ templ Home(
 									class={ twerge.It("h-48 bg-gray-700 overflow-hidden") }
 								>
 									if post.BannerPath != "" {
-										@image(
+										@components.Image(
 											post.BannerPath,
 											fmt.Sprintf("banner-%s", post.Slug),
 											"w-full h-full object-cover",
@@ -352,37 +353,22 @@ templ Home(
 				</h2>
 				<a
 					hx-target={ hx.Bodiody.Sel }
+					hx-get="/tags"
 					hx-push-url="/tags"
 					preload="mouseover"
 					class={ twerge.It("font-medium flex items-center text-blue-400 hover:underline text-lg") }
 				>
 					See All Skills/Technologies
-					@icon("arrow-right", templ.Attributes{})
+					@components.Icon("arrow-right", templ.Attributes{})
 				</a>
 			</div>
 			<div
 				class={ twerge.It("grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 grid") }
 			>
-				for _, tag := range *fullTags {
-					<a
-						hx-target={ hx.Bodiody.Sel }
-						hx-push-url="true"
-						hx-get={ tag.PagePath() }
-						preload="mouseover"
-						class={ twerge.It("p-6 text-center hover:shadow-md block rounded-lg transition-shadow bg-gray-900") }
-						aria-label={ tag.Title }
-					>
-						<div
-							class={ twerge.It("items-center flex mb-4 justify-center h-12 w-12 mx-auto bg-blue-900 rounded-full") }
-						>
-							@icon(tag.Icon, templ.Attributes{})
-						</div>
-						<h3
-							class={ twerge.It("text-white font-medium") }
-						>
-							{ tag.Title }
-						</h3>
-					</a>
+				for i, tag := range *fullTags {
+					if i < 28 {
+						@components.TagItem(tag)
+					}
 				}
 			</div>
 		</div>
@@ -417,105 +403,101 @@ templ Home(
 						href="https://www.linkedin.com/in/conner-ohnesorge-b720a4238"
 						class={ twerge.It("h-12 items-center w-12 flex bg-gray-700 rounded-full transition-colors justify-center hover:bg-blue-400 text-gray-300") }
 					>
-						@icon("linkedin", templ.Attributes{})
+						@components.Icon("linkedin", templ.Attributes{})
 					</a>
 					<a
 						href="https://github.com/conneroisu"
 						class={ twerge.It("text-gray-300 bg-gray-700 transition-colors justify-center flex rounded-full hover:bg-gray-800 w-12 h-12 items-center") }
 					>
-						@icon("github", templ.Attributes{})
+						@components.Icon("github", templ.Attributes{})
 					</a>
 					<a
 						href="https://x.com/ConnerOhnesorge"
 						class={ twerge.It("h-12 items-center w-12 flex bg-gray-700 rounded-full transition-colors justify-center hover:bg-blue-400 text-gray-300") }
 					>
-						@icon("twitter", templ.Attributes{})
+						@components.Icon("twitter", templ.Attributes{})
 					</a>
 					<a
 						href="mailto:conneroisu@outlook.com"
 						class={ twerge.It("justify-center items-center h-12 hover:bg-red-500 flex w-12 transition-colors rounded-full text-gray-300 bg-gray-700") }
 					>
-						@icon("mail", templ.Attributes{})
+						@components.Icon("mail", templ.Attributes{})
 					</a>
 				</div>
-				<div
-					class={ twerge.It("p-8 rounded-lg shadow-md bg-gray-800") }
+				<form
+					class={ twerge.It("space-y-6 p-8 rounded-lg shadow-md bg-gray-800") }
 				>
-					<form
-						class={ twerge.It("space-y-6") }
+					<div
+						class={ twerge.It("md:grid-cols-2 gap-6 grid grid-cols-1") }
 					>
-						<div
-							class={ twerge.It("md:grid-cols-2 gap-6 grid grid-cols-1") }
-						>
-							<div>
-								<label
-									for="name"
-									class={ twerge.It("text-sm font-medium text-gray-300 mb-1 block") }
-								>
-									Name
-								</label>
-								<input
-									type="text"
-									id="name"
-									name="name"
-									class={ twerge.It("focus:ring-2 px-4 border py-2 border-gray-600 w-full focus:ring-blue-500 bg-gray-700 text-white focus:outline-none rounded-md") }
-									required
-								/>
-							</div>
-							<div>
-								<label
-									for="email"
-									class={ twerge.It("text-sm font-medium text-gray-300 mb-1 block") }
-								>
-									Email
-								</label>
-								<input
-									type="email"
-									id="email"
-									name="email"
-									class={ twerge.It("focus:ring-2 px-4 border py-2 border-gray-600 w-full focus:ring-blue-500 bg-gray-700 text-white focus:outline-none rounded-md") }
-									required
-								/>
-							</div>
-						</div>
 						<div>
 							<label
-								for="subject"
+								for="name"
 								class={ twerge.It("text-sm font-medium text-gray-300 mb-1 block") }
 							>
-								Subject
+								Name
 							</label>
 							<input
 								type="text"
-								id="subject"
-								name="subject"
+								id="name"
+								name="name"
 								class={ twerge.It("focus:ring-2 px-4 border py-2 border-gray-600 w-full focus:ring-blue-500 bg-gray-700 text-white focus:outline-none rounded-md") }
 								required
 							/>
 						</div>
 						<div>
 							<label
-								for="message"
+								for="email"
 								class={ twerge.It("text-sm font-medium text-gray-300 mb-1 block") }
 							>
-								Message
+								Email
 							</label>
-							<textarea
-								id="message"
-								name="message"
-								rows="4"
+							<input
+								type="email"
+								id="email"
+								name="email"
 								class={ twerge.It("focus:ring-2 px-4 border py-2 border-gray-600 w-full focus:ring-blue-500 bg-gray-700 text-white focus:outline-none rounded-md") }
 								required
-							></textarea>
+							/>
 						</div>
-						<button
-							type="submit"
-							class={ twerge.It("focus:ring-2 rounded-md focus:ring-blue-500 transition-colors w-full hover:bg-blue-700 focus:outline-none font-medium text-white bg-blue-600 px-6 focus:ring-offset-2 py-3") }
+					</div>
+					<div>
+						<label
+							for="subject"
+							class={ twerge.It("text-sm font-medium text-gray-300 mb-1 block") }
 						>
-							Send Message
-						</button>
-					</form>
-				</div>
+							Subject
+						</label>
+						<input
+							type="text"
+							id="subject"
+							name="subject"
+							class={ twerge.It("focus:ring-2 px-4 border py-2 border-gray-600 w-full focus:ring-blue-500 bg-gray-700 text-white focus:outline-none rounded-md") }
+							required
+						/>
+					</div>
+					<div>
+						<label
+							for="message"
+							class={ twerge.It("text-sm font-medium text-gray-300 mb-1 block") }
+						>
+							Message
+						</label>
+						<textarea
+							id="message"
+							name="message"
+							rows="4"
+							class={ twerge.It("focus:ring-2 px-4 border py-2 border-gray-600 w-full focus:ring-blue-500 bg-gray-700 text-white focus:outline-none rounded-md") }
+							required
+						></textarea>
+					</div>
+					<button
+						type="submit"
+						class={ twerge.It("focus:ring-2 rounded-md focus:ring-blue-500 transition-colors w-full hover:bg-blue-700 focus:outline-none font-medium text-white bg-blue-600 px-6 focus:ring-offset-2 py-3") }
+					>
+						Send Message
+					</button>
+				</form>
 			</div>
 		</div>
 	</section>

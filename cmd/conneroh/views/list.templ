@@ -2,11 +2,10 @@ package views
 
 import (
 	"fmt"
+	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
-	"github.com/conneroisu/conneroh.com/internal/hx"
 	"github.com/conneroisu/conneroh.com/internal/routing"
 	"github.com/conneroisu/twerge"
-	"strconv"
 )
 
 const (
@@ -14,67 +13,6 @@ const (
 	inactiveBtnStyle = "px-3 py-2 rounded-md border border-gray-700 bg-gray-800 text-gray-300 hover:bg-gray-700 transition-colors"
 	ellipsisStyle    = "px-2 py-1 text-gray-400"
 )
-
-templ search(
-	target routing.PluralPath,
-	query string,
-) {
-	<div
-		class={ twerge.It("p-3 border-gray-700 border-b") }
-	>
-		<div
-			class={ twerge.It("relative") }
-		>
-			<input
-				id="search"
-				class={ twerge.It("text-white border-gray-600 rounded-md focus:outline-none bg-gray-700 border focus:ring-blue-500 w-full focus:ring-2 pr-4 py-2 pl-10") }
-				placeholder={ fmt.Sprintf("Search %s...", target) }
-				hx-get={ fmt.Sprintf("/search/%s", target) }
-				hx-target="#listi"
-				value={ query }
-				name="search"
-				hx-push-url="true"
-				hx-trigger="keyup changed delay:300ms"
-				hx-indicator="#search-indicator"
-				aria-label="Local Search"
-			/>
-			<div
-				class={ twerge.It("text-gray-500 absolute left-3 top-2.5") }
-			>
-				@icon("search", templ.Attributes{})
-			</div>
-			<div
-				id="search-indicator"
-				class={ twerge.It("htmx-indicator absolute right-3 top-2.5 text-blue-500") }
-			>
-				<svg
-					class={ twerge.It("animate-spin h-5 w-5") }
-					xmlns="http://www.w3.org/2000/svg"
-					fill="none"
-					viewBox="0 0 24 24"
-				>
-					<circle
-						class={ twerge.It("opacity-25") }
-						cx="12"
-						cy="12"
-						r="10"
-						stroke="currentColor"
-						stroke-width="4"
-					></circle>
-					<path
-						class={ twerge.It("opacity-75") }
-						fill="currentColor"
-						d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-					></path>
-				</svg>
-			</div>
-		</div>
-		<div
-			id={ fmt.Sprintf("list-suggest-%s", target) }
-			class={ twerge.It("mt-2") }
-		></div>
-	</div>
-}
 
 templ List(
 	target routing.PluralPath,
@@ -112,6 +50,67 @@ templ List(
 	</div>
 }
 
+templ search(
+	target routing.PluralPath,
+	query string,
+) {
+	<div
+		class={ twerge.It("p-3 border-gray-700 border-b") }
+	>
+		<div
+			class={ twerge.It("relative") }
+		>
+			<input
+				id="search"
+				class={ twerge.It("text-white border-gray-600 rounded-md focus:outline-none bg-gray-700 border focus:ring-blue-500 w-full focus:ring-2 pr-4 py-2 pl-10") }
+				placeholder={ fmt.Sprintf("Search %s...", target) }
+				hx-get={ fmt.Sprintf("/search/%s", target) }
+				hx-target="#listi"
+				value={ query }
+				name="search"
+				hx-push-url="true"
+				hx-trigger="keyup changed delay:300ms"
+				hx-indicator="#search-indicator"
+				aria-label="Local Search"
+			/>
+			<div
+				class={ twerge.It("text-gray-500 absolute left-3 top-2.5") }
+			>
+				@components.Icon("search", templ.Attributes{})
+			</div>
+			<div
+				id="search-indicator"
+				class={ twerge.It("htmx-indicator absolute right-3 top-2.5 text-blue-500") }
+			>
+				<svg
+					class={ twerge.It("animate-spin h-5 w-5") }
+					xmlns="http://www.w3.org/2000/svg"
+					fill="none"
+					viewBox="0 0 24 24"
+				>
+					<circle
+						class={ twerge.It("opacity-25") }
+						cx="12"
+						cy="12"
+						r="10"
+						stroke="currentColor"
+						stroke-width="4"
+					></circle>
+					<path
+						class={ twerge.It("opacity-75") }
+						fill="currentColor"
+						d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+					></path>
+				</svg>
+			</div>
+		</div>
+		<div
+			id={ fmt.Sprintf("list-suggest-%s", target) }
+			class={ twerge.It("mt-2") }
+		></div>
+	</div>
+}
+
 templ Results(
 	target routing.PluralPath,
 	posts *[]*gen.Post,
@@ -122,7 +121,7 @@ templ Results(
 	<div
 		class={ twerge.It("py-2 px-4 container mx-auto") }
 	>
-		@pagination(page, pageCount, target)
+		@components.Pagination(page, pageCount, target)
 	</div>
 	<div
 		class={ twerge.It("md:grid-cols-2 lg:grid-cols-3 gap-6 grid grid-cols-1") }
@@ -131,19 +130,19 @@ templ Results(
 			case routing.PostPluralPath:
 				for i, post := range *posts {
 					if i < routing.MaxListLargeItems {
-						@listPostItem(post)
+						@components.PostItem(post)
 					}
 				}
 			case routing.ProjectPluralPath:
 				for i, project := range *projects {
 					if i < routing.MaxListLargeItems {
-						@listProjectItem(project)
+						@components.ProjectItem(project)
 					}
 				}
 			case routing.TagsPluralPath:
 				for i, tag := range *tags {
 					if i < routing.MaxListSmallItems {
-						@listTagItem(tag)
+						@components.TagItem(tag)
 					}
 				}
 		}
@@ -151,225 +150,6 @@ templ Results(
 	<div
 		class={ twerge.It("py-2 px-4 container mx-auto") }
 	>
-		@pagination(page, pageCount, target)
-	</div>
-}
-
-templ listProjectItem(project *gen.Project) {
-	<div
-		class={ twerge.It("transition-all flex transform hover:-translate-y-3 duration-300 overflow-hidden flex-col h-full bg-gray-800 hover:shadow-lg shadow-md rounded-lg") }
-		aria-label={ project.Title }
-	>
-		<a
-			hx-target={ hx.Bodiody.Sel }
-			hx-get={ project.PagePath() }
-			hx-push-url={ project.PagePath() }
-			class={ twerge.It("cursor-pointer h-full") }
-			preload="mouseover"
-		>
-			<div class={ twerge.It("relative w-full") }>
-				@image(
-					project.BannerPath,
-					project.Title,
-					twerge.It("w-full h-48 object-cover"),
-				)
-			</div>
-			<div
-				class={ twerge.It("flex-grow flex-col flex p-6") }
-			>
-				<h2
-					class={ twerge.It("text-white line-clamp-2 mb-3 text-xl hover:underline font-semibold") }
-				>
-					{ project.Title }
-				</h2>
-				<p
-					class={ twerge.It("mb-4 line-clamp-2 text-gray-300") }
-				>
-					{ project.Description }
-				</p>
-				<div
-					class={ twerge.It("grid flex-wrap gap-2 mb-4 grid-cols-2") }
-					x-data="{ allTags: false }"
-				>
-					for i, tag := range project.Tags {
-						if i < 8 {
-							@TagControl(tag)
-						} else {
-							<div x-show="allTags">
-								@TagControl(tag)
-							</div>
-						}
-					}
-					if len(project.Tags) > 8 {
-						<button
-							type="button"
-							class={ twerge.It("w-full text-blue-200 px-3 items-center flex-row flex text-sm bg-blue-900 transition-colors py-1 hover:bg-blue-800 justify-between font-medium h-8 rounded-full hover:underline") }
-							x-on:click.stop="allTags = !allTags"
-							x-show="!allTags"
-						>
-							@icon("ellipsis", templ.Attributes{})
-							<span>Show More</span>
-						</button>
-						<button
-							type="button"
-							class={ twerge.It("w-full text-blue-200 px-3 items-center flex-row flex text-sm bg-blue-900 transition-colors py-1 hover:bg-blue-800 justify-between font-medium h-8 rounded-full hover:underline") }
-							x-on:click.stop="allTags = !allTags"
-							x-show="allTags"
-						>
-							@icon("minus", templ.Attributes{})
-							<span>Show less</span>
-						</button>
-					}
-				</div>
-			</div>
-			<a
-				class={ twerge.It("left-0 flex bottom-3 font-medium hover:underline items-center right-0 text-sm justify-center text-blue-400 absolute") }
-				hx-target={ hx.Bodiody.Sel }
-				hx-get={ project.PagePath() }
-				hx-push-url={ project.PagePath() }
-			>
-				Read More
-				@icon("arrow-right", templ.Attributes{})
-			</a>
-			<span
-				class={ twerge.It("bg-red-500 py-1 text-gray-200 bottom-0 left-0 px-2 absolute text-xs rounded-tr-md") }
-			>
-				{ strconv.Itoa(len(project.Posts)) } posts
-			</span>
-			<span
-				class={ twerge.It("right-0 px-2 text-gray-200 text-xs bottom-0 rounded-tl-md bg-blue-500 py-1 absolute") }
-			>
-				{ strconv.Itoa(len(project.Tags)) } tags
-			</span>
-		</a>
-	</div>
-}
-
-templ listTagItem(tag *gen.Tag) {
-	<a
-		hx-target={ hx.Bodiody.Sel }
-		hx-get={ tag.PagePath() }
-		hx-push-url={ tag.PagePath() }
-		class={ twerge.It("p-6 rounded-lg overflow-hidden bg-gray-800 shadow-md hover:shadow-lg duration-300 transform transition-all hover:-translate-y-1") }
-		preload="mouseover"
-		aria-label={ tag.Title }
-	>
-		<div
-			class={ twerge.It("flex items-center justify-between mb-3 p-6") }
-		>
-			<h2
-				class={ twerge.It("text-xl font-semibold text-white") }
-			>
-				{ tag.Title }
-			</h2>
-			<div
-				class={ twerge.It("rounded-full flex h-8 justify-center items-center bg-gray-700 w-8") }
-			>
-				@icon(tag.Icon, templ.Attributes{"class": "stoke-white"})
-			</div>
-		</div>
-		<div
-			class={ twerge.It("mb-4 line-clamp-2 text-gray-300") }
-		>
-			{ tag.Description }
-		</div>
-		<span
-			class={ twerge.It("bg-red-500 py-1 text-gray-200 bottom-0 left-0 px-2 absolute text-xs rounded-tr-md") }
-		>
-			{ strconv.Itoa(len(tag.Posts)) } posts
-		</span>
-		<span
-			class={ twerge.It("right-0 px-2 text-gray-200 text-xs bottom-0 rounded-tl-md bg-blue-500 py-1 absolute") }
-		>
-			{ strconv.Itoa(len(tag.Projects)) } projects
-		</span>
-	</a>
-}
-
-templ listPostItem(post *gen.Post) {
-	<div
-		class={ twerge.It("rounded-lg overflow-hidden bg-gray-800 shadow-md hover:shadow-lg duration-300 transform transition-all hover:-translate-y-1") }
-		x-transition:enter={ twerge.It("duration-200 transition ease-out") }
-		x-transition:enter-start={ twerge.It("translate-y-4 opacity-0 transform") }
-		x-transition:enter-end={ twerge.It("transform translate-y-0 opacity-100") }
-		aria-label={ post.Title }
-	>
-		<a
-			hx-target={ hx.Bodiody.Sel }
-			hx-get={ post.PagePath() }
-			hx-push-url={ post.PagePath() }
-			class={ twerge.It("cursor-pointer") }
-			preload="mouseover"
-		>
-			@image(
-				post.BannerPath,
-				post.Title,
-				twerge.It("w-full h-48 object-cover"),
-			)
-			<div
-				class={ twerge.It("p-6") }
-			>
-				<h2
-					class={ twerge.It("text-white line-clamp-2 mb-3 text-xl hover:underline font-semibold") }
-				>
-					{ post.Title }
-				</h2>
-				<p
-					class={ twerge.It("mb-4 line-clamp-2 text-gray-300") }
-				>
-					{ post.Description }
-				</p>
-				<div
-					class={ twerge.It("grid flex-wrap gap-2 mb-4 grid-cols-2") }
-					x-data="{ allTags: false }"
-				>
-					for i, tag := range post.Tags {
-						if i < 8 {
-							@TagControl(tag)
-						} else {
-							<div x-show="allTags">
-								@TagControl(tag)
-							</div>
-						}
-					}
-					if len(post.Tags) > 8 {
-						<button
-							type="button"
-							class={ twerge.It("w-full text-blue-200 px-3 items-center flex-row flex text-sm bg-blue-900 transition-colors py-1 hover:bg-blue-800 justify-between font-medium h-8 rounded-full hover:underline") }
-							x-on:click.stop="allTags = !allTags"
-							x-show="!allTags"
-						>
-							@icon("ellipsis", templ.Attributes{})
-							<span>({ strconv.Itoa(len(post.Tags) - 8) }) More</span>
-						</button>
-						<button
-							type="button"
-							class={ twerge.It("w-full text-blue-200 px-3 items-center flex-row flex text-sm bg-blue-900 transition-colors py-1 hover:bg-blue-800 justify-between font-medium h-8 rounded-full hover:underline") }
-							x-on:click.stop="allTags = !allTags"
-							x-show="allTags"
-						>
-							@icon("minus", templ.Attributes{})
-							<span>Show less</span>
-						</button>
-					}
-				</div>
-			</div>
-			<a
-				class={ twerge.It("left-0 flex bottom-5 font-medium hover:underline items-center right-0 text-sm justify-center text-blue-400 absolute") }
-			>
-				Read More
-				@icon("arrow-right", templ.Attributes{})
-			</a>
-			<span
-				class={ twerge.It("bg-red-500 py-1 text-gray-200 bottom-0 left-0 px-2 absolute text-xs rounded-tr-md") }
-			>
-				{ strconv.Itoa(len(post.Tags)) } tags | { strconv.Itoa(len(post.Projects)) } projects
-			</span>
-			<div
-				class={ twerge.It("rounded-tl-md px-2 text-xs py-1 text-white absolute right-0 bottom-0 bg-blue-500") }
-			>
-				{ post.CreatedAt.Format("Jan 02, 2006") }
-			</div>
-		</a>
+		@components.Pagination(page, pageCount, target)
 	</div>
 }

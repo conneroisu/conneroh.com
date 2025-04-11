@@ -1,4 +1,4 @@
-package views
+package components
 
 import (
 	"fmt"
@@ -9,7 +9,13 @@ import (
 	"strconv"
 )
 
-templ icon(
+const (
+	activeBtnStyle   = "px-3 py-2 rounded-md bg-blue-600 text-white font-medium"
+	inactiveBtnStyle = "px-3 py-2 rounded-md border border-gray-700 bg-gray-800 text-gray-300 hover:bg-gray-700 transition-colors"
+	ellipsisStyle    = "px-2 py-1 text-gray-400"
+)
+
+templ Icon(
 	id string,
 	attrs templ.Attributes,
 ) {
@@ -19,7 +25,7 @@ templ icon(
 	/>
 }
 
-templ image(
+templ Image(
 	id string,
 	alt string,
 	class string,
@@ -45,7 +51,7 @@ templ TagControl(
 		<div
 			class={ twerge.It("items-center flex pr-3") }
 		>
-			@icon(tag.Icon, templ.Attributes{"x-show": "open", "x-transition": ""})
+			@Icon(tag.Icon, templ.Attributes{})
 		</div>
 		<div
 			class={ twerge.It("items-center flex") }
@@ -58,7 +64,7 @@ templ TagControl(
 }
 
 // Main pagination component
-templ pagination(page, pageCount int, target routing.PluralPath) {
+templ Pagination(page, pageCount int, target routing.PluralPath) {
 	<div class={ twerge.It("flex justify-center items-center mt-8 space-x-2") }>
 		@previousPageButton(page, target)
 		<div class={ twerge.It("hidden md:flex space-x-2") }>
@@ -86,7 +92,7 @@ templ pageButton(pageNum string, currentPage int, target routing.PluralPath) {
 		</span>
 	} else {
 		if pageNum == "..." {
-			@icon("ellipsis", templ.Attributes{
+			@Icon("ellipsis", templ.Attributes{
 				"class": twerge.It(ellipsisStyle),
 			})
 		} else {

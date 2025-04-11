@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/layouts"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/views"
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
@@ -66,7 +67,7 @@ func run(ctx context.Context, dirPath string) error {
 			1,
 			10,
 		)).Render(ctx, io.Discard)
-		_ = views.TagControl(
+		_ = components.TagControl(
 			&gen.Tag{},
 		).Render(ctx, io.Discard)
 		_ = layouts.Page(views.Post(
@@ -87,9 +88,6 @@ func run(ctx context.Context, dirPath string) error {
 			&gen.AllProjects,
 			&gen.AllTags,
 		)).Render(ctx, io.Discard)
-		_ = views.TagControl(
-			&gen.Tag{},
-		).Render(ctx, io.Discard)
 		_ = views.Post(
 			gen.AllPosts[0],
 			&gen.AllPosts,
