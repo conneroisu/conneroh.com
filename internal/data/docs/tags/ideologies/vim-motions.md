@@ -2,11 +2,13 @@
 id: vim-motions
 aliases:
   - "Vim Motions: The Art of Efficient Text Editing and Their Widespread Adoption"
-tags: []
+tags:
+  - ide/neovim
+  - ide/vim
 created_at: 2025-04-11T14:44:01.000-06:00
 description: Vim motions are keyboard commands used in the Vim text editor that allow users to navigate, select, and manipulate text with speed and precision. These motions form a powerful, language-like system where commands can be combined to perform complex editing operations without ever touching the mouse.
 title: Vim Motions
-updated_at: 2025-04-11T14:45:33.000-06:00
+updated_at: 2025-04-11T14:45:59.000-06:00
 ---
 
 # Vim Motions: The Art of Efficient Text Editing and Their Widespread Adoption
