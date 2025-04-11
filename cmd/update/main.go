@@ -5,6 +5,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"log"
 	"log/slog"
 	"os"
 	"sync"
@@ -639,6 +640,13 @@ func realizeMD[T gen.Post | gen.Project | gen.Tag](
 		emb gen.Embedded
 		err error
 	)
+	defer func() {
+		if rec := recover(); rec != nil {
+			log.Printf("Recovered from panic in %s: %v", parsed.Path, err)
+			err = eris.Errorf("Recovered from panic in %s: %v", parsed.Path, rec)
+			fmt.Println("DFSFSDFSFDSFDSFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSFSDF")
+		}
+	}()
 
 	// Convert markdown to HTML
 	emb, err = mdParser.Convert(parsed)

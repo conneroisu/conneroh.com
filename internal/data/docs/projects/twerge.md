@@ -8,10 +8,11 @@ tags:
   - programming-language/html
   - framework/tailwindcss
   - ideologies/open-source
+banner_path: projects/twerge.png
 created_at: 2025-04-11T13:54:12.000-06:00
 description: Twerge is a Go library designed to enhance your experience working with Tailwind CSS in Go applications. The name "Twerge" comes from "Tailwind + Merge".
 title: Twerge
-updated_at: 2025-04-11T15:14:20.000-06:00
+updated_at: 2025-04-11T15:25:03.000-06:00
 ---
 
 Github: [https://github.com/conneroisu/twerge](https://github.com/conneroisu/twerge)
@@ -60,4 +61,5 @@ Twerge is particularly well-suited for:
 - Applications requiring build-time CSS optimization
 - Static site generators with Tailwind CSS integration
 - Dynamic web applications needing runtime class management
+
 
