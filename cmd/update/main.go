@@ -56,14 +56,6 @@ type actualizeResult struct {
 	err         error
 }
 
-// AppFS is the application filesystem
-var AppFS afero.Fs
-
-func init() {
-	// By default use the OS filesystem
-	AppFS = afero.NewOsFs()
-}
-
 func main() {
 	flag.Parse()
 	ctx := context.Background()
@@ -431,7 +423,7 @@ func parse(
 		eg.Go(func() error {
 			for filePath := range filesCh {
 				// Read file using afero
-				body, err := afero.ReadFile(AppFS, filePath)
+				body, err := afero.ReadFile(fs, filePath)
 				if err != nil {
 					slog.Error("failed to read file", "path", filePath, "error", err)
 					continue // Skip failed files but don't abort the entire process
