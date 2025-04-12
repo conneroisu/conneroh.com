@@ -77,7 +77,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	if err := run(ctx, awsClient, ollama); err != nil {
+	fs := afero.NewBasePathFs(afero.NewOsFs(), *cwd)
+	if err := run(ctx, awsClient, ollama, fs); err != nil {
 		slog.Error("error", slog.String("err", err.Error()))
 		os.Exit(1)
 	}
@@ -87,17 +88,17 @@ func run(
 	outerCtx context.Context,
 	awsClient tigris.Client,
 	ollama *credited.OllamaClient,
+	fs afero.Fs,
 ) (err error) {
 	ctx, cancel := context.WithCancel(outerCtx)
 	defer cancel()
-	fs := afero.NewBasePathFs(AppFS, *cwd)
 
 	start := time.Now()
 	objCache, err := cache.LoadCache(fs, hashFile)
 	if err != nil {
 		return err
 	}
-	mdParser := assets.NewRenderer(ctx, parser.NewContext(), AppFS)
+	mdParser := assets.NewRenderer(ctx, parser.NewContext(), fs)
 
 	// Make sure cache is written at the end, regardless of how the function exits
 	defer func() {
@@ -126,7 +127,7 @@ func run(
 		for _, loc := range []string{assetsLoc, postsLoc, projectsLoc, tagsLoc} {
 			loc := loc // Capture for closure
 			eg.Go(func() error {
-				assets, ignored, egErr := parse(objCache, loc)
+				assets, ignored, egErr := parse(fs, objCache, loc)
 
 				// Store result safely
 				mu.Lock()
@@ -383,6 +384,7 @@ func actualize[T gen.Post | gen.Tag | gen.Project](
 
 // Modified parse function to use afero
 func parse(
+	fs afero.Fs,
 	cacheObj *cache.Cache,
 	loc string,
 ) (parsedAssets []assets.Asset, ignoredSlugs []string, err error) {
@@ -398,7 +400,7 @@ func parse(
 
 	// First, collect all file paths using afero
 	err = afero.Walk(
-		AppFS,
+		fs,
 		loc,
 		func(fPath string, info os.FileInfo, err error) error {
 			if err != nil {
