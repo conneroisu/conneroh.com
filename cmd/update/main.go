@@ -466,7 +466,8 @@ func parse(
 		})
 	}
 
-	if err := eg.Wait(); err != nil {
+	err = eg.Wait()
+	if err != nil {
 		return nil, nil, err
 	}
 
