@@ -6,14 +6,13 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/conneroisu/conneroh.com/internal/credited"
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
 	mathjax "github.com/litao91/goldmark-mathjax"
 	enclave "github.com/quail-ink/goldmark-enclave"
 	"github.com/quail-ink/goldmark-enclave/core"
 	"github.com/rotisserie/eris"
+	"github.com/spf13/afero"
 	"github.com/yuin/goldmark"
 	highlighting "github.com/yuin/goldmark-highlighting/v2"
 	"github.com/yuin/goldmark/extension"
@@ -27,7 +26,10 @@ import (
 )
 
 type awsClient interface {
-	GetObject(ctx context.Context, params *s3.GetObjectInput, optFns ...func(*s3.Options)) (*s3.GetObjectOutput, error)
+	GetObject(
+		ctx context.Context,
+		params *s3.GetObjectInput, optFns ...func(*s3.Options),
+	) (*s3.GetObjectOutput, error)
 }
 
 // Renderer is a markdown parser/renderer.
@@ -37,14 +39,18 @@ type Renderer interface {
 
 // Converter is a markdown parser.
 type Converter interface {
-	Convert(source []byte, writer io.Writer, opts ...parser.ParseOption) error
+	Convert(
+		source []byte,
+		writer io.Writer,
+		opts ...parser.ParseOption,
+	) error
 }
 
 // NewRenderer creates a new markdown parser.
 func NewRenderer(
 	ctx context.Context,
 	pCtx parser.Context,
-	client credited.AWSClient,
+	fs afero.Fs,
 ) *DefaultRenderer {
 	return &DefaultRenderer{
 		Markdown: goldmark.New(goldmark.WithParserOptions(
@@ -58,7 +64,7 @@ func NewRenderer(
 			),
 			goldmark.WithExtensions(
 				&wikilink.Extender{
-					Resolver: newResolver(ctx, client),
+					Resolver: newResolver(ctx, fs),
 				},
 				extension.GFM,
 				extension.Footnote,
@@ -170,13 +176,19 @@ func (m *DefaultRenderer) Convert(asset Asset) (gen.Embedded, error) {
 // resolver is a wikilink.Resolver that resolves pages and media referenced by
 // wikilinks to their destinations.
 type resolver struct {
-	Ctx    context.Context
-	client awsClient
+	Ctx context.Context
+	fs  afero.Fs
 }
 
 // newResolver creates a new wikilink resolver.
-func newResolver(ctx context.Context, client credited.AWSClient) *resolver {
-	return &resolver{client: client, Ctx: ctx}
+func newResolver(
+	ctx context.Context,
+	fs afero.Fs,
+) *resolver {
+	return &resolver{
+		fs:  fs,
+		Ctx: ctx,
+	}
 }
 
 // ResolveWikilink returns the address of the page that the provided
@@ -187,12 +199,9 @@ func (r *resolver) ResolveWikilink(n *wikilink.Node) ([]byte, error) {
 		err       error
 		targetStr = string(n.Target)
 	)
-	_, err = r.client.GetObject(r.Ctx, &s3.GetObjectInput{
-		Bucket: aws.String("conneroh"),
-		Key:    aws.String(targetStr),
-	})
+	_, err = afero.ReadFile(r.fs, fmt.Sprintf("internal/data/docs/assets/%s", targetStr))
 	if err != nil {
-		return nil, fmt.Errorf("failed to get object(%s): %w", targetStr, err)
+		return nil, err
 	}
 	return fmt.Appendf(nil,
 		"https://conneroh.fly.storage.tigris.dev/%s",

@@ -11,7 +11,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/conneroisu/conneroh.com/internal/credited"
+	"github.com/conneroisu/conneroh.com/internal/tigris"
 )
 
 const (
@@ -50,7 +50,7 @@ func (a *Asset) URL() string {
 // Upload uploads the asset to S3.
 func (a *Asset) Upload(
 	ctx context.Context,
-	client credited.AWSClient,
+	client tigris.Client,
 ) error {
 	extension := filepath.Ext(a.Path)
 	if extension == "" {

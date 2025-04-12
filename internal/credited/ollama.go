@@ -18,9 +18,14 @@ const (
 	embeddingDim   = gen.EmbedLength
 )
 
+// Client is the minimal interface for the Ollama client.
+type Client interface {
+	Embeddings(ctx context.Context, req *api.EmbeddingRequest) (*api.EmbeddingResponse, error)
+}
+
 // OllamaClient is a wrapper for the Ollama client.
 type OllamaClient struct {
-	client *api.Client
+	client Client
 }
 
 // NewOllamaClient creates a new OllamaClient.
@@ -60,7 +65,7 @@ func (c *OllamaClient) Embeddings(
 		resp.Embedding,
 		projectionMatrixCreate(gen.EmbedLength, 3),
 	)
-	copy(emb.Vec[:], resp.Embedding[:gen.EmbedLength])
+	// copy(emb.Vec[:], resp.Embedding[:gen.EmbedLength])
 
 	return
 }

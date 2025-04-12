@@ -12,11 +12,11 @@ tags:
   - protocol/uart
   - edu/iastate
   - edu/iastate/cpre488
-banner_path: projects/mp2.png
+banner_path: projects/mp2.webp
 created_at: 2025-03-27T14:13:10.000-06:00
 description: The third Project from CPRE488 at Iowa State University
 title: CPRE488 MP2
-updated_at: 2025-04-11T15:57:35.000-06:00
+updated_at: 2025-04-12T12:19:22.000-06:00
 ---
 
 # CPRE488 MP2

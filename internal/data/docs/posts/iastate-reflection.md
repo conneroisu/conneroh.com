@@ -15,14 +15,14 @@ tags:
   - edu/iastate/cpre288
   - edu/iastate/cpre488
   - edu/iastate/cpre381
-banner_path: posts/iastate-reflect/f3211429-b21c-4f42-9373-1e6643e530df.png
+banner_path: posts/iastate-reflect.webp
 created_at: 2025-03-27T05:48:53.000-06:00
 description: This is a reflection on my time at Iowa State University.
 projects:
   - cpre488-mp1
   - cpre488-mp2
 title: A Reflective Journey - Navigating Your Cumulative Experience at Iowa State University
-updated_at: 2025-04-08T12:00:44.000-06:00
+updated_at: 2025-04-12T12:07:49.000-06:00
 ---
 
 # A Reflective Journey: Navigating Your Cumulative Experience at Iowa State University

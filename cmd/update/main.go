@@ -5,7 +5,6 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"log"
 	"log/slog"
 	"os"
 	"sync"
@@ -19,6 +18,8 @@ import (
 	"github.com/conneroisu/conneroh.com/internal/cache"
 	"github.com/conneroisu/conneroh.com/internal/credited"
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
+	"github.com/conneroisu/conneroh.com/internal/logger"
+	"github.com/conneroisu/conneroh.com/internal/tigris"
 	"github.com/conneroisu/genstruct"
 	"github.com/yuin/goldmark/parser"
 	"golang.org/x/sync/errgroup"
@@ -63,16 +64,12 @@ func init() {
 	AppFS = afero.NewOsFs()
 }
 
-// SetFileSystem allows overriding the default file system for testing
-func SetFileSystem(fs afero.Fs) {
-	AppFS = fs
-}
-
 func main() {
 	flag.Parse()
 	ctx := context.Background()
+	slog.SetDefault(logger.DefaultLogger)
 
-	awsClient, err := credited.NewAWSClient(os.Getenv)
+	awsClient, err := tigris.New(os.Getenv)
 	if err != nil {
 		panic(err)
 	}
@@ -88,47 +85,24 @@ func main() {
 
 func run(
 	outerCtx context.Context,
-	awsClient credited.AWSClient,
+	awsClient tigris.Client,
 	ollama *credited.OllamaClient,
 ) (err error) {
 	ctx, cancel := context.WithCancel(outerCtx)
 	defer cancel()
+	fs := afero.NewBasePathFs(AppFS, *cwd)
 
 	start := time.Now()
-	if *cwd != "" {
-		// Use afero for directory changes if needed
-		// Note: We can't fully abstract this part with afero since the working directory
-		// affects the entire process, not just file operations
-		err = os.Chdir(*cwd)
-		if err != nil {
-			return eris.Wrapf(
-				err,
-				"failed to change working directory to %s",
-				*cwd,
-			)
-		}
-	}
-	objCache, err := loadCache(hashFile)
+	objCache, err := cache.LoadCache(fs, hashFile)
 	if err != nil {
 		return err
 	}
-	mdParser := assets.NewRenderer(ctx, parser.NewContext(), awsClient)
-
-	// Log cache stats
-	slog.Info("cache loaded", "entries", len(objCache.Hashes))
+	mdParser := assets.NewRenderer(ctx, parser.NewContext(), AppFS)
 
 	// Make sure cache is written at the end, regardless of how the function exits
 	defer func() {
-		// Log final cache stats and time
-		slog.Info("saving cache",
-			"entries", len(objCache.Hashes),
-			"duration", time.Since(start).String())
-		err = saveCache(objCache, hashFile)
-		if err != nil {
-			err = eris.Wrap(
-				err,
-				"failed to close cache",
-			)
+		if closeErr := objCache.Close(); closeErr != nil {
+			slog.Error("failed to close cache", "error", closeErr)
 		}
 	}()
 
@@ -178,25 +152,21 @@ func run(
 		}()
 	}()
 
-	// Flag to track when parsing is complete
-	parseComplete := false
-
-	// Track counts for actualization
-	actualizationStarted := 0
-	actualizationComplete := 0
-
-	// Results storage
 	var (
-		allResults     map[string]parseResult
-		parsedPosts    []*gen.Post
-		parsedProjects []*gen.Project
-		parsedTags     []*gen.Tag
+		parseComplete         bool // default false
+		actualizationStarted  int
+		actualizationComplete int
+		allResults            map[string]parseResult
+		parsedPosts           []*gen.Post
+		parsedProjects        []*gen.Project
+		parsedTags            []*gen.Tag
 	)
 
 	// Process events until everything is complete
 	// Exit condition: parsing is done and all actualizations are complete
-	for !parseComplete || actualizationComplete != actualizationStarted || actualizationStarted <= 0 {
-		// Process all available events
+	for !parseComplete ||
+		actualizationComplete != actualizationStarted ||
+		actualizationStarted <= 0 {
 		select {
 		case result := <-parseResultCh:
 			// Process a parsing result
@@ -427,21 +397,22 @@ func parse(
 	)
 
 	// First, collect all file paths using afero
-	err = afero.Walk(AppFS, loc, func(fPath string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		if !info.IsDir() {
-			filePaths = append(filePaths, fPath)
-		}
-		return nil
-	})
+	err = afero.Walk(
+		AppFS,
+		loc,
+		func(fPath string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+			if !info.IsDir() {
+				filePaths = append(filePaths, fPath)
+			}
+			return nil
+		})
 
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to walk fsPath (%s): %w", loc, err)
 	}
-
-	slog.Info("found files to process", "location", loc, "files", len(filePaths))
 
 	// Create channels for immediate processing (1/4 split strategy)
 	// This allows work to begin being processed before all files are collected
@@ -514,52 +485,9 @@ func parse(
 	return parsedAssets, ignoredSlugs, nil
 }
 
-// Modified cache loading function to use afero
-func loadCache(filename string) (*cache.Cache, error) {
-	exists, err := afero.Exists(AppFS, filename)
-	if err != nil {
-		return nil, eris.Wrapf(err, "failed to check if cache file exists: %s", filename)
-	}
-
-	cacheObj := &cache.Cache{
-		Hashes: make(map[string]string),
-	}
-
-	if !exists {
-		return cacheObj, nil
-	}
-
-	data, err := afero.ReadFile(AppFS, filename)
-	if err != nil {
-		return nil, eris.Wrapf(err, "failed to read cache file: %s", filename)
-	}
-
-	err = cacheObj.Unmarshal(data)
-	if err != nil {
-		return nil, eris.Wrapf(err, "failed to unmarshal cache file: %s", filename)
-	}
-
-	return cacheObj, nil
-}
-
-// Modified cache saving function to use afero
-func saveCache(cacheObj *cache.Cache, filename string) error {
-	data, err := cacheObj.Marshal()
-	if err != nil {
-		return eris.Wrapf(err, "failed to marshal cache")
-	}
-
-	err = afero.WriteFile(AppFS, filename, data, 0644)
-	if err != nil {
-		return eris.Wrapf(err, "failed to write cache file: %s", filename)
-	}
-
-	return nil
-}
-
 func actualizeAssets(
 	ctx context.Context,
-	client credited.AWSClient,
+	client tigris.Client,
 	assets []assets.Asset,
 ) error {
 	amount := len(assets)
@@ -640,13 +568,6 @@ func realizeMD[T gen.Post | gen.Project | gen.Tag](
 		emb gen.Embedded
 		err error
 	)
-	defer func() {
-		if rec := recover(); rec != nil {
-			log.Printf("Recovered from panic in %s: %v", parsed.Path, err)
-			err = eris.Errorf("Recovered from panic in %s: %v", parsed.Path, rec)
-			fmt.Println("DFSFSDFSFDSFDSFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSFSDF")
-		}
-	}()
 
 	// Convert markdown to HTML
 	emb, err = mdParser.Convert(parsed)
@@ -658,10 +579,12 @@ func realizeMD[T gen.Post | gen.Project | gen.Tag](
 	if err != nil {
 		return nil, err
 	}
+
 	err = gen.Validate(&emb)
 	if err != nil {
 		return nil, err
 	}
+
 	err = ollama.Embeddings(ctx, emb.RawContent, &emb)
 	if err != nil {
 		return nil, err
