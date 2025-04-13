@@ -12,6 +12,12 @@ import (
 	"github.com/spf13/afero"
 )
 
+type MinimalEmbedding struct {
+	X float64 `json:"x"`
+	Y float64 `json:"y"`
+	Z float64 `json:"z"`
+}
+
 // Cache is the storage of previous hashes.
 type Cache struct {
 	HashFile string `json:"-"`
@@ -19,17 +25,18 @@ type Cache struct {
 	mu     sync.Mutex        `json:"-"`
 	Hashes map[string]string `json:"hashes"`
 
-	muDocs    sync.Mutex              `json:"-"`
-	DocHashes map[string]string       `json:"docHashes"`
-	Docs      map[string]gen.Embedded `json:"docs"`
+	muDocs  sync.Mutex                  `json:"-"`
+	DocsEmb map[string]MinimalEmbedding `json:"docs"`
 }
 
 // Close writes the config to disk and closes the file.
 func (c *Cache) Close() (err error) {
 	var tmpCache struct {
-		Hashes map[string]string `json:"hashes"`
+		Hashes  map[string]string           `json:"hashes"`
+		DocsEmb map[string]MinimalEmbedding `json:"docs"`
 	}
 	tmpCache.Hashes = c.Hashes
+	tmpCache.DocsEmb = c.DocsEmb
 	c.Hashes = nil
 	body, err := json.Marshal(tmpCache)
 	if err != nil {
@@ -53,10 +60,9 @@ func LoadCache(
 		if os.IsNotExist(err) {
 			// Create a new cache if the file doesn't exist
 			return &Cache{
-				HashFile:  path,
-				Hashes:    make(map[string]string),
-				Docs:      make(map[string]gen.Embedded),
-				DocHashes: make(map[string]string),
+				HashFile: path,
+				Hashes:   make(map[string]string),
+				DocsEmb:  make(map[string]MinimalEmbedding),
 			}, nil
 		}
 		return nil, err
@@ -79,6 +85,12 @@ func LoadCache(
 		)
 	}
 	cache.HashFile = path
+	if cache.Hashes == nil {
+		cache.Hashes = make(map[string]string)
+	}
+	if cache.DocsEmb == nil {
+		cache.DocsEmb = make(map[string]MinimalEmbedding)
+	}
 
 	return &cache, nil
 }
@@ -100,6 +112,14 @@ func (c *Cache) Set(path string, hash string) {
 	c.Hashes[path] = hash
 }
 
+// SetPath sets the hash for the provided path.
+func (c *Cache) SetPath(path string) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	hash := Hash([]byte(path))
+	c.Hashes[path] = hash
+}
+
 // Get returns the hash for the provided path.
 func (c *Cache) Get(path string) (string, bool) {
 	c.mu.Lock()
@@ -108,31 +128,25 @@ func (c *Cache) Get(path string) (string, bool) {
 	return hash, ok
 }
 
-// SetDoc sets the hash for the provided path.
+// SetDoc sets the vec data for the provided path.
 func (c *Cache) SetDoc(path string, emb gen.Embedded) {
 	c.muDocs.Lock()
 	defer c.muDocs.Unlock()
-	c.DocHashes[path] = Hash([]byte(emb.RawContent))
-	c.Docs[path] = emb
-}
-
-// OldDoc checks if the hash for the provided path is the same as the
-// provided hash.
-func (c *Cache) OldDoc(path string, content []byte) bool {
-	c.muDocs.Lock()
-	defer c.muDocs.Unlock()
-	hash := Hash(content)
-	known, ok := c.DocHashes[path]
-	if ok && known == hash {
-		return true
+	c.DocsEmb[path] = struct {
+		X float64 "json:\"x\""
+		Y float64 "json:\"y\""
+		Z float64 "json:\"z\""
+	}{
+		X: emb.X,
+		Y: emb.Y,
+		Z: emb.Z,
 	}
-	return false
 }
 
-// GetDoc returns the hash for the provided path.
-func (c *Cache) GetDoc(path string) (gen.Embedded, bool) {
+// GetDoc returns the vec data for the provided path.
+func (c *Cache) GetDoc(path string) (MinimalEmbedding, bool) {
 	c.muDocs.Lock()
 	defer c.muDocs.Unlock()
-	emb, ok := c.Docs[path]
+	emb, ok := c.DocsEmb[path]
 	return emb, ok
 }

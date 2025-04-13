@@ -10,17 +10,21 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/conneroisu/conneroh.com/internal/cache"
 	"github.com/conneroisu/conneroh.com/internal/credited"
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
+	"github.com/conneroisu/conneroh.com/internal/logger"
 	"github.com/conneroisu/conneroh.com/internal/tigris"
+	"github.com/conneroisu/genstruct"
 	mathjax "github.com/litao91/goldmark-mathjax"
 	enclave "github.com/quail-ink/goldmark-enclave"
 	"github.com/quail-ink/goldmark-enclave/core"
 	"github.com/rotisserie/eris"
+	"github.com/sourcegraph/conc/iter"
 	"github.com/sourcegraph/conc/pool"
 	"github.com/spf13/afero"
 	"github.com/yuin/goldmark"
@@ -50,6 +54,7 @@ const (
 
 func main() {
 	flag.Parse()
+	slog.SetDefault(logger.DefaultLogger)
 	if err := run(
 		context.Background(),
 		os.Getenv,
@@ -59,6 +64,12 @@ func main() {
 	}
 }
 
+var (
+	parsedPosts    []*gen.Post
+	parsedProjects []*gen.Project
+	parsedTags     []*gen.Tag
+)
+
 func run(
 	ctx context.Context,
 	getenv func(string) string,
@@ -66,17 +77,14 @@ func run(
 ) error {
 	var (
 		fs   = afero.NewBasePathFs(afero.NewOsFs(), vaultLoc)
-		m    = NewMathjax(ctx, fs)
+		m    = NewMD(fs)
 		err  error
 		pool = pool.New().WithMaxGoroutines(workers).WithContext(ctx)
 
-		docPaths   []string
-		assetPaths []string
+		paths []string
 
-		parsedPosts    []*gen.Post
-		parsedProjects []*gen.Project
-		parsedTags     []*gen.Tag
-		cacheObj       *cache.Cache
+		cacheObj *cache.Cache
+		ollama   *credited.OllamaClient
 	)
 	cacheObj, err = cache.LoadCache(hashFile)
 	if err != nil {
@@ -86,9 +94,12 @@ func run(
 	if err != nil {
 		return err
 	}
-	ollama, err := credited.NewOllamaClient(getenv)
+	ollama, err = credited.NewOllamaClient(getenv)
 	if err != nil {
 		return err
+	}
+	iterator := iter.Iterator[string]{
+		MaxGoroutines: workers,
 	}
 
 	err = afero.Walk(
@@ -101,97 +112,49 @@ func run(
 			if info.IsDir() {
 				return nil
 			}
-			ext := filepath.Ext(fPath)
-			if ext == ".md" {
-				docPaths = append(docPaths, fPath)
-				return nil
-			}
-			assetPaths = append(assetPaths, fPath)
+			paths = append(paths, fPath)
 			return nil
 		})
 	if err != nil {
 		return err
 	}
 
-	for _, path := range docPaths {
-		pool.Go(func(_ context.Context) error {
-			slog.Info("parsing", "path", path)
-			defer slog.Info("parsed", "path", path)
+	iterator.ForEach(paths, func(path *string) {
+		slog.Info("parsing", "path", *path)
+		defer slog.Info("parsed", "path", *path)
 
-			pCtx := parser.NewContext()
-			content, derr := afero.ReadFile(fs, path)
-			if derr != nil {
-				return err
+		if strings.HasPrefix(*path, "assets") {
+			hErr := handleAsset(ctx, *path, fs, cacheObj, tigris)
+			if hErr != nil {
+				panic(hErr)
 			}
-			if cacheObj.OldDoc(path, content) {
-				emb, ok := cacheObj.GetDoc(path)
-				if !ok {
-					return eris.Errorf("failed to get doc from cache")
-				}
-				if strings.HasPrefix(path, postsLoc) {
-					parsedPosts = append(parsedPosts, gen.New[gen.Post](&emb))
-				} else if strings.HasPrefix(path, projectsLoc) {
-					parsedProjects = append(parsedProjects, gen.New[gen.Project](&emb))
-				} else if strings.HasPrefix(path, tagsLoc) {
-					parsedTags = append(parsedTags, gen.New[gen.Tag](&emb))
-				}
-				return nil
+			return
+		}
+		if strings.HasSuffix(*path, ".md") {
+			hErr := handleDoc(ctx, *path, fs, m, cacheObj, ollama)
+			if hErr != nil {
+				panic(hErr)
 			}
-			emb, derr := Convert(pCtx, m, path, content)
-			if derr != nil {
-				return err
-			}
+			return
+		}
 
-			err = gen.Defaults(&emb)
-			if err != nil {
-				return err
-			}
-
-			err = gen.Validate(&emb)
-			if err != nil {
-				return err
-			}
-
-			err = ollama.Embeddings(ctx, emb.RawContent, &emb)
-			if err != nil {
-				return err
-			}
-
-			if strings.HasPrefix(path, postsLoc) {
-				parsedPosts = append(parsedPosts, gen.New[gen.Post](&emb))
-			} else if strings.HasPrefix(path, projectsLoc) {
-				parsedProjects = append(parsedProjects, gen.New[gen.Project](&emb))
-			} else if strings.HasPrefix(path, tagsLoc) {
-				parsedTags = append(parsedTags, gen.New[gen.Tag](&emb))
-			}
-			cacheObj.SetDoc(path, emb)
-			return nil
-		})
-	}
-	for _, path := range assetPaths {
-		path := path
-		pool.Go(func(poolCtx context.Context) error {
-			slog.Debug("updating asset", "path", path)
-			defer slog.Debug("asset updated", "path", path)
-			data, perr := afero.ReadFile(fs, path)
-			if perr != nil {
-				return perr
-			}
-			hash := cache.Hash(data)
-			known, ok := cacheObj.Hashes[path]
-			if ok && known == hash {
-				return nil
-			}
-			cacheObj.Set(path, hash)
-			err = Upload(poolCtx, tigris, path, data)
-			if err != nil {
-				return err
-			}
-			return nil
-		})
-	}
+		slog.Info("failed to find handler for", "path", *path)
+	})
 
 	err = pool.Wait()
+	if err != nil {
+		return err
+	}
+
+	postGen, err := genstruct.NewGenerator(genstruct.Config{
+		PackageName: "gen",
+		OutputFile:  "internal/data/gen/generated_data.go",
+	}, parsedPosts, parsedTags, parsedProjects)
+	if err != nil {
+		return err
+	}
+
+	err = postGen.Generate()
 	if err != nil {
 		return err
 	}
@@ -202,6 +165,8 @@ func run(
 	}
 	return nil
 }
+
+var mu sync.Mutex
 
 // Upload uploads the provided asset to the specified bucket.
 func Upload(
@@ -216,12 +181,14 @@ func Upload(
 	}
 
 	contentType := mime.TypeByExtension(extension)
+	mu.Lock()
 	_, err := client.PutObject(ctx, &s3.PutObjectInput{
 		Bucket:      aws.String("conneroh"),
 		Key:         aws.String(path),
 		Body:        bytes.NewReader(data),
 		ContentType: aws.String(contentType),
 	})
+	mu.Unlock()
 
 	if err != nil {
 		// Log error but let errgroup handle it
@@ -232,9 +199,8 @@ func Upload(
 	return nil
 }
 
-// NewMathjax creates a new markdown parser.
-func NewMathjax(
-	ctx context.Context,
+// NewMD creates a new markdown parser.
+func NewMD(
 	fs afero.Fs,
 ) goldmark.Markdown {
 	return goldmark.New(goldmark.WithParserOptions(
@@ -248,7 +214,7 @@ func NewMathjax(
 		),
 		goldmark.WithExtensions(
 			&wikilink.Extender{
-				Resolver: newResolver(ctx, fs),
+				Resolver: newResolver(fs),
 			},
 			extension.GFM,
 			extension.Footnote,
@@ -357,18 +323,15 @@ func Convert(
 // resolver is a wikilink.Resolver that resolves pages and media referenced by
 // wikilinks to their destinations.
 type resolver struct {
-	Ctx context.Context
-	fs  afero.Fs
+	fs afero.Fs
 }
 
 // newResolver creates a new wikilink resolver.
 func newResolver(
-	ctx context.Context,
 	fs afero.Fs,
 ) *resolver {
 	return &resolver{
-		fs:  fs,
-		Ctx: ctx,
+		fs: fs,
 	}
 }
 
@@ -419,4 +382,108 @@ func pathify(s string) string {
 		return path
 	}
 	panic(fmt.Errorf("failed to pathify %s", s))
+}
+
+func match(path string, emb *gen.Embedded) {
+	if strings.HasPrefix(path, postsLoc) {
+		parsedPosts = append(parsedPosts, gen.New[gen.Post](emb))
+	} else if strings.HasPrefix(path, projectsLoc) {
+		parsedProjects = append(parsedProjects, gen.New[gen.Project](emb))
+	} else if strings.HasPrefix(path, tagsLoc) {
+		parsedTags = append(parsedTags, gen.New[gen.Tag](emb))
+	}
+}
+
+func handleDoc(
+	ctx context.Context,
+	path string,
+	fs afero.Fs,
+	m goldmark.Markdown,
+	cacheObj *cache.Cache,
+	ollama *credited.OllamaClient,
+) error {
+	var (
+		err error
+		ok  bool
+		emb gen.Embedded
+	)
+
+	pCtx := parser.NewContext()
+	content, err := afero.ReadFile(fs, path)
+	if err != nil {
+		return err
+	}
+	emb, err = Convert(pCtx, m, path, content)
+	if err != nil {
+		return err
+	}
+
+	err = gen.Defaults(&emb)
+	if err != nil {
+		return err
+	}
+
+	err = gen.Validate(&emb)
+	if err != nil {
+		return err
+	}
+
+	hash := cache.Hash([]byte(emb.RawContent))
+	slog.Info("hash", "hash", hash)
+	known, ok := cacheObj.Get(path)
+	slog.Info("known", "known", known, "ok", ok)
+	if ok && known == hash {
+		slog.Info("found cached version", "path", path)
+		minV, ok := cacheObj.GetDoc(path)
+		if ok {
+			emb.X = minV.X
+			emb.Y = minV.Y
+			emb.Z = minV.Z
+		} else {
+			slog.Error("failed to get min version", "path", path)
+		}
+	} else {
+		err = ollama.Embeddings(ctx, emb.RawContent, &emb)
+		if err != nil {
+			return err
+		}
+	}
+
+	cacheObj.SetDoc(path, emb)
+	cacheObj.Set(path, hash)
+	match(path, &emb)
+	return nil
+}
+
+func handleAsset(
+	ctx context.Context,
+	path string,
+	fs afero.Fs,
+	cacheObj *cache.Cache,
+	tigris tigris.Client,
+) error {
+	var (
+		err error
+	)
+
+	slog.Debug("updating asset", "path", path)
+	defer slog.Debug("asset updated", "path", path)
+
+	data, perr := afero.ReadFile(fs, path)
+	if perr != nil {
+		return perr
+	}
+	hash := cache.Hash(data)
+	known, ok := cacheObj.Hashes[path]
+	if ok && known == hash {
+		slog.Debug("asset unchanged", "path", path)
+		return nil
+	}
+	cacheObj.Set(path, hash)
+	slog.Debug("asset changed uploading...", "path", path)
+	err = Upload(ctx, tigris, path, data)
+	if err != nil {
+		return eris.Wrapf(err, "failed to upload asset %s", path)
+	}
+	return nil
 }

@@ -2,6 +2,8 @@ package tigris
 
 import (
 	"context"
+	"net/http"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -16,11 +18,6 @@ const (
 
 // Client is an interface for AWS clients.
 type Client interface {
-	GetObject(
-		ctx context.Context,
-		params *s3.GetObjectInput,
-		optFns ...func(*s3.Options),
-	) (*s3.GetObjectOutput, error)
 	PutObject(
 		ctx context.Context,
 		params *s3.PutObjectInput,
@@ -50,6 +47,13 @@ func New(getenv func(string) string) (Client, error) {
 			Region:       "auto",
 			BaseEndpoint: aws.String(baseURL),
 			Credentials:  credHandler,
+			HTTPClient: &http.Client{
+				Transport: http.DefaultTransport,
+				Timeout:   10 * time.Second,
+				CheckRedirect: func(req *http.Request, via []*http.Request) error {
+					return http.ErrUseLastResponse
+				},
+			},
 		}),
 	}, nil
 }

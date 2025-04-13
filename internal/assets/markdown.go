@@ -86,7 +86,7 @@ func NewRenderer(
 
 // DefaultRenderer is a markdown parser that supports wikilinks.
 type DefaultRenderer struct {
-	Markdown Converter
+	Markdown goldmark.Markdown
 	pCtx     parser.Context
 }
 
