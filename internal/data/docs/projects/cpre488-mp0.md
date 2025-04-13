@@ -11,7 +11,7 @@ tags:
 created_at: 2025-03-27T14:13:10.000-06:00
 description: The first Project from CPRE488 at Iowa State University
 title: CPRE488 MP0
-updated_at: 2025-04-12T13:08:25.000-06:00
+updated_at: 2025-04-12T16:02:41.000-06:00
 ---
 
 # CPRE488 MP0
@@ -381,7 +381,7 @@ There was another attempt to interface with a SNES controller through a Verilog 
 
 Below is an example of the SNES controller correctly communicating with the FPGA.
 
-![[projects/Verilog_SNES_ex.png]]
+![[projects/verilog_snes_ex.png]]
 
 ### Graphical Menu
 

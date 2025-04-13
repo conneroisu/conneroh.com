@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"io"
+	"path/filepath"
+	"strings"
 
-	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
 	mathjax "github.com/litao91/goldmark-mathjax"
 	enclave "github.com/quail-ink/goldmark-enclave"
@@ -24,27 +24,6 @@ import (
 	"go.abhg.dev/goldmark/mermaid"
 	"go.abhg.dev/goldmark/wikilink"
 )
-
-type awsClient interface {
-	GetObject(
-		ctx context.Context,
-		params *s3.GetObjectInput, optFns ...func(*s3.Options),
-	) (*s3.GetObjectOutput, error)
-}
-
-// Renderer is a markdown parser/renderer.
-type Renderer interface {
-	Convert(Asset) (gen.Embedded, error)
-}
-
-// Converter is a markdown parser.
-type Converter interface {
-	Convert(
-		source []byte,
-		writer io.Writer,
-		opts ...parser.ParseOption,
-	) error
-}
 
 // NewRenderer creates a new markdown parser.
 func NewRenderer(
@@ -112,19 +91,22 @@ type DefaultRenderer struct {
 }
 
 // Convert converts the provided markdown to HTML.
-func (m *DefaultRenderer) Convert(asset Asset) (gen.Embedded, error) {
+func (m *DefaultRenderer) Convert(
+	path string,
+	data []byte,
+) (gen.Embedded, error) {
 	var (
 		buf      = bytes.NewBufferString("")
 		metadata *frontmatter.Data
 		emb      gen.Embedded
 		err      error
 	)
-	err = m.Markdown.Convert(asset.Data, buf, parser.WithContext(m.pCtx))
+	err = m.Markdown.Convert(data, buf, parser.WithContext(m.pCtx))
 	if err != nil {
 		return emb, eris.Wrapf(
 			err,
 			"failed to convert %s's markdown to HTML",
-			asset.Path,
+			path,
 		)
 	}
 
@@ -133,7 +115,7 @@ func (m *DefaultRenderer) Convert(asset Asset) (gen.Embedded, error) {
 	if metadata == nil {
 		return emb, eris.Errorf(
 			"frontmatter is nil for %s",
-			asset.Path,
+			path,
 		)
 	}
 
@@ -143,21 +125,21 @@ func (m *DefaultRenderer) Convert(asset Asset) (gen.Embedded, error) {
 		return emb, eris.Wrapf(
 			err,
 			"failed to decode frontmatter of %s",
-			asset.Path,
+			path,
 		)
 	}
 
 	// Set slug and content
-	emb.Slug = asset.Slug
+	emb.Slug = slugify(path)
 	emb.Content = buf.String()
-	emb.RawContent = string(asset.Data)
+	emb.RawContent = string(data)
 
 	// Get frontmatter
 	metadata = frontmatter.Get(m.pCtx)
 	if metadata == nil {
 		return emb, eris.Errorf(
 			"frontmatter is nil for %s",
-			asset.Path,
+			path,
 		)
 	}
 
@@ -167,7 +149,7 @@ func (m *DefaultRenderer) Convert(asset Asset) (gen.Embedded, error) {
 		return emb, eris.Wrapf(
 			err,
 			"failed to decode frontmatter of %s",
-			asset.Path,
+			path,
 		)
 	}
 	return emb, nil
@@ -199,7 +181,7 @@ func (r *resolver) ResolveWikilink(n *wikilink.Node) ([]byte, error) {
 		err       error
 		targetStr = string(n.Target)
 	)
-	_, err = afero.ReadFile(r.fs, fmt.Sprintf("internal/data/docs/assets/%s", targetStr))
+	_, err = afero.ReadFile(r.fs, fmt.Sprintf("/assets/%s", targetStr))
 	if err != nil {
 		return nil, err
 	}
@@ -207,4 +189,35 @@ func (r *resolver) ResolveWikilink(n *wikilink.Node) ([]byte, error) {
 		"https://conneroh.fly.storage.tigris.dev/%s",
 		targetStr,
 	), nil
+}
+
+func slugify(s string) string {
+	var path string
+	var ok bool
+	path, ok = strings.CutPrefix(s, assetsLoc)
+	if ok {
+		return path
+	}
+	return strings.TrimSuffix(pathify(s), filepath.Ext(s))
+}
+func pathify(s string) string {
+	var path string
+	var ok bool
+	path, ok = strings.CutPrefix(s, postsLoc)
+	if ok {
+		return path
+	}
+	path, ok = strings.CutPrefix(s, projectsLoc)
+	if ok {
+		return path
+	}
+	path, ok = strings.CutPrefix(s, tagsLoc)
+	if ok {
+		return path
+	}
+	path, ok = strings.CutPrefix(s, assetsLoc)
+	if ok {
+		return path
+	}
+	return s // Return original path instead of panicking
 }
