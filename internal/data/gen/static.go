@@ -10,14 +10,19 @@ import (
 )
 
 const (
-	// EmbedLength is the length of the embedding.
+	// EmbedLength is the length of the full embedding.
 	EmbedLength = 768
 )
 
-// CustomTime allows us to customize the YAML time parsing
-type CustomTime struct {
-	time.Time
-}
+var (
+	_ Embeddable = (*Post)(nil)
+	_ Embeddable = (*Project)(nil)
+	_ Embeddable = (*Tag)(nil)
+	_ Embeddable = (*Employment)(nil)
+)
+
+// CustomTime allows us to customize the YAML time parsing.
+type CustomTime struct{ time.Time }
 
 // UnmarshalYAML implements the yaml.Unmarshaler interface
 func (ct *CustomTime) UnmarshalYAML(value *yaml.Node) error {
@@ -39,6 +44,11 @@ func (ct *CustomTime) UnmarshalYAML(value *yaml.Node) error {
 }
 
 type (
+	// Embeddable is an interface for embedding content.
+	Embeddable interface {
+		GetEmb() *Embedded
+		PagePath() string
+	}
 	// Post is a post with all its projects and tags.
 	Post struct {
 		Embedded
@@ -70,7 +80,6 @@ type (
 		X               float64
 		Y               float64
 		Z               float64
-		Vec             [EmbedLength]float64
 		TagSlugs        []string      `yaml:"tags"`
 		PostSlugs       []string      `yaml:"posts"`
 		ProjectSlugs    []string      `yaml:"projects"`
@@ -82,6 +91,31 @@ type (
 	}
 )
 
+// GetEmb returns the embedding struct itself.
+func (emb *Embedded) GetEmb() *Embedded {
+	return emb
+}
+
+// PagePath returns the path to the post page.
+func (emb *Post) PagePath() string {
+	return "/post/" + emb.Slug
+}
+
+// PagePath returns the path to the project page.
+func (emb *Project) PagePath() string {
+	return "/project/" + emb.Slug
+}
+
+// PagePath returns the path to the tag page.
+func (emb *Tag) PagePath() string {
+	return "/tag/" + emb.Slug
+}
+
+// PagePath returns the path to the employment page.
+func (emb *Employment) PagePath() string {
+	return "/employment/" + emb.Slug
+}
+
 // New creates a new instance of the given type.
 func New[
 	T Post | Project | Tag,
@@ -90,10 +124,10 @@ func New[
 }
 
 var (
-	// ErrValueMissing is returned when a value is missing
+	// ErrValueMissing is returned when a value is missing.
 	ErrValueMissing = eris.Errorf("missing value")
 
-	// ErrValueInvalid is returned when the slug is invalid
+	// ErrValueInvalid is returned when the slug is invalid.
 	ErrValueInvalid = eris.Errorf("invalid value")
 )
 
@@ -114,7 +148,9 @@ func Defaults(emb *Embedded) error {
 }
 
 // Validate validate the given embedding.
-func Validate(emb *Embedded) error {
+func Validate(
+	emb *Embedded,
+) error {
 	if emb.Title == "" {
 		return eris.Wrapf(
 			ErrValueMissing,
@@ -163,4 +199,9 @@ func Validate(emb *Embedded) error {
 		)
 	}
 	return nil
+}
+
+// GetTitle returns the title of the embedding.
+func (emb *Embedded) GetTitle() string {
+	return emb.Title
 }

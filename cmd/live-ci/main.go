@@ -9,7 +9,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/conneroisu/conneroh.com/internal/data/gen"
 	"github.com/conneroisu/conneroh.com/internal/routing"
 	"github.com/playwright-community/playwright-go"
 	"golang.org/x/sync/errgroup"
@@ -41,13 +40,13 @@ func run(
 	// Install playwright driver (will use PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1)
 	err := playwright.Install(runOption)
 	if err != nil {
-		log.Fatalf("could not install playwright dependencies: %v", err)
+		return err
 	}
 
 	// Initialize playwright
 	pw, err := playwright.Run()
 	if err != nil {
-		log.Fatalf("could not start playwright: %v", err)
+		return err
 	}
 	defer func() {
 		stopErr := pw.Stop()
@@ -63,7 +62,7 @@ func run(
 	}
 	browser, err := pw.Chromium.Launch(option)
 	if err != nil {
-		log.Fatalf("could not launch browser: %v", err)
+		return err
 	}
 	defer func() {
 		err = browser.Close()
@@ -75,7 +74,7 @@ func run(
 	// Create a new browser context
 	bCtx, err := browser.NewContext()
 	if err != nil {
-		log.Fatalf("could not create context: %v", err)
+		return err
 	}
 	defer func() {
 		err = bCtx.Close()
@@ -86,7 +85,7 @@ func run(
 
 	p, err := bCtx.NewPage()
 	if err != nil {
-		log.Fatalf("could not create page: %v", err)
+		return err
 	}
 	defer func() {
 		err = p.Close()
@@ -95,9 +94,8 @@ func run(
 		}
 	}()
 
-	for _, post := range gen.AllPosts {
+	for _, url := range routing.ComputeAllURLs(base) {
 		eg.Go(func() error {
-			url := routing.GetPostURL(base, post)
 			page, pErr := bCtx.NewPage()
 			if pErr != nil {
 				return pErr
@@ -113,59 +111,6 @@ func run(
 			}
 			time.Sleep(time.Second)
 			slog.Info("visited post", "url", url)
-			return nil
-		})
-
-	}
-	err = eg.Wait()
-	if err != nil {
-		return err
-	}
-	for _, project := range gen.AllProjects {
-		eg.Go(func() error {
-			url := routing.GetProjectURL(base, project)
-			page, nPErr := bCtx.NewPage()
-			if nPErr != nil {
-				return nPErr
-			}
-			defer func() {
-				err = page.Close()
-				if err != nil {
-					log.Fatalf("could not close page: %v", err)
-				}
-			}()
-			if _, err = page.Goto(url, playwright.PageGotoOptions{}); err != nil {
-				return err
-			}
-			time.Sleep(time.Second)
-			slog.Info("visited project", "url", url)
-			return nil
-		})
-	}
-	err = eg.Wait()
-	if err != nil {
-		return err
-	}
-	for _, tag := range gen.AllTags {
-		eg.Go(func() error {
-			url := routing.GetTagURL(base, tag)
-			page, nPErr := bCtx.NewPage()
-			if nPErr != nil {
-				return nPErr
-			}
-			defer func() {
-				err = page.Close()
-				if err != nil {
-					log.Fatalf("could not close page: %v", err)
-				}
-			}()
-			if _, err = page.Goto(url, playwright.PageGotoOptions{
-				WaitUntil: playwright.WaitUntilStateNetworkidle,
-			}); err != nil {
-				return err
-			}
-			time.Sleep(time.Second)
-			slog.Info("visited tag", "url", url)
 			return nil
 		})
 	}

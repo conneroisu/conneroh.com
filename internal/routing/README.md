@@ -16,166 +16,114 @@ Package routing provides implementations for routing.
 
 ## Index
 
-- [type APIFn](#APIFn)
-- [type APIHandler](#APIHandler)
-- [type APIMap](#APIMap)
-  - [func \(m APIMap\) AddRoutes\(mux \*http.ServeMux, fullPosts \*\[\]gen.Post, fullProjects \*\[\]gen.Project, fullTags \*\[\]gen.Tag, postsSlugMap \*map\[string\]gen.Post, projectsSlugMap \*map\[string\]gen.Project, tagsSlugMap \*map\[string\]gen.Tag\) error](#APIMap.AddRoutes)
-- [type ErrMissingParam](#ErrMissingParam)
-  - [func \(e ErrMissingParam\) Error\(\) string](#ErrMissingParam.Error)
-- [type ErrNotFound](#ErrNotFound)
-  - [func \(e ErrNotFound\) Error\(\) string](#ErrNotFound.Error)
-- [type PluralTarget](#PluralTarget)
-- [type SingleFn](#SingleFn)
-- [type SingleTarget](#SingleTarget)
+- [Constants](<#constants>)
+- [func GeneratePagination\(currentPage, totalPages, maxDisplay int\) \[\]string](<#GeneratePagination>)
+- [func GetPostURL\(base string, post \*gen.Post\) string](<#GetPostURL>)
+- [func GetProjectURL\(base string, project \*gen.Project\) string](<#GetProjectURL>)
+- [func GetTagURL\(base string, tag \*gen.Tag\) string](<#GetTagURL>)
+- [func MorphableHandler\(full templ.Component, morph templ.Component\) http.HandlerFunc](<#MorphableHandler>)
+- [func Paginate\[T any\]\(items \[\]T, page int, pageSize int\) \(\[\]T, int\)](<#Paginate>)
+- [type PluralPath](<#PluralPath>)
 
-<a name="APIFn"></a>
 
-## type [APIFn](https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/main.go#L15)
+## Constants
 
-APIFn is a function that handles an API request.
-
-```go
-type APIFn func(http.ResponseWriter, *http.Request) error
-```
-
-<a name="APIHandler"></a>
-
-## type [APIHandler](https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/main.go#L18-L25)
-
-APIHandler is a function that returns an APIFn.
-
-```go
-type APIHandler func(
-    fullPosts *[]gen.Post,
-    fullProjects *[]gen.Project,
-    fullTags *[]gen.Tag,
-    postsSlugMap *map[string]gen.Post,
-    projectsSlugMap *map[string]gen.Project,
-    tagsSlugMap *map[string]gen.Tag,
-) (APIFn, error)
-```
-
-<a name="APIMap"></a>
-
-## type [APIMap](https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/main.go#L28)
-
-APIMap is a map of API functions.
-
-```go
-type APIMap map[string]APIHandler
-```
-
-<a name="APIMap.AddRoutes"></a>
-
-### func \(APIMap\) [AddRoutes](https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/main.go#L31-L39)
-
-```go
-func (m APIMap) AddRoutes(mux *http.ServeMux, fullPosts *[]gen.Post, fullProjects *[]gen.Project, fullTags *[]gen.Tag, postsSlugMap *map[string]gen.Post, projectsSlugMap *map[string]gen.Project, tagsSlugMap *map[string]gen.Tag) error
-```
-
-AddRoutes adds all routes to the router.
-
-<a name="ErrMissingParam"></a>
-
-## type [ErrMissingParam](https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/errors.go#L23-L26)
-
-ErrMissingParam is an error that is returned when a required parameter is missing.
-
-```go
-type ErrMissingParam struct {
-    ID   string
-    View string
-}
-```
-
-<a name="ErrMissingParam.Error"></a>
-
-### func \(ErrMissingParam\) [Error](https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/errors.go#L29)
-
-```go
-func (e ErrMissingParam) Error() string
-```
-
-Error implements the error interface on ErrMissingParam.
-
-<a name="ErrNotFound"></a>
-
-## type [ErrNotFound](https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/errors.go#L9-L11)
-
-ErrNotFound is an error that is returned when a resource is not found.
-
-```go
-type ErrNotFound struct {
-    URL *url.URL
-}
-```
-
-<a name="ErrNotFound.Error"></a>
-
-### func \(ErrNotFound\) [Error](https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/errors.go#L14)
-
-```go
-func (e ErrNotFound) Error() string
-```
-
-Error implements the error interface on ErrNotFound.
-
-<a name="PluralTarget"></a>
-
-## type [PluralTarget](https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/statics.go#L18)
-
-PluralTarget is the target of a plural view. string
-
-```go
-type PluralTarget = string
-```
-
-<a name="PluralTargetPost"></a>
+<a name="MaxListLargeItems"></a>
 
 ```go
 const (
-    // PluralTargetPost is the target of a plural post view.
-    PluralTargetPost PluralTarget = "posts"
-    // PluralTargetProject is the target of a plural project view.
-    PluralTargetProject PluralTarget = "projects"
-    // PluralTargetTag is the target of a plural tag view.
-    PluralTargetTag PluralTarget = "tags"
+    // MaxListLargeItems is the maximum number of items in a list view.
+    MaxListLargeItems = 9
+    // MaxListSmallItems is the maximum number of items in a list view.
+    MaxListSmallItems = 27
+
+    // MaxMobilePageNumber is the maximum number of pages to display before ... is shown.
+    MaxMobilePageNumber = 5
+    // MaxDesktopPageNumber is the maximum number of pages to display before ... is shown.
+    MaxDesktopPageNumber = 10
+
+    // Ellipsis represents pagination gaps.
+    Ellipsis = "..."
 )
 ```
 
-<a name="SingleFn"></a>
-
-## type [SingleFn](https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/main.go#L12)
-
-SingleFn returns a fullFn for the single view.
+<a name="GeneratePagination"></a>
+## func [GeneratePagination](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/pagination.go#L47>)
 
 ```go
-type SingleFn func(target SingleTarget, id string) templ.Component
+func GeneratePagination(currentPage, totalPages, maxDisplay int) []string
 ```
 
-<a name="SingleTarget"></a>
+GeneratePagination generates a pagination list of page numbers.
 
-## type [SingleTarget](https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/statics.go#L5)
-
-SingleTarget is the target of a single view. string
+<a name="GetPostURL"></a>
+## func [GetPostURL](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/targets.go#L23>)
 
 ```go
-type SingleTarget = string
+func GetPostURL(base string, post *gen.Post) string
 ```
 
-<a name="SingleTargetPost"></a>
+GetPostURL returns the URL for a post.
+
+<a name="GetProjectURL"></a>
+## func [GetProjectURL](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/targets.go#L28>)
+
+```go
+func GetProjectURL(base string, project *gen.Project) string
+```
+
+GetProjectURL returns the URL for a project.
+
+<a name="GetTagURL"></a>
+## func [GetTagURL](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/targets.go#L33>)
+
+```go
+func GetTagURL(base string, tag *gen.Tag) string
+```
+
+GetTagURL returns the URL for a tag.
+
+<a name="MorphableHandler"></a>
+## func [MorphableHandler](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/handlers.go#L12-L15>)
+
+```go
+func MorphableHandler(full templ.Component, morph templ.Component) http.HandlerFunc
+```
+
+MorphableHandler returns a handler that checks for the presence of the hx\-trigger header and serves either the full or morphed view.
+
+<a name="Paginate"></a>
+## func [Paginate](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/pagination.go#L23-L27>)
+
+```go
+func Paginate[T any](items []T, page int, pageSize int) ([]T, int)
+```
+
+Paginate paginates a list of items.
+
+<a name="PluralPath"></a>
+## type [PluralPath](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/targets.go#L11>)
+
+PluralPath is the target of a plural view. string
+
+```go
+type PluralPath = string
+```
+
+<a name="PostPluralPath"></a>
 
 ```go
 const (
-    // SingleTargetPost is the target of a single post view.
-    SingleTargetPost SingleTarget = "post"
-    // SingleTargetProject is the target of a single project view.
-    SingleTargetProject SingleTarget = "project"
-    // SingleTargetTag is the target of a single tag view.
-    SingleTargetTag SingleTarget = "tag"
+    // PostPluralPath is the target of a plural post view.
+    PostPluralPath PluralPath = "posts"
+    // ProjectPluralPath is the target of a plural project view.
+    ProjectPluralPath PluralPath = "projects"
+    // TagsPluralPath is the target of a plural tag view.
+    TagsPluralPath PluralPath = "tags"
 )
 ```
 
-Generated by [gomarkdoc](https://github.com/princjef/gomarkdoc)
+Generated by [gomarkdoc](<https://github.com/princjef/gomarkdoc>)
+
 
 <!-- gomarkdoc:embed:end -->

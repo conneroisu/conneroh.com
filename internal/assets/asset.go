@@ -10,7 +10,16 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/conneroisu/conneroh.com/internal/credited"
+	"github.com/conneroisu/conneroh.com/internal/tigris"
+)
+
+const (
+	hashFile    = "config.json"
+	vaultLoc    = "internal/data/docs/"
+	assetsLoc   = "internal/data/docs/assets/"
+	postsLoc    = "internal/data/docs/posts/"
+	tagsLoc     = "internal/data/docs/tags/"
+	projectsLoc = "internal/data/docs/projects/"
 )
 
 // Asset is a struct for embedding assets.
@@ -18,6 +27,15 @@ type Asset struct {
 	Slug string
 	Path string
 	Data []byte
+}
+
+// NewAsset creates a new asset.
+func NewAsset(path string, data []byte) *Asset {
+	return &Asset{
+		Slug: slugify(path),
+		Path: pathify(path),
+		Data: data,
+	}
 }
 
 // URL returns the url of the asset.
@@ -31,7 +49,7 @@ func (a *Asset) URL() string {
 // Upload uploads the asset to S3.
 func (a *Asset) Upload(
 	ctx context.Context,
-	client *credited.AWSClient,
+	client tigris.Client,
 ) error {
 	extension := filepath.Ext(a.Path)
 	if extension == "" {

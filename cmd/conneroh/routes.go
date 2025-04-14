@@ -6,11 +6,11 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/a-h/templ"
 	static "github.com/conneroisu/conneroh.com/cmd/conneroh/_static"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/layouts"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/views"
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
+	"github.com/conneroisu/conneroh.com/internal/routing"
 )
 
 // AddRoutes adds all routes to the router.
@@ -23,98 +23,99 @@ func AddRoutes(
 
 	h.Handle(
 		"/{$}",
-		templ.Handler(layouts.Page(home)),
+		routing.MorphableHandler(
+			layouts.Page(home),
+			home,
+		),
 	)
-	h.Handle(
-		"GET /morph/home",
-		templ.Handler(layouts.Morpher(home)))
 	h.Handle(
 		"GET /dist/",
 		http.FileServer(http.FS(static.Dist)))
-	h.Handle(
+	h.HandleFunc(
 		"GET /favicon.ico",
-		http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		func(w http.ResponseWriter, _ *http.Request) {
 			_, _ = w.Write(static.Favicon)
-		}),
-	)
+		})
+	h.HandleFunc(
+		"GET /search/all",
+		globalSearchHandler(gen.AllPosts, gen.AllProjects, gen.AllTags))
 
 	h.Handle(
 		"GET /posts",
-		postsHandler(layouts.Page))
+		routing.MorphableHandler(layouts.Page(posts), posts))
 	h.Handle(
-		"GET /morph/posts",
-		postsHandler(layouts.Morpher))
+		"GET /search/posts",
+		listHandler(routing.PostPluralPath))
+
 	h.Handle(
 		"GET /projects",
-		projectsHandler(layouts.Page))
+		routing.MorphableHandler(layouts.Page(projects), projects))
 	h.Handle(
-		"GET /morph/projects",
-		projectsHandler(layouts.Morpher))
+		"GET /search/projects",
+		listHandler(routing.ProjectPluralPath))
+
 	h.Handle(
 		"GET /tags",
-		tagsHandler(layouts.Page))
+		routing.MorphableHandler(layouts.Page(tags), tags))
 	h.Handle(
-		"GET /morph/tags",
-		tagsHandler(layouts.Morpher))
+		"GET /search/tags",
+		listHandler(routing.TagsPluralPath))
 
 	for _, p := range gen.AllPosts {
 		h.Handle(
 			fmt.Sprintf("GET /post/%s", p.Slug),
-			templ.Handler(layouts.Page(views.Post(
-				p,
-				&gen.AllPosts,
-				&gen.AllProjects,
-				&gen.AllTags,
-			))),
+			routing.MorphableHandler(
+				layouts.Page(views.Post(
+					p,
+					&gen.AllPosts,
+					&gen.AllProjects,
+					&gen.AllTags,
+				)),
+				views.Post(
+					p,
+					&gen.AllPosts,
+					&gen.AllProjects,
+					&gen.AllTags,
+				),
+			),
 		)
-		h.Handle(fmt.Sprintf(
-			"GET /morph/post/%s",
-			p.Slug,
-		), templ.Handler(layouts.Morpher(views.Post(
-			p,
-			&gen.AllPosts,
-			&gen.AllProjects,
-			&gen.AllTags,
-		))))
 	}
 	for _, p := range gen.AllProjects {
 		h.Handle(
 			fmt.Sprintf("GET /project/%s", p.Slug),
-			templ.Handler(layouts.Page(views.Project(
-				p,
-				&gen.AllPosts,
-				&gen.AllProjects,
-				&gen.AllTags,
-			))),
-		)
-		h.Handle(
-			fmt.Sprintf("GET /morph/project/%s", p.Slug),
-			templ.Handler(layouts.Morpher(views.Project(
-				p,
-				&gen.AllPosts,
-				&gen.AllProjects,
-				&gen.AllTags,
-			))),
+			routing.MorphableHandler(
+				layouts.Page(views.Project(
+					p,
+					&gen.AllPosts,
+					&gen.AllProjects,
+					&gen.AllTags,
+				)),
+				views.Project(
+					p,
+					&gen.AllPosts,
+					&gen.AllProjects,
+					&gen.AllTags,
+				),
+			),
 		)
 	}
 	for _, t := range gen.AllTags {
 		h.Handle(
 			fmt.Sprintf("GET /tag/%s", t.Slug),
-			templ.Handler(layouts.Page(views.Tag(
-				t,
-				&gen.AllPosts,
-				&gen.AllProjects,
-				&gen.AllTags,
-			))),
-		)
-		h.Handle(
-			fmt.Sprintf("GET /morph/tag/%s", t.Slug),
-			templ.Handler(layouts.Morpher(views.Tag(
-				t,
-				&gen.AllPosts,
-				&gen.AllProjects,
-				&gen.AllTags,
-			))),
+			routing.MorphableHandler(
+				layouts.Page(views.Tag(
+					t,
+					&gen.AllPosts,
+					&gen.AllProjects,
+					&gen.AllTags,
+				)),
+				views.Tag(
+					t,
+					&gen.AllPosts,
+					&gen.AllProjects,
+					&gen.AllTags,
+				),
+			),
 		)
 	}
 

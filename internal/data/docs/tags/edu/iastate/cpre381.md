@@ -4,9 +4,9 @@ aliases:
   - CPRE 381
 tags: []
 created_at: 2025-03-28T20:07:11.000-06:00
-description: CPRE 381
-title: CPRE 381
-updated_at: 2025-04-05T06:10:34.000-06:00
+description: CPRE381
+title: CPRE381
+updated_at: 2025-04-07T18:42:55.000-06:00
 ---
 
 # CPRE 381
