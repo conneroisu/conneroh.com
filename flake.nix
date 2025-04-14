@@ -36,6 +36,7 @@
       "aarch64-linux"
       "aarch64-darwin"
     ] (system: let
+      vendorHash = "sha256-XkiBPwOVZwu8NBGwKSbHq+tnm53aYMTRF+PXjotThDM=";
       overlay = final: prev: {final.go = prev.go_1_24;};
       pkgs = import inputs.nixpkgs {
         inherit system;
@@ -48,6 +49,12 @@
     in {
       devShells.default = let
         inherit (inputs.twerge.packages."${system}") hasher;
+        update = pkgs.buildGoModule {
+          inherit vendorHash;
+          name = "update";
+          src = ./.;
+          subPackages = ["./cmd/update"];
+        };
         scripts = {
           dx = {
             exec = ''$EDITOR $REPO_ROOT/flake.nix'';
@@ -75,7 +82,7 @@
           };
           update = {
             exec = ''
-              ${pkgs.doppler}/bin/doppler run -- ${pkgs.go}/bin/go run $REPO_ROOT/cmd/update --cwd $REPO_ROOT
+              ${pkgs.doppler}/bin/doppler run -- ${update}/bin/update --cwd $REPO_ROOT --workers 20
             '';
             description = "Update the generated go files.";
           };
@@ -94,7 +101,7 @@
                   echo ""
                 else
                   echo "Changes detected in docs, running update script..."
-                  ${pkgs.doppler}/bin/doppler run -- ${pkgs.go}/bin/go run $REPO_ROOT/cmd/update --cwd $REPO_ROOT
+                  update
                 fi
                 if ${hasher}/bin/hasher -dir "$REPO_ROOT/cmd/conneroh/components" -v -exclude "*_templ.go"; then
                   echo ""
@@ -285,7 +292,6 @@
         name = "conneroh.com";
         fly-name = "conneroh-com";
         fly-name-dev = "conneroh-com-dev";
-        vendorHash = "sha256-zjiWSoAowfIt56dbbdl8x0MXa/rZflqZEXdyZXcDY04=";
         created = "now";
         tag = "latest";
         version = self.shortRev or "dirty";
