@@ -6,9 +6,8 @@ require (
 	github.com/a-h/templ v0.3.857
 	github.com/aws/aws-sdk-go-v2 v1.36.3
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.78.2
-	github.com/conneroisu/genstruct v0.1.2
+	github.com/conneroisu/genstruct v0.1.6
 	github.com/conneroisu/twerge v0.3.3
-	github.com/gobwas/pool v0.2.1
 	github.com/litao91/goldmark-mathjax v0.0.0-20210217064022-a43cf739a50f
 	github.com/ollama/ollama v0.6.3
 	github.com/playwright-community/playwright-go v0.5001.0

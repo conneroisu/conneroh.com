@@ -11,16 +11,16 @@ import templruntime "github.com/a-h/templ/runtime"
 import (
 	"fmt"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
-	"github.com/conneroisu/conneroh.com/internal/data/gen"
+	"github.com/conneroisu/conneroh.com/internal/assets"
 	"github.com/conneroisu/conneroh.com/internal/routing"
 	"github.com/conneroisu/twerge"
 )
 
 func List(
 	target routing.PluralPath,
-	posts *[]*gen.Post,
-	projects *[]*gen.Project,
-	tags *[]*gen.Tag,
+	posts *[]*assets.Post,
+	projects *[]*assets.Project,
+	tags *[]*assets.Tag,
 	query string,
 	page int,
 	pageCount int,
@@ -420,9 +420,9 @@ func search(
 
 func ListResults(
 	target routing.PluralPath,
-	posts *[]*gen.Post,
-	projects *[]*gen.Project,
-	tags *[]*gen.Tag,
+	posts *[]*assets.Post,
+	projects *[]*assets.Project,
+	tags *[]*assets.Tag,
 	page, pageCount int,
 ) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {

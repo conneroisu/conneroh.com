@@ -1,7 +1,7 @@
 package components
 
 import (
-	"github.com/conneroisu/conneroh.com/internal/data/gen"
+	"github.com/conneroisu/conneroh.com/internal/assets"
 	"github.com/conneroisu/twerge"
 	"strconv"
 )
@@ -10,7 +10,10 @@ const (
 	maxShownTags = 9
 )
 
-templ ProjectItem(project *gen.Project, attrs templ.Attributes) {
+templ ProjectItem(
+	project *assets.Project,
+	attrs templ.Attributes,
+) {
 	<div
 		{ attrs... }
 		aria-label={ project.Title }
@@ -87,7 +90,7 @@ templ ProjectItem(project *gen.Project, attrs templ.Attributes) {
 	</div>
 }
 
-templ TagItem(tag *gen.Tag, attrs templ.Attributes) {
+templ TagItem(tag *assets.Tag, attrs templ.Attributes) {
 	<a
 		aria-label={ tag.Title }
 		{ attrs... }
@@ -124,7 +127,7 @@ templ TagItem(tag *gen.Tag, attrs templ.Attributes) {
 	</a>
 }
 
-templ PostItem(post *gen.Post, attrs templ.Attributes) {
+templ PostItem(post *assets.Post, attrs templ.Attributes) {
 	<div
 		aria-label={ post.Title }
 		{ attrs... }

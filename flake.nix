@@ -36,26 +36,17 @@
       "aarch64-linux"
       "aarch64-darwin"
     ] (system: let
-      vendorHash = "sha256-XkiBPwOVZwu8NBGwKSbHq+tnm53aYMTRF+PXjotThDM=";
-      src = ./.;
-      overlay = final: prev: {final.go = prev.go_1_24;};
+      overlay = final: prev: {go = prev.go_1_24;};
       pkgs = import inputs.nixpkgs {
         inherit system;
         overlays = [
           overlay
         ];
       };
-      buildGoModule = pkgs.buildGoModule.override {go = pkgs.go_1_24;};
-      buildWithSpecificGo = pkg: pkg.override {inherit buildGoModule;};
-    in {
+      buildWithSpecificGo = pkg: pkg.override {buildGoModule = pkgs.buildGo124Module;};
+    in rec {
       devShells.default = let
         inherit (inputs.twerge.packages."${system}") hasher;
-        update = pkgs.buildGoModule {
-          inherit vendorHash;
-          name = "update";
-          src = ./.;
-          subPackages = ["./cmd/update"];
-        };
         scripts = {
           dx = {
             exec = ''$EDITOR $REPO_ROOT/flake.nix'';
@@ -83,7 +74,7 @@
           };
           update = {
             exec = ''
-              ${pkgs.doppler}/bin/doppler run -- ${update}/bin/update -cwd $REPO_ROOT -jobs 20
+              ${pkgs.doppler}/bin/doppler run -- ${packages.update}/bin/update -cwd $REPO_ROOT -jobs 20
             '';
             description = "Update the generated go files.";
           };
@@ -265,12 +256,10 @@
             ]
             ++ (with pkgs;
               lib.optionals stdenv.isDarwin [
-                # macOS-specific dependencies
                 libiconv
               ])
             ++ (with pkgs;
               lib.optionals stdenv.isLinux [
-                # Linux-specific dependencies
                 chromium # Chromium browser
                 xorg.libXcomposite # X11 Composite extension - needed by browsers
                 xorg.libXdamage # X11 Damage extension - needed by browsers
@@ -288,28 +277,12 @@
             ++ scriptPackages;
         };
 
-      packages = let
-        name = "conneroh.com";
-        fly-name = "conneroh-com";
-        fly-name-dev = "conneroh-com-dev";
-        created = "now";
-        tag = "latest";
-        version = self.shortRev or "dirty";
-        nativeBuildInputs = [];
-        config = {
-          WorkingDir = "/root";
-          Cmd = ["/bin/conneroh.com"];
-          ExposedPorts = {
-            "8080/tcp" = {};
-          };
-          Env = [
-            "SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
-            "NIX_SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
-          ];
-        };
-      in rec {
-        conneroh = buildGoModule {
-          inherit vendorHash name src nativeBuildInputs version;
+      packages = rec {
+        conneroh = pkgs.buildGo124Module {
+          name = "conneroh.com";
+          vendorHash = null;
+          version = self.shortRev or "dirty";
+          src = ./.;
           preBuild = ''
             ${pkgs.templ}/bin/templ generate
             ${pkgs.tailwindcss}/bin/tailwindcss \
@@ -320,15 +293,28 @@
           '';
           subPackages = ["."];
         };
-        C-conneroh = pkgs.dockerTools.buildImage {
-          inherit name config tag created;
-          copyToRoot = [
-            conneroh
-            pkgs.cacert
-          ];
+        update = pkgs.buildGoModule {
+          vendorHash = null;
+          version = self.shortRev or "dirty";
+          src = ./.;
+          name = "update";
+          subPackages = ["./cmd/update"];
         };
-        C-conneroh-dev = pkgs.dockerTools.buildImage {
-          inherit name config tag created;
+        C-conneroh = pkgs.dockerTools.buildImage {
+          created = "now";
+          tag = "latest";
+          name = "conneroh";
+          config = {
+            WorkingDir = "/root";
+            Cmd = ["/bin/conneroh.com"];
+            ExposedPorts = {
+              "8080/tcp" = {};
+            };
+            Env = [
+              "SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
+              "NIX_SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
+            ];
+          };
           copyToRoot = [
             conneroh
             pkgs.cacert
@@ -336,50 +322,50 @@
         };
         deployPackage = pkgs.writeShellScriptBin "deploy" ''
           set -e
+          arg=$1
+          TOKEN=""
+          FLY_NAME=""
+          CONFIG_FILE=""
 
-          if [ -z "$FLY_AUTH_TOKEN" ]; then
-            echo "FLY_AUTH_TOKEN is not set. Getting it from doppler..."
-            FLY_AUTH_TOKEN=$(doppler secrets get --plain FLY_AUTH_TOKEN)
+          if [ -z "$arg" ]; then
+            echo "No argument provided. Please provide a target environment. (dev or prod)"
+            exit 1
           fi
 
-          echo "Copying image to Fly.io registry..."
+          if [ "$arg" = "dev" ]; then
+            if [ -z "$FLY_DEV_AUTH_TOKEN" ]; then
+              echo "FLY_DEV_AUTH_TOKEN is not set. Getting it from doppler..."
+              FLY_DEV_AUTH_TOKEN=$(doppler secrets get --plain FLY_DEV_AUTH_TOKEN)
+            fi
+            TOKEN="$FLY_DEV_AUTH_TOKEN"
+            export FLY_NAME="conneroh-com-dev"
+            export CONFIG_FILE=${./fly.dev.toml}
+          else
+            if [ -z "$FLY_AUTH_TOKEN" ]; then
+              echo "FLY_AUTH_TOKEN is not set. Getting it from doppler..."
+              FLY_AUTH_TOKEN=$(doppler secrets get --plain FLY_AUTH_TOKEN)
+            fi
+            TOKEN="$FLY_AUTH_TOKEN"
+            export FLY_NAME="conneroh-com"
+            export CONFIG_FILE=${./fly.toml}
+          fi
+
+          REGISTY="registry.fly.io/$FLY_NAME"
+          echo "Copying image to Fly.io... to $REGISTY"
+
           ${pkgs.skopeo}/bin/skopeo copy \
             --insecure-policy \
             docker-archive:"${C-conneroh}" \
-            docker://registry.fly.io/${fly-name}:latest \
-            --dest-creds x:"$FLY_AUTH_TOKEN" \
+            "docker://$REGISTY:latest" \
+            --dest-creds x:"$TOKEN" \
             --format v2s2
 
           echo "Deploying to Fly.io..."
           ${pkgs.flyctl}/bin/fly deploy \
             --remote-only \
-            -c ${./fly.toml} \
-            -i registry.fly.io/${fly-name} \
-            -t "$FLY_AUTH_TOKEN"
-        '';
-
-        deployPackageDev = pkgs.writeShellScriptBin "deploy-package-dev" ''
-          set -e
-
-          if [ -z "$FLY_DEV_AUTH_TOKEN" ]; then
-            echo "FLY_AUTH_TOKEN is not set. Getting it from doppler..."
-            FLY_DEV_AUTH_TOKEN=$(doppler secrets get --plain FLY_DEV_AUTH_TOKEN)
-          fi
-
-          echo "Copying dev image to Fly.io registry..."
-          ${pkgs.skopeo}/bin/skopeo copy \
-            --insecure-policy \
-            docker-archive:"${C-conneroh-dev}" \
-            docker://registry.fly.io/${fly-name-dev}:latest \
-            --dest-creds x:"$FLY_DEV_AUTH_TOKEN" \
-            --format v2s2
-
-          echo "Deploying to Fly.io..."
-          ${pkgs.flyctl}/bin/fly deploy \
-            --remote-only \
-            -c ${./fly.dev.toml} \
-            -i registry.fly.io/${fly-name-dev}:latest \
-            -t "$FLY_DEV_AUTH_TOKEN"
+            -c "$CONFIG_FILE" \
+            -i "$REGISTY" \
+            -t "$TOKEN"
         '';
       };
     });

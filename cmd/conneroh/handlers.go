@@ -10,6 +10,7 @@ import (
 	"github.com/a-h/templ"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/layouts"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/views"
+	"github.com/conneroisu/conneroh.com/internal/assets"
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
 	"github.com/conneroisu/conneroh.com/internal/hx"
 	"github.com/conneroisu/conneroh.com/internal/routing"
@@ -74,7 +75,7 @@ func listHandler(
 		}
 		switch target {
 		case routing.PostPluralPath:
-			filtered, totalPages := filter(gen.AllPosts, query, page, routing.MaxListLargeItems, func(post *gen.Post) string {
+			filtered, totalPages := filter(gen.AllPosts, query, page, routing.MaxListLargeItems, func(post *assets.Post) string {
 				return post.Title
 			})
 			if header == "" {
@@ -98,7 +99,7 @@ func listHandler(
 				)).ServeHTTP(w, r)
 			}
 		case routing.ProjectPluralPath:
-			filtered, totalPages := filter(gen.AllProjects, query, page, routing.MaxListLargeItems, func(project *gen.Project) string {
+			filtered, totalPages := filter(gen.AllProjects, query, page, routing.MaxListLargeItems, func(project *assets.Project) string {
 				return project.Title
 			})
 			if header == "" {
@@ -122,7 +123,7 @@ func listHandler(
 				)).ServeHTTP(w, r)
 			}
 		case routing.TagsPluralPath:
-			filtered, totalPages := filter(gen.AllTags, query, page, routing.MaxListSmallItems, func(tag *gen.Tag) string {
+			filtered, totalPages := filter(gen.AllTags, query, page, routing.MaxListSmallItems, func(tag *assets.Tag) string {
 				return tag.Title
 			})
 			if header == "" {
@@ -150,9 +151,9 @@ func listHandler(
 }
 
 func globalSearchHandler(
-	posts []*gen.Post,
-	projects []*gen.Project,
-	tags []*gen.Tag,
+	posts []*assets.Post,
+	projects []*assets.Project,
+	tags []*assets.Tag,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 	}

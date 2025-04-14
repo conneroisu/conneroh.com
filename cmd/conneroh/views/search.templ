@@ -1,13 +1,13 @@
 package views
 
 import (
-	"github.com/conneroisu/conneroh.com/internal/data/gen"
+	"github.com/conneroisu/conneroh.com/internal/assets"
 	"github.com/conneroisu/twerge"
 	"strconv"
 )
 
 // Search is the full search results page
-templ Search(query string, results []gen.Embeddable) {
+templ Search(query string, results []assets.Embeddable) {
 	<div class={ twerge.It("py-8 px-4 max-w-6xl mx-auto") }>
 		<h1 class={ twerge.It("text-3xl font-bold mb-2 text-white") }>
 			Search Results for "{ query }"

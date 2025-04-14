@@ -39,7 +39,8 @@ It follows a modern server-side rendering approach with HTMX for dynamic content
 │   └── update/          # Content update utility
 ├── internal/            # Private application code
 │   ├── data/            # Data access layer
-│   │   ├── docs/        # Markdown content
+│   │   ├── assets/      # Assets Data Structure definitions
+│   │   ├── docs/        # Markdown content (posts, projects, tags)
 │   │   │   ├── posts/   # Blog posts
 │   │   │   ├── projects/# Project descriptions
 │   │   │   └── tags/    # Tag descriptions
@@ -170,7 +171,7 @@ The application uses templ for type-safe HTML templates:
 
 ```go
 // Example of a templ component (simplified)
-templ Post(post gen.Post) {
+templ Post(post assets.Post) {
     <article>
         <h1>{post.Title}</h1>
         <div class="content">

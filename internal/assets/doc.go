@@ -1,2 +1,4 @@
-// Package assets provides numerous renderers for different formats.
+// Package assets contains the main data.
 package assets
+
+//go:generate gomarkdoc -o README.md -e .

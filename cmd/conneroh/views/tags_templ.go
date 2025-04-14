@@ -11,17 +11,17 @@ import templruntime "github.com/a-h/templ/runtime"
 import (
 	"fmt"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
-	"github.com/conneroisu/conneroh.com/internal/data/gen"
+	"github.com/conneroisu/conneroh.com/internal/assets"
 	"github.com/conneroisu/conneroh.com/internal/routing"
 	"github.com/conneroisu/twerge"
 )
 
 // Tag component for displaying a single tag and its associated content
 func Tag(
-	tag *gen.Tag,
-	fullPosts *[]*gen.Post,
-	fullProjects *[]*gen.Project,
-	fullTags *[]*gen.Tag,
+	tag *assets.Tag,
+	fullPosts *[]*assets.Post,
+	fullProjects *[]*assets.Project,
+	fullTags *[]*assets.Tag,
 ) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context

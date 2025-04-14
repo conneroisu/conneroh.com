@@ -26,8 +26,7 @@ func AddRoutes(
 		routing.MorphableHandler(
 			layouts.Page(home),
 			home,
-		),
-	)
+		))
 	h.Handle(
 		"GET /dist/",
 		http.FileServer(http.FS(static.Dist)))

@@ -2,7 +2,7 @@ package components
 
 import (
 	"fmt"
-	"github.com/conneroisu/conneroh.com/internal/data/gen"
+	"github.com/conneroisu/conneroh.com/internal/assets"
 	"github.com/conneroisu/conneroh.com/internal/hx"
 	"github.com/conneroisu/conneroh.com/internal/routing"
 	"github.com/conneroisu/twerge"
@@ -17,7 +17,7 @@ const (
 
 // See conneroh.views.List & conneroh.views.search
 templ TagControl(
-	tag *gen.Tag,
+	tag *assets.Tag,
 ) {
 	<div
 		class={ twerge.It("hover:bg-blue-800 flex font-medium text-blue-200 px-3 py-1 flex-row text-sm hover:underline rounded-full h-8 items-center transition-colors justify-between bg-blue-900") }
