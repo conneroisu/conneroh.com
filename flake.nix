@@ -327,10 +327,7 @@
           FLY_NAME=""
           CONFIG_FILE=""
 
-          if [ -z "$arg" ]; then
-            echo "No argument provided. Please provide a target environment. (dev or prod)"
-            exit 1
-          fi
+          [ -z "$arg" ] && { echo "No argument provided. Please provide a target environment. (dev or prod)"; exit 1; }
 
           if [ "$arg" = "dev" ]; then
             [ -z "$FLY_DEV_AUTH_TOKEN" ] && FLY_DEV_AUTH_TOKEN=$(doppler secrets get --plain FLY_DEV_AUTH_TOKEN)
