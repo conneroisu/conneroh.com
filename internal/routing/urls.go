@@ -6,6 +6,7 @@ import (
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
 )
 
+// ComputeAllURLs computes all URLs for all posts, projects, and tags given a base URL.
 func ComputeAllURLs(base string) []string {
 	var urls []string
 	for _, post := range gen.AllPosts {

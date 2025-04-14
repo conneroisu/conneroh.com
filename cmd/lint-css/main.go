@@ -12,6 +12,7 @@ import (
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/layouts"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/views"
+	"github.com/conneroisu/conneroh.com/internal/assets"
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
 	"github.com/conneroisu/conneroh.com/internal/routing"
 	"github.com/conneroisu/twerge"
@@ -68,7 +69,7 @@ func run(ctx context.Context, dirPath string) error {
 			10,
 		)).Render(ctx, io.Discard)
 		_ = components.TagControl(
-			&gen.Tag{},
+			&assets.Tag{},
 		).Render(ctx, io.Discard)
 		_ = layouts.Page(views.Post(
 			gen.AllPosts[0],

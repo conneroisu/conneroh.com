@@ -7,7 +7,7 @@ import (
 	"os"
 	"sync"
 
-	"github.com/conneroisu/conneroh.com/internal/data/gen"
+	"github.com/conneroisu/conneroh.com/internal/assets"
 	"github.com/rotisserie/eris"
 	"github.com/spf13/afero"
 )
@@ -129,7 +129,7 @@ func (c *Cache) Get(path string) (string, bool) {
 }
 
 // SetDoc sets the vec data for the provided path.
-func (c *Cache) SetDoc(path string, emb gen.Embedded) {
+func (c *Cache) SetDoc(path string, emb assets.Embedded) {
 	c.muDocs.Lock()
 	defer c.muDocs.Unlock()
 	c.DocsEmb[path] = struct {

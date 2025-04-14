@@ -170,7 +170,7 @@ The application uses templ for type-safe HTML templates:
 
 ```go
 // Example of a templ component (simplified)
-templ Post(post gen.Post) {
+templ Post(post assets.Post) {
     <article>
         <h1>{post.Title}</h1>
         <div class="content">

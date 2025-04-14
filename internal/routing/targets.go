@@ -3,7 +3,7 @@ package routing
 import (
 	"fmt"
 
-	"github.com/conneroisu/conneroh.com/internal/data/gen"
+	"github.com/conneroisu/conneroh.com/internal/assets"
 )
 
 // PluralPath is the target of a plural view.
@@ -20,16 +20,16 @@ const (
 )
 
 // GetPostURL returns the URL for a post.
-func GetPostURL(base string, post *gen.Post) string {
+func GetPostURL(base string, post *assets.Post) string {
 	return fmt.Sprintf("%s/post/%s", base, post.Slug)
 }
 
 // GetProjectURL returns the URL for a project.
-func GetProjectURL(base string, project *gen.Project) string {
+func GetProjectURL(base string, project *assets.Project) string {
 	return fmt.Sprintf("%s/project/%s", base, project.Slug)
 }
 
 // GetTagURL returns the URL for a tag.
-func GetTagURL(base string, tag *gen.Tag) string {
+func GetTagURL(base string, tag *assets.Tag) string {
 	return fmt.Sprintf("%s/tag/%s", base, tag.Slug)
 }

@@ -1,4 +1,4 @@
-package gen
+package assets
 
 import (
 	"fmt"

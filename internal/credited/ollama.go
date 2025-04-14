@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/conneroisu/conneroh.com/internal/data/gen"
+	"github.com/conneroisu/conneroh.com/internal/assets"
 	"github.com/ollama/ollama/api"
 	"github.com/rotisserie/eris"
 	"gonum.org/v1/gonum/mat"
@@ -15,7 +15,7 @@ import (
 const (
 	ollamaURLVar   = "OLLAMA_URL"
 	embeddingModel = "nomic-embed-text"
-	embeddingDim   = gen.EmbedLength
+	embeddingDim   = assets.EmbedLength
 )
 
 // Client is the minimal interface for the Ollama client.
@@ -47,7 +47,7 @@ func NewOllamaClient(getenv func(string) string) (*OllamaClient, error) {
 func (c *OllamaClient) Embeddings(
 	ctx context.Context,
 	content string,
-	emb *gen.Embedded,
+	emb *assets.Embedded,
 ) (err error) {
 	resp, err := c.client.Embeddings(ctx, &api.EmbeddingRequest{
 		Model:  embeddingModel,
@@ -63,9 +63,9 @@ func (c *OllamaClient) Embeddings(
 
 	emb.X, emb.Y, emb.Z = projectTo3D(
 		resp.Embedding,
-		projectionMatrixCreate(gen.EmbedLength, 3),
+		projectionMatrixCreate(assets.EmbedLength, 3),
 	)
-	// copy(emb.Vec[:], resp.Embedding[:gen.EmbedLength])
+	// copy(emb.Vec[:], resp.Embedding[:assets.EmbedLength])
 
 	return
 }

@@ -3,16 +3,16 @@ package views
 import (
 	"fmt"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
-	"github.com/conneroisu/conneroh.com/internal/data/gen"
+	"github.com/conneroisu/conneroh.com/internal/assets"
 	"github.com/conneroisu/twerge"
 )
 
 // Individual Post component
 templ Post(
-	post *gen.Post,
-	fullPosts *[]*gen.Post,
-	fullProjects *[]*gen.Project,
-	fullTags *[]*gen.Tag,
+	post *assets.Post,
+	fullPosts *[]*assets.Post,
+	fullProjects *[]*assets.Project,
+	fullTags *[]*assets.Tag,
 ) {
 	<article
 		class={ twerge.It("px-4 container mx-auto py-8") }

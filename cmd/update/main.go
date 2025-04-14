@@ -15,9 +15,9 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/conneroisu/conneroh.com/internal/assets"
 	"github.com/conneroisu/conneroh.com/internal/cache"
 	"github.com/conneroisu/conneroh.com/internal/credited"
-	"github.com/conneroisu/conneroh.com/internal/data/gen"
 	"github.com/conneroisu/conneroh.com/internal/tigris"
 	"github.com/conneroisu/genstruct"
 	mathjax "github.com/litao91/goldmark-mathjax"
@@ -71,9 +71,9 @@ func main() {
 }
 
 var (
-	parsedPosts    []*gen.Post
-	parsedProjects []*gen.Project
-	parsedTags     []*gen.Tag
+	parsedPosts    []*assets.Post
+	parsedProjects []*assets.Project
+	parsedTags     []*assets.Tag
 )
 
 func run(
@@ -146,15 +146,8 @@ func run(
 		slog.Info("failed to find handler for", "path", *path)
 	})
 
-	postGen, err := genstruct.NewGenerator(genstruct.Config{
-		PackageName: "gen",
-		OutputFile:  "internal/data/gen/generated_data.go",
-	}, parsedPosts, parsedTags, parsedProjects)
-	if err != nil {
-		return err
-	}
-
-	err = postGen.Generate()
+	err = genstruct.NewGenerator(genstruct.WithOutputFile("internal/data/gen/generated_data.go")).
+		Generate(parsedPosts, parsedTags, parsedProjects)
 	if err != nil {
 		return err
 	}
@@ -259,11 +252,11 @@ func Convert(
 	m goldmark.Markdown,
 	path string,
 	data []byte,
-) (gen.Embedded, error) {
+) (assets.Embedded, error) {
 	var (
 		buf      = bytes.NewBufferString("")
 		metadata *frontmatter.Data
-		emb      gen.Embedded
+		emb      assets.Embedded
 		err      error
 	)
 	err = m.Convert(data, buf, parser.WithContext(pCtx))
@@ -384,13 +377,13 @@ func pathify(s string) string {
 	panic(fmt.Errorf("failed to pathify %s", s))
 }
 
-func match(path string, emb *gen.Embedded) {
+func match(path string, emb *assets.Embedded) {
 	if strings.HasPrefix(path, postsLoc) {
-		parsedPosts = append(parsedPosts, gen.New[gen.Post](emb))
+		parsedPosts = append(parsedPosts, assets.New[assets.Post](emb))
 	} else if strings.HasPrefix(path, projectsLoc) {
-		parsedProjects = append(parsedProjects, gen.New[gen.Project](emb))
+		parsedProjects = append(parsedProjects, assets.New[assets.Project](emb))
 	} else if strings.HasPrefix(path, tagsLoc) {
-		parsedTags = append(parsedTags, gen.New[gen.Tag](emb))
+		parsedTags = append(parsedTags, assets.New[assets.Tag](emb))
 	}
 }
 
@@ -405,7 +398,7 @@ func handleDoc(
 	var (
 		err error
 		ok  bool
-		emb gen.Embedded
+		emb assets.Embedded
 	)
 
 	pCtx := parser.NewContext()
@@ -418,12 +411,12 @@ func handleDoc(
 		return err
 	}
 
-	err = gen.Defaults(&emb)
+	err = assets.Defaults(&emb)
 	if err != nil {
 		return err
 	}
 
-	err = gen.Validate(&emb)
+	err = assets.Validate(&emb)
 	if err != nil {
 		return err
 	}

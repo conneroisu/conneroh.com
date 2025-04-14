@@ -18,9 +18,9 @@ Package routing provides implementations for routing.
 
 - [Constants](<#constants>)
 - [func GeneratePagination\(currentPage, totalPages, maxDisplay int\) \[\]string](<#GeneratePagination>)
-- [func GetPostURL\(base string, post \*gen.Post\) string](<#GetPostURL>)
-- [func GetProjectURL\(base string, project \*gen.Project\) string](<#GetProjectURL>)
-- [func GetTagURL\(base string, tag \*gen.Tag\) string](<#GetTagURL>)
+- [func GetPostURL\(base string, post \*assets.Post\) string](<#GetPostURL>)
+- [func GetProjectURL\(base string, project \*assets.Project\) string](<#GetProjectURL>)
+- [func GetTagURL\(base string, tag \*assets.Tag\) string](<#GetTagURL>)
 - [func MorphableHandler\(full templ.Component, morph templ.Component\) http.HandlerFunc](<#MorphableHandler>)
 - [func Paginate\[T any\]\(items \[\]T, page int, pageSize int\) \(\[\]T, int\)](<#Paginate>)
 - [type PluralPath](<#PluralPath>)
@@ -60,7 +60,7 @@ GeneratePagination generates a pagination list of page numbers.
 ## func [GetPostURL](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/targets.go#L23>)
 
 ```go
-func GetPostURL(base string, post *gen.Post) string
+func GetPostURL(base string, post *assets.Post) string
 ```
 
 GetPostURL returns the URL for a post.
@@ -69,7 +69,7 @@ GetPostURL returns the URL for a post.
 ## func [GetProjectURL](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/targets.go#L28>)
 
 ```go
-func GetProjectURL(base string, project *gen.Project) string
+func GetProjectURL(base string, project *assets.Project) string
 ```
 
 GetProjectURL returns the URL for a project.
@@ -78,7 +78,7 @@ GetProjectURL returns the URL for a project.
 ## func [GetTagURL](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/targets.go#L33>)
 
 ```go
-func GetTagURL(base string, tag *gen.Tag) string
+func GetTagURL(base string, tag *assets.Tag) string
 ```
 
 GetTagURL returns the URL for a tag.
