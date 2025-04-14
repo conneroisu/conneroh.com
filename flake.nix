@@ -333,18 +333,12 @@
           fi
 
           if [ "$arg" = "dev" ]; then
-            if [ -z "$FLY_DEV_AUTH_TOKEN" ]; then
-              echo "FLY_DEV_AUTH_TOKEN is not set. Getting it from doppler..."
-              FLY_DEV_AUTH_TOKEN=$(doppler secrets get --plain FLY_DEV_AUTH_TOKEN)
-            fi
+            [ -z "$FLY_DEV_AUTH_TOKEN" ] && FLY_DEV_AUTH_TOKEN=$(doppler secrets get --plain FLY_DEV_AUTH_TOKEN)
             TOKEN="$FLY_DEV_AUTH_TOKEN"
             export FLY_NAME="conneroh-com-dev"
             export CONFIG_FILE=${./fly.dev.toml}
           else
-            if [ -z "$FLY_AUTH_TOKEN" ]; then
-              echo "FLY_AUTH_TOKEN is not set. Getting it from doppler..."
-              FLY_AUTH_TOKEN=$(doppler secrets get --plain FLY_AUTH_TOKEN)
-            fi
+            [ -z "$FLY_AUTH_TOKEN" ] && FLY_AUTH_TOKEN=$(doppler secrets get --plain FLY_AUTH_TOKEN)
             TOKEN="$FLY_AUTH_TOKEN"
             export FLY_NAME="conneroh-com"
             export CONFIG_FILE=${./fly.toml}
