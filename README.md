@@ -39,7 +39,8 @@ It follows a modern server-side rendering approach with HTMX for dynamic content
 │   └── update/          # Content update utility
 ├── internal/            # Private application code
 │   ├── data/            # Data access layer
-│   │   ├── docs/        # Markdown content
+│   │   ├── assets/      # Assets Data Structure definitions
+│   │   ├── docs/        # Markdown content (posts, projects, tags)
 │   │   │   ├── posts/   # Blog posts
 │   │   │   ├── projects/# Project descriptions
 │   │   │   └── tags/    # Tag descriptions

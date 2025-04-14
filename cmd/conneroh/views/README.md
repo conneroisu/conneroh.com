@@ -29,12 +29,12 @@ Package views contains the HTML templates for the website.
 - [func ListResults\(target routing.PluralPath, posts \*\[\]\*assets.Post, projects \*\[\]\*assets.Project, tags \*\[\]\*assets.Tag, page, pageCount int\) templ.Component](<#ListResults>)
 - [func Post\(post \*assets.Post, fullPosts \*\[\]\*assets.Post, fullProjects \*\[\]\*assets.Project, fullTags \*\[\]\*assets.Tag\) templ.Component](<#Post>)
 - [func Project\(project \*assets.Project, fullPosts \*\[\]\*assets.Post, fullProjects \*\[\]\*assets.Project, fullTags \*\[\]\*assets.Tag\) templ.Component](<#Project>)
-- [func Search\(query string, results \[\]gen.Embeddable\) templ.Component](<#Search>)
+- [func Search\(query string, results \[\]assets.Embeddable\) templ.Component](<#Search>)
 - [func Tag\(tag \*assets.Tag, fullPosts \*\[\]\*assets.Post, fullProjects \*\[\]\*assets.Project, fullTags \*\[\]\*assets.Tag\) templ.Component](<#Tag>)
 
 
 <a name="Home"></a>
-## func [Home](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/home_templ.go#L18-L22>)
+## func [Home](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/home_templ.go#L17-L21>)
 
 ```go
 func Home(fullPosts *[]*assets.Post, fullProjects *[]*assets.Project, fullTags *[]*assets.Tag) templ.Component
@@ -43,7 +43,7 @@ func Home(fullPosts *[]*assets.Post, fullProjects *[]*assets.Project, fullTags *
 
 
 <a name="List"></a>
-## func [List](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/list_templ.go#L25-L33>)
+## func [List](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/list_templ.go#L19-L27>)
 
 ```go
 func List(target routing.PluralPath, posts *[]*assets.Post, projects *[]*assets.Project, tags *[]*assets.Tag, query string, page int, pageCount int) templ.Component
@@ -52,7 +52,7 @@ func List(target routing.PluralPath, posts *[]*assets.Post, projects *[]*assets.
 
 
 <a name="ListResults"></a>
-## func [ListResults](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/list_templ.go#L427-L433>)
+## func [ListResults](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/list_templ.go#L421-L427>)
 
 ```go
 func ListResults(target routing.PluralPath, posts *[]*assets.Post, projects *[]*assets.Project, tags *[]*assets.Tag, page, pageCount int) templ.Component
@@ -82,7 +82,7 @@ func Project(project *assets.Project, fullPosts *[]*assets.Post, fullProjects *[
 ## func [Search](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/search_templ.go#L18>)
 
 ```go
-func Search(query string, results []gen.Embeddable) templ.Component
+func Search(query string, results []assets.Embeddable) templ.Component
 ```
 
 Search is the full search results page

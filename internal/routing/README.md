@@ -17,6 +17,7 @@ Package routing provides implementations for routing.
 ## Index
 
 - [Constants](<#constants>)
+- [func ComputeAllURLs\(base string\) \[\]string](<#ComputeAllURLs>)
 - [func GeneratePagination\(currentPage, totalPages, maxDisplay int\) \[\]string](<#GeneratePagination>)
 - [func GetPostURL\(base string, post \*assets.Post\) string](<#GetPostURL>)
 - [func GetProjectURL\(base string, project \*assets.Project\) string](<#GetProjectURL>)
@@ -46,6 +47,15 @@ const (
     Ellipsis = "..."
 )
 ```
+
+<a name="ComputeAllURLs"></a>
+## func [ComputeAllURLs](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/urls.go#L10>)
+
+```go
+func ComputeAllURLs(base string) []string
+```
+
+ComputeAllURLs computes all URLs for all posts, projects, and tags given a base URL.
 
 <a name="GeneratePagination"></a>
 ## func [GeneratePagination](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/pagination.go#L47>)
