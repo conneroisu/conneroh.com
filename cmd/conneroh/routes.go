@@ -37,7 +37,7 @@ func AddRoutes(
 			_, _ = w.Write(static.Favicon)
 		})
 	h.HandleFunc(
-		"GET /api/search",
+		"GET /search/all",
 		globalSearchHandler(gen.AllPosts, gen.AllProjects, gen.AllTags))
 
 	h.Handle(

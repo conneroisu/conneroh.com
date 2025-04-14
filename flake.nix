@@ -105,7 +105,7 @@
                   update
                 fi
                 if ${hasher}/bin/hasher -dir "$REPO_ROOT/cmd/conneroh/components" -v -exclude "*_templ.go"; then
-                  echo ""
+                  templ generate --log-level error
                 else
                   echo "Changes detected in components, running update script..."
                   gen_css

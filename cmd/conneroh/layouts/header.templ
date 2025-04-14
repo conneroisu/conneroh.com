@@ -137,7 +137,6 @@ templ search() {
 		class={ twerge.It("relative") }
 		x-data="{
 			isSearchOpen: false,
-			searchQuery: '',
 		}"
 	>
 		// Desktop search
@@ -171,10 +170,8 @@ templ search() {
 					>
 						<input
 							x-ref="searchInput"
-							x-model="searchQuery"
-							hx-get="/api/search"
+							hx-get="/search/all"
 							hx-trigger="keyup changed delay:400ms, search"
-							hx-vals="js:{q: searchQuery, isMobile: false}"
 							hx-target="#search-results-container"
 							hx-indicator="#loading-indicator"
 							class={ twerge.It("border border-gray-600 py-2 focus:ring-blue-500 focus:ring-2 pr-4 focus:outline-none rounded-md bg-gray-700 text-white w-full pl-10") }
@@ -266,10 +263,8 @@ templ search() {
 			>
 				<input
 					x-ref="mobileSearchInput"
-					x-model="searchQuery"
 					hx-get="/api/search"
 					hx-trigger="keyup changed delay:400ms, search"
-					hx-vals="js:{q: searchQuery, isMobile: true}"
 					hx-target="#search-results-container"
 					hx-indicator="#loading-indicator"
 					class={ twerge.It("pr-4 border bg-gray-800 rounded-lg focus:outline-none py-3 pl-10 focus:ring-blue-500 w-full focus:ring-2 text-white border-gray-600") }
@@ -321,13 +316,6 @@ templ search() {
 							d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
 						></path>
 					</svg>
-				</div>
-				// No results message (initial state)
-				<div
-					x-show="searchQuery.length >= 2"
-					class={ twerge.It("text-center p-4 text-gray-400") }
-				>
-					Type to search...
 				</div>
 			</div>
 		</div>
