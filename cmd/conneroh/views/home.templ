@@ -3,7 +3,6 @@ package views
 import (
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
-	"github.com/conneroisu/conneroh.com/internal/hx"
 	"github.com/conneroisu/twerge"
 )
 
@@ -115,7 +114,7 @@ templ Home(
 				<a
 					hx-get="/projects"
 					hx-push-url="true"
-					hx-target={ hx.Bodiody.Sel }
+					hx-target="#bodiody"
 					preload="mouseover"
 					class={ twerge.It("font-medium flex items-center text-blue-400 hover:underline text-lg") }
 				>
@@ -154,7 +153,7 @@ templ Home(
 				<a
 					hx-get="/posts"
 					hx-push-url="true"
-					hx-target={ hx.Bodiody.Sel }
+					hx-target="#bodiody"
 					class={ twerge.It("font-medium flex items-center text-blue-400 hover:underline text-lg") }
 					preload="mouseover"
 				>
@@ -190,7 +189,7 @@ templ Home(
 					Skills & Technologies
 				</h2>
 				<a
-					hx-target={ hx.Bodiody.Sel }
+					hx-target="#bodiody"
 					hx-get="/tags"
 					hx-push-url="/tags"
 					preload="mouseover"
