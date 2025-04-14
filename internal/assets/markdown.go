@@ -2,13 +2,17 @@ package assets
 
 import (
 	"bytes"
+	"context"
+	"fmt"
+	"path/filepath"
+	"strings"
 
-	"github.com/conneroisu/conneroh.com/internal/credited"
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
 	mathjax "github.com/litao91/goldmark-mathjax"
 	enclave "github.com/quail-ink/goldmark-enclave"
 	"github.com/quail-ink/goldmark-enclave/core"
 	"github.com/rotisserie/eris"
+	"github.com/spf13/afero"
 	"github.com/yuin/goldmark"
 	highlighting "github.com/yuin/goldmark-highlighting/v2"
 	"github.com/yuin/goldmark/extension"
@@ -21,18 +25,13 @@ import (
 	"go.abhg.dev/goldmark/wikilink"
 )
 
-// MDParser is a markdown parser that supports wikilinks.
-type MDParser struct {
-	goldmark.Markdown
-	pCtx parser.Context
-}
-
-// NewMDParser creates a new markdown parser.
-func NewMDParser(
+// NewRenderer creates a new markdown parser.
+func NewRenderer(
+	ctx context.Context,
 	pCtx parser.Context,
-	client *credited.AWSClient,
-) *MDParser {
-	return &MDParser{
+	fs afero.Fs,
+) *DefaultRenderer {
+	return &DefaultRenderer{
 		Markdown: goldmark.New(goldmark.WithParserOptions(
 			parser.WithAutoHeadingID(),
 			parser.WithAttribute(),
@@ -44,7 +43,7 @@ func NewMDParser(
 			),
 			goldmark.WithExtensions(
 				&wikilink.Extender{
-					Resolver: newResolver(client),
+					Resolver: newResolver(ctx, fs),
 				},
 				extension.GFM,
 				extension.Footnote,
@@ -85,20 +84,29 @@ func NewMDParser(
 	}
 }
 
+// DefaultRenderer is a markdown parser that supports wikilinks.
+type DefaultRenderer struct {
+	Markdown goldmark.Markdown
+	pCtx     parser.Context
+}
+
 // Convert converts the provided markdown to HTML.
-func (m *MDParser) Convert(
-	asset Asset,
-) (emb gen.Embedded, err error) {
+func (m *DefaultRenderer) Convert(
+	path string,
+	data []byte,
+) (gen.Embedded, error) {
 	var (
 		buf      = bytes.NewBufferString("")
 		metadata *frontmatter.Data
+		emb      gen.Embedded
+		err      error
 	)
-	err = m.Markdown.Convert(asset.Data, buf, parser.WithContext(m.pCtx))
+	err = m.Markdown.Convert(data, buf, parser.WithContext(m.pCtx))
 	if err != nil {
 		return emb, eris.Wrapf(
 			err,
 			"failed to convert %s's markdown to HTML",
-			asset.Path,
+			path,
 		)
 	}
 
@@ -107,7 +115,7 @@ func (m *MDParser) Convert(
 	if metadata == nil {
 		return emb, eris.Errorf(
 			"frontmatter is nil for %s",
-			asset.Path,
+			path,
 		)
 	}
 
@@ -117,21 +125,21 @@ func (m *MDParser) Convert(
 		return emb, eris.Wrapf(
 			err,
 			"failed to decode frontmatter of %s",
-			asset.Path,
+			path,
 		)
 	}
 
 	// Set slug and content
-	emb.Slug = asset.Slug
+	emb.Slug = slugify(path)
 	emb.Content = buf.String()
-	emb.RawContent = string(asset.Data)
+	emb.RawContent = string(data)
 
 	// Get frontmatter
 	metadata = frontmatter.Get(m.pCtx)
 	if metadata == nil {
 		return emb, eris.Errorf(
 			"frontmatter is nil for %s",
-			asset.Path,
+			path,
 		)
 	}
 
@@ -141,8 +149,75 @@ func (m *MDParser) Convert(
 		return emb, eris.Wrapf(
 			err,
 			"failed to decode frontmatter of %s",
-			asset.Path,
+			path,
 		)
 	}
 	return emb, nil
+}
+
+// resolver is a wikilink.Resolver that resolves pages and media referenced by
+// wikilinks to their destinations.
+type resolver struct {
+	Ctx context.Context
+	fs  afero.Fs
+}
+
+// newResolver creates a new wikilink resolver.
+func newResolver(
+	ctx context.Context,
+	fs afero.Fs,
+) *resolver {
+	return &resolver{
+		fs:  fs,
+		Ctx: ctx,
+	}
+}
+
+// ResolveWikilink returns the address of the page that the provided
+// wikilink points to. The destination will be URL-escaped before
+// being placed into a link.
+func (r *resolver) ResolveWikilink(n *wikilink.Node) ([]byte, error) {
+	var (
+		err       error
+		targetStr = string(n.Target)
+	)
+	_, err = afero.ReadFile(r.fs, fmt.Sprintf("/assets/%s", targetStr))
+	if err != nil {
+		return nil, err
+	}
+	return fmt.Appendf(nil,
+		"https://conneroh.fly.storage.tigris.dev/%s",
+		targetStr,
+	), nil
+}
+
+func slugify(s string) string {
+	var path string
+	var ok bool
+	path, ok = strings.CutPrefix(s, assetsLoc)
+	if ok {
+		return path
+	}
+	return strings.TrimSuffix(pathify(s), filepath.Ext(s))
+}
+func pathify(s string) string {
+	var path string
+	var ok bool
+	path, ok = strings.CutPrefix(s, postsLoc)
+	if ok {
+		return path
+	}
+	path, ok = strings.CutPrefix(s, projectsLoc)
+	if ok {
+		return path
+	}
+	path, ok = strings.CutPrefix(s, tagsLoc)
+	if ok {
+		return path
+	}
+	path, ok = strings.CutPrefix(s, assetsLoc)
+	if ok {
+		return path
+	}
+	return s // Return original path instead of panicking
 }

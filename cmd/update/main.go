@@ -1,272 +1,150 @@
-// Package main updates the database with new vault content.
+// Package main is the main package for the updated the generated code.
 package main
 
 import (
+	"bytes"
 	"context"
 	"flag"
 	"fmt"
-	"io/fs"
 	"log/slog"
+	"mime"
 	"os"
 	"path/filepath"
 	"strings"
 	"sync"
-	"sync/atomic"
-	"time"
 
-	"github.com/rotisserie/eris"
-
-	"github.com/conneroisu/conneroh.com/internal/assets"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/conneroisu/conneroh.com/internal/cache"
 	"github.com/conneroisu/conneroh.com/internal/credited"
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
+	"github.com/conneroisu/conneroh.com/internal/tigris"
 	"github.com/conneroisu/genstruct"
+	mathjax "github.com/litao91/goldmark-mathjax"
+	enclave "github.com/quail-ink/goldmark-enclave"
+	"github.com/quail-ink/goldmark-enclave/core"
+	"github.com/rotisserie/eris"
+	"github.com/sourcegraph/conc/iter"
+	"github.com/spf13/afero"
+	"github.com/yuin/goldmark"
+	highlighting "github.com/yuin/goldmark-highlighting/v2"
+	"github.com/yuin/goldmark/extension"
 	"github.com/yuin/goldmark/parser"
-	"golang.org/x/sync/errgroup"
-)
-
-const (
-	hashFile    = "config.json"
-	vaultLoc    = "internal/data/docs/"
-	assetsLoc   = "internal/data/docs/assets/"
-	postsLoc    = "internal/data/docs/posts/"
-	tagsLoc     = "internal/data/docs/tags/"
-	projectsLoc = "internal/data/docs/projects/"
+	"github.com/yuin/goldmark/renderer/html"
+	"go.abhg.dev/goldmark/anchor"
+	"go.abhg.dev/goldmark/frontmatter"
+	"go.abhg.dev/goldmark/hashtag"
+	"go.abhg.dev/goldmark/mermaid"
+	"go.abhg.dev/goldmark/wikilink"
 )
 
 var (
-	workers = flag.Int("jobs", 20, "number of parallel uploads")
+	workers = flag.Int("jobs", 20, "number of parallel workers")
 	cwd     = flag.String("cwd", "", "current working directory")
-	debug   = flag.Bool("debug", false, "enable debug logging for cache operations")
 )
 
-// Define parse and actualization result types
-type parseResult struct {
-	location string
-	assets   []assets.Asset
-	ignored  []string
-	err      error
-}
-
-type actualizeResult struct {
-	contentType string
-	posts       []*gen.Post
-	projects    []*gen.Project
-	tags        []*gen.Tag
-	err         error
-}
+const (
+	hashFile    = ".config.json"
+	vaultLoc    = "internal/data/docs/"
+	assetsLoc   = "assets/"
+	postsLoc    = "posts/"
+	tagsLoc     = "tags/"
+	projectsLoc = "projects/"
+)
 
 func main() {
 	flag.Parse()
-	ctx := context.Background()
-	if err := run(ctx, os.Getenv); err != nil {
-		slog.Error("error", slog.String("err", err.Error()))
-		os.Exit(1)
+	// slog.SetDefault(logger.DefaultLogger)
+	if *cwd == "" {
+		err := os.Chdir(*cwd)
+		if err != nil {
+			panic(err)
+		}
+	}
+	if err := run(
+		context.Background(),
+		os.Getenv,
+		*workers,
+	); err != nil {
+		panic(err)
 	}
 }
 
+var (
+	parsedPosts    []*gen.Post
+	parsedProjects []*gen.Project
+	parsedTags     []*gen.Tag
+)
+
 func run(
-	outerCtx context.Context,
+	ctx context.Context,
 	getenv func(string) string,
-) (err error) {
-	ctx, cancel := context.WithCancel(outerCtx)
-	defer cancel()
-
-	start := time.Now()
-	if *cwd != "" {
-		err = os.Chdir(*cwd)
-		if err != nil {
-			return eris.Wrapf(
-				err,
-				"failed to change working directory to %s",
-				*cwd,
-			)
-		}
-	}
-	awsClient, err := credited.NewAWSClient(getenv)
-	if err != nil {
-		return err
-	}
-	ollama, err := credited.NewOllamaClient(getenv)
-	if err != nil {
-		return err
-	}
-	objCache, err := cache.LoadCache(hashFile)
-	if err != nil {
-		return err
-	}
-	mdParser := assets.NewMDParser(parser.NewContext(), awsClient)
-
-	// Log cache stats
-	slog.Info("cache loaded", "entries", len(objCache.Hashes))
-
-	// Make sure cache is written at the end, regardless of how the function exits
-	defer func() {
-		// Log final cache stats and time
-		slog.Info("saving cache",
-			"entries", len(objCache.Hashes),
-			"duration", time.Since(start).String())
-		err = objCache.Close()
-		if err != nil {
-			err = eris.Wrap(
-				err,
-				"failed to close cache",
-			)
-		}
-	}()
-
-	// Create channels for communication between goroutines
-	parseResultCh := make(chan parseResult, 4)           // 4 content types
-	actualizeResultCh := make(chan actualizeResult, 3)   // 3 content types
-	parsingComplete := make(chan map[string]parseResult) // Stop Signal
-
-	// Start parsing all content types in parallel
-	go func() {
-		results := make(map[string]parseResult)
-
-		// Use errgroup for better concurrency handling
-		var eg errgroup.Group
-		eg.SetLimit(*workers) // Limit concurrent parses
-
-		// Mutex to protect the results map
-		var mu sync.Mutex
-
-		// Start parsing each location
-		for _, loc := range []string{assetsLoc, postsLoc, projectsLoc, tagsLoc} {
-			loc := loc // Capture for closure
-			eg.Go(func() error {
-				assets, ignored, egErr := parse(objCache, loc)
-
-				// Store result safely
-				mu.Lock()
-				result := parseResult{
-					location: loc,
-					assets:   assets,
-					ignored:  ignored,
-					err:      egErr,
-				}
-				results[loc] = result
-				mu.Unlock()
-
-				// Push to channel for immediate processing (1/4 split)
-				parseResultCh <- result
-				return nil
-			})
-		}
-
-		// Wait for all parsing to complete and notify via the signal channel
-		go func() {
-			_ = eg.Wait() // Ignore errors as they're captured in the results
-			parsingComplete <- results
-		}()
-	}()
-
-	// Flag to track when parsing is complete
-	parseComplete := false
-
-	// Track counts for actualization
-	actualizationStarted := 0
-	actualizationComplete := 0
-
-	// Results storage
+	workers int,
+) error {
 	var (
-		allResults     map[string]parseResult
-		parsedPosts    []*gen.Post
-		parsedProjects []*gen.Project
-		parsedTags     []*gen.Tag
+		fs  = afero.NewBasePathFs(afero.NewOsFs(), vaultLoc)
+		m   = NewMD(fs)
+		err error
+
+		paths []string
+
+		cacheObj *cache.Cache
+		ollama   *credited.OllamaClient
 	)
+	cacheObj, err = cache.LoadCache(hashFile)
+	if err != nil {
+		return err
+	}
+	tigris, err := tigris.New(getenv)
+	if err != nil {
+		return err
+	}
+	ollama, err = credited.NewOllamaClient(getenv)
+	if err != nil {
+		return err
+	}
+	iterator := iter.Iterator[string]{
+		MaxGoroutines: workers,
+	}
 
-	// Process events until everything is complete
-	// Exit condition: parsing is done and all actualizations are complete
-	for !parseComplete || actualizationComplete != actualizationStarted || actualizationStarted <= 0 {
-
-		// Process all available events
-		select {
-		case result := <-parseResultCh:
-			// Process a parsing result
-			if result.err != nil {
-				slog.Error("error parsing location",
-					"location", result.location,
-					"error", result.err)
-				continue
+	err = afero.Walk(
+		fs,
+		".",
+		func(fPath string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
 			}
-
-			slog.Info("parsed location",
-				"location", result.location,
-				"assets", len(result.assets),
-				"ignored", len(result.ignored))
-
-			// Start actualization early if not assets
-			if result.location != assetsLoc {
-				actualizationStarted++
-				go startActualization(ctx, ollama, mdParser, result, actualizeResultCh)
+			if info.IsDir() {
+				return nil
 			}
+			paths = append(paths, fPath)
+			return nil
+		})
+	if err != nil {
+		return err
+	}
 
-		case results := <-parsingComplete:
-			// All parsing is complete
-			allResults = results
-			parseComplete = true
+	iterator.ForEach(paths, func(path *string) {
+		slog.Info("parsing", "path", *path)
+		defer slog.Info("parsed", "path", *path)
 
-			// Process assets immediately once parsing is complete
-			assetResult, exists := results[assetsLoc]
-			if exists && assetResult.err == nil {
-				err = actualizeAssets(ctx, awsClient, assetResult.assets)
-				if err != nil {
-					return fmt.Errorf("failed to actualize assets: %w", err)
-				}
+		if strings.HasPrefix(*path, "assets") {
+			hErr := handleAsset(ctx, *path, fs, cacheObj, tigris)
+			if hErr != nil {
+				panic(hErr)
 			}
-
-			// Check for parse errors
-			for loc, result := range results {
-				if result.err != nil {
-					return fmt.Errorf("error parsing %s: %w", loc, result.err)
-				}
-			}
-
-		case result := <-actualizeResultCh:
-			// Process actualization result
-			actualizationComplete++
-
-			if result.err != nil {
-				return fmt.Errorf("failed to actualize %s: %w", result.contentType, result.err)
-			}
-
-			switch result.contentType {
-			case "posts":
-				parsedPosts = result.posts
-				slog.Info("posts actualized", "count", len(parsedPosts))
-			case "projects":
-				parsedProjects = result.projects
-				slog.Info("projects actualized", "count", len(parsedProjects))
-			case "tags":
-				parsedTags = result.tags
-				slog.Info("tags actualized", "count", len(parsedTags))
-			}
-
-		case <-time.After(3 * time.Second):
-			// Periodic log to show we're still working
-			slog.Info("still working...",
-				"parseComplete", parseComplete,
-				"actualizationStarted", actualizationStarted,
-				"actualizationComplete", actualizationComplete)
+			return
 		}
-	}
+		if strings.HasSuffix(*path, ".md") {
+			hErr := handleDoc(ctx, *path, fs, m, cacheObj, ollama)
+			if hErr != nil {
+				panic(hErr)
+			}
+			return
+		}
 
-	// Make sure we have results
-	if allResults == nil {
-		return fmt.Errorf("parsing completed but no results were collected")
-	}
-
-	// Get asset results for final log
-	assetResult := allResults[assetsLoc]
-
-	// Log final results
-	slog.Info("Processing complete (generating)",
-		"len(posts)", len(parsedPosts),
-		"len(tags)", len(parsedTags),
-		"len(projects)", len(parsedProjects),
-		"len(assets)", len(assetResult.assets)+len(assetResult.ignored),
-		"duration", time.Since(start).String())
+		slog.Info("failed to find handler for", "path", *path)
+	})
 
 	postGen, err := genstruct.NewGenerator(genstruct.Config{
 		PackageName: "gen",
@@ -281,331 +159,198 @@ func run(
 		return err
 	}
 
-	slog.Info("Generation complete", "duration", time.Since(start).String())
+	err = cacheObj.Close()
+	if err != nil {
+		slog.Error("failed to close cache", "error", err)
+	}
 	return nil
 }
 
-// Helper function to start actualization of a content type
-func startActualization(
+var mu sync.Mutex
+
+// Upload uploads the provided asset to the specified bucket.
+func Upload(
 	ctx context.Context,
-	ollama *credited.OllamaClient,
-	mdParser *assets.MDParser,
-	result parseResult,
-	resultCh chan<- actualizeResult,
-) {
-	switch result.location {
-	case postsLoc:
-		posts, err := actualize[gen.Post](
-			ctx,
-			ollama,
-			mdParser,
-			result.assets,
-			result.ignored,
-		)
-		resultCh <- actualizeResult{
-			contentType: "posts",
-			posts:       posts,
-			err:         err,
-		}
-	case projectsLoc:
-		projects, err := actualize[gen.Project](
-			ctx,
-			ollama,
-			mdParser,
-			result.assets,
-			result.ignored,
-		)
-		resultCh <- actualizeResult{
-			contentType: "projects",
-			projects:    projects,
-			err:         err,
-		}
-	case tagsLoc:
-		tags, err := actualize[gen.Tag](
-			ctx,
-			ollama,
-			mdParser,
-			result.assets,
-			result.ignored,
-		)
-		resultCh <- actualizeResult{
-			contentType: "tags",
-			tags:        tags,
-			err:         err,
-		}
-	}
-}
-
-func actualize[T gen.Post | gen.Tag | gen.Project](
-	ctx context.Context,
-	ollama *credited.OllamaClient,
-	mdParser *assets.MDParser,
-	contents []assets.Asset,
-	ignored []string,
-) ([]*T, error) {
-	amount := len(contents)
-
-	if amount == 0 {
-		// If no new content, just return remembered content
-		remembered := rememberMD[T](ignored)
-		return remembered, nil
-	}
-
-	// Use errgroup for better error handling and concurrency control
-	eg := errgroup.Group{}
-	eg.SetLimit(*workers)
-
-	// Create result slice with appropriate capacity
-	parsedItems := make([]*T, amount)
-
-	// Process each asset using errgroup
-	for i, content := range contents {
-		index, asset := i, content // Capture for closure
-
-		eg.Go(func() error {
-			realized, err := realizeMD[T](ctx, ollama, mdParser, asset)
-			if err != nil {
-				return eris.Wrapf(
-					err,
-					"failed to parse asset %d",
-					index,
-				)
-			}
-
-			parsedItems[index] = realized
-			return nil
-		})
-	}
-
-	// Wait for all goroutines to complete and check for errors
-	if err := eg.Wait(); err != nil {
-		return nil, err
-	}
-
-	// Include previously parsed items that were ignored this time
-	remembered := rememberMD[T](ignored)
-	parsedItems = append(parsedItems, remembered...)
-
-	slog.Info(
-		"actualization complete",
-		"type",
-		fmt.Sprintf("%T", *new(T)),
-		"total",
-		len(parsedItems),
-	)
-	return parsedItems, nil
-}
-
-func parse(
-	cacheObj *cache.Cache,
-	loc string,
-) (parsedAssets []assets.Asset, ignoredSlugs []string, err error) {
-	eg := &errgroup.Group{}
-	eg.SetLimit(*workers)
-
-	var (
-		filePaths []string
-		mu        sync.Mutex // Guards access to parsedAssets and ignoredSlugs
-		processed int32
-		skipped   int32
-	)
-
-	// First, collect all file paths
-	err = filepath.WalkDir(
-		loc,
-		func(fPath string, d fs.DirEntry, err error) error {
-			if err != nil {
-				return err
-			}
-			if d.IsDir() {
-				return nil
-			}
-			filePaths = append(filePaths, fPath)
-			return nil
-		},
-	)
-	if err != nil {
-		return nil, nil, fmt.Errorf("failed to walk fsPath (%s): %w", loc, err)
-	}
-
-	slog.Info("found files to process", "location", loc, "files", len(filePaths))
-
-	// Create channels for immediate processing (1/4 split strategy)
-	// This allows work to begin being processed before all files are collected
-	filesCh := make(chan string, len(filePaths))
-	go func() {
-		for _, fPath := range filePaths {
-			filesCh <- fPath
-		}
-		close(filesCh)
-	}()
-
-	// Process files as they come in
-	for range *workers {
-		eg.Go(func() error {
-			for filePath := range filesCh {
-				// Read file
-				body, err := os.ReadFile(filePath)
-				if err != nil {
-					slog.Error("failed to read file", "path", filePath, "error", err)
-					continue // Skip failed files but don't abort the entire process
-				}
-
-				// Calculate hash
-				hash := cache.Hash(body)
-				path := pathify(filePath)
-				slug := slugify(filePath)
-
-				mu.Lock()
-				// Check if file has changed
-				cachedHash, exists := cacheObj.Hashes[filePath]
-				if exists && cachedHash == hash {
-					// File hasn't changed
-					ignoredSlugs = append(ignoredSlugs, slug)
-					atomic.AddInt32(&skipped, 1)
-					if *debug {
-						slog.Debug("skipped unchanged file", "path", filePath)
-					}
-				} else {
-					// File is new or has changed
-					cacheObj.Hashes[filePath] = hash
-					parsedAssets = append(parsedAssets, assets.Asset{
-						Path: path,
-						Data: body,
-						Slug: slug,
-					})
-					atomic.AddInt32(&processed, 1)
-					if *debug {
-						if exists {
-							slog.Debug("file changed", "path", filePath)
-						} else {
-							slog.Debug("new file", "path", filePath)
-						}
-					}
-				}
-				mu.Unlock()
-			}
-			return nil
-		})
-	}
-
-	if err := eg.Wait(); err != nil {
-		return nil, nil, err
-	}
-
-	slog.Info("parse statistics",
-		"location", loc,
-		"total", len(filePaths),
-		"processed", processed,
-		"skipped", skipped)
-
-	return parsedAssets, ignoredSlugs, nil
-}
-
-func actualizeAssets(
-	ctx context.Context,
-	client *credited.AWSClient,
-	assets []assets.Asset,
+	client tigris.Client,
+	path string,
+	data []byte,
 ) error {
-	amount := len(assets)
-	if amount == 0 {
-		slog.Info("no assets to upload")
-		return nil
+	extension := filepath.Ext(path)
+	if extension == "" {
+		return fmt.Errorf("failed to get extension for %s", path)
 	}
 
-	slog.Info("uploading assets", "amount", amount)
+	contentType := mime.TypeByExtension(extension)
+	mu.Lock()
+	_, err := client.PutObject(ctx, &s3.PutObjectInput{
+		Bucket:      aws.String("conneroh"),
+		Key:         aws.String(path),
+		Body:        bytes.NewReader(data),
+		ContentType: aws.String(contentType),
+	})
+	mu.Unlock()
 
-	// Use errgroup for better error handling and consistent patterns
-	eg := errgroup.Group{}
-	eg.SetLimit(*workers) // Limit concurrent uploads
-
-	// Process assets concurrently using errgroup
-	for _, asset := range assets {
-		asset := asset // Capture for closure
-
-		eg.Go(func() error {
-			return asset.Upload(ctx, client)
-		})
-	}
-
-	// Wait for all uploads to complete and check for errors
-	err := eg.Wait()
 	if err != nil {
-		return eris.Wrap(err, "failed to upload assets")
+		// Log error but let errgroup handle it
+		slog.Error("asset upload failed", "path", path, "error", err)
+		return fmt.Errorf("failed to upload asset %s: %w", path, err)
 	}
 
-	slog.Info("assets upload complete", "total", amount)
 	return nil
 }
 
-func rememberMD[T gen.Post | gen.Project | gen.Tag](ignored []string) []*T {
-	ignoredMap := make(map[string]struct{}, len(ignored))
-	for _, slug := range ignored {
-		ignoredMap[slug] = struct{}{}
+// NewMD creates a new markdown parser.
+func NewMD(
+	fs afero.Fs,
+) goldmark.Markdown {
+	return goldmark.New(goldmark.WithParserOptions(
+		parser.WithAutoHeadingID(),
+		parser.WithAttribute(),
+	),
+		goldmark.WithRendererOptions(
+			html.WithHardWraps(),
+			extension.WithFootnoteBacklinkClass("footnote-backref"),
+			extension.WithFootnoteLinkClass("footnote-ref"),
+		),
+		goldmark.WithExtensions(
+			&wikilink.Extender{
+				Resolver: newResolver(fs),
+			},
+			extension.GFM,
+			extension.Footnote,
+			extension.Strikethrough,
+			extension.Table,
+			extension.TaskList,
+			extension.DefinitionList,
+			mathjax.MathJax,
+			extension.NewTypographer(
+				extension.WithTypographicSubstitutions(
+					extension.TypographicSubstitutions{
+						extension.Apostrophe: []byte("'"),
+					}),
+			),
+			enclave.New(&core.Config{DefaultImageAltPrefix: "caption: "}),
+			extension.NewFootnote(
+				extension.WithFootnoteIDPrefix("fn"),
+			),
+			&anchor.Extender{
+				Position: anchor.Before,
+				Texter:   anchor.Text("#"),
+				Attributer: anchor.Attributes{
+					"class": "anchor permalink p-4",
+				},
+			},
+			&mermaid.Extender{
+				RenderMode: mermaid.RenderModeClient,
+			},
+			&frontmatter.Extender{
+				Formats: []frontmatter.Format{frontmatter.YAML},
+			},
+			&hashtag.Extender{
+				Variant: hashtag.ObsidianVariant,
+			},
+			highlighting.NewHighlighting(highlighting.WithStyle("monokai")),
+		))
+}
+
+// Convert converts the provided markdown to HTML.
+func Convert(
+	pCtx parser.Context,
+	m goldmark.Markdown,
+	path string,
+	data []byte,
+) (gen.Embedded, error) {
+	var (
+		buf      = bytes.NewBufferString("")
+		metadata *frontmatter.Data
+		emb      gen.Embedded
+		err      error
+	)
+	err = m.Convert(data, buf, parser.WithContext(pCtx))
+	if err != nil {
+		return emb, eris.Wrapf(
+			err,
+			"failed to convert %s's markdown to HTML",
+			path,
+		)
 	}
 
-	var typeExample T
-	switch any(typeExample).(type) {
-	case gen.Post:
-		var posts []*gen.Post
-		for _, post := range gen.AllPosts {
-			if _, ok := ignoredMap[post.Slug]; ok {
-				posts = append(posts, post)
-			}
-		}
-		return any(posts).([]*T)
-	case gen.Project:
-		var projects []*gen.Project
-		for _, project := range gen.AllProjects {
-			if _, ok := ignoredMap[project.Slug]; ok {
-				projects = append(projects, project)
-			}
-		}
-		return any(projects).([]*T)
-	case gen.Tag:
-		var tags []*gen.Tag
-		for _, tag := range gen.AllTags {
-			if _, ok := ignoredMap[tag.Slug]; ok {
-				tags = append(tags, tag)
-			}
-		}
-		return any(tags).([]*T)
-	default:
-		return nil
+	// Get frontmatter
+	metadata = frontmatter.Get(pCtx)
+	if metadata == nil {
+		return emb, eris.Errorf(
+			"frontmatter is nil for %s",
+			path,
+		)
+	}
+
+	// Decode frontmatter
+	err = metadata.Decode(&emb)
+	if err != nil {
+		return emb, eris.Wrapf(
+			err,
+			"failed to decode frontmatter of %s",
+			path,
+		)
+	}
+
+	// Set slug and content
+	emb.Slug = slugify(path)
+	emb.Content = buf.String()
+	emb.RawContent = string(data)
+
+	// Get frontmatter
+	metadata = frontmatter.Get(pCtx)
+	if metadata == nil {
+		return emb, eris.Errorf(
+			"frontmatter is nil for %s",
+			path,
+		)
+	}
+
+	// Decode frontmatter
+	err = metadata.Decode(&emb)
+	if err != nil {
+		return emb, eris.Wrapf(
+			err,
+			"failed to decode frontmatter of %s",
+			path,
+		)
+	}
+	return emb, nil
+}
+
+// resolver is a wikilink.Resolver that resolves pages and media referenced by
+// wikilinks to their destinations.
+type resolver struct {
+	fs afero.Fs
+}
+
+// newResolver creates a new wikilink resolver.
+func newResolver(
+	fs afero.Fs,
+) *resolver {
+	return &resolver{
+		fs: fs,
 	}
 }
 
-func realizeMD[T gen.Post | gen.Project | gen.Tag](
-	ctx context.Context,
-	ollama *credited.OllamaClient,
-	mdParser *assets.MDParser,
-	parsed assets.Asset,
-) (*T, error) {
+// ResolveWikilink returns the address of the page that the provided
+// wikilink points to. The destination will be URL-escaped before
+// being placed into a link.
+func (r *resolver) ResolveWikilink(n *wikilink.Node) ([]byte, error) {
 	var (
-		emb gen.Embedded
-		err error
+		err       error
+		targetStr = string(n.Target)
 	)
-
-	// Convert markdown to HTML
-	emb, err = mdParser.Convert(parsed)
+	_, err = afero.ReadFile(r.fs, fmt.Sprintf("/assets/%s", targetStr))
 	if err != nil {
 		return nil, err
 	}
-
-	err = gen.Defaults(&emb)
-	if err != nil {
-		return nil, err
-	}
-	err = gen.Validate(&emb)
-	if err != nil {
-		return nil, err
-	}
-	err = ollama.Embeddings(ctx, emb.RawContent, &emb)
-	if err != nil {
-		return nil, err
-	}
-
-	return gen.New[T](&emb), nil
+	return fmt.Appendf(nil,
+		"https://conneroh.fly.storage.tigris.dev/%s",
+		targetStr,
+	), nil
 }
 
 func slugify(s string) string {
@@ -617,7 +362,6 @@ func slugify(s string) string {
 	}
 	return strings.TrimSuffix(pathify(s), filepath.Ext(s))
 }
-
 func pathify(s string) string {
 	var path string
 	var ok bool
@@ -637,5 +381,107 @@ func pathify(s string) string {
 	if ok {
 		return path
 	}
-	return s // Return original path instead of panicking
+	panic(fmt.Errorf("failed to pathify %s", s))
+}
+
+func match(path string, emb *gen.Embedded) {
+	if strings.HasPrefix(path, postsLoc) {
+		parsedPosts = append(parsedPosts, gen.New[gen.Post](emb))
+	} else if strings.HasPrefix(path, projectsLoc) {
+		parsedProjects = append(parsedProjects, gen.New[gen.Project](emb))
+	} else if strings.HasPrefix(path, tagsLoc) {
+		parsedTags = append(parsedTags, gen.New[gen.Tag](emb))
+	}
+}
+
+func handleDoc(
+	ctx context.Context,
+	path string,
+	fs afero.Fs,
+	m goldmark.Markdown,
+	cacheObj *cache.Cache,
+	ollama *credited.OllamaClient,
+) error {
+	var (
+		err error
+		ok  bool
+		emb gen.Embedded
+	)
+
+	pCtx := parser.NewContext()
+	content, err := afero.ReadFile(fs, path)
+	if err != nil {
+		return err
+	}
+	emb, err = Convert(pCtx, m, path, content)
+	if err != nil {
+		return err
+	}
+
+	err = gen.Defaults(&emb)
+	if err != nil {
+		return err
+	}
+
+	err = gen.Validate(&emb)
+	if err != nil {
+		return err
+	}
+
+	hash := cache.Hash([]byte(emb.RawContent))
+	known, ok := cacheObj.Get(path)
+	if ok && known == hash {
+		slog.Info("found cached version", "path", path)
+		minV, ok := cacheObj.GetDoc(path)
+		if ok {
+			emb.X = minV.X
+			emb.Y = minV.Y
+			emb.Z = minV.Z
+		} else {
+			slog.Error("failed to get min version", "path", path)
+		}
+	} else {
+		err = ollama.Embeddings(ctx, emb.RawContent, &emb)
+		if err != nil {
+			return err
+		}
+	}
+
+	cacheObj.SetDoc(path, emb)
+	cacheObj.Set(path, hash)
+	match(path, &emb)
+	return nil
+}
+
+func handleAsset(
+	ctx context.Context,
+	path string,
+	fs afero.Fs,
+	cacheObj *cache.Cache,
+	tigris tigris.Client,
+) error {
+	var (
+		err error
+	)
+
+	slog.Debug("updating asset", "path", path)
+	defer slog.Debug("asset updated", "path", path)
+
+	data, perr := afero.ReadFile(fs, path)
+	if perr != nil {
+		return perr
+	}
+	hash := cache.Hash(data)
+	known, ok := cacheObj.Get(path)
+	if ok && known == hash {
+		slog.Debug("asset unchanged", "path", path)
+		return nil
+	}
+	cacheObj.Set(path, hash)
+	slog.Debug("asset changed uploading...", "path", path, "pathified", pathify(path))
+	err = Upload(ctx, tigris, pathify(path), data)
+	if err != nil {
+		return eris.Wrapf(err, "failed to upload asset %s", path)
+	}
+	return nil
 }
