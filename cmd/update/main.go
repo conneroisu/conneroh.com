@@ -18,7 +18,6 @@ import (
 	"github.com/conneroisu/conneroh.com/internal/cache"
 	"github.com/conneroisu/conneroh.com/internal/credited"
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
-	"github.com/conneroisu/conneroh.com/internal/logger"
 	"github.com/conneroisu/conneroh.com/internal/tigris"
 	"github.com/conneroisu/genstruct"
 	mathjax "github.com/litao91/goldmark-mathjax"
@@ -26,7 +25,6 @@ import (
 	"github.com/quail-ink/goldmark-enclave/core"
 	"github.com/rotisserie/eris"
 	"github.com/sourcegraph/conc/iter"
-	"github.com/sourcegraph/conc/pool"
 	"github.com/spf13/afero"
 	"github.com/yuin/goldmark"
 	highlighting "github.com/yuin/goldmark-highlighting/v2"
@@ -56,7 +54,7 @@ const (
 
 func main() {
 	flag.Parse()
-	slog.SetDefault(logger.DefaultLogger)
+	// slog.SetDefault(logger.DefaultLogger)
 	if *cwd == "" {
 		err := os.Chdir(*cwd)
 		if err != nil {
@@ -84,10 +82,9 @@ func run(
 	workers int,
 ) error {
 	var (
-		fs   = afero.NewBasePathFs(afero.NewOsFs(), vaultLoc)
-		m    = NewMD(fs)
-		err  error
-		pool = pool.New().WithMaxGoroutines(workers).WithContext(ctx)
+		fs  = afero.NewBasePathFs(afero.NewOsFs(), vaultLoc)
+		m   = NewMD(fs)
+		err error
 
 		paths []string
 
@@ -148,11 +145,6 @@ func run(
 
 		slog.Info("failed to find handler for", "path", *path)
 	})
-
-	err = pool.Wait()
-	if err != nil {
-		return err
-	}
 
 	postGen, err := genstruct.NewGenerator(genstruct.Config{
 		PackageName: "gen",
@@ -437,9 +429,7 @@ func handleDoc(
 	}
 
 	hash := cache.Hash([]byte(emb.RawContent))
-	slog.Info("hash", "hash", hash)
 	known, ok := cacheObj.Get(path)
-	slog.Info("known", "known", known, "ok", ok)
 	if ok && known == hash {
 		slog.Info("found cached version", "path", path)
 		minV, ok := cacheObj.GetDoc(path)
@@ -482,14 +472,14 @@ func handleAsset(
 		return perr
 	}
 	hash := cache.Hash(data)
-	known, ok := cacheObj.Hashes[path]
+	known, ok := cacheObj.Get(path)
 	if ok && known == hash {
 		slog.Debug("asset unchanged", "path", path)
 		return nil
 	}
 	cacheObj.Set(path, hash)
-	slog.Debug("asset changed uploading...", "path", path)
-	err = Upload(ctx, tigris, path, data)
+	slog.Debug("asset changed uploading...", "path", path, "pathified", pathify(path))
+	err = Upload(ctx, tigris, pathify(path), data)
 	if err != nil {
 		return eris.Wrapf(err, "failed to upload asset %s", path)
 	}

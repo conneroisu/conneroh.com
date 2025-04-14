@@ -5,11 +5,11 @@ aliases:
 tags:
   - programming-language/go
   - ideologies/open-source
-banner_path: projects/genstruct-logo.png
+banner_path: projects/genstruct-logo.webp
 created_at: 2025-03-27T14:13:10.000-06:00
 description: Golang library for generating static structs, with a focus on performance.
 title: genstruct
-updated_at: 2025-04-11T13:52:43.000-06:00
+updated_at: 2025-04-14T06:45:48.000-06:00
 ---
 
 # genstruct

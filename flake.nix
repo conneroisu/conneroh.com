@@ -37,6 +37,7 @@
       "aarch64-darwin"
     ] (system: let
       vendorHash = "sha256-XkiBPwOVZwu8NBGwKSbHq+tnm53aYMTRF+PXjotThDM=";
+      src = ./.;
       overlay = final: prev: {final.go = prev.go_1_24;};
       pkgs = import inputs.nixpkgs {
         inherit system;
@@ -288,7 +289,6 @@
         };
 
       packages = let
-        src = ./.;
         name = "conneroh.com";
         fly-name = "conneroh-com";
         fly-name-dev = "conneroh-com-dev";

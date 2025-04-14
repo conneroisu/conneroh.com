@@ -15,28 +15,6 @@ const (
 	ellipsisStyle    = "text-gray-400 px-2 py-1"
 )
 
-templ Icon(
-	id string,
-	attrs templ.Attributes,
-) {
-	<img
-		src={ fmt.Sprintf("https://conneroh.fly.storage.tigris.dev/svg/%s.svg", id) }
-		{ attrs... }
-	/>
-}
-
-templ Image(
-	id string,
-	alt string,
-	class string,
-) {
-	<img
-		src={ fmt.Sprintf("https://conneroh.fly.storage.tigris.dev/%s", id) }
-		alt={ alt }
-		class={ class }
-	/>
-}
-
 // See conneroh.views.List & conneroh.views.search
 templ TagControl(
 	tag *gen.Tag,

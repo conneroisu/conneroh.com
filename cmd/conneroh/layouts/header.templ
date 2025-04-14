@@ -3,9 +3,7 @@ package layouts
 import (
 	"fmt"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
-	"github.com/conneroisu/conneroh.com/internal/hx"
 	"github.com/conneroisu/twerge"
-	"net/url"
 	"strings"
 )
 
@@ -176,7 +174,7 @@ templ search() {
 							x-model="searchQuery"
 							hx-get="/api/search"
 							hx-trigger="keyup changed delay:400ms, search"
-							hx-vals="js:{q: searchQuery}"
+							hx-vals="js:{q: searchQuery, isMobile: false}"
 							hx-target="#search-results-container"
 							hx-indicator="#loading-indicator"
 							class={ twerge.It("border border-gray-600 py-2 focus:ring-blue-500 focus:ring-2 pr-4 focus:outline-none rounded-md bg-gray-700 text-white w-full pl-10") }
@@ -198,45 +196,6 @@ templ search() {
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
 							</svg>
 						</div>
-					</div>
-				</div>
-				// Results container
-				<div
-					id="search-results-container"
-					class={ twerge.It("max-h-64 overflow-y-auto") }
-				>
-					// Loading indicator
-					<div
-						id="loading-indicator"
-						class={ twerge.It("htmx-indicator text-center p-4 text-gray-400") }
-					>
-						<svg
-							class={ twerge.It("w-5 mx-auto animate-spin h-5") }
-							xmlns="http://www.w3.org/2000/svg"
-							fill="none"
-							viewBox="0 0 24 24"
-						>
-							<circle
-								class={ twerge.It("opacity-25") }
-								cx="12"
-								cy="12"
-								r="10"
-								stroke="currentColor"
-								stroke-width="4"
-							></circle>
-							<path
-								class={ twerge.It("opacity-75") }
-								fill="currentColor"
-								d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-							></path>
-						</svg>
-					</div>
-					// No results message (initial state)
-					<div
-						x-show="searchQuery.length >= 2"
-						class={ twerge.It("text-center p-4 text-gray-400") }
-					>
-						Type to search...
 					</div>
 				</div>
 			</div>
@@ -310,9 +269,9 @@ templ search() {
 					x-model="searchQuery"
 					hx-get="/api/search"
 					hx-trigger="keyup changed delay:400ms, search"
-					hx-vals="js:{q: searchQuery, mobile: true}"
-					hx-target="#mobile-search-results-container"
-					hx-indicator="#mobile-loading-indicator"
+					hx-vals="js:{q: searchQuery, isMobile: true}"
+					hx-target="#search-results-container"
+					hx-indicator="#loading-indicator"
 					class={ twerge.It("pr-4 border bg-gray-800 rounded-lg focus:outline-none py-3 pl-10 focus:ring-blue-500 w-full focus:ring-2 text-white border-gray-600") }
 					type="search"
 					placeholder="Search site..."
@@ -332,18 +291,18 @@ templ search() {
 					</svg>
 				</div>
 			</div>
-			// Mobile results container
+			// Mobile results container (using the same ID as desktop)
 			<div
-				id="mobile-search-results-container"
-				class={ twerge.It("mt-4 max-h-[calc(100vh-180px)] overflow-y-auto") }
+				id="search-results-container"
+				class={ twerge.It("max-h-64 overflow-y-auto") }
 			>
 				// Loading indicator
 				<div
-					id="mobile-loading-indicator"
-					class={ twerge.It("htmx-indicator py-8 text-center text-gray-400") }
+					id="loading-indicator"
+					class={ twerge.It("htmx-indicator text-center p-4 text-gray-400") }
 				>
 					<svg
-						class={ twerge.It("h-8 w-8 mx-auto mb-2 animate-spin") }
+						class={ twerge.It("w-5 mx-auto animate-spin h-5") }
 						xmlns="http://www.w3.org/2000/svg"
 						fill="none"
 						viewBox="0 0 24 24"
@@ -362,12 +321,11 @@ templ search() {
 							d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
 						></path>
 					</svg>
-					<p>Searching...</p>
 				</div>
-				// Initial state message
+				// No results message (initial state)
 				<div
 					x-show="searchQuery.length >= 2"
-					class={ twerge.It("py-8 text-center text-gray-400") }
+					class={ twerge.It("text-center p-4 text-gray-400") }
 				>
 					Type to search...
 				</div>
@@ -377,182 +335,10 @@ templ search() {
 }
 
 // Unified template for search results that works for both desktop and mobile
-templ searchResults(query string, results []SearchResult, isMobile bool) {
-	if len(query) >= 2 && len(results) == 0 {
-		if isMobile {
-			// Mobile no results message
-			<div class={ twerge.It("py-8 text-center text-gray-400") }>
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					class={ twerge.It("text-gray-600 h-16 w-16 mx-auto mb-4") }
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke="currentColor"
-				>
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-				</svg>
-				<p class={ twerge.It("text-lg") }>
-					No results found for "{ query }"
-				</p>
-				<p class={ twerge.It("mt-2") }>Try different keywords or check spelling</p>
-			</div>
-		} else {
-			// Desktop no results message
-			<div class={ twerge.It("text-center p-4 text-gray-400") }>
-				No results found for "{ query }"
-			</div>
-		}
-	} else if len(results) > 0 {
-		if isMobile {
-			// Mobile results list
-			<div>
-				<h3 class={ twerge.It("text-gray-400 uppercase tracking-wider mb-3 text-sm font-semibold") }>
-					Search Results
-				</h3>
-				<ul class={ twerge.It("space-y-2") }>
-					for _, result := range results {
-						<li class={ twerge.It("rounded-lg shadow-sm bg-gray-800") }>
-							<a
-								hx-get={ result.URL }
-								hx-target={ hx.Bodiody.Sel }
-								class={ twerge.It("hover:bg-gray-700 rounded-lg p-4 transition-colors block") }
-								@click="isSearchOpen = false"
-							>
-								<div class={ twerge.It("items-center flex") }>
-									// Icon based on result type
-									<div class={ twerge.It("flex-shrink-0 text-blue-300 items-center h-10 justify-center rounded-full bg-blue-900 mr-4 w-10 flex") }>
-										if result.Type == "post" {
-											<svg
-												xmlns="http://www.w3.org/2000/svg"
-												class={ twerge.It("w-5 h-5") }
-												fill="none"
-												viewBox="0 0 24 24"
-												stroke="currentColor"
-											>
-												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1M19 20a2 2 0 002-2V8a2 2 0 00-2-2h-5a2 2 0 00-2 2v12a2 2 0 002 2h5z"></path>
-											</svg>
-										} else if result.Type == "project" {
-											<svg
-												xmlns="http://www.w3.org/2000/svg"
-												class={ twerge.It("w-5 h-5") }
-												fill="none"
-												viewBox="0 0 24 24"
-												stroke="currentColor"
-											>
-												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-											</svg>
-										} else if result.Type == "tag" {
-											<svg
-												xmlns="http://www.w3.org/2000/svg"
-												class={ twerge.It("w-5 h-5") }
-												fill="none"
-												viewBox="0 0 24 24"
-												stroke="currentColor"
-											>
-												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
-											</svg>
-										}
-									</div>
-									<div>
-										<p class={ twerge.It("text-base font-medium text-white") }>
-											{ result.Title }
-										</p>
-										<p class={ twerge.It("text-gray-400 text-sm") }>
-											{ capitalize(result.Type) }
-										</p>
-									</div>
-								</div>
-							</a>
-						</li>
-					}
-				</ul>
-				// View all results link
-				<div class={ twerge.It("border-t border-gray-700 mt-4 pt-4") }>
-					<a
-						hx-get={ "/search?q=" + url.QueryEscape(query) }
-						hx-target={ hx.Bodiody.Sel }
-						class={ twerge.It("text-center font-medium w-full transition-colors hover:bg-blue-600 text-white rounded-lg py-3 block bg-blue-500 px-4") }
-						@click="isSearchOpen = false"
-					>
-						View all results
-					</a>
-				</div>
-			</div>
-		} else {
-			// Desktop results list
-			<div>
-				<h3 class={ twerge.It("font-semibold tracking-wider text-gray-400 px-4 text-xs uppercase pb-2 pt-3") }>
-					Search Results
-				</h3>
-				<ul>
-					for _, result := range results {
-						<li>
-							<a
-								hx-get={ result.URL }
-								class={ twerge.It("hover:bg-gray-700 py-3 px-4 block transition-colors") }
-								@click="isSearchOpen = false"
-							>
-								<div class={ twerge.It("items-center flex") }>
-									// Icon based on result type
-									<div class={ twerge.It("text-gray-500 mr-3") }>
-										if result.Type == "post" {
-											<svg
-												xmlns="http://www.w3.org/2000/svg"
-												class={ twerge.It("w-5 h-5") }
-												fill="none"
-												viewBox="0 0 24 24"
-												stroke="currentColor"
-											>
-												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1M19 20a2 2 0 002-2V8a2 2 0 00-2-2h-5a2 2 0 00-2 2v12a2 2 0 002 2h5z"></path>
-											</svg>
-										} else if result.Type == "project" {
-											<svg
-												xmlns="http://www.w3.org/2000/svg"
-												class={ twerge.It("w-5 h-5") }
-												fill="none"
-												viewBox="0 0 24 24"
-												stroke="currentColor"
-											>
-												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-											</svg>
-										} else if result.Type == "tag" {
-											<svg
-												xmlns="http://www.w3.org/2000/svg"
-												class={ twerge.It("w-5 h-5") }
-												fill="none"
-												viewBox="0 0 24 24"
-												stroke="currentColor"
-											>
-												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
-											</svg>
-										}
-									</div>
-									<div>
-										<p class={ twerge.It("text-sm font-medium text-white") }>
-											{ result.Title }
-										</p>
-										<p class={ twerge.It("text-xs text-gray-400") }>
-											{ capitalize(result.Type) }
-										</p>
-									</div>
-								</div>
-							</a>
-						</li>
-					}
-				</ul>
-				// View all results link
-				<div class={ twerge.It("px-4 border-t border-gray-700 py-3") }>
-					<a
-						hx-get={ "/search?q=" + url.QueryEscape(query) }
-						class={ twerge.It("block text-center text-sm text-blue-400 hover:underline") }
-						@click="isSearchOpen = false"
-					>
-						View all results
-					</a>
-				</div>
-			</div>
-		}
-	}
+templ searchResults(
+	query string,
+	results []SearchResult,
+) {
 }
 
 // Helper type for search results

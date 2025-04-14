@@ -2,7 +2,6 @@ package components
 
 import (
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
-	"github.com/conneroisu/conneroh.com/internal/hx"
 	"github.com/conneroisu/twerge"
 	"strconv"
 )
@@ -15,7 +14,7 @@ templ ProjectItem(project *gen.Project, attrs templ.Attributes) {
 	<div
 		{ attrs... }
 		aria-label={ project.Title }
-		hx-target={ hx.Bodiody.Sel }
+		hx-target="#bodiody"
 		hx-get={ project.PagePath() }
 		hx-push-url="true"
 		preload="mouseover"
@@ -90,10 +89,6 @@ templ ProjectItem(project *gen.Project, attrs templ.Attributes) {
 
 templ TagItem(tag *gen.Tag, attrs templ.Attributes) {
 	<a
-		hx-target={ hx.Bodiody.Sel }
-		hx-get={ tag.PagePath() }
-		hx-push-url={ tag.PagePath() }
-		preload="mouseover"
 		aria-label={ tag.Title }
 		{ attrs... }
 	>
@@ -133,13 +128,6 @@ templ PostItem(post *gen.Post, attrs templ.Attributes) {
 	<div
 		aria-label={ post.Title }
 		{ attrs... }
-		x-transition:enter={ twerge.It("transition ease-out duration-200") }
-		x-transition:enter-start={ twerge.It("transform translate-y-4 opacity-0") }
-		x-transition:enter-end={ twerge.It("transform translate-y-0 opacity-100") }
-		hx-target={ hx.Bodiody.Sel }
-		hx-get={ post.PagePath() }
-		hx-push-url={ post.PagePath() }
-		preload="mouseover"
 	>
 		@Image(
 			post.BannerPath,
