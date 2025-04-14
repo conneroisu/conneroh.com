@@ -82,7 +82,7 @@
           };
           update = {
             exec = ''
-              ${pkgs.doppler}/bin/doppler run -- ${update}/bin/update --cwd $REPO_ROOT --workers 20
+              ${pkgs.doppler}/bin/doppler run -- ${update}/bin/update -cwd $REPO_ROOT -jobs 20
             '';
             description = "Update the generated go files.";
           };
