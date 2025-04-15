@@ -24,20 +24,6 @@ func init() {
 
 	// Process Posts
 	for _, post := range AllPosts {
-		// Add Tag references
-		for _, tagSlug := range post.TagSlugs {
-			if tag, ok := tagMap[tagSlug]; ok {
-				post.Tags = append(post.Tags, tag)
-			}
-		}
-
-		// Add Project references
-		for _, projectSlug := range post.ProjectSlugs {
-			if project, ok := projectMap[projectSlug]; ok {
-				post.Projects = append(post.Projects, project)
-			}
-		}
-
 		// Add Post references (if needed)
 		for _, postSlug := range post.PostSlugs {
 			if referredPost, ok := postMap[postSlug]; ok {
@@ -48,24 +34,10 @@ func init() {
 
 	// Process Projects
 	for _, project := range AllProjects {
-		// Add Tag references
-		for _, tagSlug := range project.TagSlugs {
-			if tag, ok := tagMap[tagSlug]; ok {
-				project.Tags = append(project.Tags, tag)
-			}
-		}
-
-		// Add Project references (if needed)
+		// Add Project references
 		for _, projectSlug := range project.ProjectSlugs {
 			if referredProject, ok := projectMap[projectSlug]; ok {
 				project.Projects = append(project.Projects, referredProject)
-			}
-		}
-
-		// Add Post references
-		for _, postSlug := range project.PostSlugs {
-			if post, ok := postMap[postSlug]; ok {
-				project.Posts = append(project.Posts, post)
 			}
 		}
 	}
@@ -76,20 +48,6 @@ func init() {
 		for _, tagSlug := range tag.TagSlugs {
 			if referredTag, ok := tagMap[tagSlug]; ok {
 				tag.Tags = append(tag.Tags, referredTag)
-			}
-		}
-
-		// Add Project references
-		for _, projectSlug := range tag.ProjectSlugs {
-			if project, ok := projectMap[projectSlug]; ok {
-				tag.Projects = append(tag.Projects, project)
-			}
-		}
-
-		// Add Post references
-		for _, postSlug := range tag.PostSlugs {
-			if post, ok := postMap[postSlug]; ok {
-				tag.Posts = append(tag.Posts, post)
 			}
 		}
 	}
