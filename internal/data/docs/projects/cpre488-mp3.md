@@ -11,7 +11,7 @@ tags:
   - hdl/vhdl
   - hdl/verilog
   - edu/iastate
-  - ideologies/device-drivers
+  - ideology/device-drivers
   - protocol/uart
   - protocol/usb
 banner_path: projects/mp3.webp
