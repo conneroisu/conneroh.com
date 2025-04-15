@@ -190,10 +190,9 @@ func (g *Generator) generateStructValues(group *jen.Group, structValue reflect.V
 			pkgPath := embeddedType.PkgPath()
 
 			if pkgPath != "" && pkgPath != "main" && pkgPath != g.PackageName {
-				// Use qualified package reference for embedded fields from other packages
-				// but still generate all the fields inside it
+				// Reference the embedded type from its original package but keep its field values
 				dict[jen.Id(fieldType.Name)] = jen.Qual(pkgPath, embeddedType.Name()).ValuesFunc(func(embGroup *jen.Group) {
-					// Generate inner struct values
+					// Generate inner struct values while preserving field data
 					innerDict := jen.Dict{}
 
 					for j := range field.NumField() {
@@ -203,6 +202,17 @@ func (g *Generator) generateStructValues(group *jen.Group, structValue reflect.V
 						// Skip unexported fields
 						if !innerFieldType.IsExported() {
 							continue
+						}
+
+						// Check for structgen tag
+						structgenVal, hasStructgenTag := innerFieldType.Tag.Lookup("structgen")
+						if hasStructgenTag && structgenVal != "" {
+							// Generate reference for this field using the structgen tag
+							value := g.generateStructGenField(field, structgenVal, innerFieldType)
+							if value != nil {
+								innerDict[jen.Id(innerFieldType.Name)] = value
+								continue
+							}
 						}
 
 						// Add each field with its value
@@ -277,6 +287,12 @@ func (g *Generator) generateStructGenField(
 		srcField.Type.Kind() == reflect.Slice &&
 		srcField.Type.Elem().Kind() == reflect.String {
 
+		// Check if the slice is empty
+		if srcValue.Len() == 0 {
+			// For empty source slices, return an empty slice of the appropriate type
+			return g.getEmptyReferenceSlice(targetType)
+		}
+
 		// We need to look up structs by ID or another field
 		return g.generateReferenceSlice(srcValue, targetType)
 	}
@@ -286,12 +302,86 @@ func (g *Generator) generateStructGenField(
 		(targetType.Kind() == reflect.Pointer && targetType.Elem().Kind() == reflect.Struct)) &&
 		srcField.Type.Kind() == reflect.String {
 
+		// Check if the source string is empty
+		if srcValue.String() == "" {
+			// For empty source string, return nil or empty struct
+			return g.getEmptyReference(targetType)
+		}
+
 		// We need to look up one struct by ID or another field
 		return g.generateReferenceSingle(srcValue, targetType)
 	}
 
 	// Unsupported reference type
 	return nil
+}
+
+// getEmptyReferenceSlice returns an empty slice statement for a given target type
+func (g *Generator) getEmptyReferenceSlice(targetType reflect.Type) *jen.Statement {
+	// Determine if we're dealing with a pointer slice ([]*T) or struct slice ([]T)
+	isPointerSlice := targetType.Elem().Kind() == reflect.Pointer
+
+	// Get the target struct type name
+	var structTypeName string
+	if isPointerSlice {
+		structTypeName = targetType.Elem().Elem().Name()
+	} else {
+		structTypeName = targetType.Elem().Name()
+	}
+
+	// Check if we need to use fully qualified type references
+	isExportMode := strings.Contains(g.OutputFile, "/")
+	refType := targetType.Elem()
+	if isPointerSlice {
+		refType = refType.Elem()
+	}
+	pkgPath := refType.PkgPath()
+	useQualified := isExportMode && pkgPath != "" && pkgPath != "main" && pkgPath != g.PackageName
+
+	// Return an empty slice of the appropriate type
+	if isPointerSlice {
+		if useQualified {
+			return jen.Index().Add(jen.Op("*").Qual(pkgPath, structTypeName)).Values()
+		}
+		return jen.Index().Add(jen.Op("*").Id(structTypeName)).Values()
+	}
+	if useQualified {
+		return jen.Index().Add(jen.Qual(pkgPath, structTypeName)).Values()
+	}
+	return jen.Index().Add(jen.Id(structTypeName)).Values()
+}
+
+// getEmptyReference returns nil or an empty struct for a given target type
+func (g *Generator) getEmptyReference(targetType reflect.Type) *jen.Statement {
+	// Determine if we're dealing with a pointer (*T) or struct (T)
+	isPointer := targetType.Kind() == reflect.Pointer
+
+	// Get the target struct type name
+	var structTypeName string
+	var structType reflect.Type
+	if isPointer {
+		structTypeName = targetType.Elem().Name()
+		structType = targetType.Elem()
+	} else {
+		structTypeName = targetType.Name()
+		structType = targetType
+	}
+
+	// Check if we need to use fully qualified type references
+	isExportMode := strings.Contains(g.OutputFile, "/")
+	pkgPath := structType.PkgPath()
+	useQualified := isExportMode && pkgPath != "" && pkgPath != "main" && pkgPath != g.PackageName
+
+	// For pointer types, return nil
+	if isPointer {
+		return jen.Nil()
+	}
+
+	// For struct types, return an empty struct
+	if useQualified {
+		return jen.Qual(pkgPath, structTypeName).Values()
+	}
+	return jen.Id(structTypeName).Values()
 }
 
 // generateReferenceSlice generates a slice of referenced structs for string slice to struct slice references
@@ -383,6 +473,7 @@ func (g *Generator) generateReferenceSlice(srcValue reflect.Value, targetType re
 		// For each source ID
 		for i := range srcValue.Len() {
 			idValue := srcValue.Index(i).String()
+			found := false
 
 			// Try to find a matching reference struct
 			for j := range refData.Len() {
@@ -413,8 +504,12 @@ func (g *Generator) generateReferenceSlice(srcValue reflect.Value, targetType re
 						} else {
 							group.Add(jen.Id(refVarName))
 						}
+						found = true
 						break
 					}
+				}
+				if found {
+					break
 				}
 			}
 		}
@@ -435,18 +530,32 @@ func (g *Generator) generateReferenceSingle(srcValue reflect.Value, targetType r
 
 	// Get the target struct type name
 	var structTypeName string
+	var structType reflect.Type
 	if isPointer {
 		structTypeName = targetType.Elem().Name()
+		structType = targetType.Elem()
 	} else {
 		structTypeName = targetType.Name()
+		structType = targetType
 	}
+
+	// Check if we need to use fully qualified type references
+	isExportMode := strings.Contains(g.OutputFile, "/")
+	pkgPath := structType.PkgPath()
+	useQualified := isExportMode && pkgPath != "" && pkgPath != "main" && pkgPath != g.PackageName
 
 	// Check if we have this reference type
 	refDataObj, hasRef := g.Refs[structTypeName]
 	if !hasRef {
 		// We don't have this reference data
 		if isPointer {
+			if useQualified {
+				return jen.Op("&").Qual(pkgPath, structTypeName).Values()
+			}
 			return jen.Op("&").Id(structTypeName).Values()
+		}
+		if useQualified {
+			return jen.Qual(pkgPath, structTypeName).Values()
 		}
 		return jen.Id(structTypeName).Values()
 	}
@@ -456,7 +565,13 @@ func (g *Generator) generateReferenceSingle(srcValue reflect.Value, targetType r
 	if refData.Kind() != reflect.Slice && refData.Kind() != reflect.Array {
 		// Reference isn't a slice/array
 		if isPointer {
+			if useQualified {
+				return jen.Op("&").Qual(pkgPath, structTypeName).Values()
+			}
 			return jen.Op("&").Id(structTypeName).Values()
+		}
+		if useQualified {
+			return jen.Qual(pkgPath, structTypeName).Values()
 		}
 		return jen.Id(structTypeName).Values()
 	}
@@ -497,7 +612,13 @@ func (g *Generator) generateReferenceSingle(srcValue reflect.Value, targetType r
 
 	// No match found
 	if isPointer {
+		if useQualified {
+			return jen.Op("&").Qual(pkgPath, structTypeName).Values()
+		}
 		return jen.Op("&").Id(structTypeName).Values()
+	}
+	if useQualified {
+		return jen.Qual(pkgPath, structTypeName).Values()
 	}
 	return jen.Id(structTypeName).Values()
 }

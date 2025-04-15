@@ -14,12 +14,37 @@ import (
 	"github.com/conneroisu/conneroh.com/internal/data/gen"
 	"github.com/conneroisu/conneroh.com/internal/hx"
 	"github.com/conneroisu/conneroh.com/internal/routing"
+	"github.com/gorilla/schema"
 	"github.com/sourcegraph/conc/pool"
 )
+
+// ContactForm is the struct schema for the contact form.
+type ContactForm struct {
+	Name    string `schema:"name"`
+	Email   string `schema:"email"`
+	Subject string `schema:"subject"`
+	Message string `schema:"message"`
+}
+
+var encoder = schema.NewEncoder()
 
 const (
 	maxSearchRoutines = 10
 )
+
+func handleContactForm(w http.ResponseWriter, r *http.Request) {
+	var form ContactForm
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	if err := encoder.Encode(form, r.PostForm); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	// TODO: Send email
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
 
 var (
 	home = views.Home(

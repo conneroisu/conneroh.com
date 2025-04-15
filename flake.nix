@@ -36,12 +36,13 @@
       "aarch64-linux"
       "aarch64-darwin"
     ] (system: let
-      overlay = final: prev: {go = prev.go_1_24;};
+      overlay = final: prev: {final.go = prev.go_1_24;};
       pkgs = import inputs.nixpkgs {
         inherit system;
         overlays = [
           overlay
         ];
+        config.allowUnfree = true;
       };
       buildWithSpecificGo = pkg: pkg.override {buildGoModule = pkgs.buildGo124Module;};
     in rec {
@@ -232,13 +233,14 @@
               flyctl
               openssl.dev
               skopeo
+              consul
 
               # Playwright
               playwright-driver # Provides browser archives and driver scripts
               (
-                if pkgs.stdenv.isDarwin
-                then pkgs.darwin.apple_sdk.frameworks.WebKit
-                else pkgs.webkitgtk
+                if stdenv.isDarwin
+                then darwin.apple_sdk.frameworks.WebKit
+                else webkitgtk
               ) # WebKit browser
               nodejs_20 # Required for Playwright driver
               pkg-config # Needed for some browser dependencies

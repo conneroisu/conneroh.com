@@ -34,8 +34,8 @@ github.com/chromedp/chromedp v0.9.1 h1:CC7cC5p1BeLiiS2gfNNPwp3OaUxtRMBjfiw3E3k6d
 github.com/chromedp/chromedp v0.9.1/go.mod h1:DUgZWRvYoEfgi66CgZ/9Yv+psgi+Sksy5DTScENWjaQ=
 github.com/chromedp/sysutil v1.0.0 h1:+ZxhTpfpZlmchB58ih/LBHX52ky7w2VhQVKQMucy3Ic=
 github.com/chromedp/sysutil v1.0.0/go.mod h1:kgWmDdq8fTzXYcKIBqIYvRRTnYb9aNS9moAV0xufSww=
-github.com/conneroisu/genstruct v0.1.6 h1:ImuVZegExN1RHOjSwcQ6ShSKe9KIwPAqbeSePJ7Cy8M=
-github.com/conneroisu/genstruct v0.1.6/go.mod h1:oRlnawZROHDfGo1Jb4K3QtHQrAWN7t+fzqEbAIhacF4=
+github.com/conneroisu/genstruct v0.1.7 h1:zdanvZGbG/dKzqNdIQgm0esqgwxCDLJ/p9a49V5qtg8=
+github.com/conneroisu/genstruct v0.1.7/go.mod h1:oRlnawZROHDfGo1Jb4K3QtHQrAWN7t+fzqEbAIhacF4=
 github.com/conneroisu/twerge v0.3.3 h1:YnlPqMs/LsluJ0hwFl3h4rt8E2r98DpMCCkNdR6ALGU=
 github.com/conneroisu/twerge v0.3.3/go.mod h1:TXSvjZ2LtaAHCtXVCrpihRMC7ohOUSaYN36NKQEWPVU=
 github.com/dave/jennifer v1.7.1 h1:B4jJJDHelWcDhlRQxWeo0Npa/pYKBLrirAQoTN45txo=
@@ -64,6 +64,8 @@ github.com/gobwas/ws v1.1.0/go.mod h1:nzvNcVha5eUziGrbxFCo6qFIojQHjJV5cLYIbezhfL
 github.com/google/go-cmp v0.5.9/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeNGIjoY=
 github.com/google/go-cmp v0.6.0 h1:ofyhxvXcZhMsU5ulbFiLKl/XBFqE1GSq7atu8tAmTRI=
 github.com/google/go-cmp v0.6.0/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeNGIjoY=
+github.com/gorilla/schema v1.4.1 h1:jUg5hUjCSDZpNGLuXQOgIWGdlgrIdYvgQ0wZtdK1M3E=
+github.com/gorilla/schema v1.4.1/go.mod h1:Dg5SSm5PV60mhF2NFaTV1xuYYj8tV8NOPRo4FggUMnM=
 github.com/josharian/intern v1.0.0 h1:vlS4z54oSdjm0bgjRigI+G1HpF+tI+9rE5LLzOg8HmY=
 github.com/josharian/intern v1.0.0/go.mod h1:5DoeVV0s6jJacbCEi61lwdGj/aVlrQvzHFFd8Hwg//Y=
 github.com/kr/pretty v0.3.1 h1:flRD4NNwYAUpkphVc1HcthR4KEIFJ65n8Mw5qdRn3LE=

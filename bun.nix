@@ -11,6 +11,16 @@
 }: let
   # Set of Bun packages to install
   packages = {
+    "@alpinejs/anchor" = {
+      out_path = "@alpinejs/anchor";
+      binaries = {
+      };
+      pkg = fetchurl {
+        name = "@alpinejs/anchor@3.14.9";
+        url = "https://registry.npmjs.org/@alpinejs/anchor/-/anchor-3.14.9.tgz";
+        hash = "sha256-kMQLV3ItTtpqwPvoXEn8CTmU7EaiS+mKchvLTOnByEc=";
+      };
+    };
     "@alpinejs/intersect" = {
       out_path = "@alpinejs/intersect";
       binaries = {
@@ -320,6 +330,16 @@
         name = "@types/alpinejs@3.13.11";
         url = "https://registry.npmjs.org/@types/alpinejs/-/alpinejs-3.13.11.tgz";
         hash = "sha256-R+5HQDLB86YXkbUgnDcm/SnHZSPjyfDyYNlVy7QuTik=";
+      };
+    };
+    "@types/alpinejs__anchor" = {
+      out_path = "@types/alpinejs__anchor";
+      binaries = {
+      };
+      pkg = fetchurl {
+        name = "@types/alpinejs__anchor@3.13.1";
+        url = "https://registry.npmjs.org/@types/alpinejs__anchor/-/alpinejs__anchor-3.13.1.tgz";
+        hash = "sha256-zbCEYGCu4viGfmgikq0FhXUtShH8sFetluWAzgHOM2Y=";
       };
     };
     "@types/alpinejs__intersect" = {

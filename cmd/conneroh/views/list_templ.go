@@ -516,14 +516,16 @@ func ListResults(
 		case routing.ProjectPluralPath:
 			for i, project := range *projects {
 				if i < routing.MaxListLargeItems {
-					templ_7745c5c3_Err = components.ProjectItem(project,
+					templ_7745c5c3_Err = components.ProjectItem(
+						project,
 						templ.Attributes{
 							"class":       twerge.It("bg-gray-800 transition-all flex transform hover:-translate-y-3 flex-col shadow-md rounded-lg hover:shadow-lg duration-300 overflow-hidden h-full"),
 							"hx-target":   "#bodiody",
 							"hx-get":      project.PagePath(),
 							"hx-push-url": "true",
 							"preload":     "mouseover",
-						}).Render(ctx, templ_7745c5c3_Buffer)
+						},
+					).Render(ctx, templ_7745c5c3_Buffer)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}

@@ -3,7 +3,7 @@ id: locality
 aliases:
   - Locality in Applications
 tags:
-  - ideologies/cache
+  - ideology/cache
 created_at: 2025-03-28T20:02:34.000-06:00
 description: Locality refers to the proximity of data items in memory.
 title: Locality

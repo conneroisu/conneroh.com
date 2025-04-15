@@ -4,8 +4,8 @@ aliases:
   - groq-go
 tags:
   - programming-language/go
-  - ideologies/open-source
-  - ideologies/api
+  - ideology/open-source
+  - ideology/api
 banner_path: projects/groq-go.webp
 created_at: 2025-03-27T14:13:10.000-06:00
 description: Golang library for interacting with the groq API.
