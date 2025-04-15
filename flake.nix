@@ -280,6 +280,8 @@
         };
 
       packages = let
+        internal_port = 8080;
+        force_https = true;
         settingsFormat = pkgs.formats.toml {};
 
         flyDevConfig = {
@@ -287,8 +289,7 @@
           primary_region = "ord";
           build = {};
           http_service = {
-            internal_port = 8080;
-            force_https = true;
+            inherit internal_port force_https;
             auto_stop_machines = "stop";
             auto_start_machines = true;
             min_machines_running = 0;
@@ -308,8 +309,7 @@
           primary_region = "ord";
           build = {};
           http_service = {
-            internal_port = 8080;
-            force_https = true;
+            inherit internal_port force_https;
             auto_stop_machines = "stop";
             auto_start_machines = true;
             min_machines_running = 0;
