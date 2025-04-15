@@ -2,11 +2,14 @@
 id: verilog-single-cycle-mips
 aliases:
   - singe-cycle-mips-verilog
-tags: []
+tags:
+  - hdl/verilog
+  - edu/iastate/cpre281
+banner_path: projects/single-cycle-mips-verilog.webp
 created_at: 2025-04-12T19:35:20.000-06:00
 description: A single cycle mips processor implementation in verilog.
 title: Verilog Single Cycle MIPS
-updated_at: 2025-04-12T19:36:32.000-06:00
+updated_at: 2025-04-15T05:32:18.000-06:00
 ---
 
 Github: [https://github.com/conneroisu/single-cycle-mips-verilog](https://github.com/conneroisu/single-cycle-mips-verilog)

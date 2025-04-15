@@ -236,9 +236,9 @@
               # Playwright
               playwright-driver # Provides browser archives and driver scripts
               (
-                if pkgs.stdenv.isDarwin
-                then pkgs.darwin.apple_sdk.frameworks.WebKit
-                else pkgs.webkitgtk
+                if stdenv.isDarwin
+                then darwin.apple_sdk.frameworks.WebKit
+                else webkitgtk
               ) # WebKit browser
               nodejs_20 # Required for Playwright driver
               pkg-config # Needed for some browser dependencies
