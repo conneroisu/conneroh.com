@@ -36,7 +36,7 @@
       "aarch64-linux"
       "aarch64-darwin"
     ] (system: let
-      overlay = final: prev: {go = prev.go_1_24;};
+      overlay = final: prev: {final.go = prev.go_1_24;};
       pkgs = import inputs.nixpkgs {
         inherit system;
         overlays = [
