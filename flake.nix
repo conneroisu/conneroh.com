@@ -42,6 +42,7 @@
         overlays = [
           overlay
         ];
+        config.allowUnfree = true;
       };
       buildWithSpecificGo = pkg: pkg.override {buildGoModule = pkgs.buildGo124Module;};
     in rec {
