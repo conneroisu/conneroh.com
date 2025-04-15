@@ -198,14 +198,12 @@
           '';
           packages = with pkgs;
             [
-              # Nix
-              alejandra
+              alejandra # Nix
               nixd
               statix
               deadnix
 
-              # Go Tools
-              go_1_24
+              go_1_24 # Go Tools
               air
               templ
               golangci-lint
@@ -221,22 +219,19 @@
               pprof
               graphviz
 
-              # Web
-              tailwindcss
+              tailwindcss # Web
               tailwindcss-language-server
               bun
               nodePackages.typescript-language-server
               nodePackages.prettier
               inputs.bun2nix.defaultPackage.${pkgs.system}.bin
 
-              # Infra
-              flyctl
+              flyctl # Infra
               openssl.dev
               skopeo
               consul
 
-              # Playwright
-              playwright-driver # Provides browser archives and driver scripts
+              playwright-driver # Browser Archives and Driver Scripts
               (
                 if stdenv.isDarwin
                 then darwin.apple_sdk.frameworks.WebKit
@@ -275,7 +270,6 @@
                 nspr # NetScape Portable Runtime
                 pango # Text layout and rendering
               ])
-            # Add the generated script packages
             ++ scriptPackages;
         };
 
