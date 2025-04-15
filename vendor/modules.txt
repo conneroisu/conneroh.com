@@ -124,6 +124,9 @@ github.com/go-jose/go-jose/v3/json
 # github.com/go-stack/stack v1.8.1
 ## explicit; go 1.17
 github.com/go-stack/stack
+# github.com/gorilla/schema v1.4.1
+## explicit; go 1.20
+github.com/gorilla/schema
 # github.com/litao91/goldmark-mathjax v0.0.0-20210217064022-a43cf739a50f
 ## explicit; go 1.14
 github.com/litao91/goldmark-mathjax
