@@ -232,6 +232,7 @@
               flyctl
               openssl.dev
               skopeo
+              consul
 
               # Playwright
               playwright-driver # Provides browser archives and driver scripts
