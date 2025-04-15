@@ -9,11 +9,11 @@ tags:
   - framework/astro
   - framework/alpinejs
   - framework/tailwindcss
-banner_path: projects/conneroh-com.png
+banner_path: projects/conneroh-com.webp
 created_at: 2025-04-09T08:15:48.000-06:00
 description: This site!
 title: conneroh.com
-updated_at: 2025-04-10T12:46:13.000-06:00
+updated_at: 2025-04-14T19:17:21.000-06:00
 ---
 
 # conneroh.com
