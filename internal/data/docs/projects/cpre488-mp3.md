@@ -14,11 +14,11 @@ tags:
   - ideologies/device-drivers
   - protocol/uart
   - protocol/usb
-banner_path: projects/mp3.png
+banner_path: projects/mp3.webp
 created_at: 2025-03-27T14:13:10.000-06:00
 description: Mini-project 3 for CPRE488. Linux Device Drivers, Petalinux, boot loaders, and OpenCV, oh my!
 title: CPRE488-mp3
-updated_at: 2025-04-11T08:33:35.000-06:00
+updated_at: 2025-04-14T19:09:33.000-06:00
 ---
 
 # cpre488-mp3
