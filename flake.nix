@@ -279,7 +279,54 @@
             ++ scriptPackages;
         };
 
-      packages = rec {
+      packages = let
+        settingsFormat = pkgs.formats.toml {};
+
+        flyDevConfig = {
+          app = "conneroh-com-dev";
+          primary_region = "ord";
+          build = {};
+          http_service = {
+            internal_port = 8080;
+            force_https = true;
+            auto_stop_machines = "stop";
+            auto_start_machines = true;
+            min_machines_running = 0;
+            processes = ["app"];
+          };
+          vm = [
+            {
+              memory = "512M";
+              cpu_kind = "shared";
+              cpus = 1;
+            }
+          ];
+        };
+
+        flyProdConfig = {
+          app = "conneroh-com";
+          primary_region = "ord";
+          build = {};
+          http_service = {
+            internal_port = 8080;
+            force_https = true;
+            auto_stop_machines = "stop";
+            auto_start_machines = true;
+            min_machines_running = 0;
+            processes = ["app"];
+          };
+          vm = [
+            {
+              memory = "1gb";
+              cpu_kind = "shared";
+              cpus = 2;
+            }
+          ];
+        };
+
+        flyDevToml = settingsFormat.generate "fly.dev.toml" flyDevConfig;
+        flyProdToml = settingsFormat.generate "fly.toml" flyProdConfig;
+      in rec {
         conneroh = pkgs.buildGo124Module {
           name = "conneroh.com";
           vendorHash = null;
@@ -335,12 +382,12 @@
             [ -z "$FLY_DEV_AUTH_TOKEN" ] && FLY_DEV_AUTH_TOKEN=$(doppler secrets get --plain FLY_DEV_AUTH_TOKEN)
             TOKEN="$FLY_DEV_AUTH_TOKEN"
             export FLY_NAME="conneroh-com-dev"
-            export CONFIG_FILE=${./fly.dev.toml}
+            export CONFIG_FILE=${flyDevToml}
           else
             [ -z "$FLY_AUTH_TOKEN" ] && FLY_AUTH_TOKEN=$(doppler secrets get --plain FLY_AUTH_TOKEN)
             TOKEN="$FLY_AUTH_TOKEN"
             export FLY_NAME="conneroh-com"
-            export CONFIG_FILE=${./fly.toml}
+            export CONFIG_FILE=${flyProdToml}
           fi
 
           REGISTY="registry.fly.io/$FLY_NAME"
