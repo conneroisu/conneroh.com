@@ -12,6 +12,7 @@ import (
 	"github.com/spf13/afero"
 )
 
+// MinimalEmbedding is a minimal embedding of a document.
 type MinimalEmbedding struct {
 	X float64 `json:"x"`
 	Y float64 `json:"y"`

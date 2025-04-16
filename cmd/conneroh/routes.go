@@ -22,11 +22,14 @@ func AddRoutes(
 	defer slog.Info("added routes")
 
 	h.Handle(
-		"/{$}",
+		"GET /{$}",
 		routing.MorphableHandler(
 			layouts.Page(home),
 			home,
 		))
+	h.HandleFunc(
+		"POST /contact",
+		handleContactForm)
 	h.Handle(
 		"GET /dist/",
 		http.FileServer(http.FS(static.Dist)))
@@ -37,7 +40,7 @@ func AddRoutes(
 		})
 	h.HandleFunc(
 		"GET /search/all",
-		globalSearchHandler(gen.AllPosts, gen.AllProjects, gen.AllTags))
+		searchHandler(gen.AllPosts, gen.AllProjects, gen.AllTags))
 
 	h.Handle(
 		"GET /posts",

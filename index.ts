@@ -17,6 +17,6 @@ Alpine.plugin(intersect);
 Alpine.plugin(anchor);
 Alpine.start();
 
-// import htmx from "htmx.org";
-//
-// htmx.logAll();
+import htmx from "htmx.org";
+
+htmx.logAll();

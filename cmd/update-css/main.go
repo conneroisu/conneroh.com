@@ -82,6 +82,7 @@ func genCSS(ctx context.Context) error {
 			&gen.AllTags,
 		).Render(ctx, io.Discard)
 		_ = layouts.Layout("hello").Render(ctx, io.Discard)
+		_ = components.ThankYou().Render(ctx, io.Discard)
 	)
 	content := twerge.GenerateClassMapCode("css")
 	f, err := os.Create("internal/data/css/classes.go")

@@ -8,6 +8,7 @@ import (
 	"sync"
 
 	"github.com/a-h/templ"
+	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/layouts"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/views"
 	"github.com/conneroisu/conneroh.com/internal/assets"
@@ -20,10 +21,10 @@ import (
 
 // ContactForm is the struct schema for the contact form.
 type ContactForm struct {
-	Name    string `schema:"name"`
-	Email   string `schema:"email"`
-	Subject string `schema:"subject"`
-	Message string `schema:"message"`
+	Name    string `schema:"name,required"`
+	Email   string `schema:"email,required"`
+	Subject string `schema:"subject,required"`
+	Message string `schema:"message,required"`
 }
 
 var encoder = schema.NewEncoder()
@@ -34,16 +35,18 @@ const (
 
 func handleContactForm(w http.ResponseWriter, r *http.Request) {
 	var form ContactForm
-	if err := r.ParseForm(); err != nil {
+	err := r.ParseForm()
+	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	if err := encoder.Encode(form, r.PostForm); err != nil {
+	err = encoder.Encode(form, r.PostForm)
+	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	// TODO: Send email
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	templ.Handler(components.ThankYou()).ServeHTTP(w, r)
 }
 
 var (
@@ -175,7 +178,7 @@ func listHandler(
 	}
 }
 
-func globalSearchHandler(
+func searchHandler(
 	posts []*assets.Post,
 	projects []*assets.Project,
 	tags []*assets.Tag,

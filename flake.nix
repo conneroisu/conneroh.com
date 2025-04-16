@@ -81,32 +81,32 @@
           };
           generate-reload = {
             exec = ''
+              export REPO_ROOT=$(git rev-parse --show-toplevel) # needed
               function gen_css() {
                 ${pkgs.templ}/bin/templ generate --log-level error
                 go run $REPO_ROOT/cmd/update-css --cwd $REPO_ROOT
-                ${pkgs.tailwindcss}/bin/tailwindcss -m -i ./input.css -o ./cmd/conneroh/_static/dist/style.css --cwd $REPO_ROOT
+                ${pkgs.tailwindcss}/bin/tailwindcss -m -i ./input.css -o $REPO_ROOT/cmd/conneroh/_static/dist/style.css --cwd $REPO_ROOT
               }
-              export REPO_ROOT=$(git rev-parse --show-toplevel) # needed
-              cd $REPO_ROOT
-              if ${hasher}/bin/hasher -dir "$REPO_ROOT/cmd/conneroh/views" -v -exclude "*_templ.go"; then
-                echo ""
-                if ${hasher}/bin/hasher -dir "$REPO_ROOT/internal/data/docs" -v -exclude "*_templ.go"; then
-                  echo ""
-                else
-                  echo "Changes detected in docs, running update script..."
-                  update
-                fi
-                if ${hasher}/bin/hasher -dir "$REPO_ROOT/cmd/conneroh/components" -v -exclude "*_templ.go"; then
-                  templ generate --log-level error
-                else
-                  echo "Changes detected in components, running update script..."
-                  gen_css
-                fi
-              else
-                echo "Changes detected in templates, running update script..."
+              function gen_doc() {
+                ${pkgs.doppler}/bin/doppler run -- ${packages.update}/bin/update -cwd $REPO_ROOT -jobs 20
+              }
+
+              TEMPL_HASH=$(nix-hash --type sha256 --base32 $REPO_ROOT/cmd/conneroh/**/*.templ | sha256sum | cut -d' ' -f1)
+              echo "TEMPL_HASH: $TEMPL_HASH"
+              OLD_TEMPL_HASH=$(cat $REPO_ROOT/cmd/conneroh/_static/dist/templ.hash)
+              if [ "$OLD_TEMPL_HASH" != "$TEMPL_HASH" ]; then
+                echo "templ change"
                 gen_css
+                echo "$TEMPL_HASH" > ./internal/cache/templ.hash
               fi
-              cd -
+
+              DOCS_HASH=$(nix-hash --type sha256 --base32 ./internal/data/docs/ | sha256sum | cut -d' ' -f1)
+              echo "DOCS_HASH: $DOCS_HASH"
+              if [ "$DOCS_HASH" != "$DOCS_HASH" ]; then
+                echo "docs change"
+                gen_doc
+                echo "$DOCS_HASH" > ./internal/cache/docs.hash
+              fi
             '';
             description = "Code Generation Steps for specific directory changes.";
           };

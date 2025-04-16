@@ -1,0 +1,20 @@
+package components
+
+import "github.com/conneroisu/twerge"
+
+// CThanks is the component for the thanks response after submitting a contact forum
+templ ThankYou() {
+	<div class={ twerge.It("bg-blue-500 p-8 rounded-lg shadow-md text-center") }>
+		<div class={ twerge.It("mb-6 flex justify-center") }>
+			<div class={ twerge.It("bg-green-600 rounded-full p-4 w-16 h-16 flex items-center justify-center") }>
+				<svg xmlns="http://www.w3.org/2000/svg" class={ twerge.It("h-8 w-8 text-white") } fill="none" viewBox="0 0 24 24" stroke="currentColor">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+				</svg>
+			</div>
+		</div>
+		<h3 class={ twerge.It("text-2xl font-bold text-white mb-4") }>Thank You!</h3>
+		<p class={ twerge.It("text-white mb-6") }>
+			Your message has been sent successfully. I'll get back to you as soon as possible.
+		</p>
+	</div>
+}
