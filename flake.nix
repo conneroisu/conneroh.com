@@ -47,7 +47,6 @@
       buildWithSpecificGo = pkg: pkg.override {buildGoModule = pkgs.buildGo124Module;};
     in rec {
       devShells.default = let
-        inherit (inputs.twerge.packages."${system}") hasher;
         scripts = {
           dx = {
             exec = ''$EDITOR $REPO_ROOT/flake.nix'';
