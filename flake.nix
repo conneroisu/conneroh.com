@@ -84,7 +84,7 @@
               export REPO_ROOT=$(git rev-parse --show-toplevel) # needed
               function gen_css() {
                 ${pkgs.templ}/bin/templ generate --log-level error
-                go run $REPO_ROOT/cmd/update-css --cwd $REPO_ROOT
+                ${pkgs.go}/bin/go run $REPO_ROOT/cmd/update-css --cwd $REPO_ROOT
                 ${pkgs.tailwindcss}/bin/tailwindcss -m -i ./input.css -o $REPO_ROOT/cmd/conneroh/_static/dist/style.css --cwd $REPO_ROOT
               }
               function gen_doc() {
