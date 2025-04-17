@@ -14,7 +14,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "flake-utils";
     };
-
     systems.url = "github:nix-systems/default";
   };
 
@@ -275,50 +274,7 @@
       packages = let
         internal_port = 8080;
         force_https = true;
-        settingsFormat = pkgs.formats.toml {};
-
-        flyDevConfig = {
-          app = "conneroh-com-dev";
-          primary_region = "ord";
-          build = {};
-          http_service = {
-            inherit internal_port force_https;
-            auto_stop_machines = "stop";
-            auto_start_machines = true;
-            min_machines_running = 0;
-            processes = ["app"];
-          };
-          vm = [
-            {
-              memory = "512M";
-              cpu_kind = "shared";
-              cpus = 1;
-            }
-          ];
-        };
-
-        flyProdConfig = {
-          app = "conneroh-com";
-          primary_region = "ord";
-          build = {};
-          http_service = {
-            inherit internal_port force_https;
-            auto_stop_machines = "stop";
-            auto_start_machines = true;
-            min_machines_running = 0;
-            processes = ["app"];
-          };
-          vm = [
-            {
-              memory = "1gb";
-              cpu_kind = "shared";
-              cpus = 2;
-            }
-          ];
-        };
-
-        flyDevToml = settingsFormat.generate "fly.dev.toml" flyDevConfig;
-        flyProdToml = settingsFormat.generate "fly.toml" flyProdConfig;
+        processes = ["app"];
       in rec {
         conneroh = pkgs.buildGo124Module {
           name = "conneroh.com";
@@ -357,49 +313,90 @@
               "NIX_SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
             ];
           };
-          copyToRoot = [
-            conneroh
-            pkgs.cacert
-          ];
+          copyToRoot = [conneroh pkgs.cacert];
         };
-        deployPackage = pkgs.writeShellScriptBin "deploy" ''
-          set -e
-          arg=$1
-          TOKEN=""
-          FLY_NAME=""
-          CONFIG_FILE=""
+        deployPackage = let
+          settingsFormat = pkgs.formats.toml {};
 
-          [ -z "$arg" ] && { echo "No argument provided. Please provide a target environment. (dev or prod)"; exit 1; }
+          flyDevConfig = {
+            app = "conneroh-com-dev";
+            primary_region = "ord";
+            build = {};
+            http_service = {
+              inherit internal_port force_https processes;
+              auto_stop_machines = "stop";
+              auto_start_machines = true;
+              min_machines_running = 0;
+            };
+            vm = [
+              {
+                memory = "512M";
+                cpu_kind = "shared";
+                cpus = 1;
+              }
+            ];
+          };
 
-          if [ "$arg" = "dev" ]; then
-            [ -z "$FLY_DEV_AUTH_TOKEN" ] && FLY_DEV_AUTH_TOKEN=$(doppler secrets get --plain FLY_DEV_AUTH_TOKEN)
-            TOKEN="$FLY_DEV_AUTH_TOKEN"
-            export FLY_NAME="conneroh-com-dev"
-            export CONFIG_FILE=${flyDevToml}
-          else
-            [ -z "$FLY_AUTH_TOKEN" ] && FLY_AUTH_TOKEN=$(doppler secrets get --plain FLY_AUTH_TOKEN)
-            TOKEN="$FLY_AUTH_TOKEN"
-            export FLY_NAME="conneroh-com"
-            export CONFIG_FILE=${flyProdToml}
-          fi
+          flyProdConfig = {
+            app = "conneroh-com";
+            primary_region = "ord";
+            build = {};
+            http_service = {
+              inherit internal_port force_https processes;
+              auto_stop_machines = "stop";
+              auto_start_machines = true;
+              min_machines_running = 0;
+            };
+            vm = [
+              {
+                memory = "1gb";
+                cpu_kind = "shared";
+                cpus = 2;
+              }
+            ];
+          };
 
-          REGISTY="registry.fly.io/$FLY_NAME"
-          echo "Copying image to Fly.io... to $REGISTY"
+          flyDevToml = settingsFormat.generate "fly.dev.toml" flyDevConfig;
+          flyProdToml = settingsFormat.generate "fly.toml" flyProdConfig;
+        in
+          pkgs.writeShellScriptBin "deploy" ''
+            set -e
+            arg=$1
+            TOKEN=""
+            FLY_NAME=""
+            CONFIG_FILE=""
 
-          ${pkgs.skopeo}/bin/skopeo copy \
-            --insecure-policy \
-            docker-archive:"${C-conneroh}" \
-            "docker://$REGISTY:latest" \
-            --dest-creds x:"$TOKEN" \
-            --format v2s2
+            [ -z "$arg" ] && { echo "No argument provided. Please provide a target environment. (dev or prod)"; exit 1; }
 
-          echo "Deploying to Fly.io..."
-          ${pkgs.flyctl}/bin/fly deploy \
-            --remote-only \
-            -c "$CONFIG_FILE" \
-            -i "$REGISTY" \
-            -t "$TOKEN"
-        '';
+            if [ "$arg" = "dev" ]; then
+              [ -z "$FLY_DEV_AUTH_TOKEN" ] && FLY_DEV_AUTH_TOKEN=$(doppler secrets get --plain FLY_DEV_AUTH_TOKEN)
+              TOKEN="$FLY_DEV_AUTH_TOKEN"
+              export FLY_NAME="conneroh-com-dev"
+              export CONFIG_FILE=${flyDevToml}
+            else
+              [ -z "$FLY_AUTH_TOKEN" ] && FLY_AUTH_TOKEN=$(doppler secrets get --plain FLY_AUTH_TOKEN)
+              TOKEN="$FLY_AUTH_TOKEN"
+              export FLY_NAME="conneroh-com"
+              export CONFIG_FILE=${flyProdToml}
+            fi
+
+            REGISTY="registry.fly.io/$FLY_NAME"
+            echo "Copying image to Fly.io... to $REGISTY"
+
+            ${pkgs.skopeo}/bin/skopeo copy \
+              --insecure-policy \
+              docker-archive:"${C-conneroh}" \
+              "docker://$REGISTY:latest" \
+              --dest-creds x:"$TOKEN" \
+              --format v2s2
+
+            echo "Deploying to Fly.io..."
+            ${pkgs.flyctl}/bin/fly deploy \
+              --remote-only \
+              -c "$CONFIG_FILE" \
+              -i "$REGISTY" \
+              -t "$TOKEN"
+          '';
       };
     });
 }
