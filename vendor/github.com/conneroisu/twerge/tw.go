@@ -11,7 +11,7 @@ import (
 	"strings"
 
 	"github.com/a-h/templ"
-	"github.com/conneroisu/twerge/intneral/files"
+	"github.com/conneroisu/twerge/internal/files"
 	"github.com/dave/jennifer/jen"
 )
 

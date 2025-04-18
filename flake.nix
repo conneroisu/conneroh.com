@@ -46,7 +46,7 @@
             description = "Edit flake.nix";
           };
           gx = {
-            exec = ''$EDITOR $REPO_ROOT/go.mod'';
+            exec = "$EDITOR $REPO_ROOT/go.mod";
             description = "Edit go.mod";
           };
           clean = {
@@ -71,6 +71,12 @@
             '';
             description = "Update the generated go files.";
           };
+          generate-docs = {
+            exec = ''
+              ${pkgs.doppler}/bin/doppler run -- ${packages.update}/bin/update -cwd $REPO_ROOT -jobs 20
+            '';
+            description = "Update the generated go files from the md docs.";
+          };
           generate-reload = {
             exec = ''
               export REPO_ROOT=$(git rev-parse --show-toplevel) # needed
@@ -78,9 +84,6 @@
                 ${pkgs.templ}/bin/templ generate --log-level error
                 ${pkgs.go}/bin/go run $REPO_ROOT/cmd/update-css --cwd $REPO_ROOT
                 ${pkgs.tailwindcss}/bin/tailwindcss -m -i ./input.css -o $REPO_ROOT/cmd/conneroh/_static/dist/style.css --cwd $REPO_ROOT
-              }
-              function gen_doc() {
-                ${pkgs.doppler}/bin/doppler run -- ${packages.update}/bin/update -cwd $REPO_ROOT -jobs 20
               }
 
               TEMPL_HASH=$(nix-hash --type sha256 --base32 $REPO_ROOT/cmd/conneroh/**/*.templ | sha256sum | cut -d' ' -f1)
@@ -97,7 +100,7 @@
               OLD_DOCS_HASH=$(cat $REPO_ROOT/internal/cache/docs.hash)
               if [ "$OLD_DOCS_HASH" != "$DOCS_HASH" ]; then
                 echo "docs change"
-                gen_doc
+                ${scriptPackages.generate-docs}/bin/generate-docs
                 echo "$DOCS_HASH" > ./internal/cache/docs.hash
               fi
             '';
@@ -153,9 +156,8 @@
             description = "Run the application with air for hot reloading";
           };
         };
-
         scriptPackages =
-          pkgs.lib.mapAttrsToList
+          pkgs.lib.mapAttrs
           (name: script: pkgs.writeShellScriptBin name script.exec)
           scripts;
       in
@@ -262,7 +264,7 @@
                 nspr # NetScape Portable Runtime
                 pango # Text layout and rendering
               ])
-            ++ scriptPackages;
+            ++ builtins.attrValues scriptPackages;
         };
 
       packages = let
