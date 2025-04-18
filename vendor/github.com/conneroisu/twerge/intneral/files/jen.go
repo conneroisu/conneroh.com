@@ -12,7 +12,7 @@ func JenFile(
 	fil *jen.File,
 	path string,
 ) error {
-	file, err := os.Open(path)
+	file, err := os.Create(path)
 	if err != nil {
 		return fmt.Errorf("failed to open file: %w", err)
 	}

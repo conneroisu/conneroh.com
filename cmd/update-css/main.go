@@ -31,7 +31,7 @@ func main() {
 			panic(err)
 		}
 	}
-	if err := twerge.GenCSS(
+	if err := twerge.CodeGen(
 		"internal/data/css/classes.go",
 		"input.css",
 		"internal/data/css/classes.html",
