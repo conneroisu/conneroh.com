@@ -287,8 +287,7 @@
           subPackages = ["."];
         };
         update = pkgs.buildGoModule {
-          inherit src vendorHash;
-          version = self.shortRev or "dirty";
+          inherit src vendorHash version;
           name = "update";
           subPackages = ["./cmd/update"];
         };
