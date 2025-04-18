@@ -3,18 +3,12 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-
+    systems.url = "github:nix-systems/default";
     flake-utils = {
       url = "github:numtide/flake-utils";
       inputs.systems.follows = "systems";
     };
     bun2nix.url = "github:baileyluTCD/bun2nix";
-    twerge = {
-      url = "github:conneroisu/twerge?tag=v0.2.9";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-utils.follows = "flake-utils";
-    };
-    systems.url = "github:nix-systems/default";
   };
 
   nixConfig = {
@@ -100,7 +94,8 @@
 
               DOCS_HASH=$(nix-hash --type sha256 --base32 ./internal/data/docs/ | sha256sum | cut -d' ' -f1)
               echo "DOCS_HASH: $DOCS_HASH"
-              if [ "$DOCS_HASH" != "$DOCS_HASH" ]; then
+              OLD_DOCS_HASH=$(cat $REPO_ROOT/cmd/conneroh/_static/dist/docs.hash)
+              if [ "$OLD_DOCS_HASH" != "$DOCS_HASH" ]; then
                 echo "docs change"
                 gen_doc
                 echo "$DOCS_HASH" > ./internal/cache/docs.hash
@@ -159,7 +154,6 @@
           };
         };
 
-        # Convert scripts to packages
         scriptPackages =
           pkgs.lib.mapAttrsToList
           (name: script: pkgs.writeShellScriptBin name script.exec)

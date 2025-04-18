@@ -49,21 +49,33 @@ templ Tag(
 				>
 					<button
 						@click="activeTab = 'posts'"
-						:class={ fmt.Sprintf("{'%s': activeTab === 'posts', '%s': activeTab !== 'posts'}", twerge.It("text-blue-500 border-blue-500"), twerge.It("text-gray-400 hover:text-gray-300 border-transparent")) }
+						:class={
+							fmt.Sprintf("{'%s': activeTab === 'posts', '%s': activeTab !== 'posts'}",
+								twerge.It("text-blue-500 border-blue-500"),
+								twerge.It("text-gray-400 hover:text-gray-300 border-transparent")),
+						}
 						class={ twerge.It("px-1 sm:text-base text-sm font-medium py-4 border-b-2") }
 					>
 						Posts ({ fmt.Sprintf("%d", len(tag.Posts)) })
 					</button>
 					<button
 						@click="activeTab = 'projects'"
-						:class={ fmt.Sprintf("{'%s': activeTab === 'projects', '%s': activeTab !== 'projects'}", twerge.It("text-blue-500 border-blue-500"), twerge.It("text-gray-400 hover:text-gray-300 border-transparent")) }
+						:class={
+							fmt.Sprintf("{'%s': activeTab === 'projects', '%s': activeTab !== 'projects'}",
+								twerge.It("text-blue-500 border-blue-500"),
+								twerge.It("text-gray-400 hover:text-gray-300 border-transparent")),
+						}
 						class={ twerge.It("px-1 sm:text-base text-sm font-medium py-4 border-b-2") }
 					>
 						Projects ({ fmt.Sprintf("%d", len(tag.Projects)) })
 					</button>
 					<button
 						@click="activeTab = 'related'"
-						:class={ fmt.Sprintf("{'%s': activeTab === 'related', '%s': activeTab !== 'related'}", twerge.It("text-blue-500 border-blue-500"), twerge.It("text-gray-400 hover:text-gray-300 border-transparent")) }
+						:class={
+							fmt.Sprintf("{'%s': activeTab === 'related', '%s': activeTab !== 'related'}",
+								twerge.It("text-blue-500 border-blue-500"),
+								twerge.It("text-gray-400 hover:text-gray-300 border-transparent")),
+						}
 						class={ twerge.It("px-1 sm:text-base text-sm font-medium py-4 border-b-2") }
 					>
 						Related Tags ({ fmt.Sprintf("%d", len(tag.Tags)) })
@@ -71,23 +83,30 @@ templ Tag(
 				</nav>
 			</div>
 			// Posts Tab
-			<div x-show="activeTab === 'posts'">
+			<div
+				x-show="activeTab === 'posts'"
+			>
 				@List(
 					routing.PostPluralPath,
 					&tag.Posts,
 					nil, nil,
 					"",
-					0, 0,
+					0,
+					(len(tag.Posts)+routing.MaxListLargeItems-1)/routing.MaxListLargeItems,
 				)
 			</div>
 			// Projects Tab
-			<div x-show="activeTab === 'projects'" x-cloak>
+			<div
+				x-show="activeTab === 'projects'"
+				x-cloak
+			>
 				@List(
 					routing.ProjectPluralPath,
 					nil,
 					&tag.Projects,
 					nil,
-					"", 0, 0,
+					"", 0,
+					(len(tag.Projects)+routing.MaxListLargeItems-1)/routing.MaxListLargeItems,
 				)
 			</div>
 			// Related Tags Tab
@@ -99,7 +118,8 @@ templ Tag(
 					routing.TagsPluralPath,
 					nil, nil,
 					&tag.Tags,
-					"", 0, 0,
+					"", 0,
+					(len(tag.Tags)+routing.MaxListSmallItems-1)/routing.MaxListSmallItems,
 				)
 			</div>
 		</div>

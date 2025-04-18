@@ -96,31 +96,6 @@
         "type": "github"
       }
     },
-    "nix2container": {
-      "inputs": {
-        "flake-utils": [
-          "twerge",
-          "flake-utils"
-        ],
-        "nixpkgs": [
-          "twerge",
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1742501024,
-        "narHash": "sha256-4G0RaAkRQY8Oty0WjoDfIkEAkX7PckUqUGjAQrxhDiA=",
-        "owner": "nlewo",
-        "repo": "nix2container",
-        "rev": "e6315c8307edf2938ae24df0e28b47ca865121de",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nlewo",
-        "repo": "nix2container",
-        "type": "github"
-      }
-    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1742889210,
@@ -181,8 +156,7 @@
         "bun2nix": "bun2nix",
         "flake-utils": "flake-utils_2",
         "nixpkgs": "nixpkgs_2",
-        "systems": "systems_2",
-        "twerge": "twerge"
+        "systems": "systems_2"
       }
     },
     "systems": {
@@ -212,46 +186,6 @@
       "original": {
         "owner": "nix-systems",
         "repo": "default",
-        "type": "github"
-      }
-    },
-    "systems_3": {
-      "locked": {
-        "lastModified": 1681028828,
-        "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",
-        "owner": "nix-systems",
-        "repo": "default",
-        "rev": "da67096a3b9bf56a91d16901293e51ba5b49a27e",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nix-systems",
-        "repo": "default",
-        "type": "github"
-      }
-    },
-    "twerge": {
-      "inputs": {
-        "flake-utils": [
-          "flake-utils"
-        ],
-        "nix2container": "nix2container",
-        "nixpkgs": [
-          "nixpkgs"
-        ],
-        "systems": "systems_3"
-      },
-      "locked": {
-        "lastModified": 1744405151,
-        "narHash": "sha256-iqYkbfJDI3FcFslTZF037bwtBOAFu7treeOjQOdyzG0=",
-        "owner": "conneroisu",
-        "repo": "twerge",
-        "rev": "d88dc485e688faabb080b94712bb4d98257492bd",
-        "type": "github"
-      },
-      "original": {
-        "owner": "conneroisu",
-        "repo": "twerge",
         "type": "github"
       }
     }
