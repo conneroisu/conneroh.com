@@ -85,7 +85,7 @@
 
               TEMPL_HASH=$(nix-hash --type sha256 --base32 $REPO_ROOT/cmd/conneroh/**/*.templ | sha256sum | cut -d' ' -f1)
               echo "TEMPL_HASH: $TEMPL_HASH"
-              OLD_TEMPL_HASH=$(cat $REPO_ROOT/cmd/conneroh/_static/dist/templ.hash)
+              OLD_TEMPL_HASH=$(cat $REPO_ROOT/internal/cache/templ.hash)
               if [ "$OLD_TEMPL_HASH" != "$TEMPL_HASH" ]; then
                 echo "templ change"
                 gen_css
@@ -94,7 +94,7 @@
 
               DOCS_HASH=$(nix-hash --type sha256 --base32 ./internal/data/docs/ | sha256sum | cut -d' ' -f1)
               echo "DOCS_HASH: $DOCS_HASH"
-              OLD_DOCS_HASH=$(cat $REPO_ROOT/cmd/conneroh/_static/dist/docs.hash)
+              OLD_DOCS_HASH=$(cat $REPO_ROOT/internal/cache/docs.hash)
               if [ "$OLD_DOCS_HASH" != "$DOCS_HASH" ]; then
                 echo "docs change"
                 gen_doc

@@ -5,7 +5,6 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"io"
 	"os"
 	"time"
 
@@ -20,97 +19,6 @@ import (
 
 var cwd = flag.String("cwd", "", "current working directory")
 
-func genCSS(ctx context.Context) error {
-	var (
-		_ = layouts.Page(views.Home(
-			&gen.AllPosts,
-			&gen.AllProjects,
-			&gen.AllTags,
-		)).Render(ctx, io.Discard)
-		_ = layouts.Page(views.List(
-			routing.PostPluralPath,
-			&gen.AllPosts,
-			&gen.AllProjects,
-			&gen.AllTags,
-			"",
-			1,
-			10,
-		)).Render(ctx, io.Discard)
-		_ = layouts.Page(views.List(
-			routing.ProjectPluralPath,
-			&gen.AllPosts,
-			&gen.AllProjects,
-			&gen.AllTags,
-			"",
-			1,
-			10,
-		)).Render(ctx, io.Discard)
-		_ = layouts.Page(views.List(
-			routing.TagsPluralPath,
-			&gen.AllPosts,
-			&gen.AllProjects,
-			&gen.AllTags,
-			"",
-			1,
-			10,
-		)).Render(ctx, io.Discard)
-		_ = components.TagControl(
-			&assets.Tag{},
-		).Render(ctx, io.Discard)
-		_ = layouts.Page(views.Post(
-			gen.AllPosts[0],
-			&gen.AllPosts,
-			&gen.AllProjects,
-			&gen.AllTags,
-		)).Render(ctx, io.Discard)
-		_ = layouts.Page(views.Project(
-			gen.AllProjects[0],
-			&gen.AllPosts,
-			&gen.AllProjects,
-			&gen.AllTags,
-		)).Render(ctx, io.Discard)
-		_ = layouts.Page(views.Tag(
-			gen.AllTags[0],
-			&gen.AllPosts,
-			&gen.AllProjects,
-			&gen.AllTags,
-		)).Render(ctx, io.Discard)
-		_ = views.Post(
-			gen.AllPosts[0],
-			&gen.AllPosts,
-			&gen.AllProjects,
-			&gen.AllTags,
-		).Render(ctx, io.Discard)
-		_ = layouts.Layout("hello").Render(ctx, io.Discard)
-		_ = components.ThankYou().Render(ctx, io.Discard)
-	)
-	content := twerge.GenerateClassMapCode("css")
-	f, err := os.Create("internal/data/css/classes.go")
-	if err != nil {
-		return err
-	}
-	defer func() {
-		err = f.Close()
-		if err != nil {
-			panic(err)
-		}
-	}()
-	_, err = f.WriteString(content)
-	if err != nil {
-		return err
-	}
-	err = twerge.GenerateTailwind("input.css")
-	if err != nil {
-		return err
-	}
-	err = twerge.GenerateTempl("internal/data/css/classes.templ")
-	if err != nil {
-		return err
-	}
-	println("Generated classes.go.")
-	return nil
-}
-
 func main() {
 	start := time.Now()
 	defer func() {
@@ -124,7 +32,74 @@ func main() {
 			panic(err)
 		}
 	}
-	if err := genCSS(context.Background()); err != nil {
+	if err := twerge.GenCSS(
+		context.Background(),
+		"internal/data/css/classes.go",
+		"input.css",
+		"internal/data/css/classes.html",
+
+		layouts.Page(views.Home(
+			&gen.AllPosts,
+			&gen.AllProjects,
+			&gen.AllTags,
+		)),
+		layouts.Page(views.List(
+			routing.PostPluralPath,
+			&gen.AllPosts,
+			&gen.AllProjects,
+			&gen.AllTags,
+			"",
+			1,
+			10,
+		)),
+		layouts.Page(views.List(
+			routing.ProjectPluralPath,
+			&gen.AllPosts,
+			&gen.AllProjects,
+			&gen.AllTags,
+			"",
+			1,
+			10,
+		)),
+		layouts.Page(views.List(
+			routing.TagsPluralPath,
+			&gen.AllPosts,
+			&gen.AllProjects,
+			&gen.AllTags,
+			"",
+			1,
+			10,
+		)),
+		components.TagControl(
+			&assets.Tag{},
+		),
+		layouts.Page(views.Post(
+			gen.AllPosts[0],
+			&gen.AllPosts,
+			&gen.AllProjects,
+			&gen.AllTags,
+		)),
+		layouts.Page(views.Project(
+			gen.AllProjects[0],
+			&gen.AllPosts,
+			&gen.AllProjects,
+			&gen.AllTags,
+		)),
+		layouts.Page(views.Tag(
+			gen.AllTags[0],
+			&gen.AllPosts,
+			&gen.AllProjects,
+			&gen.AllTags,
+		)),
+		views.Post(
+			gen.AllPosts[0],
+			&gen.AllPosts,
+			&gen.AllProjects,
+			&gen.AllTags,
+		),
+		layouts.Layout("hello"),
+		components.ThankYou(),
+	); err != nil {
 		panic(err)
 	}
 }

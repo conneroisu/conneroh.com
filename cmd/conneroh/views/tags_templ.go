@@ -240,9 +240,13 @@ func Tag(
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var19 string
-		templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("{'%s': activeTab === 'posts', '%s': activeTab !== 'posts'}", twerge.It("text-blue-500 border-blue-500"), twerge.It("text-gray-400 hover:text-gray-300 border-transparent")))
+		templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(
+			fmt.Sprintf("{'%s': activeTab === 'posts', '%s': activeTab !== 'posts'}",
+				twerge.It("text-blue-500 border-blue-500"),
+				twerge.It("text-gray-400 hover:text-gray-300 border-transparent")),
+		)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/tags.templ`, Line: 52, Col: 199}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/tags.templ`, Line: 56, Col: 6}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 		if templ_7745c5c3_Err != nil {
@@ -268,7 +272,7 @@ func Tag(
 		var templ_7745c5c3_Var21 string
 		templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", len(tag.Posts)))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/tags.templ`, Line: 55, Col: 48}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/tags.templ`, Line: 59, Col: 48}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 		if templ_7745c5c3_Err != nil {
@@ -288,9 +292,13 @@ func Tag(
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var23 string
-		templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("{'%s': activeTab === 'projects', '%s': activeTab !== 'projects'}", twerge.It("text-blue-500 border-blue-500"), twerge.It("text-gray-400 hover:text-gray-300 border-transparent")))
+		templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinStringErrs(
+			fmt.Sprintf("{'%s': activeTab === 'projects', '%s': activeTab !== 'projects'}",
+				twerge.It("text-blue-500 border-blue-500"),
+				twerge.It("text-gray-400 hover:text-gray-300 border-transparent")),
+		)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/tags.templ`, Line: 59, Col: 205}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/tags.templ`, Line: 67, Col: 6}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
 		if templ_7745c5c3_Err != nil {
@@ -316,7 +324,7 @@ func Tag(
 		var templ_7745c5c3_Var25 string
 		templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", len(tag.Projects)))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/tags.templ`, Line: 62, Col: 54}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/tags.templ`, Line: 70, Col: 54}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var25))
 		if templ_7745c5c3_Err != nil {
@@ -336,9 +344,13 @@ func Tag(
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var27 string
-		templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("{'%s': activeTab === 'related', '%s': activeTab !== 'related'}", twerge.It("text-blue-500 border-blue-500"), twerge.It("text-gray-400 hover:text-gray-300 border-transparent")))
+		templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinStringErrs(
+			fmt.Sprintf("{'%s': activeTab === 'related', '%s': activeTab !== 'related'}",
+				twerge.It("text-blue-500 border-blue-500"),
+				twerge.It("text-gray-400 hover:text-gray-300 border-transparent")),
+		)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/tags.templ`, Line: 66, Col: 203}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/tags.templ`, Line: 78, Col: 6}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
 		if templ_7745c5c3_Err != nil {
@@ -364,7 +376,7 @@ func Tag(
 		var templ_7745c5c3_Var29 string
 		templ_7745c5c3_Var29, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("%d", len(tag.Tags)))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/tags.templ`, Line: 69, Col: 54}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/tags.templ`, Line: 81, Col: 54}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var29))
 		if templ_7745c5c3_Err != nil {
@@ -379,7 +391,8 @@ func Tag(
 			&tag.Posts,
 			nil, nil,
 			"",
-			0, 0,
+			0,
+			(len(tag.Posts)+routing.MaxListLargeItems-1)/routing.MaxListLargeItems,
 		).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -393,7 +406,8 @@ func Tag(
 			nil,
 			&tag.Projects,
 			nil,
-			"", 0, 0,
+			"", 0,
+			(len(tag.Projects)+routing.MaxListLargeItems-1)/routing.MaxListLargeItems,
 		).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -406,7 +420,8 @@ func Tag(
 			routing.TagsPluralPath,
 			nil, nil,
 			&tag.Tags,
-			"", 0, 0,
+			"", 0,
+			(len(tag.Tags)+routing.MaxListSmallItems-1)/routing.MaxListSmallItems,
 		).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

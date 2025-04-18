@@ -11,11 +11,16 @@ var (
 		"full":   true,
 		"screen": true,
 	}
+	// TODO: Replace this with a regex that matches all valid CSS units with pure Go
 	lengthUnitRegex = regexp.MustCompile(`\d+(%|px|r?em|[sdl]?v([hwib]|min|max)|pt|pc|in|cm|mm|cap|ch|ex|r?lh|cq(w|h|i|b|min|max))|\b(calc|min|max|clamp)\(.+\)|^0$`)
-	colorFnRegex    = regexp.MustCompile(`^(rgba?|hsla?|hwb|(ok)?(lab|lch))\(.+\)$`)
-	arbitraryRegex  = regexp.MustCompile(`(?i)^\[(?:([a-z-]+):)?(.+)\]$`)
-	shirtPattern    = regexp.MustCompile(`^(\d+(\.\d+)?)?(xs|sm|md|lg|xl)$`)
-	shardowPattern  = regexp.MustCompile(`^(inset_)?-?((\d+)?\.?(\d+)[a-z]+|0)_-?((\d+)?\.?(\d+)[a-z]+|0)`)
+	// TODO: Replace this with a regex that matches all valid CSS color functions with pure Go
+	colorFnRegex = regexp.MustCompile(`^(rgba?|hsla?|hwb|(ok)?(lab|lch))\(.+\)$`)
+	// TODO: Replace this with a regex that matches all valid arbitrary CSS values with pure Go
+	arbitraryRegex = regexp.MustCompile(`(?i)^\[(?:([a-z-]+):)?(.+)\]$`)
+	// TODO: Replace this with a regex that matches all valid CSS size values with pure Go
+	shirtPattern = regexp.MustCompile(`^(\d+(\.\d+)?)?(xs|sm|md|lg|xl)$`)
+	// TODO: Replace this with a regex that matches all valid CSS shadow values with pure Go
+	shardowPattern = regexp.MustCompile(`^(inset_)?-?((\d+)?\.?(\d+)[a-z]+|0)_-?((\d+)?\.?(\d+)[a-z]+|0)`)
 
 	sizeLabels  = map[string]bool{"length": true, "size": true, "percentage": true}
 	imageLabels = map[string]bool{"image": true, "url": true}
@@ -148,7 +153,7 @@ func isPercent(val string) bool {
 	return val[len(val)-1] == '%' && isNumber(val[:len(val)-1])
 }
 
-func isTshirtSize(val string) bool {
+func isTShirt(val string) bool {
 	return shirtPattern.MatchString(val)
 }
 
@@ -300,7 +305,7 @@ var defaultConfig = &config{
 				NextPart: map[string]classPart{},
 				Validators: []classGroupValidator{
 					{
-						Fn:           isTshirtSize,
+						Fn:           isTShirt,
 						ClassGroupID: "columns",
 					},
 				},
@@ -2084,7 +2089,7 @@ var defaultConfig = &config{
 							"screen": {
 								Validators: []classGroupValidator{
 									{
-										Fn:           isTshirtSize,
+										Fn:           isTShirt,
 										ClassGroupID: "max-w",
 									},
 								},
@@ -2105,7 +2110,7 @@ var defaultConfig = &config{
 								ClassGroupID: "max-w",
 							},
 							{
-								Fn:           isTshirtSize,
+								Fn:           isTShirt,
 								ClassGroupID: "max-w",
 							},
 						},
@@ -2278,7 +2283,7 @@ var defaultConfig = &config{
 				},
 				Validators: []classGroupValidator{
 					{
-						Fn:           isTshirtSize,
+						Fn:           isTShirt,
 						ClassGroupID: "font-size",
 					},
 					{
@@ -3020,7 +3025,7 @@ var defaultConfig = &config{
 						},
 						Validators: []classGroupValidator{
 							{
-								Fn:           isTshirtSize,
+								Fn:           isTShirt,
 								ClassGroupID: "rounded-s",
 							},
 							{
@@ -3041,7 +3046,7 @@ var defaultConfig = &config{
 						},
 						Validators: []classGroupValidator{
 							{
-								Fn:           isTshirtSize,
+								Fn:           isTShirt,
 								ClassGroupID: "rounded-e",
 							},
 							{
@@ -3062,7 +3067,7 @@ var defaultConfig = &config{
 						},
 						Validators: []classGroupValidator{
 							{
-								Fn:           isTshirtSize,
+								Fn:           isTShirt,
 								ClassGroupID: "rounded-t",
 							},
 							{
@@ -3083,7 +3088,7 @@ var defaultConfig = &config{
 						},
 						Validators: []classGroupValidator{
 							{
-								Fn:           isTshirtSize,
+								Fn:           isTShirt,
 								ClassGroupID: "rounded-r",
 							},
 							{
@@ -3104,7 +3109,7 @@ var defaultConfig = &config{
 						},
 						Validators: []classGroupValidator{
 							{
-								Fn:           isTshirtSize,
+								Fn:           isTShirt,
 								ClassGroupID: "rounded-b",
 							},
 							{
@@ -3125,7 +3130,7 @@ var defaultConfig = &config{
 						},
 						Validators: []classGroupValidator{
 							{
-								Fn:           isTshirtSize,
+								Fn:           isTShirt,
 								ClassGroupID: "rounded-l",
 							},
 							{
@@ -3146,7 +3151,7 @@ var defaultConfig = &config{
 						},
 						Validators: []classGroupValidator{
 							{
-								Fn:           isTshirtSize,
+								Fn:           isTShirt,
 								ClassGroupID: "rounded-ss",
 							},
 							{
@@ -3167,7 +3172,7 @@ var defaultConfig = &config{
 						},
 						Validators: []classGroupValidator{
 							{
-								Fn:           isTshirtSize,
+								Fn:           isTShirt,
 								ClassGroupID: "rounded-se",
 							},
 							{
@@ -3188,7 +3193,7 @@ var defaultConfig = &config{
 						},
 						Validators: []classGroupValidator{
 							{
-								Fn:           isTshirtSize,
+								Fn:           isTShirt,
 								ClassGroupID: "rounded-ee",
 							},
 							{
@@ -3209,7 +3214,7 @@ var defaultConfig = &config{
 						},
 						Validators: []classGroupValidator{
 							{
-								Fn:           isTshirtSize,
+								Fn:           isTShirt,
 								ClassGroupID: "rounded-es",
 							},
 							{
@@ -3230,7 +3235,7 @@ var defaultConfig = &config{
 						},
 						Validators: []classGroupValidator{
 							{
-								Fn:           isTshirtSize,
+								Fn:           isTShirt,
 								ClassGroupID: "rounded-tl",
 							},
 							{
@@ -3251,7 +3256,7 @@ var defaultConfig = &config{
 						},
 						Validators: []classGroupValidator{
 							{
-								Fn:           isTshirtSize,
+								Fn:           isTShirt,
 								ClassGroupID: "rounded-tr",
 							},
 							{
@@ -3272,7 +3277,7 @@ var defaultConfig = &config{
 						},
 						Validators: []classGroupValidator{
 							{
-								Fn:           isTshirtSize,
+								Fn:           isTShirt,
 								ClassGroupID: "rounded-br",
 							},
 							{
@@ -3293,7 +3298,7 @@ var defaultConfig = &config{
 						},
 						Validators: []classGroupValidator{
 							{
-								Fn:           isTshirtSize,
+								Fn:           isTShirt,
 								ClassGroupID: "rounded-bl",
 							},
 							{
@@ -3306,7 +3311,7 @@ var defaultConfig = &config{
 				},
 				Validators: []classGroupValidator{
 					{
-						Fn:           isTshirtSize,
+						Fn:           isTShirt,
 						ClassGroupID: "rounded",
 					},
 					{
@@ -3731,7 +3736,7 @@ var defaultConfig = &config{
 				},
 				Validators: []classGroupValidator{
 					{
-						Fn:           isTshirtSize,
+						Fn:           isTShirt,
 						ClassGroupID: "shadow",
 					},
 					{
@@ -3848,7 +3853,7 @@ var defaultConfig = &config{
 				},
 				Validators: []classGroupValidator{
 					{
-						Fn:           isTshirtSize,
+						Fn:           isTShirt,
 						ClassGroupID: "blur",
 					},
 					{
@@ -3899,7 +3904,7 @@ var defaultConfig = &config{
 						},
 						Validators: []classGroupValidator{
 							{
-								Fn:           isTshirtSize,
+								Fn:           isTShirt,
 								ClassGroupID: "drop-shadow",
 							},
 							{
@@ -4006,7 +4011,7 @@ var defaultConfig = &config{
 						},
 						Validators: []classGroupValidator{
 							{
-								Fn:           isTshirtSize,
+								Fn:           isTShirt,
 								ClassGroupID: "backdrop-blur",
 							},
 							{

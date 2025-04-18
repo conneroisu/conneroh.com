@@ -14,7 +14,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/conneroisu/conneroh.com/internal/data/css"
+	classes "github.com/conneroisu/conneroh.com/internal/data/css"
 	"github.com/conneroisu/twerge"
 )
 
@@ -32,8 +32,7 @@ const (
 func NewServer(
 	ctx context.Context,
 ) http.Handler {
-	twerge.ClassMapStr = css.ClassMapStr
-	twerge.GenClassMergeStr = css.ClassMapStr
+	twerge.DefaultCache = twerge.NewCacheFromMaps(classes.ClassMapStr, classes.MergedMapStr)
 	mux := http.NewServeMux()
 	err := AddRoutes(ctx, mux)
 	if err != nil {
