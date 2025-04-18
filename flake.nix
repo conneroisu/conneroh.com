@@ -269,12 +269,13 @@
         internal_port = 8080;
         force_https = true;
         processes = ["app"];
+        src = ./.;
+        vendorHash = null;
       in rec {
         conneroh = pkgs.buildGo124Module {
+          inherit src vendorHash;
           name = "conneroh.com";
-          vendorHash = null;
           version = self.shortRev or "dirty";
-          src = ./.;
           preBuild = ''
             ${pkgs.templ}/bin/templ generate
             ${pkgs.tailwindcss}/bin/tailwindcss \
@@ -286,9 +287,8 @@
           subPackages = ["."];
         };
         update = pkgs.buildGoModule {
-          vendorHash = null;
+          inherit src vendorHash;
           version = self.shortRev or "dirty";
-          src = ./.;
           name = "update";
           subPackages = ["./cmd/update"];
         };
