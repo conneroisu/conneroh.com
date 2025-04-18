@@ -2,7 +2,6 @@
 package main
 
 import (
-	"context"
 	"flag"
 	"fmt"
 	"os"
@@ -33,11 +32,9 @@ func main() {
 		}
 	}
 	if err := twerge.GenCSS(
-		context.Background(),
 		"internal/data/css/classes.go",
 		"input.css",
 		"internal/data/css/classes.html",
-
 		layouts.Page(views.Home(
 			&gen.AllPosts,
 			&gen.AllProjects,

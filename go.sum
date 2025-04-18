@@ -36,8 +36,8 @@ github.com/chromedp/sysutil v1.0.0 h1:+ZxhTpfpZlmchB58ih/LBHX52ky7w2VhQVKQMucy3I
 github.com/chromedp/sysutil v1.0.0/go.mod h1:kgWmDdq8fTzXYcKIBqIYvRRTnYb9aNS9moAV0xufSww=
 github.com/conneroisu/genstruct v0.1.7 h1:zdanvZGbG/dKzqNdIQgm0esqgwxCDLJ/p9a49V5qtg8=
 github.com/conneroisu/genstruct v0.1.7/go.mod h1:oRlnawZROHDfGo1Jb4K3QtHQrAWN7t+fzqEbAIhacF4=
-github.com/conneroisu/twerge v0.3.5 h1:UgCaMoMhsAQ5RihSGfUWjNDpuwMcTcUHPVWa5RUMgbg=
-github.com/conneroisu/twerge v0.3.5/go.mod h1:TXSvjZ2LtaAHCtXVCrpihRMC7ohOUSaYN36NKQEWPVU=
+github.com/conneroisu/twerge v0.3.9 h1:k1QgPLhI8Ef8Y66f46lx+EsH9thirgi+JnHhYK9HUN0=
+github.com/conneroisu/twerge v0.3.9/go.mod h1:TXSvjZ2LtaAHCtXVCrpihRMC7ohOUSaYN36NKQEWPVU=
 github.com/dave/jennifer v1.7.1 h1:B4jJJDHelWcDhlRQxWeo0Npa/pYKBLrirAQoTN45txo=
 github.com/dave/jennifer v1.7.1/go.mod h1:nXbxhEmQfOZhWml3D1cDK5M1FLnMSozpbFN/m3RmGZc=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

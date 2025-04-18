@@ -27,245 +27,106 @@ Basic Usage:
 
 ```
 import "github.com/conneroisu/twerge"
+
+// Merge TailwindCSS classes from a space-delimited string
+merged := twerge.Merge("text-red-500 bg-blue-500 text-blue-700")
+// Returns: "bg-blue-500 text-blue-700"
+
+// Generate a short unique class name
+className := twerge.Generate("text-red-500 bg-blue-500")
+// Returns something like: "tw-Ab3F5g7"
 ```
 
 ## Index
 
 - [Variables](<#variables>)
-- [type AmnesicMerger](<#AmnesicMerger>)
-  - [func \(m \*AmnesicMerger\) Merge\(classes string\) string](<#AmnesicMerger.Merge>)
-- [type Cache](<#Cache>)
-  - [func NewCache\(\) \*Cache](<#NewCache>)
-  - [func NewCacheFromMaps\(raw, merged map\[string\]string\) \*Cache](<#NewCacheFromMaps>)
-  - [func \(c \*Cache\) All\(\) func\(yield func\(string, CacheValue\) bool\)](<#Cache.All>)
-  - [func \(c \*Cache\) Get\(key string\) \(string, string\)](<#Cache.Get>)
-  - [func \(c \*Cache\) Set\(raw, merged string\) string](<#Cache.Set>)
-- [type CacheValue](<#CacheValue>)
-- [type Generater](<#Generater>)
-- [type Generator](<#Generator>)
-  - [func NewGenerator\(config \*config\) \*Generator](<#NewGenerator>)
-  - [func \(g \*Generator\) Cached\(\) cacher](<#Generator.Cached>)
-  - [func \(g \*Generator\) GenCSS\(ctx context.Context, classPath, inputCSSPath, templPath string, components ...templ.Component\) error](<#Generator.GenCSS>)
-  - [func \(g \*Generator\) If\(cond bool, trueClass, falseClass string\) string](<#Generator.If>)
-  - [func \(g \*Generator\) It\(classes string\) string](<#Generator.It>)
-- [type Merger](<#Merger>)
-- [type MergerImpl](<#MergerImpl>)
-  - [func NewMerger\(config \*config\) \*MergerImpl](<#NewMerger>)
-  - [func \(m \*MergerImpl\) Merge\(classes string\) string](<#MergerImpl.Merge>)
+- [func CodeGen\(cssPath string, htmlPath string, goPath string\) error](<#CodeGen>)
+- [func GenerateCSS\(cssPath string\) error](<#GenerateCSS>)
+- [func GenerateGo\(goPath string\) error](<#GenerateGo>)
+- [func GenerateHTML\(htmlPath string\) error](<#GenerateHTML>)
+- [func If\(cond bool, trueClass, falseClass string\) string](<#If>)
+- [func It\(classes string\) string](<#It>)
 
 
 ## Variables
 
-<a name="DefaultMerger"></a>
+<a name="Merge"></a>ClassMapStr is a map of class strings to their generated class names This variable can be populated by code generation or manually It is protected by mapMutex for concurrent access
 
 ```go
 var (
-    // DefaultMerger is the default template merger
-    DefaultMerger = NewMerger(defaultConfig)
-    // DefaultGenerator is the default implementation of the Generater interface.
-    DefaultGenerator = NewGenerator(defaultConfig)
-    // DefaultCache is the default cache object.
-    DefaultCache = NewCache()
     // Merge is the default template merger
-    //
-    // It takes a space-delimited string of TailwindCSS classes and returns
-    // a merged string
-    //
+    // It takes a space-delimited string of TailwindCSS classes and returns a merged string
     // It also adds the merged class to the ClassMapStr when used
-    //
-    // It will quickly return the generated class name from ClassMapStr if
-    // available
-    Merge = DefaultMerger.Merge
-    // It returns a short unique CSS class name from the merged classes
-    // given a raw class string.
-    //
-    // It will quickly return the existing class name if the class name already
-    // exists in the cache.
-    //
-    // Example:
-    //
-    //	templ ExampleComp () {
-    //		<div class={twerge.It("bg-red-500 text-white")}>
-    //			Hello World
-    //		</div>
-    //	}
-    It  = DefaultGenerator.It
-    // If returns a short unique CSS class name from the merged classes for a conditional.
-    If  = DefaultGenerator.If
-    // GenCSS generates the CSS classes from the provided components.
-    GenCSS = DefaultGenerator.GenCSS
+    // It will quickly return the generated class name from ClassMapStr if available
+    Merge = createTwMerge(nil, nil)
+
+    ClassMapStr = make(map[string]string)
+
+    // GenClassMergeStr is a map of merged class strings to their generated class names
+    // This variable can be populated by code generation or manually
+    // It is protected by mapMutex for concurrent access
+    GenClassMergeStr = make(map[string]string)
 )
 ```
 
-<a name="AmnesicMerger"></a>
-## type [AmnesicMerger](<https://github.com/conneroisu/tmplmerge/blob/main/merge.go#L111-L113>)
-
-AmnesicMerger is the default template merger for generating Tailwind CSS classes.
-
-It does not modify it's cache.
+<a name="CodeGen"></a>
+## func CodeGen
 
 ```go
-type AmnesicMerger struct {
-    // contains filtered or unexported fields
-}
+func CodeGen(cssPath string, htmlPath string, goPath string) error
 ```
 
-<a name="AmnesicMerger.Merge"></a>
-### func \(\*AmnesicMerger\) [Merge](<https://github.com/conneroisu/tmplmerge/blob/main/merge.go#L408>)
+CodeGen generates all the code needed to use Twerge statically.
+
+<a name="GenerateCSS"></a>
+## func GenerateCSS
 
 ```go
-func (m *AmnesicMerger) Merge(classes string) string
+func GenerateCSS(cssPath string) error
 ```
 
-Merge is the default template merger's Merge function.
+GenerateCSS creates an input CSS file for the Tailwind CLI that includes all the @apply directives from the provided class map.
 
-This functions definition makes the template merger implement the Merger interface.
+This is useful for building a production CSS file with Tailwind's CLI.
 
-<a name="Cache"></a>
-## type [Cache](<https://github.com/conneroisu/tmplmerge/blob/main/cache.go#L9-L12>)
+The marker is used to identify the start and end of the @apply directives generated by Twerge.
 
-Cache is a simple thread\-safe cache.
+<a name="GenerateGo"></a>
+## func GenerateGo
 
 ```go
-type Cache struct {
-    Map map[string]CacheValue
-    // contains filtered or unexported fields
-}
+func GenerateGo(goPath string) error
 ```
 
-<a name="NewCache"></a>
-### func [NewCache](<https://github.com/conneroisu/tmplmerge/blob/main/cache.go#L21>)
+GenerateGo generates Go code for a variable containing the class mapping
+
+<a name="GenerateHTML"></a>
+## func GenerateHTML
 
 ```go
-func NewCache() *Cache
+func GenerateHTML(htmlPath string) error
 ```
 
-NewCache creates a new cache.
+GenerateHTML creates a .templ file that can be used to generate a CSS file with the provided class map.
 
-<a name="NewCacheFromMaps"></a>
-### func [NewCacheFromMaps](<https://github.com/conneroisu/tmplmerge/blob/main/cache.go#L29>)
+<a name="If"></a>
+## func If
 
 ```go
-func NewCacheFromMaps(raw, merged map[string]string) *Cache
+func If(cond bool, trueClass, falseClass string) string
 ```
 
-NewCacheFromMaps creates a new cache from the given maps.
-
-<a name="Cache.All"></a>
-### func \(\*Cache\) [All](<https://github.com/conneroisu/tmplmerge/blob/main/cache.go#L63>)
-
-```go
-func (c *Cache) All() func(yield func(string, CacheValue) bool)
-```
-
-All returns an iterator over the string keys and CacheValue values in the cache.
-
-<a name="Cache.Get"></a>
-### func \(\*Cache\) [Get](<https://github.com/conneroisu/tmplmerge/blob/main/cache.go#L44>)
-
-```go
-func (c *Cache) Get(key string) (string, string)
-```
-
-Get returns the value for the given key in the merged cache.
-
-<a name="Cache.Set"></a>
-### func \(\*Cache\) [Set](<https://github.com/conneroisu/tmplmerge/blob/main/cache.go#L51>)
-
-```go
-func (c *Cache) Set(raw, merged string) string
-```
-
-Set sets the value for the given key in the merged cache.
-
-<a name="CacheValue"></a>
-## type [CacheValue](<https://github.com/conneroisu/tmplmerge/blob/main/cache.go#L15-L18>)
-
-CacheValue is a cache value.
-
-```go
-type CacheValue struct {
-    Generated string
-    Merged    string
-}
-```
-
-<a name="Generater"></a>
-## type [Generater](<https://github.com/conneroisu/tmplmerge/blob/main/merge.go#L92-L100>)
-
-Generater is the minimal interface for generating Tailwind CSS classes.
-
-```go
-type Generater interface {
-    It(classes string) string
-    If(cond bool, trueClass, falseClass string) string
-    Cached() cacher
-    GenCSS(ctx context.Context,
-        classPath, twPath, templPath string,
-        components ...templ.Component,
-    ) error
-}
-```
-
-<a name="Generator"></a>
-## type [Generator](<https://github.com/conneroisu/tmplmerge/blob/main/merge.go#L102-L107>)
-
-Generator is the default implementation of the Generator interface.
-
-```go
-type Generator struct {
-    Config *config
-    Merger Merger
-    Cache  cacher
-    Logger *slog.Logger
-}
-```
-
-<a name="NewGenerator"></a>
-### func [NewGenerator](<https://github.com/conneroisu/tmplmerge/blob/main/merge.go#L166>)
-
-```go
-func NewGenerator(config *config) *Generator
-```
-
-NewGenerator creates a new Generator.
-
-<a name="Generator.Cached"></a>
-### func \(\*Generator\) [Cached](<https://github.com/conneroisu/tmplmerge/blob/main/merge.go#L599>)
-
-```go
-func (g *Generator) Cached() cacher
-```
-
-Cached returns the cacher for the Generator.
-
-<a name="Generator.GenCSS"></a>
-### func \(\*Generator\) [GenCSS](<https://github.com/conneroisu/tmplmerge/blob/main/merge.go#L438-L442>)
-
-```go
-func (g *Generator) GenCSS(ctx context.Context, classPath, inputCSSPath, templPath string, components ...templ.Component) error
-```
-
-GenCSS generates the CSS classes from the provided components.
-
-<a name="Generator.If"></a>
-### func \(\*Generator\) [If](<https://github.com/conneroisu/tmplmerge/blob/main/merge.go#L428>)
-
-```go
-func (g *Generator) If(cond bool, trueClass, falseClass string) string
-```
-
-If returns a short unique CSS class name from the merged classes.
+If returns a short unique CSS class name from the merged classes taking an additional boolean parameter.
 
 If the class name already exists, it will return the existing class name.
 
 If the class name does not exist, it will generate a new class name and return it.
 
-<a name="Generator.It"></a>
-### func \(\*Generator\) [It](<https://github.com/conneroisu/tmplmerge/blob/main/merge.go#L387>)
+<a name="It"></a>
+## func It
 
 ```go
-func (g *Generator) It(classes string) string
+func It(classes string) string
 ```
 
 It returns a short unique CSS class name from the merged classes.
@@ -273,50 +134,6 @@ It returns a short unique CSS class name from the merged classes.
 If the class name already exists, it will return the existing class name.
 
 If the class name does not exist, it will generate a new class name and return it.
-
-<a name="Merger"></a>
-## type [Merger](<https://github.com/conneroisu/tmplmerge/blob/main/merge.go#L81-L83>)
-
-Merger is the minimal interface for merging Tailwind CSS classes
-
-```go
-type Merger interface {
-    Merge(classes string) string
-}
-```
-
-<a name="MergerImpl"></a>
-## type [MergerImpl](<https://github.com/conneroisu/tmplmerge/blob/main/merge.go#L85-L89>)
-
-MergerImpl is the default template merger
-
-```go
-type MergerImpl struct {
-    Config *config
-    Cache  cacher
-    Logger *slog.Logger
-}
-```
-
-<a name="NewMerger"></a>
-### func [NewMerger](<https://github.com/conneroisu/tmplmerge/blob/main/merge.go#L117-L119>)
-
-```go
-func NewMerger(config *config) *MergerImpl
-```
-
-NewMerger creates a new template merger
-
-<a name="MergerImpl.Merge"></a>
-### func \(\*MergerImpl\) [Merge](<https://github.com/conneroisu/tmplmerge/blob/main/merge.go#L134-L136>)
-
-```go
-func (m *MergerImpl) Merge(classes string) string
-```
-
-Merge is the default template merger's Merge function.
-
-This functions definition makes the template merger implement the Merger interface.
 
 Generated by [gomarkdoc](<https://github.com/princjef/gomarkdoc>)
 

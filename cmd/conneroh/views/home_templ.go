@@ -847,9 +847,12 @@ func Home(
 		}
 		for i, tag := range *fullTags {
 			if i < 28 {
-				templ_7745c5c3_Err = components.TagItem(tag, templ.Attributes{
-					"class": twerge.It("p-6 rounded-lg overflow-hidden bg-gray-900 shadow-md hover:shadow-lg duration-300 transform transition-all hover:-translate-y-1"),
-				}).Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = components.TagItem(
+					tag,
+					templ.Attributes{
+						"class": twerge.It("p-6 rounded-lg overflow-hidden bg-gray-900 shadow-md hover:shadow-lg duration-300 transform transition-all hover:-translate-y-1"),
+					},
+				).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}

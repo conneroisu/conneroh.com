@@ -32,7 +32,7 @@ const (
 func NewServer(
 	ctx context.Context,
 ) http.Handler {
-	twerge.DefaultCache = twerge.NewCacheFromMaps(classes.ClassMapStr, classes.MergedMapStr)
+	twerge.ClassMapStr = classes.ClassMapStr
 	mux := http.NewServeMux()
 	err := AddRoutes(ctx, mux)
 	if err != nil {

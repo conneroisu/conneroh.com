@@ -11,58 +11,51 @@ var (
 		"full":   true,
 		"screen": true,
 	}
-	// TODO: Replace this with a regex that matches all valid CSS units with pure Go
 	lengthUnitRegex = regexp.MustCompile(`\d+(%|px|r?em|[sdl]?v([hwib]|min|max)|pt|pc|in|cm|mm|cap|ch|ex|r?lh|cq(w|h|i|b|min|max))|\b(calc|min|max|clamp)\(.+\)|^0$`)
-	// TODO: Replace this with a regex that matches all valid CSS color functions with pure Go
-	colorFnRegex = regexp.MustCompile(`^(rgba?|hsla?|hwb|(ok)?(lab|lch))\(.+\)$`)
-	// TODO: Replace this with a regex that matches all valid arbitrary CSS values with pure Go
-	arbitraryRegex = regexp.MustCompile(`(?i)^\[(?:([a-z-]+):)?(.+)\]$`)
-	// TODO: Replace this with a regex that matches all valid CSS size values with pure Go
-	shirtPattern = regexp.MustCompile(`^(\d+(\.\d+)?)?(xs|sm|md|lg|xl)$`)
-	// TODO: Replace this with a regex that matches all valid CSS shadow values with pure Go
-	shardowPattern = regexp.MustCompile(`^(inset_)?-?((\d+)?\.?(\d+)[a-z]+|0)_-?((\d+)?\.?(\d+)[a-z]+|0)`)
-
-	sizeLabels  = map[string]bool{"length": true, "size": true, "percentage": true}
-	imageLabels = map[string]bool{"image": true, "url": true}
+	colorFnRegex    = regexp.MustCompile(`^(rgba?|hsla?|hwb|(ok)?(lab|lch))\(.+\)$`)
+	arbitraryRegex  = regexp.MustCompile(`(?i)^\[(?:([a-z-]+):)?(.+)\]$`)
+	shirtPattern    = regexp.MustCompile(`^(\d+(\.\d+)?)?(xs|sm|md|lg|xl)$`)
+	shardowPattern  = regexp.MustCompile(`^(inset_)?-?((\d+)?\.?(\d+)[a-z]+|0)_-?((\d+)?\.?(\d+)[a-z]+|0)`)
+	sizeLabels      = map[string]bool{"length": true, "size": true, "percentage": true}
+	imageLabels     = map[string]bool{"image": true, "url": true}
 )
 
 // config is the configuration for the template merger
-type config struct {
-	// defaults should be good enough
-	// hover:bg-red-500 -> :
-	ModifierSeparator rune
-	// bg-red-500 -> -
-	ClassSeparator rune
-	// !bg-red-500 -> !
-	ImportantModifier rune
-	// used for bg-red-500/50 (50% opacity) -> /
-	PostfixModifier rune
-	// optional
-	Prefix string
-	// CACHE
-	MaxCacheSize int
-	// This is a large map of all the classes and their validators -> see default-config.go
-	ClassGroups classPart
-	// class group with conflict + conflicting groups -> if "p" is set all others are removed
-	// p: ['px', 'py', 'ps', 'pe', 'pt', 'pr', 'pb', 'pl']
-	ConflictingClassGroups conflictingClassGroups
-}
-
-// classGroupValidator is a validator for a class group
-type classGroupValidator struct {
-	Fn           func(string) bool
-	ClassGroupID string
-}
-
-// classPart is a part of a class group
-type classPart struct {
-	NextPart     map[string]classPart
-	Validators   []classGroupValidator
-	ClassGroupID string
-}
-
-// conflictingClassGroups is a map of class groups that conflict with each other
-type conflictingClassGroups map[string][]string
+type (
+	config struct {
+		// defaults should be good enough
+		// hover:bg-red-500 -> :
+		ModifierSeparator rune
+		// bg-red-500 -> -
+		ClassSeparator rune
+		// !bg-red-500 -> !
+		ImportantModifier rune
+		// used for bg-red-500/50 (50% opacity) -> /
+		PostfixModifier rune
+		// optional
+		Prefix string
+		// CACHE
+		MaxCacheSize int
+		// This is a large map of all the classes and their validators -> see default-config.go
+		ClassGroups classPart
+		// class group with conflict + conflicting groups -> if "p" is set all others are removed
+		// p: ['px', 'py', 'ps', 'pe', 'pt', 'pr', 'pb', 'pl']
+		ConflictingClassGroups conflictingClassGroups
+	}
+	// classGroupValidator is a validator for a class group
+	classGroupValidator struct {
+		Fn           func(string) bool
+		ClassGroupID string
+	}
+	// classPart is a part of a class group
+	classPart struct {
+		NextPart     map[string]classPart
+		Validators   []classGroupValidator
+		ClassGroupID string
+	}
+	// conflictingClassGroups is a map of class groups that conflict with each other
+	conflictingClassGroups map[string][]string
+)
 
 func getBreaks(groupID string) map[string]classPart {
 	return map[string]classPart{
@@ -103,22 +96,18 @@ func getBreaks(groupID string) map[string]classPart {
 		},
 	}
 }
-
 func isAny(_ string) bool {
 	return true
 }
-
 func isNever(_ string) bool {
 	return false
 }
-
 func isLength(val string) bool {
 	if isNumber(val) || stringLengths[val] || isFraction(val) {
 		return true
 	}
 	return false
 }
-
 func isArbitraryLength(val string) bool {
 	return labelIsArbitraryValue(val, "length", isLengthOnly)
 }
@@ -137,54 +126,43 @@ func isArbitraryPosition(val string) bool {
 func isArbitrarySize(val string) bool {
 	return labelIsArbitraryValue(val, sizeLabels, isNever)
 }
-
 func isArbitraryImage(val string) bool {
 	return labelIsArbitraryValue(val, imageLabels, isImage)
 }
 func isArbitraryShadow(val string) bool {
 	return labelIsArbitraryValue(val, "", isShadow)
 }
-
 func isArbitraryValue(val string) bool {
 	return arbitraryRegex.MatchString(val)
 }
-
 func isPercent(val string) bool {
 	return val[len(val)-1] == '%' && isNumber(val[:len(val)-1])
 }
-
-func isTShirt(val string) bool {
+func isTshirtSize(val string) bool {
 	return shirtPattern.MatchString(val)
 }
-
 func isShadow(val string) bool {
 	return shardowPattern.MatchString(val)
 }
-
 func isImage(val string) bool {
 	pattern := regexp.MustCompile(`^(url|image|image-set|cross-fade|element|(repeating-)?(linear|radial|conic)-gradient)\(.+\)$`)
 	return pattern.MatchString(val)
 }
-
 func isFraction(val string) bool {
 	pattern := regexp.MustCompile(`^\d+\/\d+$`)
 	return pattern.MatchString(val)
 }
-
 func isNumber(val string) bool {
 	return isInteger(val) || isFloat(val)
 }
-
 func isInteger(val string) bool {
 	_, err := strconv.Atoi(val)
 	return err == nil
 }
-
 func isFloat(val string) bool {
 	_, err := strconv.ParseFloat(val, 64)
 	return err == nil
 }
-
 func isLengthOnly(val string) bool {
 	return lengthUnitRegex.MatchString(val) && !colorFnRegex.MatchString(val)
 }
@@ -203,7 +181,6 @@ func labelIsArbitraryValue(
 			if t, ok := label.(string); ok {
 				return res[1] == t
 			}
-
 			if t, ok := label.(map[string]bool); ok {
 				return t[res[1]]
 			}
@@ -305,7 +282,7 @@ var defaultConfig = &config{
 				NextPart: map[string]classPart{},
 				Validators: []classGroupValidator{
 					{
-						Fn:           isTShirt,
+						Fn:           isTshirtSize,
 						ClassGroupID: "columns",
 					},
 				},
@@ -317,12 +294,10 @@ var defaultConfig = &config{
 					"after": {
 						NextPart: getBreaks("break-after"),
 					},
-
 					// Break Before @see https://tailwindcss.com/docs/break-before
 					"before": {
 						NextPart: getBreaks("break-before"),
 					},
-
 					// Break Inside
 					// @see https://tailwindcss.com/docs/break-inside
 					"inside": {
@@ -343,7 +318,6 @@ var defaultConfig = &config{
 							},
 						},
 					},
-
 					// Word Break
 					// @see https://tailwindcss.com/docs/word-break
 					"normal": {
@@ -361,7 +335,6 @@ var defaultConfig = &config{
 				},
 				Validators: []classGroupValidator{},
 			},
-
 			"box": {
 				NextPart: map[string]classPart{
 					// Box Sizing
@@ -372,7 +345,6 @@ var defaultConfig = &config{
 					"content": {
 						ClassGroupID: "box",
 					},
-
 					// Box Decoration Break
 					// @see https://tailwindcss.com/docs/box-decoration-break
 					"decoration": {
@@ -386,7 +358,6 @@ var defaultConfig = &config{
 					},
 				},
 			},
-
 			// Display
 			// @see https://tailwindcss.com/docs/display
 			"block": {
@@ -698,7 +669,6 @@ var defaultConfig = &config{
 					},
 				},
 			},
-
 			"overflow": {
 				NextPart: map[string]classPart{
 					"auto": {
@@ -796,7 +766,6 @@ var defaultConfig = &config{
 				},
 				Validators: []classGroupValidator{},
 			},
-
 			"static": {
 				ClassGroupID: "position",
 			},
@@ -812,7 +781,6 @@ var defaultConfig = &config{
 			"sticky": {
 				ClassGroupID: "position",
 			},
-
 			"inset": {
 				NextPart: map[string]classPart{
 					"auto": {
@@ -2089,7 +2057,7 @@ var defaultConfig = &config{
 							"screen": {
 								Validators: []classGroupValidator{
 									{
-										Fn:           isTShirt,
+										Fn:           isTshirtSize,
 										ClassGroupID: "max-w",
 									},
 								},
@@ -2110,7 +2078,7 @@ var defaultConfig = &config{
 								ClassGroupID: "max-w",
 							},
 							{
-								Fn:           isTShirt,
+								Fn:           isTshirtSize,
 								ClassGroupID: "max-w",
 							},
 						},
@@ -2283,7 +2251,7 @@ var defaultConfig = &config{
 				},
 				Validators: []classGroupValidator{
 					{
-						Fn:           isTShirt,
+						Fn:           isTshirtSize,
 						ClassGroupID: "font-size",
 					},
 					{
@@ -3025,7 +2993,7 @@ var defaultConfig = &config{
 						},
 						Validators: []classGroupValidator{
 							{
-								Fn:           isTShirt,
+								Fn:           isTshirtSize,
 								ClassGroupID: "rounded-s",
 							},
 							{
@@ -3046,7 +3014,7 @@ var defaultConfig = &config{
 						},
 						Validators: []classGroupValidator{
 							{
-								Fn:           isTShirt,
+								Fn:           isTshirtSize,
 								ClassGroupID: "rounded-e",
 							},
 							{
@@ -3067,7 +3035,7 @@ var defaultConfig = &config{
 						},
 						Validators: []classGroupValidator{
 							{
-								Fn:           isTShirt,
+								Fn:           isTshirtSize,
 								ClassGroupID: "rounded-t",
 							},
 							{
@@ -3088,7 +3056,7 @@ var defaultConfig = &config{
 						},
 						Validators: []classGroupValidator{
 							{
-								Fn:           isTShirt,
+								Fn:           isTshirtSize,
 								ClassGroupID: "rounded-r",
 							},
 							{
@@ -3109,7 +3077,7 @@ var defaultConfig = &config{
 						},
 						Validators: []classGroupValidator{
 							{
-								Fn:           isTShirt,
+								Fn:           isTshirtSize,
 								ClassGroupID: "rounded-b",
 							},
 							{
@@ -3130,7 +3098,7 @@ var defaultConfig = &config{
 						},
 						Validators: []classGroupValidator{
 							{
-								Fn:           isTShirt,
+								Fn:           isTshirtSize,
 								ClassGroupID: "rounded-l",
 							},
 							{
@@ -3151,7 +3119,7 @@ var defaultConfig = &config{
 						},
 						Validators: []classGroupValidator{
 							{
-								Fn:           isTShirt,
+								Fn:           isTshirtSize,
 								ClassGroupID: "rounded-ss",
 							},
 							{
@@ -3172,7 +3140,7 @@ var defaultConfig = &config{
 						},
 						Validators: []classGroupValidator{
 							{
-								Fn:           isTShirt,
+								Fn:           isTshirtSize,
 								ClassGroupID: "rounded-se",
 							},
 							{
@@ -3193,7 +3161,7 @@ var defaultConfig = &config{
 						},
 						Validators: []classGroupValidator{
 							{
-								Fn:           isTShirt,
+								Fn:           isTshirtSize,
 								ClassGroupID: "rounded-ee",
 							},
 							{
@@ -3214,7 +3182,7 @@ var defaultConfig = &config{
 						},
 						Validators: []classGroupValidator{
 							{
-								Fn:           isTShirt,
+								Fn:           isTshirtSize,
 								ClassGroupID: "rounded-es",
 							},
 							{
@@ -3235,7 +3203,7 @@ var defaultConfig = &config{
 						},
 						Validators: []classGroupValidator{
 							{
-								Fn:           isTShirt,
+								Fn:           isTshirtSize,
 								ClassGroupID: "rounded-tl",
 							},
 							{
@@ -3256,7 +3224,7 @@ var defaultConfig = &config{
 						},
 						Validators: []classGroupValidator{
 							{
-								Fn:           isTShirt,
+								Fn:           isTshirtSize,
 								ClassGroupID: "rounded-tr",
 							},
 							{
@@ -3277,7 +3245,7 @@ var defaultConfig = &config{
 						},
 						Validators: []classGroupValidator{
 							{
-								Fn:           isTShirt,
+								Fn:           isTshirtSize,
 								ClassGroupID: "rounded-br",
 							},
 							{
@@ -3298,7 +3266,7 @@ var defaultConfig = &config{
 						},
 						Validators: []classGroupValidator{
 							{
-								Fn:           isTShirt,
+								Fn:           isTshirtSize,
 								ClassGroupID: "rounded-bl",
 							},
 							{
@@ -3311,7 +3279,7 @@ var defaultConfig = &config{
 				},
 				Validators: []classGroupValidator{
 					{
-						Fn:           isTShirt,
+						Fn:           isTshirtSize,
 						ClassGroupID: "rounded",
 					},
 					{
@@ -3724,7 +3692,6 @@ var defaultConfig = &config{
 				},
 				ClassGroupID: "ring-w",
 			},
-
 			"shadow": {
 				NextPart: map[string]classPart{
 					"inner": {
@@ -3736,7 +3703,7 @@ var defaultConfig = &config{
 				},
 				Validators: []classGroupValidator{
 					{
-						Fn:           isTShirt,
+						Fn:           isTshirtSize,
 						ClassGroupID: "shadow",
 					},
 					{
@@ -3763,7 +3730,6 @@ var defaultConfig = &config{
 					},
 				},
 			},
-
 			"mix": {
 				NextPart: map[string]classPart{
 					"blend": {
@@ -3853,7 +3819,7 @@ var defaultConfig = &config{
 				},
 				Validators: []classGroupValidator{
 					{
-						Fn:           isTShirt,
+						Fn:           isTshirtSize,
 						ClassGroupID: "blur",
 					},
 					{
@@ -3863,7 +3829,6 @@ var defaultConfig = &config{
 				},
 				ClassGroupID: "blur",
 			},
-
 			"brightness": {
 				NextPart: map[string]classPart{},
 				Validators: []classGroupValidator{
@@ -3878,7 +3843,6 @@ var defaultConfig = &config{
 				},
 				ClassGroupID: "brightness",
 			},
-
 			"contrast": {
 				NextPart: map[string]classPart{},
 				Validators: []classGroupValidator{
@@ -3893,7 +3857,6 @@ var defaultConfig = &config{
 				},
 				ClassGroupID: "contrast",
 			},
-
 			"drop": {
 				NextPart: map[string]classPart{
 					"shadow": {
@@ -3904,7 +3867,7 @@ var defaultConfig = &config{
 						},
 						Validators: []classGroupValidator{
 							{
-								Fn:           isTShirt,
+								Fn:           isTshirtSize,
 								ClassGroupID: "drop-shadow",
 							},
 							{
@@ -3916,7 +3879,6 @@ var defaultConfig = &config{
 					},
 				},
 			},
-
 			"grayscale": {
 				NextPart: map[string]classPart{
 					"0": {
@@ -3931,7 +3893,6 @@ var defaultConfig = &config{
 				},
 				ClassGroupID: "grayscale",
 			},
-
 			"hue": {
 				NextPart: map[string]classPart{
 					"rotate": {
@@ -3962,7 +3923,6 @@ var defaultConfig = &config{
 				},
 				ClassGroupID: "invert",
 			},
-
 			"saturate": {
 				NextPart: map[string]classPart{},
 				Validators: []classGroupValidator{
@@ -3977,7 +3937,6 @@ var defaultConfig = &config{
 				},
 				ClassGroupID: "saturate",
 			},
-
 			"sepia": {
 				NextPart: map[string]classPart{
 					"0": {
@@ -3992,7 +3951,6 @@ var defaultConfig = &config{
 				},
 				ClassGroupID: "sepia",
 			},
-
 			"backdrop": {
 				NextPart: map[string]classPart{
 					"filter": {
@@ -4011,7 +3969,7 @@ var defaultConfig = &config{
 						},
 						Validators: []classGroupValidator{
 							{
-								Fn:           isTShirt,
+								Fn:           isTshirtSize,
 								ClassGroupID: "backdrop-blur",
 							},
 							{

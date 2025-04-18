@@ -9,6 +9,14 @@
 // Basic Usage:
 //
 //	import "github.com/conneroisu/twerge"
+//
+//	// Merge TailwindCSS classes from a space-delimited string
+//	merged := twerge.Merge("text-red-500 bg-blue-500 text-blue-700")
+//	// Returns: "bg-blue-500 text-blue-700"
+//
+//	// Generate a short unique class name
+//	className := twerge.Generate("text-red-500 bg-blue-500")
+//	// Returns something like: "tw-Ab3F5g7"
 package twerge
 
 //go:generate gomarkdoc -o README.md -e .

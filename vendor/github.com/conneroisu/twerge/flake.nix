@@ -3,11 +3,19 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-    systems.url = "github:nix-systems/default";
+
     flake-utils = {
       url = "github:numtide/flake-utils";
       inputs.systems.follows = "systems";
     };
+
+    nix2container = {
+      url = "github:nlewo/nix2container";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.follows = "flake-utils";
+    };
+
+    systems.url = "github:nix-systems/default";
   };
 
   nixConfig = {
@@ -28,7 +36,7 @@
       pkgs = import inputs.nixpkgs {inherit system overlays;};
       buildGoModule = pkgs.buildGoModule.override {go = pkgs.go_1_24;};
       specificGo = pkg: pkg.override {inherit buildGoModule;};
-    in {
+    in rec {
       devShells.default = let
         scripts = {
           dx = {
@@ -108,6 +116,7 @@
             export REPO_ROOT=$(git rev-parse --show-toplevel)
             export CGO_CFLAGS="-O2"
 
+            # Print available commands
             echo "Available commands:"
             ${pkgs.lib.concatStringsSep "\n" (
               pkgs.lib.mapAttrsToList (
@@ -153,7 +162,20 @@
             ++ scriptPackages;
         };
 
+      overlays = {
+        default = final: prev: {
+          inherit (packages) hasher;
+        };
+      };
+
       packages = {
+        hasher = buildGoModule {
+          name = "hasher";
+          src = ./cmd/hasher;
+          vendorHash = null;
+          version = "0.0.1";
+          subPackages = ["."];
+        };
         doc = pkgs.stdenv.mkDerivation {
           pname = "twerge-docs";
           version = "0.1";
