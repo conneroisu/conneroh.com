@@ -39,7 +39,7 @@
       };
       buildWithSpecificGo = pkg: pkg.override {buildGoModule = pkgs.buildGo124Module;};
     in rec {
-      devShells.default = let
+      devShell = let
         scripts = {
           dx = {
             exec = ''$EDITOR $REPO_ROOT/flake.nix'';
