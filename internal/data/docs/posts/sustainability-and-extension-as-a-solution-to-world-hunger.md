@@ -11,7 +11,7 @@ description: An AI Solution to Evaluating the Adoption of Innovations I presente
 professor: connero@iastate.edu
 subtitle: An AI Solution to Evaluating the Adoption of Innovations
 title: Sustainability and Extension as a Solution to World Hunger
-updated_at: 2025-04-18T20:05:00.000-06:00
+updated_at: 2025-04-18T20:13:05.000-06:00
 ---
 
 ## Quotes of Preface
@@ -196,9 +196,9 @@ This AI‑driven, satellite‑based evaluation framework offers a scalable, unbi
 
 ## References
 
-- Gladwell, M. (2002). *The tipping point: how little things can make a big difference* (1st Back Bay pbk. ed.). ISBN 0316346624. [Google Books](https://books.google.com/books/about/The_Tipping_Point.html?id=GqepQgAACAAJ) 
-- Swanson, B. E., Bentz, R. P., & Sofranko, A. J. (Eds.). (1997). *Improving agricultural extension: a reference manual*. ISBN 9251040079. [FAO](https://www.fao.org/4/w5830e/w5830e00.htm) 
-- Ren, Q., Zhang, R., Cai, W., Sun, X., & Cao, L. (2020). Application and development of new drones in agriculture. *IOP Conference Series: Earth and Environmental Science*, 440(5), 052041. [ResearchGate](https://www.researchgate.net/publication/340035385_Application_and_Development_of_New_Drones_in_Agriculture) 
-- Rogers, E. M. (2003). *Diffusion of Innovations* (5th ed.). ISBN 0743222091. [Google Books](https://books.google.com/books/about/Diffusion_of_Innovations_5th_Edition.html?hl=nl&id=9U1K5LjUOwEC) 
-- Brunner, E. de S., Sanders, I. T., & Ensminger, D. (Eds.). (1945). *Farmers of the world; the development of agricultural extension.* ISBN 0231911084. [Google Books](https://books.google.com/books/about/Farmers_of_the_World.html?id=sxdDAAAAIAAJ) 
-- Zhao, P., Liu, S., Zhou, Y., Lynch, T., Lu, W., Zhang, T., & Yang, H. (2021). Estimating animal population size with very high‐resolution satellite imagery. *Conservation Biology*, 35(1), 316–324. [Wiley Online Library](https://conbio.onlinelibrary.wiley.com/doi/abs/10.1111/cobi.13613) 
+- [ ] Gladwell, M. (2002). *The tipping point: how little things can make a big difference* (1st Back Bay pbk. ed.). ISBN 0316346624. [[https://books.google.com/books/about/The_Tipping_Point.html?id=GqepQgAACAAJ]]
+- [ ] Swanson, B. E., Bentz, R. P., & Sofranko, A. J. (Eds.). (1997). *Improving agricultural extension: a reference manual*. ISBN 9251040079. [[https://www.fao.org/4/w5830e/w5830e00.htm]]
+- [ ] Ren, Q., Zhang, R., Cai, W., Sun, X., & Cao, L. (2020). Application and development of new drones in agriculture. *IOP Conference Series: Earth and Environmental Science*, 440(5), 052041. [[https://www.researchgate.net/publication/340035385_Application_and_Development_of_New_Drones_in_Agriculture]]
+- [ ] Rogers, E. M. (2003). *Diffusion of Innovations* (5th ed.). ISBN 0743222091. [[https://books.google.com/books/about/Diffusion_of_Innovations_5th_Edition.html?hl=nl&id=9U1K5LjUOwEC]] 
+- [ ] Brunner, E. de S., Sanders, I. T., & Ensminger, D. (Eds.). (1945). *Farmers of the world; the development of agricultural extension.* ISBN 0231911084. [[https://books.google.com/books/about/Farmers_of_the_World.html?id=sxdDAAAAIAAJ]]
+- [ ] Zhao, P., Liu, S., Zhou, Y., Lynch, T., Lu, W., Zhang, T., & Yang, H. (2021). Estimating animal population size with very high‐resolution satellite imagery. *Conservation Biology*, 35(1), 316–324. [[https://conbio.onlinelibrary.wiley.com/doi/abs/10.1111/cobi.13613]]

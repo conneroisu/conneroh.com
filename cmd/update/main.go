@@ -336,6 +336,10 @@ func (r *resolver) ResolveWikilink(n *wikilink.Node) ([]byte, error) {
 		err       error
 		targetStr = string(n.Target)
 	)
+	// first check if it a url
+	if strings.HasPrefix(targetStr, "http") {
+		return []byte(targetStr), nil
+	}
 	_, err = afero.ReadFile(r.fs, fmt.Sprintf("/assets/%s", targetStr))
 	if err != nil {
 		return nil, err
