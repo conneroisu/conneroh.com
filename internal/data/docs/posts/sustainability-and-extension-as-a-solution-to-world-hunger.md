@@ -7,15 +7,13 @@ affiliation: Iowa State University
 author: Conner D. Ohnesorge
 course: AGEDS 461
 created_at: 2021-12-17T19:42:03.000-06:00
-description: An AI Solution to Evaluating the Adoption of Innovations that I presented at AGEDS 461 at Iowa State University.
 professor: connero@iastate.edu
 subtitle: An AI Solution to Evaluating the Adoption of Innovations
 title: Sustainability and Extension as a Solution to World Hunger
-updated_at: 2025-04-18T19:52:39.000-06:00
+updated_at: 2025-04-18T19:58:58.000-06:00
 ---
 
 ## Quotes of Preface
----
 
 > “It's a basic truth of the human condition, that everybody lies. The only variable is about what.”  
 > **Hugh Laurie**, *House M.D.*
@@ -27,9 +25,7 @@ updated_at: 2025-04-18T19:52:39.000-06:00
 > **Matthew 4:19**
 
 ## Puzzle Piece Preface  
-<!-- ![Puzzle Piece Preface](puzzle.jpg) -->
-![[minimal-puzzle.webp]]
----
+![Puzzle Piece Preface](puzzle.jpg)
 
 Developed through the perspective of the *Diffusion of Innovations* by **Everett Rogers**, this paper looks to define and introduce the problem of world hunger as an issue ultimately solved by the efficient application of international agricultural Extension rather than current approaches—largely defined by the use of food banks and donations. With the advice of Dr. Nav Ghimire and Dr. Fally Masambuka‑Kanchewa, this paper aims to transform the lengthy, complex problem of evaluating sustainable on‑field agricultural development into smaller instances approachable by an Artificial Neural Network.
 
@@ -38,21 +34,18 @@ Developed through the perspective of the *Diffusion of Innovations* by **Everett
 This paper will explore key concepts from AGEDS 461 at Iowa State University. Thinking through the perspective of an extension agent, this model could replace the need for on‑field evaluative work by providing automated, scalable assessments of innovation adoption.
 
 ## Introduction
----
 
 The investigations explored throughout this paper began with contact with Dr. Nav Ghimire—Associate Director, University of Idaho Extension. He admitted that a large issue of the extension program is evaluating the impact of an innovation in areas like India and Nepal. A “light bulb” moment occurred during a presentation about barriers to international extension in Africa, and the idea for this method began to take shape.
 
 ## Sustainability against Morality: Barriers to World Hunger Solutions  
-![[minimal-bricks.webp]]
----
+![Morality vs. Sustainability](ddd.jpg)
 
 While this paper focuses on evaluating the impact of extension work, it’s also important to consider the wider vision of how these methods serve global populations. Alarmingly, current food‑security approaches (e.g., food banks) can actually reverse progress. Nick Saul, co‑founder and CEO of Community Food Centres Canada, explained in a 2016 TED Talk that complex food‑bank systems have coincided with worsening food‑security outcomes. The root issue isn’t a lack of food but poverty and misfortune—problems not solved by donations alone.
 
 By building sustainable agricultural and industrial sectors in struggling areas, we address the source of food security issues. This underpins the purpose of agricultural Extension.
 
 ## Extension as a Solution  
-![[minimal-food.webp]]
----
+![Extension Work](food.png)
 
 ### Defining Extension Work
 
@@ -67,7 +60,6 @@ World hunger is a complex issue. Since Extension promotes sustainable developmen
 Satellite imagery combined with AI can provide unbiased, accurate evaluations without expensive travel or extensive surveys.
 
 ## A Introduction to AI
----
 
 ### Hollywood, Wrong Again?
 
@@ -78,14 +70,12 @@ Current AI lacks the “sentient intelligence” of Hollywood. While AI can pose
 AI already collects data to target ads. Our devices listen constantly, providing the raw material for algorithms that recommend products and services.
 
 ## Derivative of Satellite Imagery
----
 
 ### Time
 
 Satellite imagery outperforms drones by providing continuous, time‑series data, enabling ongoing evaluation of field innovations.
 
 ## The Role of AI in Extension
----
 
 ### Destroying Hierarchies of Communication
 
@@ -110,7 +100,6 @@ Transparency between farmers and agents is crucial. Satellite imagery ensures da
 High‑resolution satellite applications—such as those in conservation biology—illustrate how imagery can enable new feedback loops between stakeholders.
 
 ## Method
----
 
 This section introduces our proposed method, grounded in Rogers’s *Diffusion of Innovations*, and compares it with current evaluation approaches.
 
@@ -153,7 +142,6 @@ The prototype demonstrates that a skilled programmer can build a basic evaluatio
 Conservation biologists report exponential growth in satellite applications, driven by Moore’s Law and emerging quantum computing. [@Animal]
 
 ## Context of Evaluation Methods
----
 
 Dr. Nav Ghimire outlined five evaluation perspectives:
 
@@ -164,12 +152,10 @@ Dr. Nav Ghimire outlined five evaluation perspectives:
 - **Progress‑Referenced Judgement:** Determines if new solutions outperform existing ones.
 
 ## The Impact of Perfect Evaluations of Adoption
----
 
 *Section to discuss the broader implications of achieving near‑perfect, automated evaluation of innovation diffusion.*
 
 ## Conclusion
----
 
 This AI‑driven, satellite‑based evaluation framework offers a scalable, unbiased way to measure agricultural innovation adoption. To safeguard privacy and encourage trust, the system should remain open source and be promoted openly within the international extension community.
 

@@ -702,7 +702,11 @@ func Home(
 		for i, post := range *fullPosts {
 			if i < 4 {
 				templ_7745c5c3_Err = components.PostItem(post, templ.Attributes{
-					"class": twerge.It("overflow-hidden bg-gray-800 transform rounded-lg transition-all hover:shadow-lg duration-300 shadow-md hover:-translate-y-1 cursor-pointer"),
+					"class":       twerge.It("overflow-hidden bg-gray-800 transform rounded-lg transition-all hover:shadow-lg duration-300 shadow-md hover:-translate-y-1 cursor-pointer"),
+					"hx-target":   "#bodiody",
+					"hx-get":      post.PagePath(),
+					"hx-push-url": post.PagePath(),
+					"preload":     "mouseover",
 				}).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
