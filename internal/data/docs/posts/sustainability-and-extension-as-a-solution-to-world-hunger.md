@@ -11,7 +11,7 @@ description: An AI Solution to Evaluating the Adoption of Innovations I presente
 professor: connero@iastate.edu
 subtitle: An AI Solution to Evaluating the Adoption of Innovations
 title: Sustainability and Extension as a Solution to World Hunger
-updated_at: 2025-04-18T20:01:24.000-06:00
+updated_at: 2025-04-18T20:02:57.000-06:00
 ---
 
 ## Quotes of Preface
@@ -109,13 +109,38 @@ This section introduces our proposed method, grounded in Rogers’s *Diffusion o
 
 ### Characteristics of Innovations
 
-Rogers identified five attributes:
+## 1. Relative Advantage  
+How much better an innovation is perceived compared to the idea, practice, or product it supersedes.  
+- **Definition:** Degree to which users believe the new idea is superior in terms of economic benefits, social prestige, convenience, or satisfaction.  
+- **Why it matters:** The greater the perceived advantage, the more rapid the adoption. If people see clear gains—cost savings, time savings, improved outcomes—they’ll be more motivated to switch.  
+- **Example:** Solar panels offer lower electricity bills (economic benefit) and “greener” credentials (social prestige) relative to grid power.
 
-- **Relative Advantage**  
-- **Trialability**  
-- **Compatibility**  
-- **Complexity**  
-- **Observability**
+## 2. Trialability  
+The extent to which an innovation can be experimented with on a limited basis.  
+- **Definition:** Degree to which a new idea can be tested or piloted before full-scale commitment.  
+- **Why it matters:** Lowers perceived risk. Being able to “try it out” helps potential adopters build confidence and iron out uncertainties before making a big investment.  
+- **Example:** Free trials of software let users explore features risk‑free; farmers trial small plots with a new crop variety before dedicating their entire acreage.
+
+## 3. Compatibility  
+How consistent the innovation is with existing values, past experiences, and needs of potential adopters.  
+- **Definition:** Degree to which an innovation aligns with users’ cultural norms, workflows, and prior practices.  
+- **Why it matters:** The more an innovation “fits” into what people already do and believe, the fewer changes they must make—reducing friction and resistance.  
+- **Example:** Electric cars that use the same “drive and refuel” mental model as gasoline cars (i.e., you still pump energy into a tank) feel more familiar than radically new transport systems.
+
+## 4. Complexity  
+How difficult the innovation is to understand and use.  
+- **Definition:** Degree to which an innovation is perceived as hard to grasp, learn, or implement.  
+- **Why it matters:** Higher complexity slows adoption—users tend to shy away from tools or ideas that seem too confusing or that require steep learning curves.  
+- **Example:** A new analytics dashboard that requires months of training will face more resistance than one with a clean, intuitive UI and built‑in tutorials.
+
+## 5. Observability  
+The degree to which the results of an innovation are visible to others.  
+- **Definition:** Extent to which positive outcomes of an innovation (benefits, successes) can be seen, demonstrated, and communicated.  
+- **Why it matters:** Visible results create word‑of‑mouth momentum. When peers see someone benefitting, they’re more likely to try it themselves.  
+- **Example:** Neighbors installing solar panels—in full view on rooftops—serve as a public demonstration that encourages others in the community to explore solar.
+
+**Putting it all together:**  
+An innovation that clearly outperforms existing options (relative advantage), can be tested easily (trialability), fits into current habits and values (compatibility), is user‑friendly (low complexity), and yields visible benefits (observability) will diffuse most rapidly through a social system.
 
 #### Relative Advantage
 
