@@ -7,10 +7,11 @@ affiliation: Iowa State University
 author: Conner D. Ohnesorge
 course: AGEDS 461
 created_at: 2021-12-17T19:42:03.000-06:00
+description: An AI Solution to Evaluating the Adoption of Innovations I presented at AGEDS 461 at Iowa State University.
 professor: connero@iastate.edu
 subtitle: An AI Solution to Evaluating the Adoption of Innovations
 title: Sustainability and Extension as a Solution to World Hunger
-updated_at: 2025-04-18T19:58:58.000-06:00
+updated_at: 2025-04-18T20:01:24.000-06:00
 ---
 
 ## Quotes of Preface
@@ -25,7 +26,8 @@ updated_at: 2025-04-18T19:58:58.000-06:00
 > **Matthew 4:19**
 
 ## Puzzle Piece Preface  
-![Puzzle Piece Preface](puzzle.jpg)
+
+![[minimal-puzzle.webp]]
 
 Developed through the perspective of the *Diffusion of Innovations* by **Everett Rogers**, this paper looks to define and introduce the problem of world hunger as an issue ultimately solved by the efficient application of international agricultural Extension rather than current approaches—largely defined by the use of food banks and donations. With the advice of Dr. Nav Ghimire and Dr. Fally Masambuka‑Kanchewa, this paper aims to transform the lengthy, complex problem of evaluating sustainable on‑field agricultural development into smaller instances approachable by an Artificial Neural Network.
 
@@ -38,14 +40,16 @@ This paper will explore key concepts from AGEDS 461 at Iowa State University. T
 The investigations explored throughout this paper began with contact with Dr. Nav Ghimire—Associate Director, University of Idaho Extension. He admitted that a large issue of the extension program is evaluating the impact of an innovation in areas like India and Nepal. A “light bulb” moment occurred during a presentation about barriers to international extension in Africa, and the idea for this method began to take shape.
 
 ## Sustainability against Morality: Barriers to World Hunger Solutions  
-![Morality vs. Sustainability](ddd.jpg)
+
+![[minimal-bricks.webp]]
 
 While this paper focuses on evaluating the impact of extension work, it’s also important to consider the wider vision of how these methods serve global populations. Alarmingly, current food‑security approaches (e.g., food banks) can actually reverse progress. Nick Saul, co‑founder and CEO of Community Food Centres Canada, explained in a 2016 TED Talk that complex food‑bank systems have coincided with worsening food‑security outcomes. The root issue isn’t a lack of food but poverty and misfortune—problems not solved by donations alone.
 
 By building sustainable agricultural and industrial sectors in struggling areas, we address the source of food security issues. This underpins the purpose of agricultural Extension.
 
 ## Extension as a Solution  
-![Extension Work](food.png)
+
+![[minimal-food.webp]]
 
 ### Defining Extension Work
 
