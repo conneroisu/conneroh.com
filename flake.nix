@@ -59,17 +59,25 @@
           };
           lint = {
             exec = ''
+              export REPO_ROOT=$(git rev-parse --show-toplevel)
+
               ${pkgs.golangci-lint}/bin/golangci-lint run
               ${pkgs.statix}/bin/statix check $REPO_ROOT/flake.nix
               ${pkgs.deadnix}/bin/deadnix $REPO_ROOT/flake.nix
             '';
             description = "Run Linting Steps.";
           };
-          update = {
+          generate-css = {
             exec = ''
-              ${pkgs.doppler}/bin/doppler run -- ${packages.update}/bin/update -cwd $REPO_ROOT -jobs 20
+              export REPO_ROOT=$(git rev-parse --show-toplevel)
+
+              ${pkgs.templ}/bin/templ generate --log-level error
+              ${pkgs.go}/bin/go run $REPO_ROOT/cmd/update-css --cwd $REPO_ROOT
+              ${pkgs.tailwindcss}/bin/tailwindcss -m -i ./input.css \
+                -o $REPO_ROOT/cmd/conneroh/_static/dist/style.css \
+                --cwd $REPO_ROOT
             '';
-            description = "Update the generated go files.";
+            description = "Update the generated html and css files.";
           };
           generate-docs = {
             exec = ''
@@ -80,27 +88,22 @@
           generate-reload = {
             exec = ''
               export REPO_ROOT=$(git rev-parse --show-toplevel) # needed
-              function gen_css() {
-                ${pkgs.templ}/bin/templ generate --log-level error
-                ${pkgs.go}/bin/go run $REPO_ROOT/cmd/update-css --cwd $REPO_ROOT
-                ${pkgs.tailwindcss}/bin/tailwindcss -m -i ./input.css -o $REPO_ROOT/cmd/conneroh/_static/dist/style.css --cwd $REPO_ROOT
-              }
 
               TEMPL_HASH=$(nix-hash --type sha256 --base32 $REPO_ROOT/cmd/conneroh/**/*.templ | sha256sum | cut -d' ' -f1)
-              echo "TEMPL_HASH: $TEMPL_HASH"
               OLD_TEMPL_HASH=$(cat $REPO_ROOT/internal/cache/templ.hash)
+
               if [ "$OLD_TEMPL_HASH" != "$TEMPL_HASH" ]; then
-                echo "templ change"
-                gen_css
+                echo "OLD_TEMPL_HASH: $OLD_TEMPL_HASH; NEW_TEMPL_HASH: $TEMPL_HASH"
+                ${pkgs.lib.getExe scriptPackages.generate-css}
                 echo "$TEMPL_HASH" > ./internal/cache/templ.hash
               fi
 
               DOCS_HASH=$(nix-hash --type sha256 --base32 ./internal/data/docs/ | sha256sum | cut -d' ' -f1)
-              echo "DOCS_HASH: $DOCS_HASH"
               OLD_DOCS_HASH=$(cat $REPO_ROOT/internal/cache/docs.hash)
+
               if [ "$OLD_DOCS_HASH" != "$DOCS_HASH" ]; then
-                echo "docs change"
-                ${scriptPackages.generate-docs}/bin/generate-docs
+                echo "OLD_DOCS_HASH: $OLD_DOCS_HASH; NEW_DOCS_HASH: $DOCS_HASH"
+                ${pkgs.lib.getExe scriptPackages.generate-docs}
                 echo "$DOCS_HASH" > ./internal/cache/docs.hash
               fi
             '';
@@ -171,14 +174,15 @@
             export PLAYWRIGHT_NODEJS_PATH=${pkgs.nodejs_20}/bin/node
 
             # Browser executable paths
-            export PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=${"${pkgs.playwright-driver.browsers}/chromium-1155"}
+            export PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=${ #
+              "${pkgs.playwright-driver.browsers}/chromium-1155"
+            }
 
             echo "Playwright configured with:"
             echo "  - Browsers directory: $PLAYWRIGHT_BROWSERS_PATH"
             echo "  - Node.js path: $PLAYWRIGHT_NODEJS_PATH"
             echo "  - Chromium path: $PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH"
 
-            # Print available commands
             echo "Available commands:"
             ${pkgs.lib.concatStringsSep "\n" (
               pkgs.lib.mapAttrsToList (
@@ -226,11 +230,6 @@
               consul
 
               playwright-driver # Browser Archives and Driver Scripts
-              (
-                if stdenv.isDarwin
-                then darwin.apple_sdk.frameworks.WebKit
-                else webkitgtk
-              ) # WebKit browser
               nodejs_20 # Required for Playwright driver
               pkg-config # Needed for some browser dependencies
               at-spi2-core # Accessibility support
