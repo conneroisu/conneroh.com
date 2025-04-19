@@ -223,6 +223,7 @@
               nodePackages.typescript-language-server
               nodePackages.prettier
               inputs.bun2nix.defaultPackage.${pkgs.system}.bin
+              svgcleaner
 
               flyctl # Infra
               openssl.dev
