@@ -88,7 +88,7 @@ func Tag(
 			return templ_7745c5c3_Err
 		}
 		templ_7745c5c3_Err = components.Icon(tag.Icon, templ.Attributes{
-			"style": "width: 4em; height: 4em;",
+			"style": "width: 8em; height: 8em;",
 			"class": twerge.It("p-4 inline-block"),
 		}).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {

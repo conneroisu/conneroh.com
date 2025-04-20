@@ -30,7 +30,9 @@ templ TagControl(
 		<div
 			class={ twerge.It("items-center flex pr-3") }
 		>
-			@Icon(tag.Icon, templ.Attributes{})
+			@Icon(tag.Icon, templ.Attributes{
+				"style": "width: 2em; height: 2em;",
+			})
 		</div>
 		<div
 			class={ twerge.It("items-center flex") }

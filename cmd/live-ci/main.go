@@ -94,6 +94,8 @@ func run(
 		}
 	}()
 
+	time.Sleep(time.Second * 40)
+
 	for _, url := range routing.ComputeAllURLs(base) {
 		eg.Go(func() error {
 			page, pErr := bCtx.NewPage()

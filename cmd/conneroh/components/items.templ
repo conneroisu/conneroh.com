@@ -191,7 +191,10 @@ templ TagItem(tag *assets.Tag, attrs templ.Attributes) {
 			<div
 				class={ twerge.It("rounded-full h-8 justify-center items-center flex w-8 bg-gray-700") }
 			>
-				@Icon(tag.Icon, templ.Attributes{"class": "stoke-white"})
+				@Icon(tag.Icon, templ.Attributes{
+					"class": "stoke-white",
+					"style": "width: 4em; height: 4em;",
+				})
 			</div>
 		</div>
 		<div
