@@ -1,0 +1,26 @@
+{
+    "name": "Conner Ohnesorge's Personal Website Remote Dev Container",
+    "$schema": "https://raw.githubusercontent.com/devcontainers/spec/refs/heads/main/schemas/devContainer.base.schema.json",
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "bbenoist.nix"
+            ],
+            "settings": {
+                "terminal.integrated.shell.linux": "/bin/bash"
+            }
+        }
+    },
+    "mounts": [
+        "source=yourproject_nix,target=/nix,type=volume"
+    ],
+    "containerEnv": {
+        "PROJECT_DIR": "${containerWorkspaceFolder}"
+    },
+    "userEnvProbe": "loginShell",
+    "forwardPorts": [],
+    "remoteUser": "vscode"
+}
