@@ -7,7 +7,7 @@ import (
 )
 
 // Search is the full global search results page
-templ Search(query string, results []assets.Embeddable) {
+templ Search(query string, results []assets.Doc) {
 	<div class={ twerge.It("py-8 px-4 max-w-6xl mx-auto") }>
 		<h1 class={ twerge.It("text-3xl font-bold mb-2 text-white") }>
 			Search Results for "{ query }"

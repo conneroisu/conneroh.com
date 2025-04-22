@@ -47,7 +47,7 @@ func NewOllamaClient(getenv func(string) string) (*OllamaClient, error) {
 func (c *OllamaClient) Embeddings(
 	ctx context.Context,
 	content string,
-	emb *assets.Embedded,
+	emb *assets.Emb,
 ) (err error) {
 	resp, err := c.client.Embeddings(ctx, &api.EmbeddingRequest{
 		Model:  embeddingModel,

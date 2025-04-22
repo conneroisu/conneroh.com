@@ -11,13 +11,14 @@ var (
 		"full":   true,
 		"screen": true,
 	}
-	lengthUnitRegex = regexp.MustCompile(`\d+(%|px|r?em|[sdl]?v([hwib]|min|max)|pt|pc|in|cm|mm|cap|ch|ex|r?lh|cq(w|h|i|b|min|max))|\b(calc|min|max|clamp)\(.+\)|^0$`)
-	colorFnRegex    = regexp.MustCompile(`^(rgba?|hsla?|hwb|(ok)?(lab|lch))\(.+\)$`)
-	arbitraryRegex  = regexp.MustCompile(`(?i)^\[(?:([a-z-]+):)?(.+)\]$`)
-	shirtPattern    = regexp.MustCompile(`^(\d+(\.\d+)?)?(xs|sm|md|lg|xl)$`)
-	shardowPattern  = regexp.MustCompile(`^(inset_)?-?((\d+)?\.?(\d+)[a-z]+|0)_-?((\d+)?\.?(\d+)[a-z]+|0)`)
-	sizeLabels      = map[string]bool{"length": true, "size": true, "percentage": true}
-	imageLabels     = map[string]bool{"image": true, "url": true}
+	lengthUnitRegex        = regexp.MustCompile(`\d+(%|px|r?em|[sdl]?v([hwib]|min|max)|pt|pc|in|cm|mm|cap|ch|ex|r?lh|cq(w|h|i|b|min|max))|\b(calc|min|max|clamp)\(.+\)|^0$`)
+	colorFnRegex           = regexp.MustCompile(`^(rgba?|hsla?|hwb|(ok)?(lab|lch))\(.+\)$`)
+	arbitraryRegex         = regexp.MustCompile(`(?i)^\[(?:([a-z-]+):)?(.+)\]$`)
+	shirtPattern           = regexp.MustCompile(`^(\d+(\.\d+)?)?(xs|sm|md|lg|xl)$`)
+	shardowPattern         = regexp.MustCompile(`^(inset_)?-?((\d+)?\.?(\d+)[a-z]+|0)_-?((\d+)?\.?(\d+)[a-z]+|0)`)
+	arbitraryPropertyRegex = regexp.MustCompile(`^\[(.+)\]$`)
+	sizeLabels             = map[string]bool{"length": true, "size": true, "percentage": true}
+	imageLabels            = map[string]bool{"image": true, "url": true}
 )
 
 // config is the configuration for the template merger
@@ -200,52 +201,130 @@ var defaultConfig = &config{
 	PostfixModifier:   '/',
 	MaxCacheSize:      1000,
 	ConflictingClassGroups: conflictingClassGroups{
-		"overflow":         {"overflow-x", "overflow-y"},
-		"overscroll":       {"overscroll-x", "overscroll-y"},
-		"inset":            {"inset-x", "inset-y", "start", "end", "top", "right", "bottom", "left"},
-		"inset-x":          {"right", "left"},
-		"inset-y":          {"top", "bottom"},
-		"flex":             {"basis", "grow", "shrink"},
-		"gap":              {"gap-x", "gap-y"},
-		"p":                {"px", "py", "ps", "pe", "pt", "pr", "pb", "pl"},
-		"px":               {"pr", "pl"},
-		"py":               {"pt", "pb"},
-		"m":                {"mx", "my", "ms", "me", "mt", "mr", "mb", "ml"},
-		"mx":               {"mr", "ml"},
-		"my":               {"mt", "mb"},
-		"size":             {"w", "h"},
-		"font-size":        {"leading"},
-		"fvn-normal":       {"fvn-ordinal", "fvn-slashed-zero", "fvn-figure", "fvn-spacing", "fvn-fraction"},
+		"overflow":   {"overflow-x", "overflow-y"},
+		"overscroll": {"overscroll-x", "overscroll-y"},
+		"inset": {
+			"inset-x",
+			"inset-y",
+			"start",
+			"end",
+			"top",
+			"right",
+			"bottom",
+			"left",
+		},
+		"inset-x": {"right", "left"},
+		"inset-y": {"top", "bottom"},
+		"flex":    {"basis", "grow", "shrink"},
+		"gap":     {"gap-x", "gap-y"},
+		"p": {
+			"px",
+			"py",
+			"ps",
+			"pe",
+			"pt",
+			"pr",
+			"pb",
+			"pl",
+		},
+		"px": {"pr", "pl"},
+		"py": {"pt", "pb"},
+		"m": {
+			"mx",
+			"my",
+			"ms",
+			"me",
+			"mt",
+			"mr",
+			"mb",
+			"ml",
+		},
+		"mx":        {"mr", "ml"},
+		"my":        {"mt", "mb"},
+		"size":      {"w", "h"},
+		"font-size": {"leading"},
+		"fvn-normal": {
+			"fvn-ordinal",
+			"fvn-slashed-zero",
+			"fvn-figure",
+			"fvn-spacing",
+			"fvn-fraction",
+		},
 		"fvn-ordinal":      {"fvn-normal"},
 		"fvn-slashed-zero": {"fvn-normal"},
 		"fvn-figure":       {"fvn-normal"},
 		"fvn-spacing":      {"fvn-normal"},
 		"fvn-fraction":     {"fvn-normal"},
 		"line-clamp":       {"display", "overflow"},
-		"rounded":          {"rounded-s", "rounded-e", "rounded-t", "rounded-r", "rounded-b", "rounded-l", "rounded-ss", "rounded-se", "rounded-ee", "rounded-es", "rounded-tl", "rounded-tr", "rounded-br", "rounded-bl"},
-		"rounded-s":        {"rounded-ss", "rounded-es"},
-		"rounded-e":        {"rounded-se", "rounded-ee"},
-		"rounded-t":        {"rounded-tl", "rounded-tr"},
-		"rounded-r":        {"rounded-tr", "rounded-br"},
-		"rounded-b":        {"rounded-br", "rounded-bl"},
-		"rounded-l":        {"rounded-tl", "rounded-bl"},
-		"border-spacing":   {"border-spacing-x", "border-spacing-y"},
-		"border-w":         {"border-w-s", "border-w-e", "border-w-t", "border-w-r", "border-w-b", "border-w-l"},
-		"border-w-x":       {"border-w-r", "border-w-l"},
-		"border-w-y":       {"border-w-t", "border-w-b"},
-		"border-color":     {"border-color-t", "border-color-r", "border-color-b", "border-color-l"},
-		"border-color-x":   {"border-color-r", "border-color-l"},
-		"border-color-y":   {"border-color-t", "border-color-b"},
-		"scroll-m":         {"scroll-mx", "scroll-my", "scroll-ms", "scroll-me", "scroll-mt", "scroll-mr", "scroll-mb", "scroll-ml"},
-		"scroll-mx":        {"scroll-mr", "scroll-ml"},
-		"scroll-my":        {"scroll-mt", "scroll-mb"},
-		"scroll-p":         {"scroll-px", "scroll-py", "scroll-ps", "scroll-pe", "scroll-pt", "scroll-pr", "scroll-pb", "scroll-pl"},
-		"scroll-px":        {"scroll-pr", "scroll-pl"},
-		"scroll-py":        {"scroll-pt", "scroll-pb"},
-		"touch":            {"touch-x", "touch-y", "touch-pz"},
-		"touch-x":          {"touch"},
-		"touch-y":          {"touch"},
-		"touch-pz":         {"touch"},
+		"rounded": {
+			"rounded-s",
+			"rounded-e",
+			"rounded-t",
+			"rounded-r",
+			"rounded-b",
+			"rounded-l",
+			"rounded-ss",
+			"rounded-se",
+			"rounded-ee",
+			"rounded-es",
+			"rounded-tl",
+			"rounded-tr",
+			"rounded-br",
+			"rounded-bl",
+		},
+		"rounded-s":      {"rounded-ss", "rounded-es"},
+		"rounded-e":      {"rounded-se", "rounded-ee"},
+		"rounded-t":      {"rounded-tl", "rounded-tr"},
+		"rounded-r":      {"rounded-tr", "rounded-br"},
+		"rounded-b":      {"rounded-br", "rounded-bl"},
+		"rounded-l":      {"rounded-tl", "rounded-bl"},
+		"border-spacing": {"border-spacing-x", "border-spacing-y"},
+		"border-w": {
+			"border-w-s",
+			"border-w-e",
+			"border-w-t",
+			"border-w-r",
+			"border-w-b",
+			"border-w-l",
+		},
+		"border-w-x": {"border-w-r", "border-w-l"},
+		"border-w-y": {"border-w-t", "border-w-b"},
+		"border-color": {
+			"border-color-t",
+			"border-color-r",
+			"border-color-b",
+			"border-color-l",
+		},
+		"border-color-x": {"border-color-r", "border-color-l"},
+		"border-color-y": {"border-color-t", "border-color-b"},
+		"scroll-m": {
+			"scroll-mx",
+			"scroll-my",
+			"scroll-ms",
+			"scroll-me",
+			"scroll-mt",
+			"scroll-mr",
+			"scroll-mb",
+			"scroll-ml",
+		},
+		"scroll-mx": {"scroll-mr", "scroll-ml"},
+		"scroll-my": {"scroll-mt", "scroll-mb"},
+		"scroll-p": {
+			"scroll-px",
+			"scroll-py",
+			"scroll-ps",
+			"scroll-pe",
+			"scroll-pt",
+			"scroll-pr",
+			"scroll-pb",
+			"scroll-pl",
+		},
+		"scroll-px": {"scroll-pr", "scroll-pl"},
+		"scroll-py": {"scroll-pt", "scroll-pb"},
+		"touch":     {"touch-x", "touch-y", "touch-pz"},
+		"touch-x":   {"touch"},
+		"touch-y":   {"touch"},
+		"touch-pz":  {"touch"},
 	},
 	ClassGroups: classPart{
 		NextPart: map[string]classPart{
@@ -300,23 +379,22 @@ var defaultConfig = &config{
 					},
 					// Break Inside
 					// @see https://tailwindcss.com/docs/break-inside
-					"inside": {
-						NextPart: map[string]classPart{
-							"auto": {
-								ClassGroupID: "break-inside",
-							},
-							"avoid": {
-								NextPart: map[string]classPart{
-									"page": {
-										ClassGroupID: "break-inside",
-									},
-									"column": {
-										ClassGroupID: "break-inside",
-									},
-								},
-								ClassGroupID: "break-inside",
-							},
+					"inside": {NextPart: map[string]classPart{
+						"auto": {
+							ClassGroupID: "break-inside",
 						},
+						"avoid": {
+							NextPart: map[string]classPart{
+								"page": {
+									ClassGroupID: "break-inside",
+								},
+								"column": {
+									ClassGroupID: "break-inside",
+								},
+							},
+							ClassGroupID: "break-inside",
+						},
+					},
 					},
 					// Word Break
 					// @see https://tailwindcss.com/docs/word-break

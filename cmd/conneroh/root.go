@@ -2,6 +2,7 @@ package conneroh
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	"log"
@@ -15,7 +16,11 @@ import (
 	"time"
 
 	classes "github.com/conneroisu/conneroh.com/internal/data/css"
-	"github.com/conneroisu/twerge"
+	"github.com/uptrace/bun"
+	"github.com/uptrace/bun/dialect/sqlitedialect"
+
+	// SQLite driver
+	_ "modernc.org/sqlite"
 )
 
 const (
@@ -32,9 +37,16 @@ const (
 func NewServer(
 	ctx context.Context,
 ) http.Handler {
-	twerge.ClassMapStr = classes.ClassMapStr
+	classes.SetCache()
 	mux := http.NewServeMux()
-	err := AddRoutes(ctx, mux)
+	sqlDB, err := sql.Open("sqlite", "test.db")
+	if err != nil {
+		slog.Error("error opening database", slog.String("error", err.Error()))
+		return nil
+	}
+	db := bun.NewDB(sqlDB, sqlitedialect.New())
+
+	err = AddRoutes(ctx, mux, db)
 	if err != nil {
 		slog.Error("error adding routes", slog.String("error", err.Error()))
 		log.Fatal(err)

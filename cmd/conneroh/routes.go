@@ -2,31 +2,86 @@ package conneroh
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
 	"net/http"
 
+	"github.com/a-h/templ"
 	static "github.com/conneroisu/conneroh.com/cmd/conneroh/_static"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/layouts"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/views"
-	"github.com/conneroisu/conneroh.com/internal/data/gen"
+	"github.com/conneroisu/conneroh.com/internal/assets"
 	"github.com/conneroisu/conneroh.com/internal/routing"
+	"github.com/uptrace/bun"
+)
+
+var (
+	tag     = new(assets.Tag)
+	project = new(assets.Project)
+	post    = new(assets.Post)
+
+	homePage    *templ.Component
+	postList    *templ.Component
+	projectList *templ.Component
+	tagList     *templ.Component
+	allPosts    = []*assets.Post{}
+	postMap     = map[string]templ.Component{}
+	allProjects = []*assets.Project{}
+	projectMap  = map[string]templ.Component{}
+	allTags     = []*assets.Tag{}
+	tagMap      = map[string]templ.Component{}
 )
 
 // AddRoutes adds all routes to the router.
 func AddRoutes(
 	_ context.Context,
 	h *http.ServeMux,
+	db *bun.DB,
 ) error {
 	slog.Info("adding routes")
 	defer slog.Info("added routes")
 
-	h.Handle(
+	h.HandleFunc(
 		"GET /{$}",
-		routing.MorphableHandler(
-			layouts.Page(home),
-			home,
-		))
+		func(w http.ResponseWriter, r *http.Request) {
+			if homePage != nil {
+				routing.MorphableHandler(
+					layouts.Page(*homePage),
+					*homePage,
+				).ServeHTTP(w, r)
+				return
+			}
+			err := db.NewSelect().Model(post).
+				Order("updated_at").
+				Scan(r.Context(), &allPosts)
+			if err != nil {
+				slog.Error("failed to scan posts", "err", err, "posts", postList)
+				return
+			}
+			err = db.NewSelect().Model(project).
+				Order("updated_at").
+				Scan(r.Context(), &allProjects)
+			if err != nil {
+				slog.Error("failed to scan projects", "err", err, "projects", projectList)
+				return
+			}
+			err = db.NewSelect().Model(tag).
+				Order("updated_at").
+				Scan(r.Context(), &allTags)
+			if err != nil {
+				slog.Error("failed to scan tags", "err", err)
+				return
+			}
+			var home = views.Home(
+				&allPosts,
+				&allProjects,
+				&allTags,
+			)
+			routing.MorphableHandler(
+				layouts.Page(home),
+				home,
+			).ServeHTTP(w, r)
+			homePage = &home
+		})
 	h.HandleFunc(
 		"POST /contact",
 		handleContactForm)
@@ -40,86 +95,188 @@ func AddRoutes(
 		})
 	h.HandleFunc(
 		"GET /search/all",
-		searchHandler(gen.AllPosts, gen.AllProjects, gen.AllTags))
+		searchHandler(db))
 
-	h.Handle(
+	h.HandleFunc(
 		"GET /posts",
-		routing.MorphableHandler(layouts.Page(posts), posts))
+		func(w http.ResponseWriter, r *http.Request) {
+			if postList != nil {
+				routing.MorphableHandler(layouts.Page(*postList), *postList).ServeHTTP(w, r)
+				return
+			}
+			err := db.NewSelect().Model(post).
+				Order("created_at").
+				Scan(r.Context(), &allPosts)
+			if err != nil {
+				slog.Error("failed to scan posts", "err", err, "posts", postList)
+				return
+			}
+			var posts = views.List(
+				routing.PostPluralPath,
+				&allPosts,
+				nil,
+				nil,
+				"",
+				1,
+				(len(allPosts)+routing.MaxListLargeItems-1)/routing.MaxListLargeItems,
+			)
+			routing.MorphableHandler(layouts.Page(posts), posts).ServeHTTP(w, r)
+			postList = &posts
+		})
 	h.Handle(
 		"GET /search/posts",
-		listHandler(routing.PostPluralPath))
+		listHandler(routing.PostPluralPath, db))
+	h.HandleFunc(
+		"GET /post/{slug...}",
+		func(w http.ResponseWriter, r *http.Request) {
+			var (
+				p  assets.Post
+				c  templ.Component
+				ok bool
+			)
+			if c, ok = postMap[p.Slug]; ok {
+				routing.MorphableHandler(
+					layouts.Page(c),
+					c,
+				).ServeHTTP(w, r)
+				return
+			}
+			err := db.NewSelect().Model(post).
+				Where("slug = ?", routing.Slug(r)).
+				Limit(1).Scan(r.Context(), &p)
+			if err != nil {
+				slog.Error("failed to scan post", "err", err)
+				return
+			}
+			c = views.Post(&p)
+			routing.MorphableHandler(layouts.Page(c), c).
+				ServeHTTP(w, r)
+			postMap[p.Slug] = c
+		})
 
-	h.Handle(
+	h.HandleFunc(
 		"GET /projects",
-		routing.MorphableHandler(layouts.Page(projects), projects))
+		func(w http.ResponseWriter, r *http.Request) {
+			if projectList != nil {
+				routing.MorphableHandler(
+					layouts.Page(*projectList),
+					*projectList,
+				).ServeHTTP(w, r)
+				return
+			}
+			err := db.NewSelect().Model(project).
+				Order("created_at").
+				Scan(r.Context(), &allProjects)
+			if err != nil {
+				slog.Error("failed to scan projects", "err", err, "projects", projectList)
+				return
+			}
+			var projects = views.List(
+				routing.ProjectPluralPath,
+				nil,
+				&allProjects,
+				nil,
+				"",
+				1,
+				(len(allProjects)+routing.MaxListLargeItems-1)/routing.MaxListLargeItems,
+			)
+			routing.MorphableHandler(layouts.Page(projects), projects).ServeHTTP(w, r)
+			projectList = &projects
+		})
 	h.Handle(
 		"GET /search/projects",
-		listHandler(routing.ProjectPluralPath))
+		listHandler(routing.ProjectPluralPath, db))
 
-	h.Handle(
+	h.HandleFunc(
+		"GET /project/{slug...}",
+		func(w http.ResponseWriter, r *http.Request) {
+			var (
+				p  assets.Project
+				c  templ.Component
+				ok bool
+			)
+			if c, ok = projectMap[p.Slug]; ok {
+				routing.MorphableHandler(
+					layouts.Page(c),
+					c,
+				).ServeHTTP(w, r)
+				return
+			}
+			err := db.NewSelect().Model(project).
+				Where("slug = ?", routing.Slug(r)).
+				Limit(1).Scan(r.Context(), &p)
+			if err != nil {
+				slog.Error("failed to scan project", "err", err)
+				return
+			}
+			c = views.Project(&p)
+			routing.MorphableHandler(
+				layouts.Page(c),
+				c,
+			).ServeHTTP(w, r)
+			projectMap[p.Slug] = c
+		})
+
+	h.HandleFunc(
 		"GET /tags",
-		routing.MorphableHandler(layouts.Page(tags), tags))
+		func(w http.ResponseWriter, r *http.Request) {
+			if tagList != nil {
+				routing.MorphableHandler(layouts.Page(*tagList), *tagList).ServeHTTP(w, r)
+				return
+			}
+			err := db.NewSelect().Model(tag).
+				Order("created_at").
+				Scan(r.Context(), &allTags)
+			if err != nil {
+				slog.Error("failed to scan tags", "err", err)
+				return
+			}
+			var tags = views.List(
+				routing.TagsPluralPath,
+				nil,
+				nil,
+				&allTags,
+				"",
+				1,
+				(len(allTags)+routing.MaxListSmallItems-1)/routing.MaxListSmallItems,
+			)
+			routing.MorphableHandler(layouts.Page(tags), tags).ServeHTTP(w, r)
+			tagList = &tags
+		})
+
 	h.Handle(
 		"GET /search/tags",
-		listHandler(routing.TagsPluralPath))
+		listHandler(routing.TagsPluralPath, db))
 
-	for _, p := range gen.AllPosts {
-		h.Handle(
-			fmt.Sprintf("GET /post/%s", p.Slug),
+	h.HandleFunc(
+		"GET /tag/{slug...}",
+		func(w http.ResponseWriter, r *http.Request) {
+			var (
+				t  assets.Tag
+				c  templ.Component
+				ok bool
+			)
+			if c, ok = tagMap[t.Slug]; ok {
+				routing.MorphableHandler(
+					layouts.Page(c),
+					c,
+				).ServeHTTP(w, r)
+				return
+			}
+			err := db.NewSelect().Model(tag).
+				Where("slug = ?", routing.Slug(r)).
+				Limit(1).Scan(r.Context(), &t)
+			if err != nil {
+				slog.Error("failed to scan tag", "err", err)
+				return
+			}
+			c = views.Tag(&t)
 			routing.MorphableHandler(
-				layouts.Page(views.Post(
-					p,
-					&gen.AllPosts,
-					&gen.AllProjects,
-					&gen.AllTags,
-				)),
-				views.Post(
-					p,
-					&gen.AllPosts,
-					&gen.AllProjects,
-					&gen.AllTags,
-				),
-			),
-		)
-	}
-	for _, p := range gen.AllProjects {
-		h.Handle(
-			fmt.Sprintf("GET /project/%s", p.Slug),
-			routing.MorphableHandler(
-				layouts.Page(views.Project(
-					p,
-					&gen.AllPosts,
-					&gen.AllProjects,
-					&gen.AllTags,
-				)),
-				views.Project(
-					p,
-					&gen.AllPosts,
-					&gen.AllProjects,
-					&gen.AllTags,
-				),
-			),
-		)
-	}
-	for _, t := range gen.AllTags {
-		h.Handle(
-			fmt.Sprintf("GET /tag/%s", t.Slug),
-			routing.MorphableHandler(
-				layouts.Page(views.Tag(
-					t,
-					&gen.AllPosts,
-					&gen.AllProjects,
-					&gen.AllTags,
-				)),
-				views.Tag(
-					t,
-					&gen.AllPosts,
-					&gen.AllProjects,
-					&gen.AllTags,
-				),
-			),
-		)
-	}
+				layouts.Page(c),
+				c,
+			).ServeHTTP(w, r)
+			tagMap[t.Slug] = c
+		})
 
 	return nil
 }

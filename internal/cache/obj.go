@@ -130,7 +130,7 @@ func (c *Cache) Get(path string) (string, bool) {
 }
 
 // SetDoc sets the vec data for the provided path.
-func (c *Cache) SetDoc(path string, emb assets.Embedded) {
+func (c *Cache) SetDoc(path string, emb assets.Emb) {
 	c.muDocs.Lock()
 	defer c.muDocs.Unlock()
 	c.DocsEmb[path] = struct {

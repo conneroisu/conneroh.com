@@ -4,6 +4,7 @@ package main
 import (
 	"bytes"
 	"context"
+	"database/sql"
 	"flag"
 	"fmt"
 	"log/slog"
@@ -13,13 +14,16 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/uptrace/bun"
+	"github.com/uptrace/bun/dialect/sqlitedialect"
+
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/conneroisu/conneroh.com/internal/assets"
 	"github.com/conneroisu/conneroh.com/internal/cache"
+	"github.com/conneroisu/conneroh.com/internal/copygen"
 	"github.com/conneroisu/conneroh.com/internal/credited"
 	"github.com/conneroisu/conneroh.com/internal/tigris"
-	"github.com/conneroisu/genstruct"
 	mathjax "github.com/litao91/goldmark-mathjax"
 	enclave "github.com/quail-ink/goldmark-enclave"
 	"github.com/quail-ink/goldmark-enclave/core"
@@ -36,6 +40,7 @@ import (
 	"go.abhg.dev/goldmark/hashtag"
 	"go.abhg.dev/goldmark/mermaid"
 	"go.abhg.dev/goldmark/wikilink"
+	_ "modernc.org/sqlite"
 )
 
 var (
@@ -146,8 +151,53 @@ func run(
 		slog.Info("failed to find handler for", "path", *path)
 	})
 
-	err = genstruct.NewGenerator(genstruct.WithOutputFile("internal/data/gen/generated_data.go")).
-		Generate(parsedPosts, parsedTags, parsedProjects)
+	sqldb, err := sql.Open("sqlite", "file:test.db?cache=shared&mode=rwc")
+	if err != nil {
+		return err
+	}
+	defer sqldb.Close()
+	db := bun.NewDB(sqldb, sqlitedialect.New())
+
+	alldocs := make([]*assets.Emb, 0)
+	for _, p := range parsedPosts {
+		alldocs = append(alldocs, &p.Embbedding)
+	}
+	for _, p := range parsedProjects {
+		alldocs = append(alldocs, &p.Embedding)
+	}
+	for _, p := range parsedTags {
+		alldocs = append(alldocs, &p.Embedding)
+	}
+	_, err = db.NewCreateTable().IfNotExists().Model(&alldocs).Exec(ctx)
+	if err != nil {
+		return err
+	}
+	_, err = db.NewCreateTable().IfNotExists().Model(assets.EmpPost).Exec(ctx)
+	if err != nil {
+		return err
+	}
+	_, err = db.NewCreateTable().IfNotExists().Model(assets.EmpProject).Exec(ctx)
+	if err != nil {
+		return err
+	}
+	_, err = db.NewCreateTable().IfNotExists().Model(assets.EmpTag).Exec(ctx)
+	if err != nil {
+		return err
+	}
+
+	_, err = db.NewInsert().Model(&alldocs).Exec(ctx)
+	if err != nil {
+		return err
+	}
+	_, err = db.NewInsert().Model(&parsedPosts).Exec(ctx)
+	if err != nil {
+		return err
+	}
+	_, err = db.NewInsert().Model(&parsedProjects).Exec(ctx)
+	if err != nil {
+		return err
+	}
+	_, err = db.NewInsert().Model(&parsedTags).Exec(ctx)
 	if err != nil {
 		return err
 	}
@@ -252,13 +302,14 @@ func Convert(
 	m goldmark.Markdown,
 	path string,
 	data []byte,
-) (assets.Embedded, error) {
+) (assets.Raw, error) {
 	var (
 		buf      = bytes.NewBufferString("")
 		metadata *frontmatter.Data
-		emb      assets.Embedded
+		emb      assets.Raw
 		err      error
 	)
+
 	err = m.Convert(data, buf, parser.WithContext(pCtx))
 	if err != nil {
 		return emb, eris.Wrapf(
@@ -310,6 +361,7 @@ func Convert(
 			path,
 		)
 	}
+
 	return emb, nil
 }
 
@@ -344,6 +396,7 @@ func (r *resolver) ResolveWikilink(n *wikilink.Node) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	return fmt.Appendf(nil,
 		"https://conneroh.fly.storage.tigris.dev/%s",
 		targetStr,
@@ -360,8 +413,11 @@ func slugify(s string) string {
 	return strings.TrimSuffix(pathify(s), filepath.Ext(s))
 }
 func pathify(s string) string {
-	var path string
-	var ok bool
+	var (
+		path string
+		ok   bool
+	)
+
 	path, ok = strings.CutPrefix(s, postsLoc)
 	if ok {
 		return path
@@ -381,13 +437,19 @@ func pathify(s string) string {
 	panic(fmt.Errorf("failed to pathify %s", s))
 }
 
-func match(path string, emb *assets.Embedded) {
+func match(path string, emb *assets.Raw) {
 	if strings.HasPrefix(path, postsLoc) {
-		parsedPosts = append(parsedPosts, assets.New[assets.Post](emb))
+		var post assets.Post
+		copygen.ToPost(&post, emb)
+		parsedPosts = append(parsedPosts, &post)
 	} else if strings.HasPrefix(path, projectsLoc) {
-		parsedProjects = append(parsedProjects, assets.New[assets.Project](emb))
+		var project assets.Project
+		copygen.ToProject(&project, emb)
+		parsedProjects = append(parsedProjects, &project)
 	} else if strings.HasPrefix(path, tagsLoc) {
-		parsedTags = append(parsedTags, assets.New[assets.Tag](emb))
+		var tag assets.Tag
+		copygen.ToTag(&tag, emb)
+		parsedTags = append(parsedTags, &tag)
 	}
 }
 
@@ -402,7 +464,7 @@ func handleDoc(
 	var (
 		err error
 		ok  bool
-		emb assets.Embedded
+		emb assets.Raw
 	)
 
 	pCtx := parser.NewContext()
@@ -420,7 +482,7 @@ func handleDoc(
 		return err
 	}
 
-	err = assets.Validate(&emb)
+	err = assets.Validate(path, &emb)
 	if err != nil {
 		return err
 	}
@@ -438,13 +500,13 @@ func handleDoc(
 			slog.Error("failed to get min version", "path", path)
 		}
 	} else {
-		err = ollama.Embeddings(ctx, emb.RawContent, &emb)
+		err = ollama.Embeddings(ctx, emb.RawContent, &emb.Emb)
 		if err != nil {
 			return err
 		}
 	}
 
-	cacheObj.SetDoc(path, emb)
+	cacheObj.SetDoc(path, emb.Emb)
 	cacheObj.Set(path, hash)
 	match(path, &emb)
 	return nil

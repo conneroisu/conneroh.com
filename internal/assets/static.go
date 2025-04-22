@@ -6,19 +6,13 @@ import (
 	"time"
 
 	"github.com/rotisserie/eris"
+	"github.com/uptrace/bun"
 	"gopkg.in/yaml.v3"
 )
 
 const (
 	// EmbedLength is the length of the full embedding.
 	EmbedLength = 768
-)
-
-var (
-	_ Embeddable = (*Post)(nil)
-	_ Embeddable = (*Project)(nil)
-	_ Embeddable = (*Tag)(nil)
-	_ Embeddable = (*Employment)(nil)
 )
 
 // CustomTime allows us to customize the YAML time parsing.
@@ -44,56 +38,179 @@ func (ct *CustomTime) UnmarshalYAML(value *yaml.Node) error {
 }
 
 type (
-	// Embeddable is an interface for embedding content.
-	Embeddable interface {
-		GetEmb() *Embedded
-		PagePath() string
-	}
-	// Post is a post with all its projects and tags.
-	Post struct {
-		Embedded
-	}
-	// Project is a project with all its posts and tags.
-	Project struct {
-		Embedded
-	}
-	// Tag is a tag with all its posts and projects.
-	Tag struct {
-		Embedded
-	}
-	// Employment is an employment of a tag.
-	Employment struct {
-		Embedded
-	}
+	// Doc is a base struct for all embeddedable structs.
+	Doc struct {
+		bun.BaseModel `bun:"docs"`
 
-	// Embedded is a base struct for all embeddedable structs.
-	Embedded struct {
-		Title           string `yaml:"title"`
-		Slug            string `yaml:"slug"`
-		Description     string `yaml:"description"`
-		Content         string
-		BannerPath      string `yaml:"banner_path"`
-		RawContent      string
-		Icon            string    `yaml:"icon"`
-		CreatedAt       time.Time `yaml:"created_at"`
-		UpdatedAt       time.Time `yaml:"updated_at"`
-		X               float64
-		Y               float64
-		Z               float64
-		TagSlugs        []string      `yaml:"tags"`
-		PostSlugs       []string      `yaml:"posts"`
-		ProjectSlugs    []string      `yaml:"projects"`
-		EmploymentSlugs []string      `yaml:"employments"`
-		Posts           []*Post       `yaml:"-" structgen:"PostSlugs"`
-		Tags            []*Tag        `yaml:"-" structgen:"TagSlugs"`
-		Projects        []*Project    `yaml:"-" structgen:"ProjectSlugs"`
-		Employments     []*Employment `yaml:"-" structgen:"EmploymentSlugs"`
+		ID    int64  `yaml:"-" bun:"id,pk,autoincrement"`
+		CType string `yaml:"-" bun:"ctype,notnull"`
+
+		Title        string     `yaml:"title"`
+		Slug         string     `yaml:"slug"`
+		Description  string     `yaml:"description"`
+		Content      string     `yaml:"-"`
+		BannerPath   string     `yaml:"banner_path"`
+		RawContent   string     `yaml:"-"`
+		Icon         string     `yaml:"icon"`
+		CreatedAt    CustomTime `yaml:"created_at"`
+		UpdatedAt    CustomTime `yaml:"updated_at"`
+		TagSlugs     []string   `yaml:"tags"`
+		PostSlugs    []string   `yaml:"posts"`
+		ProjectSlugs []string   `yaml:"projects"`
+		Posts        []*Post    `yaml:"-"`
+		Tags         []*Tag     `yaml:"-"`
+		Projects     []*Project `yaml:"-"`
+	}
+	// Emb is a struct for embedding.
+	Emb struct {
+		bun.BaseModel `bun:"embeddings"`
+
+		Hash string `bun:"hash" yaml:"-"`
+		// Hash string  `bun:"hash,pk,unique" yaml:"-"`
+		X float64 `json:"x"`
+		Y float64 `json:"y"`
+		Z float64 `json:"z"`
+	}
+	// Raw is a full raw doc.
+	Raw struct {
+		ID int64 `yaml:"-"`
+		Doc
+		Emb
+		Posts    []*Post    `yaml:"-"`
+		Tags     []*Tag     `yaml:"-"`
+		Projects []*Project `yaml:"-"`
 	}
 )
 
-// GetEmb returns the embedding struct itself.
-func (emb *Embedded) GetEmb() *Embedded {
-	return emb
+type (
+	// Post is a post with all its projects and tags.
+	Post struct {
+		bun.BaseModel `bun:"posts"`
+
+		ID int64 `bun:"id,pk,autoincrement" yaml:"-"`
+		Doc
+
+		EmbeddingID int64 `yaml:"-"`
+		Embbedding  Emb   `yaml:"-"`
+
+		TagSlugs     []string   `yaml:"tags"`
+		PostSlugs    []string   `yaml:"posts"`
+		ProjectSlugs []string   `yaml:"projects"`
+		Posts        []*Post    `yaml:"-" bun:"rel:has-many,join:post_slugs=slug"`
+		Tags         []*Tag     `yaml:"-" bun:"rel:has-many,join:tag_slugs=slug"`
+		Projects     []*Project `yaml:"-" bun:"rel:has-many,join:project_slugs=slug"`
+	}
+)
+
+type (
+	// Project is a project with all its posts and tags.
+	Project struct {
+		bun.BaseModel `bun:"projects"`
+
+		ID int64 `bun:"id,pk,autoincrement" yaml:"-"`
+		Doc
+
+		EmbbeddingID int64 `yaml:"-"`
+		Embedding    Emb   `yaml:"-"`
+
+		TagSlugs     []string   `yaml:"tags"`
+		PostSlugs    []string   `yaml:"posts"`
+		ProjectSlugs []string   `yaml:"projects"`
+		Posts        []*Post    `yaml:"-" bun:"rel:has-many,join:post_slugs=slug"`
+		Tags         []*Tag     `yaml:"-" bun:"rel:has-many,join:tag_slugs=slug"`
+		Projects     []*Project `yaml:"-" bun:"rel:has-many,join:project_slugs=slug"`
+	}
+)
+
+type (
+	// Tag is a tag with all its posts and projects.
+	Tag struct {
+		bun.BaseModel `bun:"tags"`
+
+		ID int64 `bun:"id,pk,autoincrement" yaml:"-"`
+		Doc
+		Embedding Emb `yaml:"-"`
+
+		TagSlugs     []string   `yaml:"tags"`
+		PostSlugs    []string   `yaml:"posts"`
+		ProjectSlugs []string   `yaml:"projects"`
+		Posts        []*Post    `yaml:"-" bun:"rel:has-many,join:post_slugs=slug"`
+		Tags         []*Tag     `yaml:"-" bun:"rel:has-many,join:tag_slugs=slug"`
+		Projects     []*Project `yaml:"-" bun:"rel:has-many,join:project_slugs=slug"`
+	}
+)
+
+// Defaults sets the default values for the embedding if they are missing.
+func Defaults(doc *Raw) error {
+	// Set default icon if not provided
+	if doc.Icon == "" {
+		doc.Icon = "tag"
+	}
+
+	return nil
+}
+
+// GetTitle returns the title of the embedding.
+func (emb *Doc) GetTitle() string {
+	return emb.Title
+}
+
+// Validate validate the given embedding.
+func Validate(
+	path string,
+	emb *Raw,
+) error {
+	errs := []error{}
+	if emb.Slug == "" {
+		errs = append(errs, eris.Wrapf(
+			ErrValueMissing,
+			"%s is missing slug",
+			path,
+		))
+	}
+
+	if emb.Description == "" {
+		errs = append(errs, eris.Wrapf(
+			ErrValueMissing,
+			"%s is missing description",
+			path,
+		))
+	}
+
+	if emb.Content == "" {
+		errs = append(errs, eris.Wrapf(
+			ErrValueMissing,
+			"%s is missing content",
+			path,
+		))
+	}
+
+	if emb.RawContent == "" {
+		errs = append(errs, eris.Wrapf(
+			ErrValueMissing,
+			"%s is missing raw content",
+			path,
+		))
+	}
+
+	if strings.Contains(emb.Slug, " ") {
+		errs = append(errs, eris.Wrapf(
+			ErrValueInvalid,
+			"slug %s contains spaces",
+			path,
+		))
+	}
+
+	var err error
+	for _, er := range errs {
+		if er != nil {
+			err = eris.Wrapf(err, "failed validating %s", path)
+		}
+	}
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // PagePath returns the path to the post page.
@@ -111,97 +228,14 @@ func (emb *Tag) PagePath() string {
 	return "/tag/" + emb.Slug
 }
 
-// PagePath returns the path to the employment page.
-func (emb *Employment) PagePath() string {
-	return "/employment/" + emb.Slug
+func (emb *Post) String() string {
+	return fmt.Sprintf("%s %s %s %d", emb.Title, emb.Slug, emb.Description, emb.ID)
 }
 
-// New creates a new instance of the given type.
-func New[
-	T Post | Project | Tag,
-](emb *Embedded) *T {
-	return &T{Embedded: *emb}
+func (emb *Project) String() string {
+	return fmt.Sprintf("%s %s %s %d", emb.Title, emb.Slug, emb.Description, emb.ID)
 }
 
-var (
-	// ErrValueMissing is returned when a value is missing.
-	ErrValueMissing = eris.Errorf("missing value")
-
-	// ErrValueInvalid is returned when the slug is invalid.
-	ErrValueInvalid = eris.Errorf("invalid value")
-)
-
-// Defaults sets the default values for the embedding if they are missing.
-func Defaults(emb *Embedded) error {
-	if emb == nil {
-		return eris.Wrap(
-			ErrValueMissing,
-			"whole embedding is nil",
-		)
-	}
-	// Set default icon if not provided
-	if emb.Icon == "" {
-		emb.Icon = "tag"
-	}
-
-	return nil
-}
-
-// Validate validate the given embedding.
-func Validate(
-	emb *Embedded,
-) error {
-	if emb.Title == "" {
-		return eris.Wrapf(
-			ErrValueMissing,
-			"%s is missing title",
-			emb.RawContent,
-		)
-	}
-
-	if emb.Slug == "" {
-		return eris.Wrapf(
-			ErrValueMissing,
-			"%s is missing slug",
-			emb.Title,
-		)
-	}
-
-	if emb.Description == "" {
-		return eris.Wrapf(
-			ErrValueMissing,
-			"%s is missing description",
-			emb.Slug,
-		)
-	}
-
-	if emb.Content == "" {
-		return eris.Wrapf(
-			ErrValueMissing,
-			"%s is missing content",
-			emb.Slug,
-		)
-	}
-
-	if emb.RawContent == "" {
-		return eris.Wrapf(
-			ErrValueMissing,
-			"%s is missing raw content",
-			emb.Slug,
-		)
-	}
-
-	if strings.Contains(emb.Slug, " ") {
-		return eris.Wrapf(
-			ErrValueInvalid,
-			"slug %s contains spaces",
-			emb.Slug,
-		)
-	}
-	return nil
-}
-
-// GetTitle returns the title of the embedding.
-func (emb *Embedded) GetTitle() string {
-	return emb.Title
+func (emb *Tag) String() string {
+	return fmt.Sprintf("%s %s %s %d", emb.Title, emb.Slug, emb.Description, emb.ID)
 }

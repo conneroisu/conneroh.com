@@ -5,11 +5,9 @@ import (
 	"context"
 	"flag"
 	"log"
-	"log/slog"
 	"os"
 	"time"
 
-	"github.com/conneroisu/conneroh.com/internal/routing"
 	"github.com/playwright-community/playwright-go"
 	"golang.org/x/sync/errgroup"
 )
@@ -96,26 +94,26 @@ func run(
 
 	time.Sleep(time.Second * 40)
 
-	for _, url := range routing.ComputeAllURLs(base) {
-		eg.Go(func() error {
-			page, pErr := bCtx.NewPage()
-			if pErr != nil {
-				return pErr
-			}
-			defer func() {
-				err = page.Close()
-				if err != nil {
-					log.Fatalf("could not close page: %v", err)
-				}
-			}()
-			if _, pErr = page.Goto(url, playwright.PageGotoOptions{}); pErr != nil {
-				return pErr
-			}
-			time.Sleep(time.Second)
-			slog.Info("visited post", "url", url)
-			return nil
-		})
-	}
+	// for _, url := range routing.ComputeAllURLs(base) {
+	// 	eg.Go(func() error {
+	// 		page, pErr := bCtx.NewPage()
+	// 		if pErr != nil {
+	// 			return pErr
+	// 		}
+	// 		defer func() {
+	// 			err = page.Close()
+	// 			if err != nil {
+	// 				log.Fatalf("could not close page: %v", err)
+	// 			}
+	// 		}()
+	// 		if _, pErr = page.Goto(url, playwright.PageGotoOptions{}); pErr != nil {
+	// 			return pErr
+	// 		}
+	// 		time.Sleep(time.Second)
+	// 		slog.Info("visited post", "url", url)
+	// 		return nil
+	// 	})
+	// }
 	err = eg.Wait()
 	if err != nil {
 		return err

@@ -2,6 +2,8 @@
 package main
 
 import (
+	"context"
+	"database/sql"
 	"flag"
 	"fmt"
 	"os"
@@ -11,9 +13,12 @@ import (
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/layouts"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/views"
 	"github.com/conneroisu/conneroh.com/internal/assets"
-	"github.com/conneroisu/conneroh.com/internal/data/gen"
 	"github.com/conneroisu/conneroh.com/internal/routing"
 	"github.com/conneroisu/twerge"
+	"github.com/uptrace/bun"
+	"github.com/uptrace/bun/dialect/sqlitedialect"
+
+	_ "modernc.org/sqlite"
 )
 
 var cwd = flag.String("cwd", "", "current working directory")
@@ -31,38 +36,62 @@ func main() {
 			panic(err)
 		}
 	}
+	sqlDB, err := sql.Open("sqlite", "file:test.db?cache=shared&mode=rwc")
+	if err != nil {
+		panic(err)
+	}
+	db := bun.NewDB(sqlDB, sqlitedialect.New())
+
+	var (
+		allPosts    []*assets.Post
+		allProjects []*assets.Project
+		allTags     []*assets.Tag
+	)
+	_, err = db.NewSelect().Model(assets.EmpPost).Exec(context.Background(), &allPosts)
+	if err != nil {
+		panic(err)
+	}
+	_, err = db.NewSelect().Model(assets.EmpProject).Exec(context.Background(), &allProjects)
+	if err != nil {
+		panic(err)
+	}
+	_, err = db.NewSelect().Model(assets.EmpTag).Exec(context.Background(), &allTags)
+	if err != nil {
+		panic(err)
+	}
 	if err := twerge.CodeGen(
+		twerge.Default(),
 		"internal/data/css/classes.go",
 		"input.css",
 		"internal/data/css/classes.html",
 		layouts.Page(views.Home(
-			&gen.AllPosts,
-			&gen.AllProjects,
-			&gen.AllTags,
+			&allPosts,
+			&allProjects,
+			&allTags,
 		)),
 		layouts.Page(views.List(
 			routing.PostPluralPath,
-			&gen.AllPosts,
-			&gen.AllProjects,
-			&gen.AllTags,
+			&allPosts,
+			&allProjects,
+			&allTags,
 			"",
 			1,
 			10,
 		)),
 		layouts.Page(views.List(
 			routing.ProjectPluralPath,
-			&gen.AllPosts,
-			&gen.AllProjects,
-			&gen.AllTags,
+			&allPosts,
+			&allProjects,
+			&allTags,
 			"",
 			1,
 			10,
 		)),
 		layouts.Page(views.List(
 			routing.TagsPluralPath,
-			&gen.AllPosts,
-			&gen.AllProjects,
-			&gen.AllTags,
+			&allPosts,
+			&allProjects,
+			&allTags,
 			"",
 			1,
 			10,
@@ -71,28 +100,16 @@ func main() {
 			&assets.Tag{},
 		),
 		layouts.Page(views.Post(
-			gen.AllPosts[0],
-			&gen.AllPosts,
-			&gen.AllProjects,
-			&gen.AllTags,
+			allPosts[0],
 		)),
 		layouts.Page(views.Project(
-			gen.AllProjects[0],
-			&gen.AllPosts,
-			&gen.AllProjects,
-			&gen.AllTags,
+			allProjects[0],
 		)),
 		layouts.Page(views.Tag(
-			gen.AllTags[0],
-			&gen.AllPosts,
-			&gen.AllProjects,
-			&gen.AllTags,
+			allTags[0],
 		)),
 		views.Post(
-			gen.AllPosts[0],
-			&gen.AllPosts,
-			&gen.AllProjects,
-			&gen.AllTags,
+			allPosts[0],
 		),
 		layouts.Layout("hello"),
 		components.ThankYou(),

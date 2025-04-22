@@ -22,4 +22,4 @@ templ Home() {
 ```
 `twerge` introduces a required code generation step to improve performance of the runtime application.
 
-
+This code generation step requires a golang program to be run in order to render all to be used templ templates and generate the required code.

@@ -3,19 +3,11 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-
+    systems.url = "github:nix-systems/default";
     flake-utils = {
       url = "github:numtide/flake-utils";
       inputs.systems.follows = "systems";
     };
-
-    nix2container = {
-      url = "github:nlewo/nix2container";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-utils.follows = "flake-utils";
-    };
-
-    systems.url = "github:nix-systems/default";
   };
 
   nixConfig = {
@@ -25,18 +17,12 @@
   };
 
   outputs = inputs @ {flake-utils, ...}:
-    flake-utils.lib.eachSystem [
-      "x86_64-linux"
-      "i686-linux"
-      "x86_64-darwin"
-      "aarch64-linux"
-      "aarch64-darwin"
-    ] (system: let
+    flake-utils.lib.eachDefaultSystem (system: let
       overlays = [(final: prev: {final.go = prev.go_1_24;})];
       pkgs = import inputs.nixpkgs {inherit system overlays;};
       buildGoModule = pkgs.buildGoModule.override {go = pkgs.go_1_24;};
       specificGo = pkg: pkg.override {inherit buildGoModule;};
-    in rec {
+    in {
       devShells.default = let
         scripts = {
           dx = {
@@ -162,20 +148,7 @@
             ++ scriptPackages;
         };
 
-      overlays = {
-        default = final: prev: {
-          inherit (packages) hasher;
-        };
-      };
-
       packages = {
-        hasher = buildGoModule {
-          name = "hasher";
-          src = ./cmd/hasher;
-          vendorHash = null;
-          version = "0.0.1";
-          subPackages = ["."];
-        };
         doc = pkgs.stdenv.mkDerivation {
           pname = "twerge-docs";
           version = "0.1";
