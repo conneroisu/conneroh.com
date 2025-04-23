@@ -225,6 +225,7 @@
               nodePackages.prettier
               inputs.bun2nix.defaultPackage.${pkgs.system}.bin
               svgcleaner
+              sqlite-web
 
               flyctl # Infra
               openssl.dev
@@ -335,9 +336,7 @@
           config = {
             WorkingDir = "/root";
             Cmd = ["/bin/conneroh.com"];
-            ExposedPorts = {
-              "8080/tcp" = {};
-            };
+            ExposedPorts = {"8080/tcp" = {};};
             Env = [
               "SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
               "NIX_SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"

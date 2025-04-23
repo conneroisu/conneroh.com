@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"log"
 	"log/slog"
 	"net"
 	"net/http"
@@ -15,7 +14,10 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/conneroisu/conneroh.com/internal/assets"
 	classes "github.com/conneroisu/conneroh.com/internal/data/css"
+	"github.com/conneroisu/conneroh.com/internal/logger"
+	"github.com/rotisserie/eris"
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/sqlitedialect"
 
@@ -36,20 +38,20 @@ const (
 // NewServer creates a new web-ui server
 func NewServer(
 	ctx context.Context,
-) http.Handler {
+) (http.Handler, error) {
 	classes.SetCache()
+	slog.SetDefault(logger.DefaultLogger)
 	mux := http.NewServeMux()
-	sqlDB, err := sql.Open("sqlite", "test.db")
+	sqlDB, err := sql.Open("sqlite", assets.DBName())
 	if err != nil {
-		slog.Error("error opening database", slog.String("error", err.Error()))
-		return nil
+		return nil, eris.Wrap(err, "error opening database")
 	}
 	db := bun.NewDB(sqlDB, sqlitedialect.New())
+	assets.RegisterModels(db)
 
 	err = AddRoutes(ctx, mux, db)
 	if err != nil {
-		slog.Error("error adding routes", slog.String("error", err.Error()))
-		log.Fatal(err)
+		return nil, eris.Wrap(err, "error adding routes")
 	}
 	slogLogHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		slog.Info(
@@ -65,7 +67,7 @@ func NewServer(
 		mux.ServeHTTP(w, r)
 	})
 	var handler http.Handler = slogLogHandler
-	return handler
+	return handler, nil
 }
 
 // Run is the entry point for the application.
@@ -91,7 +93,10 @@ func Run(
 		wg         sync.WaitGroup
 	)
 
-	handler := NewServer(ctx) // Use original context for server setup
+	handler, err := NewServer(ctx) // Use original context for server setup
+	if err != nil {
+		return err
+	}
 
 	// Configure server with timeouts
 	httpServer = &http.Server{

@@ -7,7 +7,9 @@ created_at: 2025-03-27T14:13:17.000-06:00
 description: CMake is a cross-platform, open-source build system.
 icon: cmake-plain
 title: CMake
-updated_at: 2025-03-28T20:07:44.000-06:00
+updated_at: 2025-04-23T07:03:02.000-06:00
 ---
 
 # CMake
+
+CMake is a cross-platform, open-source build system.

@@ -15,10 +15,6 @@ import (
 )
 
 var (
-	tag     = new(assets.Tag)
-	project = new(assets.Project)
-	post    = new(assets.Post)
-
 	homePage    *templ.Component
 	postList    *templ.Component
 	projectList *templ.Component
@@ -50,23 +46,32 @@ func AddRoutes(
 				).ServeHTTP(w, r)
 				return
 			}
-			err := db.NewSelect().Model(post).
+			_, err := db.NewSelect().Model(assets.EmpPost).
 				Order("updated_at").
-				Scan(r.Context(), &allPosts)
+				Relation("Tags").
+				Relation("Posts").
+				Relation("Projects").
+				Exec(r.Context(), &allPosts)
 			if err != nil {
 				slog.Error("failed to scan posts", "err", err, "posts", postList)
 				return
 			}
-			err = db.NewSelect().Model(project).
+			_, err = db.NewSelect().Model(assets.EmpProject).
 				Order("updated_at").
-				Scan(r.Context(), &allProjects)
+				Relation("Tags").
+				Relation("Posts").
+				Relation("Projects").
+				Exec(r.Context(), &allProjects)
 			if err != nil {
 				slog.Error("failed to scan projects", "err", err, "projects", projectList)
 				return
 			}
-			err = db.NewSelect().Model(tag).
+			_, err = db.NewSelect().Model(assets.EmpTag).
 				Order("updated_at").
-				Scan(r.Context(), &allTags)
+				Relation("Tags").
+				Relation("Posts").
+				Relation("Projects").
+				Exec(r.Context(), &allTags)
 			if err != nil {
 				slog.Error("failed to scan tags", "err", err)
 				return
@@ -104,11 +109,14 @@ func AddRoutes(
 				routing.MorphableHandler(layouts.Page(*postList), *postList).ServeHTTP(w, r)
 				return
 			}
-			err := db.NewSelect().Model(post).
+			_, err := db.NewSelect().Model(assets.EmpPost).
 				Order("created_at").
-				Scan(r.Context(), &allPosts)
+				Relation("Tags").
+				Relation("Posts").
+				Relation("Projects").
+				Exec(r.Context(), &allPosts)
 			if err != nil {
-				slog.Error("failed to scan posts", "err", err, "posts", postList)
+				slog.Error("failed to exec select posts", "err", err, "posts", postList)
 				return
 			}
 			var posts = views.List(
@@ -141,9 +149,12 @@ func AddRoutes(
 				).ServeHTTP(w, r)
 				return
 			}
-			err := db.NewSelect().Model(post).
+			_, err := db.NewSelect().Model(assets.EmpPost).
 				Where("slug = ?", routing.Slug(r)).
-				Limit(1).Scan(r.Context(), &p)
+				Relation("Tags").
+				Relation("Posts").
+				Relation("Projects").
+				Limit(1).Exec(r.Context(), &p)
 			if err != nil {
 				slog.Error("failed to scan post", "err", err)
 				return
@@ -164,9 +175,12 @@ func AddRoutes(
 				).ServeHTTP(w, r)
 				return
 			}
-			err := db.NewSelect().Model(project).
+			_, err := db.NewSelect().Model(assets.EmpProject).
 				Order("created_at").
-				Scan(r.Context(), &allProjects)
+				Relation("Tags").
+				Relation("Posts").
+				Relation("Projects").
+				Exec(r.Context(), &allProjects)
 			if err != nil {
 				slog.Error("failed to scan projects", "err", err, "projects", projectList)
 				return
@@ -202,9 +216,12 @@ func AddRoutes(
 				).ServeHTTP(w, r)
 				return
 			}
-			err := db.NewSelect().Model(project).
+			_, err := db.NewSelect().Model(assets.EmpProject).
 				Where("slug = ?", routing.Slug(r)).
-				Limit(1).Scan(r.Context(), &p)
+				Relation("Tags").
+				Relation("Posts").
+				Relation("Projects").
+				Limit(1).Exec(r.Context(), &p)
 			if err != nil {
 				slog.Error("failed to scan project", "err", err)
 				return
@@ -224,9 +241,12 @@ func AddRoutes(
 				routing.MorphableHandler(layouts.Page(*tagList), *tagList).ServeHTTP(w, r)
 				return
 			}
-			err := db.NewSelect().Model(tag).
+			_, err := db.NewSelect().Model(assets.EmpTag).
 				Order("created_at").
-				Scan(r.Context(), &allTags)
+				Relation("Tags").
+				Relation("Posts").
+				Relation("Projects").
+				Exec(r.Context(), &allTags)
 			if err != nil {
 				slog.Error("failed to scan tags", "err", err)
 				return
@@ -263,9 +283,12 @@ func AddRoutes(
 				).ServeHTTP(w, r)
 				return
 			}
-			err := db.NewSelect().Model(tag).
+			_, err := db.NewSelect().Model(assets.EmpTag).
 				Where("slug = ?", routing.Slug(r)).
-				Limit(1).Scan(r.Context(), &t)
+				Relation("Tags").
+				Relation("Posts").
+				Relation("Projects").
+				Limit(1).Exec(r.Context(), &t)
 			if err != nil {
 				slog.Error("failed to scan tag", "err", err)
 				return

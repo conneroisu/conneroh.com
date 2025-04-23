@@ -6,44 +6,77 @@ package copygen
 
 import "github.com/conneroisu/conneroh.com/internal/assets"
 
-// ToPost copies a *assets.Raw to a *assets.Post.
-func ToPost(tP *assets.Post, fR *assets.Raw) {
+// ToPost copies a *assets.Doc to a *assets.Post.
+func ToPost(tP *assets.Post, fD *assets.Doc) {
 	// *assets.Post fields
-	tP.BaseModel = fR.Doc.BaseModel
-	tP.ID = fR.ID
-	tP.Doc = fR.Doc
-	tP.Embbedding.BaseModel = fR.Doc.BaseModel
-	tP.Embbedding.Hash = fR.Emb.Hash
-	tP.Embbedding.X = fR.Emb.X
-	tP.Embbedding.Y = fR.Emb.Y
-	tP.Embbedding.Z = fR.Emb.Z
-	tP.Tags = fR.Tags
-	tP.Projects = fR.Projects
+	tP.Hash = fD.Hash
+	tP.X = fD.X
+	tP.Y = fD.Y
+	tP.Z = fD.Z
+	tP.Title = fD.Title
+	tP.Slug = fD.Slug
+	tP.Description = fD.Description
+	tP.Content = fD.Content
+	tP.BannerPath = fD.BannerPath
+	tP.RawContent = fD.RawContent
+	tP.Icon = fD.Icon
+	tP.CreatedAt = fD.CreatedAt
+	tP.UpdatedAt = fD.UpdatedAt
+	tP.TagSlugs = fD.TagSlugs
+	tP.PostSlugs = fD.PostSlugs
+	tP.ProjectSlugs = fD.ProjectSlugs
+	tP.Tags = fD.Tags
+	tP.Projects = fD.Projects
 }
 
-// ToProject copies a *assets.Raw to a *assets.Project.
-func ToProject(tP *assets.Project, fR *assets.Raw) {
+// ToProject copies a *assets.Doc to a *assets.Project.
+func ToProject(tP *assets.Project, fD *assets.Doc) {
 	// *assets.Project fields
-	tP.BaseModel = fR.Doc.BaseModel
-	tP.ID = fR.ID
-	tP.Doc = fR.Doc
-	tP.Embedding.BaseModel = fR.Doc.BaseModel
-	tP.Embedding.Hash = fR.Emb.Hash
-	tP.Embedding.X = fR.Emb.X
-	tP.Embedding.Y = fR.Emb.Y
-	tP.Embedding.Z = fR.Emb.Z
+	tP.Hash = fD.Hash
+	tP.X = fD.X
+	tP.Y = fD.Y
+	tP.Z = fD.Z
+	tP.Title = fD.Title
+	tP.Slug = fD.Slug
+	tP.Description = fD.Description
+	tP.Content = fD.Content
+	tP.BannerPath = fD.BannerPath
+	tP.RawContent = fD.RawContent
+	tP.Icon = fD.Icon
+	tP.CreatedAt = fD.CreatedAt
+	tP.UpdatedAt = fD.UpdatedAt
+	tP.TagSlugs = fD.TagSlugs
+	tP.PostSlugs = fD.PostSlugs
+	tP.ProjectSlugs = fD.ProjectSlugs
 }
 
-// ToTag copies a *assets.Raw to a *assets.Tag.
-func ToTag(tT *assets.Tag, fR *assets.Raw) {
+// ToTag copies a *assets.Doc to a *assets.Tag.
+func ToTag(tT *assets.Tag, fD *assets.Doc) {
 	// *assets.Tag fields
-	tT.BaseModel = fR.Doc.BaseModel
-	tT.ID = fR.ID
-	tT.Doc = fR.Doc
-	tT.Embedding.BaseModel = fR.Doc.BaseModel
-	tT.Embedding.Hash = fR.Emb.Hash
-	tT.Embedding.X = fR.Emb.X
-	tT.Embedding.Y = fR.Emb.Y
-	tT.Embedding.Z = fR.Emb.Z
-	tT.Projects = fR.Projects
+	tT.Hash = fD.Hash
+	tT.X = fD.X
+	tT.Y = fD.Y
+	tT.Z = fD.Z
+	tT.Title = fD.Title
+	tT.Slug = fD.Slug
+	tT.Description = fD.Description
+	tT.Content = fD.Content
+	tT.BannerPath = fD.BannerPath
+	tT.RawContent = fD.RawContent
+	tT.Icon = fD.Icon
+	tT.CreatedAt = fD.CreatedAt
+	tT.UpdatedAt = fD.UpdatedAt
+	tT.TagSlugs = fD.TagSlugs
+	tT.PostSlugs = fD.PostSlugs
+	tT.ProjectSlugs = fD.ProjectSlugs
+	tT.Projects = fD.Projects
+}
+
+// ToAsset copies a *assets.Doc to a *assets.Asset.
+func ToAsset(tA *assets.Asset, fD *assets.Doc) {
+	// *assets.Asset fields
+	tA.Hash = fD.Hash
+	tA.X = fD.X
+	tA.Y = fD.Y
+	tA.Z = fD.Z
 }

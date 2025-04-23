@@ -1,6 +1,8 @@
 package assets
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"fmt"
 	"strings"
 	"time"
@@ -9,6 +11,11 @@ import (
 	"github.com/uptrace/bun"
 	"gopkg.in/yaml.v3"
 )
+
+// DBName returns the name/file of the database.
+func DBName() string {
+	return "file:master.db?_pragma=busy_timeout=5000&_pragma=journal_mode=WAL&_pragma=mmap_size=30000000000&_pragma=page_size=32768&_pragma=synchronous=FULL"
+}
 
 const (
 	// EmbedLength is the length of the full embedding.
@@ -40,45 +47,25 @@ func (ct *CustomTime) UnmarshalYAML(value *yaml.Node) error {
 type (
 	// Doc is a base struct for all embeddedable structs.
 	Doc struct {
-		bun.BaseModel `bun:"docs"`
-
-		ID    int64  `yaml:"-" bun:"id,pk,autoincrement"`
-		CType string `yaml:"-" bun:"ctype,notnull"`
-
 		Title        string     `yaml:"title"`
 		Slug         string     `yaml:"slug"`
 		Description  string     `yaml:"description"`
 		Content      string     `yaml:"-"`
 		BannerPath   string     `yaml:"banner_path"`
-		RawContent   string     `yaml:"-"`
+		RawContent   []byte     `yaml:"-"`
 		Icon         string     `yaml:"icon"`
 		CreatedAt    CustomTime `yaml:"created_at"`
 		UpdatedAt    CustomTime `yaml:"updated_at"`
 		TagSlugs     []string   `yaml:"tags"`
 		PostSlugs    []string   `yaml:"posts"`
 		ProjectSlugs []string   `yaml:"projects"`
+		Hash         string     `bun:"hash" yaml:"-"`
+		X            float64    `json:"x"`
+		Y            float64    `json:"y"`
+		Z            float64    `json:"z"`
 		Posts        []*Post    `yaml:"-"`
 		Tags         []*Tag     `yaml:"-"`
 		Projects     []*Project `yaml:"-"`
-	}
-	// Emb is a struct for embedding.
-	Emb struct {
-		bun.BaseModel `bun:"embeddings"`
-
-		Hash string `bun:"hash" yaml:"-"`
-		// Hash string  `bun:"hash,pk,unique" yaml:"-"`
-		X float64 `json:"x"`
-		Y float64 `json:"y"`
-		Z float64 `json:"z"`
-	}
-	// Raw is a full raw doc.
-	Raw struct {
-		ID int64 `yaml:"-"`
-		Doc
-		Emb
-		Posts    []*Post    `yaml:"-"`
-		Tags     []*Tag     `yaml:"-"`
-		Projects []*Project `yaml:"-"`
 	}
 )
 
@@ -88,60 +75,192 @@ type (
 		bun.BaseModel `bun:"posts"`
 
 		ID int64 `bun:"id,pk,autoincrement" yaml:"-"`
-		Doc
 
-		EmbeddingID int64 `yaml:"-"`
-		Embbedding  Emb   `yaml:"-"`
+		Hash string  `bun:"hashed,unique" yaml:"-"`
+		X    float64 `json:"x"`
+		Y    float64 `json:"y"`
+		Z    float64 `json:"z"`
 
-		TagSlugs     []string   `yaml:"tags"`
-		PostSlugs    []string   `yaml:"posts"`
-		ProjectSlugs []string   `yaml:"projects"`
-		Posts        []*Post    `yaml:"-" bun:"rel:has-many,join:post_slugs=slug"`
-		Tags         []*Tag     `yaml:"-" bun:"rel:has-many,join:tag_slugs=slug"`
-		Projects     []*Project `yaml:"-" bun:"rel:has-many,join:project_slugs=slug"`
+		Title       string     `yaml:"title"`
+		Slug        string     `yaml:"slug"`
+		Description string     `yaml:"description"`
+		Content     string     `yaml:"-"`
+		BannerPath  string     `yaml:"banner_path"`
+		RawContent  []byte     `yaml:"-"`
+		Icon        string     `yaml:"icon"`
+		CreatedAt   CustomTime `yaml:"created_at"`
+		UpdatedAt   CustomTime `yaml:"updated_at"`
+
+		TagSlugs     []string `bun:"tag_slugs"`
+		PostSlugs    []string `bun:"post_slugs"`
+		ProjectSlugs []string `bun:"project_slugs"`
+
+		// M2M relationships
+		Tags     []*Tag     `yaml:"-" bun:"m2m:post_to_tags,join:Post=Tag"`
+		Posts    []*Post    `yaml:"-" bun:"m2m:post_to_posts,join:SourcePost=TargetPost"`
+		Projects []*Project `yaml:"-" bun:"m2m:post_to_projects,join:Post=Project"`
 	}
-)
 
-type (
 	// Project is a project with all its posts and tags.
 	Project struct {
 		bun.BaseModel `bun:"projects"`
 
 		ID int64 `bun:"id,pk,autoincrement" yaml:"-"`
-		Doc
 
-		EmbbeddingID int64 `yaml:"-"`
-		Embedding    Emb   `yaml:"-"`
+		Hash string  `bun:"hashed,unique" yaml:"-"`
+		X    float64 `json:"x"`
+		Y    float64 `json:"y"`
+		Z    float64 `json:"z"`
 
-		TagSlugs     []string   `yaml:"tags"`
-		PostSlugs    []string   `yaml:"posts"`
-		ProjectSlugs []string   `yaml:"projects"`
-		Posts        []*Post    `yaml:"-" bun:"rel:has-many,join:post_slugs=slug"`
-		Tags         []*Tag     `yaml:"-" bun:"rel:has-many,join:tag_slugs=slug"`
-		Projects     []*Project `yaml:"-" bun:"rel:has-many,join:project_slugs=slug"`
+		Title       string     `yaml:"title"`
+		Slug        string     `yaml:"slug"`
+		Description string     `yaml:"description"`
+		Content     string     `yaml:"-"`
+		BannerPath  string     `yaml:"banner_path"`
+		RawContent  []byte     `yaml:"-"`
+		Icon        string     `yaml:"icon"`
+		CreatedAt   CustomTime `yaml:"created_at"`
+		UpdatedAt   CustomTime `yaml:"updated_at"`
+
+		TagSlugs     []string `bun:"tag_slugs"`
+		PostSlugs    []string `bun:"post_slugs"`
+		ProjectSlugs []string `bun:"project_slugs"`
+
+		// M2M relationships
+		Tags     []*Tag     `yaml:"-" bun:"m2m:project_to_tags,join:Project=Tag"`
+		Posts    []*Post    `yaml:"-" bun:"m2m:post_to_projects,join:Project=Post"`
+		Projects []*Project `yaml:"-" bun:"m2m:project_to_projects,join:SourceProject=TargetProject"`
 	}
-)
 
-type (
 	// Tag is a tag with all its posts and projects.
 	Tag struct {
 		bun.BaseModel `bun:"tags"`
 
-		ID int64 `bun:"id,pk,autoincrement" yaml:"-"`
-		Doc
-		Embedding Emb `yaml:"-"`
+		ID int64 `bun:"id,pk,autoincrement"`
 
-		TagSlugs     []string   `yaml:"tags"`
-		PostSlugs    []string   `yaml:"posts"`
-		ProjectSlugs []string   `yaml:"projects"`
-		Posts        []*Post    `yaml:"-" bun:"rel:has-many,join:post_slugs=slug"`
-		Tags         []*Tag     `yaml:"-" bun:"rel:has-many,join:tag_slugs=slug"`
-		Projects     []*Project `yaml:"-" bun:"rel:has-many,join:project_slugs=slug"`
+		Hash string  `bun:"hashed,unique"`
+		X    float64 `json:"x"`
+		Y    float64 `json:"y"`
+		Z    float64 `json:"z"`
+
+		Title       string
+		Slug        string
+		Description string
+		Content     string
+		BannerPath  string
+		RawContent  []byte
+		Icon        string
+		CreatedAt   CustomTime
+		UpdatedAt   CustomTime
+
+		TagSlugs     []string `bun:"tag_slugs"`
+		PostSlugs    []string `bun:"post_slugs"`
+		ProjectSlugs []string `bun:"project_slugs"`
+
+		// M2M relationships
+		Tags     []*Tag     `yaml:"-" bun:"m2m:tag_to_tags,join:SourceTag=TargetTag"`
+		Posts    []*Post    `yaml:"-" bun:"m2m:post_to_tags,join:Tag=Post"`
+		Projects []*Project `yaml:"-" bun:"m2m:project_to_tags,join:Tag=Project"`
+	}
+
+	// Asset is a media asset.
+	Asset struct {
+		bun.BaseModel `bun:"assets"`
+
+		ID   int64  `bun:"id,pk,autoincrement"`
+		Path string `yaml:"-" bun:"path,unique"`
+		Hash string `bun:"hashed,unique"`
+
+		X float64 `json:"x"`
+		Y float64 `json:"y"`
+		Z float64 `json:"z"`
 	}
 )
 
-// Defaults sets the default values for the embedding if they are missing.
-func Defaults(doc *Raw) error {
+type (
+	// PostToTag represents a many-to-many relationship between posts and tags
+	PostToTag struct {
+		bun.BaseModel `bun:"post_to_tags"`
+
+		PostID int64 `bun:",pk"`
+		Post   *Post `bun:"rel:belongs-to,join:post_id=id"`
+		TagID  int64 `bun:",pk"`
+		Tag    *Tag  `bun:"rel:belongs-to,join:tag_id=id"`
+	}
+
+	// PostToPost represents a many-to-many relationship between posts and other posts
+	PostToPost struct {
+		bun.BaseModel `bun:"post_to_posts"`
+
+		SourcePostID int64 `bun:",pk"`
+		SourcePost   *Post `bun:"rel:belongs-to,join:source_post_id=id"`
+		TargetPostID int64 `bun:",pk"`
+		TargetPost   *Post `bun:"rel:belongs-to,join:target_post_id=id"`
+	}
+
+	// PostToProject represents a many-to-many relationship between posts and projects
+	PostToProject struct {
+		bun.BaseModel `bun:"post_to_projects"`
+
+		PostID    int64    `bun:",pk"`
+		Post      *Post    `bun:"rel:belongs-to,join:post_id=id"`
+		ProjectID int64    `bun:",pk"`
+		Project   *Project `bun:"rel:belongs-to,join:project_id=id"`
+	}
+
+	// ProjectToTag represents a many-to-many relationship between projects and tags
+	ProjectToTag struct {
+		bun.BaseModel `bun:"project_to_tags"`
+
+		ProjectID int64    `bun:",pk"`
+		Project   *Project `bun:"rel:belongs-to,join:project_id=id"`
+		TagID     int64    `bun:",pk"`
+		Tag       *Tag     `bun:"rel:belongs-to,join:tag_id=id"`
+	}
+
+	// ProjectToProject represents a many-to-many relationship between projects and other projects
+	ProjectToProject struct {
+		bun.BaseModel `bun:"project_to_projects"`
+
+		SourceProjectID int64    `bun:",pk"`
+		SourceProject   *Project `bun:"rel:belongs-to,join:source_project_id=id"`
+		TargetProjectID int64    `bun:",pk"`
+		TargetProject   *Project `bun:"rel:belongs-to,join:target_project_id=id"`
+	}
+
+	// TagToTag represents a many-to-many relationship between tags and other tags
+	TagToTag struct {
+		bun.BaseModel `bun:"tag_to_tags"`
+
+		SourceTagID int64 `bun:",pk"`
+		SourceTag   *Tag  `bun:"rel:belongs-to,join:source_tag_id=id"`
+		TargetTagID int64 `bun:",pk"`
+		TargetTag   *Tag  `bun:"rel:belongs-to,join:target_tag_id=id"`
+	}
+
+	// TagToPost represents a many-to-many relationship between tags and posts
+	TagToPost struct {
+		bun.BaseModel `bun:"tag_to_posts"`
+
+		TagID  int64 `bun:",pk"`
+		Tag    *Tag  `bun:"rel:belongs-to,join:tag_id=id"`
+		PostID int64 `bun:",pk"`
+		Post   *Post `bun:"rel:belongs-to,join:post_id=id"`
+	}
+
+	// TagToProject represents a many-to-many relationship between tags and projects
+	TagToProject struct {
+		bun.BaseModel `bun:"tag_to_projects"`
+
+		TagID     int64    `bun:",pk"`
+		Tag       *Tag     `bun:"rel:belongs-to,join:tag_id=id"`
+		ProjectID int64    `bun:",pk"`
+		Project   *Project `bun:"rel:belongs-to,join:project_id=id"`
+	}
+)
+
+// Defaults sets the default values for the document if they are missing.
+func Defaults(doc *Doc) error {
 	// Set default icon if not provided
 	if doc.Icon == "" {
 		doc.Icon = "tag"
@@ -158,7 +277,7 @@ func (emb *Doc) GetTitle() string {
 // Validate validate the given embedding.
 func Validate(
 	path string,
-	emb *Raw,
+	emb *Doc,
 ) error {
 	errs := []error{}
 	if emb.Slug == "" {
@@ -185,7 +304,7 @@ func Validate(
 		))
 	}
 
-	if emb.RawContent == "" {
+	if len(emb.RawContent) == 0 {
 		errs = append(errs, eris.Wrapf(
 			ErrValueMissing,
 			"%s is missing raw content",
@@ -238,4 +357,10 @@ func (emb *Project) String() string {
 
 func (emb *Tag) String() string {
 	return fmt.Sprintf("%s %s %s %d", emb.Title, emb.Slug, emb.Description, emb.ID)
+}
+
+// Hash calculates the hash of a file's content.
+func Hash(content []byte) string {
+	sum := md5.Sum(content)
+	return hex.EncodeToString(sum[:])
 }

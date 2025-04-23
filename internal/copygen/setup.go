@@ -6,9 +6,11 @@ import "github.com/conneroisu/conneroh.com/internal/assets"
 /* Copygen defines the functions that are generated. */
 type Copygen interface {
 	// depth domain.Post 2
-	ToPost(*assets.Raw) *assets.Post
+	ToPost(*assets.Doc) *assets.Post
 	// depth domain.Project 2
-	ToProject(*assets.Raw) *assets.Project
+	ToProject(*assets.Doc) *assets.Project
 	// depth domain.Tag 2
-	ToTag(*assets.Raw) *assets.Tag
+	ToTag(*assets.Doc) *assets.Tag
+
+	ToAsset(*assets.Doc) *assets.Asset
 }
