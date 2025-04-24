@@ -91,9 +91,9 @@ type (
 		CreatedAt   CustomTime `bun:"created_at"`
 		UpdatedAt   CustomTime `bun:"updated_at"`
 
-		TagSlugs     []string `bun:"tag_slugs"`
-		PostSlugs    []string `bun:"post_slugs"`
-		ProjectSlugs []string `bun:"project_slugs"`
+		TagSlugs     []string
+		PostSlugs    []string
+		ProjectSlugs []string
 
 		// M2M relationships
 		Tags     []*Tag     `bun:"m2m:post_to_tags,join:Post=Tag"`

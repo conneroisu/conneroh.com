@@ -72,19 +72,20 @@ func run(
 	}
 	defer sqldb.Close()
 	db := bun.NewDB(sqldb, sqlitedialect.New())
-	// db.AddQueryHook(bundebug.NewQueryHook(bundebug.WithVerbose(true)))
 	err = assets.InitDB(ctx, db)
 	if err != nil {
 		return err
 	}
 	fs := afero.NewBasePathFs(afero.NewOsFs(), assets.VaultLoc)
 	md := markdown.NewMD(fs)
+	// db.AddQueryHook(bundebug.NewQueryHook(bundebug.WithVerbose(true)))
 
 	h := cache.NewHollywood(workers, fs, db, ti, ol, md)
 	println("starting hollywood")
 
 	go h.Start(innerCtx, msgCh, errCh, &wg)
-	go ReadFS(fs, &wg, msgCh, errCh)
+	go ReadFS(fs, &wg, queCh, errCh)
+	go Querer(innerCtx, queCh, msgCh)
 	time.Sleep(time.Millisecond * 50)
 	go func() {
 		wg.Wait()
@@ -116,7 +117,7 @@ func run(
 func ReadFS(
 	fs afero.Fs,
 	wg *sync.WaitGroup,
-	msgCh cache.MsgChannel,
+	queCh cache.MsgChannel,
 	errCh chan error,
 ) {
 	wg.Add(1)
@@ -142,10 +143,23 @@ func ReadFS(
 				slog.Info("skipping file", "path", fPath, "type", mime.TypeByExtension(filepath.Ext(fPath)))
 				return nil
 			}
-			msgCh <- cache.Msg{Path: fPath, Type: msgType}
+			queCh <- cache.Msg{Path: fPath, Type: msgType}
 			return nil
 		})
 	if err != nil {
 		errCh <- err
+	}
+}
+
+// Querer reads from the message channel and sends messages to the que channel.
+func Querer(ctx context.Context, queCh cache.MsgChannel, msgCh cache.MsgChannel) {
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case msg := <-queCh:
+			slog.Info("queing", "msg", msg)
+			msgCh <- msg
+		}
 	}
 }
