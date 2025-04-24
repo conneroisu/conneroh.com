@@ -145,7 +145,7 @@ drainLoop:
 	for {
 		select {
 		case err := <-errCh:
-			errs = eris.Wrapf(errs, "error while handling error: %w", err)
+			errs = eris.Wrapf(errs, "error while handling error: %v", err)
 			slog.Error("error during shutdown", "err", err)
 		case <-time.After(100 * time.Millisecond):
 			break drainLoop

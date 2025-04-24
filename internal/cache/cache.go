@@ -331,25 +331,16 @@ func (a *Actor) isCached(ctx context.Context, msg Msg, doc *assets.Doc) (bool, e
 		Model(&c).
 		Where("path = ?", msg.Path).
 		Scan(ctx)
-
-	// Document not found in cache, need to add it
 	if errors.Is(err, sql.ErrNoRows) {
-		slog.Info("asset not found in cache", "path", msg.Path)
 		return false, nil
 	}
-
-	// Other database error
 	if err != nil {
 		return false, fmt.Errorf("failed to check cache: %w", err)
 	}
-
-	// Document found and hash matches - no changes needed
 	if c.Hash == doc.Hash {
 		slog.Debug("asset already cached and unchanged", "path", msg.Path)
 		return true, nil
 	}
-
-	// Document found but hash is different - needs update
 	slog.Info("asset has changed", "path", msg.Path, "old_hash", c.Hash, "new_hash", doc.Hash)
 	return false, nil
 }
