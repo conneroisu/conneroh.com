@@ -5,8 +5,11 @@ import (
 	"context"
 	"database/sql"
 	"flag"
+	"fmt"
 	"log/slog"
+	"mime"
 	"os"
+	"path/filepath"
 	"sync"
 	"time"
 
@@ -14,11 +17,12 @@ import (
 	"github.com/conneroisu/conneroh.com/internal/cache"
 	"github.com/conneroisu/conneroh.com/internal/llama"
 	"github.com/conneroisu/conneroh.com/internal/logger"
+	"github.com/conneroisu/conneroh.com/internal/markdown"
 	"github.com/conneroisu/conneroh.com/internal/tigris"
+	"github.com/rotisserie/eris"
 	"github.com/spf13/afero"
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/sqlitedialect"
-	"github.com/uptrace/bun/extra/bundebug"
 	_ "modernc.org/sqlite"
 )
 
@@ -34,7 +38,9 @@ func main() {
 		os.Getenv,
 		*workers,
 	); err != nil {
-		panic(err)
+		formattedStr := eris.ToString(err, true)
+		fmt.Println(formattedStr)
+		os.Exit(1)
 	}
 }
 
@@ -45,7 +51,8 @@ func run(
 ) error {
 	var (
 		errCh = make(chan error)
-		msgCh = make(chan *cache.Msg)
+		msgCh = make(cache.MsgChannel, workers)
+		queCh = make(cache.MsgChannel, 5)
 		wg    = sync.WaitGroup{}
 	)
 	innerCtx, cancel := context.WithCancel(ctx)
@@ -65,13 +72,13 @@ func run(
 	}
 	defer sqldb.Close()
 	db := bun.NewDB(sqldb, sqlitedialect.New())
-	db.AddQueryHook(bundebug.NewQueryHook(bundebug.WithVerbose(true)))
+	// db.AddQueryHook(bundebug.NewQueryHook(bundebug.WithVerbose(true)))
 	err = assets.InitDB(ctx, db)
 	if err != nil {
 		return err
 	}
 	fs := afero.NewBasePathFs(afero.NewOsFs(), assets.VaultLoc)
-	md := assets.NewMD(fs)
+	md := markdown.NewMD(fs)
 
 	h := cache.NewHollywood(workers, fs, db, ti, ol, md)
 	println("starting hollywood")
@@ -81,6 +88,7 @@ func run(
 	time.Sleep(time.Millisecond * 50)
 	go func() {
 		wg.Wait()
+		slog.Info("hollywood finished")
 		cancel()
 	}()
 	for {
@@ -88,12 +96,16 @@ func run(
 		case <-time.After(time.Second * 1):
 			slog.Info("waiting for hollywood to finish")
 		case <-innerCtx.Done():
+			slog.Info("inner context done")
 			close(msgCh)
+			close(queCh)
 			close(errCh)
 			return nil
 		case err := <-errCh:
+			slog.Error("error", "err", err)
 			cancel()
 			close(msgCh)
+			close(queCh)
 			close(errCh)
 			return err
 		}
@@ -104,7 +116,7 @@ func run(
 func ReadFS(
 	fs afero.Fs,
 	wg *sync.WaitGroup,
-	msgCh chan *cache.Msg,
+	msgCh cache.MsgChannel,
 	errCh chan error,
 ) {
 	wg.Add(1)
@@ -127,9 +139,10 @@ func ReadFS(
 			case info.IsDir():
 				return nil
 			default:
+				slog.Info("skipping file", "path", fPath, "type", mime.TypeByExtension(filepath.Ext(fPath)))
 				return nil
 			}
-			msgCh <- &cache.Msg{Path: fPath, Type: msgType}
+			msgCh <- cache.Msg{Path: fPath, Type: msgType}
 			return nil
 		})
 	if err != nil {

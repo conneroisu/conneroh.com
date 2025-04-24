@@ -48,6 +48,7 @@ type (
 	// Doc is a base struct for all embeddedable structs.
 	Doc struct {
 		Title        string     `yaml:"title"`
+		Path         string     `yaml:"-"`
 		Slug         string     `yaml:"slug"`
 		Description  string     `yaml:"description"`
 		Content      string     `yaml:"-"`
@@ -59,7 +60,7 @@ type (
 		TagSlugs     []string   `yaml:"tags"`
 		PostSlugs    []string   `yaml:"posts"`
 		ProjectSlugs []string   `yaml:"projects"`
-		Hash         string     `bun:"hash" yaml:"-"`
+		Hash         string     `yaml:"-"`
 		X            float64    `json:"x"`
 		Y            float64    `json:"y"`
 		Z            float64    `json:"z"`
@@ -74,31 +75,32 @@ type (
 	Post struct {
 		bun.BaseModel `bun:"posts"`
 
-		ID int64 `bun:"id,pk,autoincrement" yaml:"-"`
+		ID int64 `bun:"id,pk,autoincrement" `
 
-		Hash string  `bun:"hashed,unique" yaml:"-"`
-		X    float64 `json:"x"`
-		Y    float64 `json:"y"`
-		Z    float64 `json:"z"`
+		Hash string `bun:"hashed,unique"`
+		X    float64
+		Y    float64
+		Z    float64
 
-		Title       string     `yaml:"title"`
-		Slug        string     `yaml:"slug"`
-		Description string     `yaml:"description"`
-		Content     string     `yaml:"-"`
-		BannerPath  string     `yaml:"banner_path"`
-		RawContent  []byte     `yaml:"-"`
-		Icon        string     `yaml:"icon"`
-		CreatedAt   CustomTime `yaml:"created_at"`
-		UpdatedAt   CustomTime `yaml:"updated_at"`
+		Title       string     `bun:"title"`
+		Slug        string     `bun:"slug,unique"`
+		Path        string     `bun:"path"`
+		Description string     `bun:"description"`
+		Content     string     `bun:"content"`
+		BannerPath  string     `bun:"banner_path"`
+		RawContent  []byte     `bun:"raw_content"`
+		Icon        string     `bun:"icon"`
+		CreatedAt   CustomTime `bun:"created_at"`
+		UpdatedAt   CustomTime `bun:"updated_at"`
 
 		TagSlugs     []string `bun:"tag_slugs"`
 		PostSlugs    []string `bun:"post_slugs"`
 		ProjectSlugs []string `bun:"project_slugs"`
 
 		// M2M relationships
-		Tags     []*Tag     `yaml:"-" bun:"m2m:post_to_tags,join:Post=Tag"`
-		Posts    []*Post    `yaml:"-" bun:"m2m:post_to_posts,join:SourcePost=TargetPost"`
-		Projects []*Project `yaml:"-" bun:"m2m:post_to_projects,join:Post=Project"`
+		Tags     []*Tag     `bun:"m2m:post_to_tags,join:Post=Tag"`
+		Posts    []*Post    `bun:"m2m:post_to_posts,join:SourcePost=TargetPost"`
+		Projects []*Project `bun:"m2m:post_to_projects,join:Post=Project"`
 	}
 
 	// Project is a project with all its posts and tags.
@@ -107,29 +109,30 @@ type (
 
 		ID int64 `bun:"id,pk,autoincrement" yaml:"-"`
 
-		Hash string  `bun:"hashed,unique" yaml:"-"`
-		X    float64 `json:"x"`
-		Y    float64 `json:"y"`
-		Z    float64 `json:"z"`
+		Hash string `bun:"hashed,unique" yaml:"-"`
+		X    float64
+		Y    float64
+		Z    float64
 
-		Title       string     `yaml:"title"`
-		Slug        string     `yaml:"slug"`
-		Description string     `yaml:"description"`
-		Content     string     `yaml:"-"`
-		BannerPath  string     `yaml:"banner_path"`
-		RawContent  []byte     `yaml:"-"`
-		Icon        string     `yaml:"icon"`
-		CreatedAt   CustomTime `yaml:"created_at"`
-		UpdatedAt   CustomTime `yaml:"updated_at"`
+		Title       string     `bun:"title"`
+		Slug        string     `bun:"slug,unique"`
+		Path        string     `bun:"path"`
+		Description string     `bun:"description"`
+		Content     string     `bun:"content"`
+		BannerPath  string     `bun:"banner_path"`
+		RawContent  []byte     `bun:"raw_content"`
+		Icon        string     `bun:"icon"`
+		CreatedAt   CustomTime `bun:"created_at"`
+		UpdatedAt   CustomTime `bun:"updated_at"`
 
 		TagSlugs     []string `bun:"tag_slugs"`
 		PostSlugs    []string `bun:"post_slugs"`
 		ProjectSlugs []string `bun:"project_slugs"`
 
 		// M2M relationships
-		Tags     []*Tag     `yaml:"-" bun:"m2m:project_to_tags,join:Project=Tag"`
-		Posts    []*Post    `yaml:"-" bun:"m2m:post_to_projects,join:Project=Post"`
-		Projects []*Project `yaml:"-" bun:"m2m:project_to_projects,join:SourceProject=TargetProject"`
+		Tags     []*Tag     `bun:"m2m:project_to_tags,join:Project=Tag"`
+		Posts    []*Post    `bun:"m2m:post_to_projects,join:Project=Post"`
+		Projects []*Project `bun:"m2m:project_to_projects,join:SourceProject=TargetProject"`
 	}
 
 	// Tag is a tag with all its posts and projects.
@@ -138,29 +141,30 @@ type (
 
 		ID int64 `bun:"id,pk,autoincrement"`
 
-		Hash string  `bun:"hashed,unique"`
-		X    float64 `json:"x"`
-		Y    float64 `json:"y"`
-		Z    float64 `json:"z"`
+		Hash string `bun:"hashed,unique"`
+		X    float64
+		Y    float64
+		Z    float64
 
-		Title       string
-		Slug        string
-		Description string
-		Content     string
-		BannerPath  string
-		RawContent  []byte
-		Icon        string
-		CreatedAt   CustomTime
-		UpdatedAt   CustomTime
+		Title       string     `bun:"title"`
+		Slug        string     `bun:"slug,unique"`
+		Path        string     `bun:"path"`
+		Description string     `bun:"description"`
+		Content     string     `bun:"content"`
+		BannerPath  string     `bun:"banner_path"`
+		RawContent  []byte     `bun:"raw_content"`
+		Icon        string     `bun:"icon"`
+		CreatedAt   CustomTime `bun:"created_at"`
+		UpdatedAt   CustomTime `bun:"updated_at"`
 
 		TagSlugs     []string `bun:"tag_slugs"`
 		PostSlugs    []string `bun:"post_slugs"`
 		ProjectSlugs []string `bun:"project_slugs"`
 
 		// M2M relationships
-		Tags     []*Tag     `yaml:"-" bun:"m2m:tag_to_tags,join:SourceTag=TargetTag"`
-		Posts    []*Post    `yaml:"-" bun:"m2m:post_to_tags,join:Tag=Post"`
-		Projects []*Project `yaml:"-" bun:"m2m:project_to_tags,join:Tag=Project"`
+		Tags     []*Tag     `bun:"m2m:tag_to_tags,join:SourceTag=TargetTag"`
+		Posts    []*Post    `bun:"m2m:post_to_tags,join:Tag=Post"`
+		Projects []*Project `bun:"m2m:project_to_tags,join:Tag=Project"`
 	}
 
 	// Asset is a media asset.
@@ -168,12 +172,12 @@ type (
 		bun.BaseModel `bun:"assets"`
 
 		ID   int64  `bun:"id,pk,autoincrement"`
-		Path string `yaml:"-" bun:"path,unique"`
+		Path string `bun:"path,unique"`
 		Hash string `bun:"hashed,unique"`
 
-		X float64 `json:"x"`
-		Y float64 `json:"y"`
-		Z float64 `json:"z"`
+		X float64
+		Y float64
+		Z float64
 	}
 )
 
@@ -182,9 +186,10 @@ type (
 	PostToTag struct {
 		bun.BaseModel `bun:"post_to_tags"`
 
-		PostID int64 `bun:",pk"`
+		ID     int64 `bun:"id,pk,autoincrement"`
+		PostID int64 `bun:"post_id"`
 		Post   *Post `bun:"rel:belongs-to,join:post_id=id"`
-		TagID  int64 `bun:",pk"`
+		TagID  int64 `bun:"tag_id"`
 		Tag    *Tag  `bun:"rel:belongs-to,join:tag_id=id"`
 	}
 
@@ -192,9 +197,10 @@ type (
 	PostToPost struct {
 		bun.BaseModel `bun:"post_to_posts"`
 
-		SourcePostID int64 `bun:",pk"`
+		ID           int64 `bun:"id,pk,autoincrement"`
+		SourcePostID int64 `bun:"source_post_id"`
 		SourcePost   *Post `bun:"rel:belongs-to,join:source_post_id=id"`
-		TargetPostID int64 `bun:",pk"`
+		TargetPostID int64 `bun:"target_post_id"`
 		TargetPost   *Post `bun:"rel:belongs-to,join:target_post_id=id"`
 	}
 
@@ -202,9 +208,10 @@ type (
 	PostToProject struct {
 		bun.BaseModel `bun:"post_to_projects"`
 
-		PostID    int64    `bun:",pk"`
+		ID        int64    `bun:"id,pk,autoincrement"`
+		PostID    int64    `bun:"post_id"`
 		Post      *Post    `bun:"rel:belongs-to,join:post_id=id"`
-		ProjectID int64    `bun:",pk"`
+		ProjectID int64    `bun:"project_id"`
 		Project   *Project `bun:"rel:belongs-to,join:project_id=id"`
 	}
 
@@ -212,9 +219,10 @@ type (
 	ProjectToTag struct {
 		bun.BaseModel `bun:"project_to_tags"`
 
-		ProjectID int64    `bun:",pk"`
+		ID        int64    `bun:"id,pk,autoincrement"`
+		ProjectID int64    `bun:"project_id"`
 		Project   *Project `bun:"rel:belongs-to,join:project_id=id"`
-		TagID     int64    `bun:",pk"`
+		TagID     int64    `bun:"tag_id"`
 		Tag       *Tag     `bun:"rel:belongs-to,join:tag_id=id"`
 	}
 
@@ -222,9 +230,10 @@ type (
 	ProjectToProject struct {
 		bun.BaseModel `bun:"project_to_projects"`
 
-		SourceProjectID int64    `bun:",pk"`
+		ID              int64    `bun:"id,pk,autoincrement"`
+		SourceProjectID int64    `bun:"source_project_id"`
 		SourceProject   *Project `bun:"rel:belongs-to,join:source_project_id=id"`
-		TargetProjectID int64    `bun:",pk"`
+		TargetProjectID int64    `bun:"target_project_id"`
 		TargetProject   *Project `bun:"rel:belongs-to,join:target_project_id=id"`
 	}
 
@@ -232,9 +241,10 @@ type (
 	TagToTag struct {
 		bun.BaseModel `bun:"tag_to_tags"`
 
-		SourceTagID int64 `bun:",pk"`
+		ID          int64 `bun:"id,pk,autoincrement"`
+		SourceTagID int64 `bun:"source_tag_id"`
 		SourceTag   *Tag  `bun:"rel:belongs-to,join:source_tag_id=id"`
-		TargetTagID int64 `bun:",pk"`
+		TargetTagID int64 `bun:"target_tag_id"`
 		TargetTag   *Tag  `bun:"rel:belongs-to,join:target_tag_id=id"`
 	}
 
@@ -242,9 +252,10 @@ type (
 	TagToPost struct {
 		bun.BaseModel `bun:"tag_to_posts"`
 
-		TagID  int64 `bun:",pk"`
+		ID     int64 `bun:"id,pk,autoincrement"`
+		TagID  int64 `bun:"tag_id"`
 		Tag    *Tag  `bun:"rel:belongs-to,join:tag_id=id"`
-		PostID int64 `bun:",pk"`
+		PostID int64 `bun:"post_id"`
 		Post   *Post `bun:"rel:belongs-to,join:post_id=id"`
 	}
 
@@ -252,9 +263,10 @@ type (
 	TagToProject struct {
 		bun.BaseModel `bun:"tag_to_projects"`
 
-		TagID     int64    `bun:",pk"`
+		ID        int64    `bun:"id,pk,autoincrement"`
+		TagID     int64    `bun:"tag_id"`
 		Tag       *Tag     `bun:"rel:belongs-to,join:tag_id=id"`
-		ProjectID int64    `bun:",pk"`
+		ProjectID int64    `bun:"project_id"`
 		Project   *Project `bun:"rel:belongs-to,join:project_id=id"`
 	}
 )
@@ -319,6 +331,8 @@ func Validate(
 			path,
 		))
 	}
+
+	// TODO: Validate that the banner path is a valid image and is not null/zero
 
 	var err error
 	for _, er := range errs {

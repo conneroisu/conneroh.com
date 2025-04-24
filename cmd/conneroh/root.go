@@ -20,6 +20,7 @@ import (
 	"github.com/rotisserie/eris"
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/sqlitedialect"
+	"github.com/uptrace/bun/extra/bundebug"
 
 	// SQLite driver
 	_ "modernc.org/sqlite"
@@ -49,6 +50,7 @@ func NewServer(
 	db := bun.NewDB(sqlDB, sqlitedialect.New())
 	assets.RegisterModels(db)
 
+	db.AddQueryHook(bundebug.NewQueryHook(bundebug.WithVerbose(true)))
 	err = AddRoutes(ctx, mux, db)
 	if err != nil {
 		return nil, eris.Wrap(err, "error adding routes")
@@ -75,6 +77,8 @@ func Run(
 	ctx context.Context,
 	_ func(string) string,
 ) error {
+	var wg sync.WaitGroup
+
 	start := time.Now()
 
 	// Create a separate context for signal handling
@@ -88,18 +92,13 @@ func Run(
 	)
 	defer cancel()
 
-	var (
-		httpServer *http.Server
-		wg         sync.WaitGroup
-	)
-
 	handler, err := NewServer(ctx) // Use original context for server setup
 	if err != nil {
 		return err
 	}
 
 	// Configure server with timeouts
-	httpServer = &http.Server{
+	httpServer := &http.Server{
 		Addr: net.JoinHostPort(
 			defaultHost,
 			defaultPort,

@@ -46,32 +46,32 @@ func AddRoutes(
 				).ServeHTTP(w, r)
 				return
 			}
-			_, err := db.NewSelect().Model(assets.EmpPost).
+			err := db.NewSelect().Model(&allPosts).
 				Order("updated_at").
 				Relation("Tags").
 				Relation("Posts").
 				Relation("Projects").
-				Exec(r.Context(), &allPosts)
+				Scan(r.Context())
 			if err != nil {
 				slog.Error("failed to scan posts", "err", err, "posts", postList)
 				return
 			}
-			_, err = db.NewSelect().Model(assets.EmpProject).
+			err = db.NewSelect().Model(&allProjects).
 				Order("updated_at").
 				Relation("Tags").
 				Relation("Posts").
 				Relation("Projects").
-				Exec(r.Context(), &allProjects)
+				Scan(r.Context())
 			if err != nil {
 				slog.Error("failed to scan projects", "err", err, "projects", projectList)
 				return
 			}
-			_, err = db.NewSelect().Model(assets.EmpTag).
+			err = db.NewSelect().Model(&allTags).
 				Order("updated_at").
 				Relation("Tags").
 				Relation("Posts").
 				Relation("Projects").
-				Exec(r.Context(), &allTags)
+				Scan(r.Context())
 			if err != nil {
 				slog.Error("failed to scan tags", "err", err)
 				return

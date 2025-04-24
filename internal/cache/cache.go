@@ -3,17 +3,20 @@ package cache
 import (
 	"bytes"
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 	"log/slog"
 	"mime"
 	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/conneroisu/conneroh.com/internal/assets"
-	"github.com/conneroisu/conneroh.com/internal/data/db"
+	"github.com/conneroisu/conneroh.com/internal/copygen"
 	"github.com/conneroisu/conneroh.com/internal/tigris"
 	"github.com/rotisserie/eris"
 	"github.com/spf13/afero"
@@ -24,18 +27,33 @@ import (
 )
 
 // MsgChannel is a cache message channel.
-type MsgChannel chan *Msg
+type (
+	MsgChannel chan Msg
 
-// Hollywood is a slice of actors.
-type Hollywood []*Actor
+	// Hollywood is a slice of actors.
+	Hollywood []*Actor
 
-// OllamaClient is the ollama client.
-type OllamaClient interface {
-	Embeddings(
-		ctx context.Context,
-		content string,
-		emb *assets.Doc,
-	) (err error)
+	// OllamaClient is the ollama client.
+	OllamaClient interface {
+		Embeddings(
+			ctx context.Context,
+			content string,
+			emb *assets.Doc,
+		) (err error)
+	}
+)
+
+// CtxSend sends a message to the channel with a context.
+func (m MsgChannel) CtxSend(ctx context.Context, msg Msg, wg *sync.WaitGroup) {
+	wg.Add(1)
+	defer wg.Done()
+	time.Sleep(time.Second * 1)
+	select {
+	case <-ctx.Done():
+		return
+	case m <- msg:
+		return
+	}
 }
 
 // NewHollywood creates a new asset hollywood.
@@ -57,7 +75,7 @@ func NewHollywood(
 // Start starts the asset hollywood.
 func (h Hollywood) Start(
 	ctx context.Context,
-	msgCh chan *Msg,
+	msgCh chan Msg,
 	errCh chan error,
 	wg *sync.WaitGroup,
 ) {
@@ -95,13 +113,15 @@ const (
 	MsgTypeAsset MsgType = "asset"
 	// MsgTypeDoc is the message type for a document.
 	MsgTypeDoc MsgType = "doc"
+	// MsgTypeAction is the message type for an action.
+	MsgTypeAction MsgType = "action"
 )
 
 // Msg is the message for the document actor.
 type Msg struct {
 	Type  MsgType
 	Path  string
-	Doc   *assets.Doc
+	fn    func() error
 	Tries int
 }
 
@@ -115,11 +135,13 @@ func (a *Actor) Start(
 	a.msgCh = msgCh
 	for {
 		select {
+		case <-time.After(time.Second * 5):
+			slog.Debug("cache actor", "killed", "was idle for 5 seconds")
 		case <-ctx.Done():
 			return
 		case msg := <-msgCh:
 			wg.Add(1)
-			err := a.Handle(ctx, msg)
+			err := a.Handle(ctx, wg, msg)
 			if err != nil {
 				errCh <- err
 			}
@@ -133,20 +155,66 @@ func (a *Actor) Start(
 // (e.g. /assets/foo.md, foo.svg, etc)
 func (a *Actor) Handle(
 	ctx context.Context,
-	msg *Msg,
+	wg *sync.WaitGroup,
+	msg Msg,
 ) (err error) {
-	var doc assets.Doc
+	var (
+		doc assets.Doc
+		ok  bool
+	)
 	if msg.Path == "" {
-		return fmt.Errorf("path is empty")
+		return eris.New("path is empty")
 	}
-	doc.RawContent, err = afero.ReadFile(a.fs, msg.Path)
-	if err != nil {
-		return err
+	if msg.Type == "" {
+		return eris.New("type is empty")
 	}
 	switch msg.Type {
+	case MsgTypeAction:
+		slog.Info("action", "tries", msg.Tries)
+		err = msg.fn()
+		msg.Tries++
+		if msg.Tries > 3 {
+			return eris.Wrapf(err, "failed to handle (path: %s) action (tries: %d)", msg.Path, msg.Tries)
+		}
+		go a.msgCh.CtxSend(ctx, msg, wg)
+		return nil
 	case MsgTypeAsset:
-		return Upload(ctx, a.ti, msg.Path, doc.RawContent)
+		doc.RawContent, err = afero.ReadFile(a.fs, msg.Path)
+		if err != nil {
+			return err
+		}
+		doc.Hash = assets.Hash(doc.RawContent)
+		ok, err = a.isCached(ctx, msg, &doc)
+		if err != nil {
+			return err
+		}
+		if ok {
+			return nil
+		}
+		err = Upload(ctx, a.ti, msg.Path, doc.RawContent)
+		if err != nil {
+			return eris.Wrapf(err, "failed to upload asset: %s", msg.Path)
+		}
+		var asset assets.Asset
+		copygen.ToAsset(&asset, &doc)
+		err = SaveAsset(ctx, a.db, msg.Path, &asset, a.msgCh, wg)
+		if err != nil {
+			return eris.Wrapf(err, "failed to save asset: %s", msg.Path)
+		}
+		return nil
 	case MsgTypeDoc:
+		doc.RawContent, err = afero.ReadFile(a.fs, msg.Path)
+		if err != nil {
+			return err
+		}
+		doc.Hash = assets.Hash(doc.RawContent)
+		ok, err = a.isCached(ctx, msg, &doc)
+		if err != nil {
+			return err
+		}
+		if ok {
+			return nil
+		}
 		var metadata *frontmatter.Data
 		pCtx := parser.NewContext()
 		buf := bytes.NewBufferString("")
@@ -185,85 +253,21 @@ func (a *Actor) Handle(
 		// Set slug and content
 		doc.Slug = assets.Slugify(msg.Path)
 		doc.Content = buf.String()
-		doc.Hash = assets.Hash(doc.RawContent)
 
 		err = assets.Validate(msg.Path, &doc)
 		if err != nil {
 			return eris.Wrapf(err, "failed to validate %s", msg.Path)
 		}
 
-		err = db.Save(ctx, a.db, msg.Path, &doc)
+		err = Save(ctx, a.db, msg.Path, &doc, a.msgCh, wg)
 		if err != nil {
-			return err
+			return eris.Wrapf(err, "failed to save %s", msg.Path)
 		}
 	default:
-		return fmt.Errorf("unknown message type: %s", msg.Type)
+		return eris.New("unknown message type: " + string(msg.Type))
 	}
 	return nil
 }
-
-// UploadManager manages concurrent uploads using multiple mutexes
-type UploadManager struct {
-	mutexes    []sync.Mutex
-	mutexCount int
-	inUse      []bool
-	lock       sync.Mutex // Meta-mutex to protect the inUse array
-}
-
-// NewUploadManager creates a new UploadManager with the specified number of mutexes
-func NewUploadManager(count int) *UploadManager {
-	if count <= 0 {
-		count = 10 // Default to 10 mutexes if invalid count provided
-	}
-
-	manager := &UploadManager{
-		mutexes:    make([]sync.Mutex, count),
-		mutexCount: count,
-		inUse:      make([]bool, count),
-	}
-
-	return manager
-}
-
-// AcquireMutex finds an available mutex, locks it, and returns its index
-// This function will block until a mutex is available
-func (um *UploadManager) AcquireMutex() int {
-	for {
-		um.lock.Lock()
-		for i := range um.mutexCount {
-			if !um.inUse[i] {
-				// Mark this mutex as in use
-				um.inUse[i] = true
-				um.lock.Unlock()
-
-				// Lock the mutex
-				um.mutexes[i].Lock()
-				return i
-			}
-		}
-		// No mutex available, release meta-lock and wait a bit before trying again
-		um.lock.Unlock()
-		time.Sleep(10 * time.Millisecond)
-	}
-}
-
-// ReleaseMutex unlocks the mutex at the specified index and marks it as available
-func (um *UploadManager) ReleaseMutex(index int) {
-	if index < 0 || index >= um.mutexCount {
-		return
-	}
-
-	// First unlock the actual mutex
-	um.mutexes[index].Unlock()
-
-	// Then mark it as not in use
-	um.lock.Lock()
-	um.inUse[index] = false
-	um.lock.Unlock()
-}
-
-// Global upload manager instance
-var uploadManager = NewUploadManager(20) // Create 20 mutexes for more concurrency
 
 // Upload uploads the provided asset to the specified bucket.
 // This version supports concurrent uploads using multiple mutexes
@@ -283,20 +287,6 @@ func Upload(
 	}
 	contentType := mime.TypeByExtension(extension)
 
-	// Acquire a mutex for this upload - this will block until one is available
-	mutexIndex := uploadManager.AcquireMutex()
-
-	// Ensure we release the mutex when done
-	defer uploadManager.ReleaseMutex(mutexIndex)
-
-	// Check if context is done before proceeding with upload
-	select {
-	case <-ctx.Done():
-		return ctx.Err()
-	default:
-		// Continue with upload
-	}
-
 	_, err := client.PutObject(ctx, &s3.PutObjectInput{
 		Bucket:      aws.String("conneroh"),
 		Key:         aws.String(path),
@@ -309,6 +299,73 @@ func Upload(
 		return fmt.Errorf("failed to upload asset %s: %w", path, err)
 	}
 
-	slog.Info("asset upload successful", "path", path, "mutexIndex", mutexIndex)
+	slog.Info("asset upload successful", "path", path)
 	return nil
+}
+
+func (a *Actor) isCached(ctx context.Context, msg Msg, doc *assets.Doc) (bool, error) {
+	// if content has not changed, skip
+	switch {
+	case strings.HasPrefix(msg.Path, assets.PostsLoc):
+		var p assets.Post
+		_, err := a.db.NewSelect().
+			Model(assets.EmpPost).
+			Where("path = ?", msg.Path).
+			Exec(ctx, &p)
+		if errors.Is(err, sql.ErrNoRows) {
+			return false, nil
+		}
+		if err != nil {
+			return false, err
+		}
+		if p.Hash == doc.Hash {
+			return true, nil
+		}
+	case strings.HasPrefix(msg.Path, assets.ProjectsLoc):
+		var p assets.Project
+		_, err := a.db.NewSelect().
+			Model(assets.EmpProject).
+			Where("path = ?", msg.Path).
+			Exec(ctx, &p)
+		if errors.Is(err, sql.ErrNoRows) {
+			return false, nil
+		}
+		if err != nil {
+			return false, err
+		}
+		if p.Hash == doc.Hash {
+			return true, nil
+		}
+	case strings.HasPrefix(msg.Path, assets.TagsLoc):
+		var t assets.Tag
+		_, err := a.db.NewSelect().
+			Model(assets.EmpTag).
+			Where("path = ?", msg.Path).
+			Exec(ctx, &t)
+		if errors.Is(err, sql.ErrNoRows) {
+			return false, nil
+		}
+		if err != nil {
+			return false, err
+		}
+		if t.Hash == doc.Hash {
+			return true, nil
+		}
+	case strings.HasPrefix(msg.Path, assets.AssetsLoc):
+		var ass assets.Asset
+		_, err := a.db.NewSelect().
+			Model(assets.EmpAsset).
+			Where("path = ?", msg.Path).
+			Exec(ctx, &a)
+		if errors.Is(err, sql.ErrNoRows) {
+			return false, nil
+		}
+		if err != nil {
+			return false, err
+		}
+		if ass.Hash == doc.Hash {
+			return true, nil
+		}
+	}
+	return false, nil
 }

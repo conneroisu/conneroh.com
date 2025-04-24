@@ -1,6 +1,7 @@
 package conneroh
 
 import (
+	"log/slog"
 	"net/http"
 	"sort"
 	"strconv"
@@ -64,8 +65,21 @@ func listHandler(
 		if err != nil {
 			return
 		}
+		slog.Info("searching", "target", target)
 		switch target {
 		case routing.PostPluralPath:
+			if len(allPosts) == 0 {
+				err = db.NewSelect().Model(&allPosts).
+					Order("updated_at").
+					Relation("Tags").
+					Relation("Posts").
+					Relation("Projects").
+					Scan(r.Context())
+				if err != nil {
+					slog.Error("failed to scan posts", "err", err, "posts", postList)
+					return
+				}
+			}
 			filtered, totalPages := filter(allPosts, query, page, routing.MaxListLargeItems, func(post *assets.Post) string {
 				return post.Title
 			})
@@ -90,6 +104,18 @@ func listHandler(
 				)).ServeHTTP(w, r)
 			}
 		case routing.ProjectPluralPath:
+			if len(allProjects) == 0 {
+				err = db.NewSelect().Model(&allProjects).
+					Order("updated_at").
+					Relation("Tags").
+					Relation("Posts").
+					Relation("Projects").
+					Scan(r.Context())
+				if err != nil {
+					slog.Error("failed to scan projects", "err", err, "projects", projectList)
+					return
+				}
+			}
 			filtered, totalPages := filter(allProjects, query, page, routing.MaxListLargeItems, func(project *assets.Project) string {
 				return project.Title
 			})
@@ -114,6 +140,18 @@ func listHandler(
 				)).ServeHTTP(w, r)
 			}
 		case routing.TagsPluralPath:
+			if len(allTags) == 0 {
+				err = db.NewSelect().Model(&allTags).
+					Order("updated_at").
+					Relation("Tags").
+					Relation("Posts").
+					Relation("Projects").
+					Scan(r.Context())
+				if err != nil {
+					slog.Error("failed to scan tags", "err", err, "tags", tagList)
+					return
+				}
+			}
 			filtered, totalPages := filter(allTags, query, page, routing.MaxListSmallItems, func(tag *assets.Tag) string {
 				return tag.Title
 			})

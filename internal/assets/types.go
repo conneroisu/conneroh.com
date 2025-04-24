@@ -7,9 +7,11 @@ import (
 )
 
 var (
+	// AllowedAssetTypes is a list of allowed asset types.
 	AllowedAssetTypes = []string{
 		"image/png",
 		"image/jpeg",
+		"image/jpg",
 		"image/gif",
 		"image/webp",
 		"image/avif",
@@ -17,9 +19,10 @@ var (
 		"image/svg+xml",
 		"application/pdf",
 	}
+	// AllowedDocumentTypes is a list of allowed document types.
 	AllowedDocumentTypes = []string{
 		"text/markdown",
-		"text/html",
+		"text/markdown; charset=utf-8",
 	}
 )
 

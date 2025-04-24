@@ -15,8 +15,10 @@ import (
 	"github.com/conneroisu/conneroh.com/internal/assets"
 	"github.com/conneroisu/conneroh.com/internal/routing"
 	"github.com/conneroisu/twerge"
+	"github.com/rotisserie/eris"
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/sqlitedialect"
+	"github.com/uptrace/bun/extra/bundebug"
 
 	_ "modernc.org/sqlite"
 )
@@ -24,6 +26,13 @@ import (
 var cwd = flag.String("cwd", "", "current working directory")
 
 func main() {
+	if err := run(context.Background()); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+}
+
+func run(ctx context.Context) error {
 	start := time.Now()
 	defer func() {
 		elapsed := time.Since(start)
@@ -36,30 +45,48 @@ func main() {
 			panic(err)
 		}
 	}
-	sqlDB, err := sql.Open("sqlite", "file:test.db?cache=shared&mode=rwc")
+	sqlDB, err := sql.Open("sqlite", assets.DBName())
 	if err != nil {
 		panic(err)
 	}
 	db := bun.NewDB(sqlDB, sqlitedialect.New())
+	assets.RegisterModels(db)
+	db.AddQueryHook(bundebug.NewQueryHook(bundebug.WithVerbose(true)))
 
 	var (
 		allPosts    []*assets.Post
 		allProjects []*assets.Project
 		allTags     []*assets.Tag
 	)
-	_, err = db.NewSelect().Model(assets.EmpPost).Exec(context.Background(), &allPosts)
+
+	err = db.NewSelect().
+		Model(&allPosts).
+		Relation("Tags").
+		Relation("Posts").
+		Relation("Projects").
+		Scan(ctx)
 	if err != nil {
-		panic(err)
+		return eris.Wrapf(err, "(update-css) failed to get posts")
 	}
-	_, err = db.NewSelect().Model(assets.EmpProject).Exec(context.Background(), &allProjects)
+	err = db.NewSelect().
+		Model(&allProjects).
+		Relation("Tags").
+		Relation("Posts").
+		Relation("Projects").
+		Scan(ctx)
 	if err != nil {
-		panic(err)
+		return eris.Wrapf(err, "(update-css) failed to get projects")
 	}
-	_, err = db.NewSelect().Model(assets.EmpTag).Exec(context.Background(), &allTags)
+	err = db.NewSelect().
+		Model(&allTags).
+		Relation("Tags").
+		Relation("Posts").
+		Relation("Projects").
+		Scan(ctx)
 	if err != nil {
-		panic(err)
+		return eris.Wrapf(err, "(update-css) failed to get tags")
 	}
-	if err := twerge.CodeGen(
+	return twerge.CodeGen(
 		twerge.Default(),
 		"internal/data/css/classes.go",
 		"input.css",
@@ -113,7 +140,5 @@ func main() {
 		),
 		layouts.Layout("hello"),
 		components.ThankYou(),
-	); err != nil {
-		panic(err)
-	}
+	)
 }
