@@ -66,14 +66,6 @@ func ToTag(tT *assets.Tag, fD *assets.Doc) {
 	tT.Projects = fD.Projects
 }
 
-// ToAsset copies a *assets.Doc to a *assets.Asset.
-func ToAsset(tA *assets.Asset, fD *assets.Doc) {
-	// *assets.Asset fields
-	tA.X = fD.X
-	tA.Y = fD.Y
-	tA.Z = fD.Z
-}
-
 // ToCache copies a *assets.Doc to a *assets.Cache.
 func ToCache(tC *assets.Cache, fD *assets.Doc) {
 	// *assets.Cache fields
@@ -82,4 +74,70 @@ func ToCache(tC *assets.Cache, fD *assets.Doc) {
 	tC.X = fD.X
 	tC.Y = fD.Y
 	tC.Z = fD.Z
+}
+
+// CachedToPost copies a *assets.Cache, *assets.Doc to a *assets.Post.
+func CachedToPost(tP *assets.Post, fC *assets.Cache, fD *assets.Doc) {
+	// *assets.Post fields
+	tP.BaseModel = fC.BaseModel
+	tP.ID = fC.ID
+	tP.X = fC.X
+	tP.Y = fC.Y
+	tP.Z = fC.Z
+	tP.Title = fD.Title
+	tP.Slug = fD.Slug
+	tP.Description = fD.Description
+	tP.Content = fD.Content
+	tP.BannerPath = fD.BannerPath
+	tP.Icon = fD.Icon
+	tP.CreatedAt = fD.CreatedAt
+	tP.UpdatedAt = fD.UpdatedAt
+	tP.TagSlugs = fD.TagSlugs
+	tP.PostSlugs = fD.PostSlugs
+	tP.ProjectSlugs = fD.ProjectSlugs
+	tP.Tags = fD.Tags
+	tP.Projects = fD.Projects
+}
+
+// CachedToProject copies a *assets.Cache, *assets.Doc to a *assets.Project.
+func CachedToProject(tP *assets.Project, fC *assets.Cache, fD *assets.Doc) {
+	// *assets.Project fields
+	tP.BaseModel = fC.BaseModel
+	tP.ID = fC.ID
+	tP.X = fC.X
+	tP.Y = fC.Y
+	tP.Z = fC.Z
+	tP.Title = fD.Title
+	tP.Slug = fD.Slug
+	tP.Description = fD.Description
+	tP.Content = fD.Content
+	tP.BannerPath = fD.BannerPath
+	tP.Icon = fD.Icon
+	tP.CreatedAt = fD.CreatedAt
+	tP.UpdatedAt = fD.UpdatedAt
+	tP.TagSlugs = fD.TagSlugs
+	tP.PostSlugs = fD.PostSlugs
+	tP.ProjectSlugs = fD.ProjectSlugs
+}
+
+// CachedToTag copies a *assets.Cache, *assets.Doc to a *assets.Tag.
+func CachedToTag(tT *assets.Tag, fC *assets.Cache, fD *assets.Doc) {
+	// *assets.Tag fields
+	tT.BaseModel = fC.BaseModel
+	tT.ID = fC.ID
+	tT.X = fC.X
+	tT.Y = fC.Y
+	tT.Z = fC.Z
+	tT.Title = fD.Title
+	tT.Slug = fD.Slug
+	tT.Description = fD.Description
+	tT.Content = fD.Content
+	tT.BannerPath = fD.BannerPath
+	tT.Icon = fD.Icon
+	tT.CreatedAt = fD.CreatedAt
+	tT.UpdatedAt = fD.UpdatedAt
+	tT.TagSlugs = fD.TagSlugs
+	tT.PostSlugs = fD.PostSlugs
+	tT.ProjectSlugs = fD.ProjectSlugs
+	tT.Projects = fD.Projects
 }

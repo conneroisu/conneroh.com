@@ -164,16 +164,6 @@ type (
 		Posts    []*Post    `bun:"m2m:post_to_tags,join:Tag=Post"`
 		Projects []*Project `bun:"m2m:project_to_tags,join:Tag=Project"`
 	}
-
-	// Asset is a media asset.
-	Asset struct {
-		bun.BaseModel `bun:"assets"`
-
-		ID int64 `bun:"id,pk,autoincrement"`
-		X  float64
-		Y  float64
-		Z  float64
-	}
 )
 
 type (

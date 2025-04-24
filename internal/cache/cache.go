@@ -151,6 +151,7 @@ func (a *Actor) Handle(
 	if msg.Type == "" {
 		return eris.New("type is empty")
 	}
+	doc.Path = msg.Path
 	switch msg.Type {
 	case MsgTypeAction:
 		slog.Info("action", "tries", msg.Tries)
@@ -169,6 +170,9 @@ func (a *Actor) Handle(
 			// Only requeue if there was an error and we haven't exceeded retry count
 			select {
 			case <-ctx.Done():
+				if errors.Is(ctx.Err(), context.Canceled) {
+					return nil
+				}
 				return ctx.Err()
 			default:
 				err = CtxSend(ctx, a.queCh, msg)
@@ -181,24 +185,23 @@ func (a *Actor) Handle(
 	case MsgTypeAsset:
 		var (
 			content []byte
-			asset   assets.Asset
 			cache   assets.Cache
-			cacheID int
+			ok      bool
 		)
 		content, err = afero.ReadFile(a.fs, msg.Path)
 		if err != nil {
 			return err
 		}
 		doc.Hash = assets.Hash(content)
-		cacheID, err = a.isCached(ctx, msg, &doc)
+		ok, err = a.isCached(ctx, msg, &doc)
 		if err != nil {
 			return err
 		}
-		if cacheID > 0 {
+		if ok {
 			return nil
 		}
 		copygen.ToCache(&cache, &doc)
-		err = Cache(ctx, a.db, &cache, cacheID)
+		err = Cache(ctx, a.db, &cache, msg.Path)
 		if err != nil {
 			return eris.Wrapf(err, "failed to cache %s", msg.Path)
 		}
@@ -206,32 +209,26 @@ func (a *Actor) Handle(
 		if err != nil {
 			return eris.Wrapf(err, "failed to upload asset: %s", msg.Path)
 		}
-		copygen.ToAsset(&asset, &doc)
-		err = SaveAsset(ctx, a.db, &asset)
-		if err != nil {
-			return eris.Wrapf(err, "failed to save asset: %s", msg.Path)
-		}
 		return nil
 	case MsgTypeDoc:
 		var (
 			metadata *frontmatter.Data
 			content  []byte
-			cacheID  int
 			cache    assets.Cache
+			ok       bool
 		)
 		content, err = afero.ReadFile(a.fs, msg.Path)
 		if err != nil {
 			return err
 		}
 		doc.Hash = assets.Hash(content)
-		cacheID, err = a.isCached(ctx, msg, &doc)
+		ok, err = a.isCached(ctx, msg, &doc)
 		if err != nil {
 			return err
 		}
-		if cacheID > 0 {
+		if ok {
 			return nil
 		}
-
 		pCtx := parser.NewContext()
 		buf := bytes.NewBufferString("")
 
@@ -280,7 +277,7 @@ func (a *Actor) Handle(
 		}
 
 		copygen.ToCache(&cache, &doc)
-		err = Cache(ctx, a.db, &cache, cacheID)
+		err = Cache(ctx, a.db, &cache, msg.Path)
 		if err != nil {
 			return eris.Wrapf(err, "failed to cache %s", msg.Path)
 		}
@@ -323,21 +320,36 @@ func Upload(
 	return nil
 }
 
-func (a *Actor) isCached(ctx context.Context, msg Msg, doc *assets.Doc) (int, error) {
+// isCached checks if a document or asset is already cached.
+// Returns:
+// - cacheID > 0: Document exists and is cached (unchanged)
+// - cacheID == 0 && err == nil: Document doesn't exist or has changed (needs update)
+// - err != nil: An error occurred
+func (a *Actor) isCached(ctx context.Context, msg Msg, doc *assets.Doc) (bool, error) {
 	var c assets.Cache
 	err := a.db.NewSelect().
 		Model(&c).
 		Where("path = ?", msg.Path).
 		Scan(ctx)
+
+	// Document not found in cache, need to add it
 	if errors.Is(err, sql.ErrNoRows) {
-		return int(c.ID), nil
+		slog.Info("asset not found in cache", "path", msg.Path)
+		return false, nil
 	}
+
+	// Other database error
 	if err != nil {
-		return int(c.ID), fmt.Errorf("failed to check cache: %w", err)
+		return false, fmt.Errorf("failed to check cache: %w", err)
 	}
+
+	// Document found and hash matches - no changes needed
 	if c.Hash == doc.Hash {
-		return int(c.ID), nil
+		slog.Debug("asset already cached and unchanged", "path", msg.Path)
+		return true, nil
 	}
-	slog.Info("asset is not cached", "path", msg.Path)
-	return 0, nil
+
+	// Document found but hash is different - needs update
+	slog.Info("asset has changed", "path", msg.Path, "old_hash", c.Hash, "new_hash", doc.Hash)
+	return false, nil
 }

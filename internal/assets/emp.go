@@ -14,9 +14,6 @@ var (
 	// EmpProject is a pointer to a Project.
 	EmpProject = new(Project)
 
-	// EmpAsset is a pointer to an Asset.
-	EmpAsset = new(Asset)
-
 	// EmpCache is a pointer to a Cache.
 	EmpCache = new(Cache)
 
@@ -80,7 +77,6 @@ func CreateTables(ctx context.Context, db *bun.DB) error {
 		EmpPost,
 		EmpTag,
 		EmpProject,
-		EmpAsset,
 		EmpCache,
 	}
 

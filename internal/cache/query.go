@@ -464,27 +464,6 @@ func FindProjectBySlug(ctx context.Context, db *bun.DB, slug, origin string) (*a
 	return &relatedProject, nil
 }
 
-// SaveAsset saves an asset media to the database.
-func SaveAsset(
-	ctx context.Context,
-	db *bun.DB,
-	asset *assets.Asset,
-) error {
-	_, err := db.NewInsert().
-		Model(asset).
-		On("CONFLICT (path) DO UPDATE").
-		Set("path = EXCLUDED.path").
-		Set("hashed = EXCLUDED.hashed").
-		Set("x = EXCLUDED.x").
-		Set("y = EXCLUDED.y").
-		Set("z = EXCLUDED.z").
-		Exec(ctx)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 // Save saves a document to the database.
 func Save(
 	ctx context.Context,
@@ -517,11 +496,15 @@ func Cache(
 	ctx context.Context,
 	db *bun.DB,
 	cache *assets.Cache,
-	cacheID int,
+	fPath string,
 ) error {
-	_, err := db.NewUpdate().
+	_, err := db.NewInsert().
 		Model(cache).
-		Where("id = ?", cacheID).
+		On("CONFLICT (path) DO UPDATE").
+		Set("hashed = EXCLUDED.hashed").
+		Set("x = EXCLUDED.x").
+		Set("y = EXCLUDED.y").
+		Set("z = EXCLUDED.z").
 		Exec(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to cache %s: %w", cache.Path, err)

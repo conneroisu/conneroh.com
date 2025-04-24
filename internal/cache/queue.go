@@ -36,6 +36,9 @@ func CtxSend[T any](
 		slog.Error(err.Error(), "msg", msg)
 		return err
 	case <-ctx.Done():
+		if errors.Is(ctx.Err(), context.Canceled) {
+			return nil
+		}
 		return ctx.Err()
 	case ch <- msg:
 		return nil

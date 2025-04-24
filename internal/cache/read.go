@@ -2,6 +2,7 @@ package cache
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"mime"
@@ -35,6 +36,9 @@ func ReadFS(
 				// Check context before processing each file
 				select {
 				case <-ctx.Done():
+					if errors.Is(ctx.Err(), context.Canceled) {
+						return nil
+					}
 					return ctx.Err()
 				default:
 					// Continue processing
@@ -61,6 +65,9 @@ func ReadFS(
 				// Send with context awareness
 				select {
 				case <-ctx.Done():
+					if errors.Is(ctx.Err(), context.Canceled) {
+						return nil
+					}
 					return ctx.Err()
 				default:
 					return CtxSend(ctx, queCh, Msg{Path: fPath, Type: msgType})

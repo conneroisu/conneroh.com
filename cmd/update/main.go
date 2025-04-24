@@ -24,6 +24,7 @@ import (
 	"github.com/spf13/afero"
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/sqlitedialect"
+	"github.com/uptrace/bun/extra/bundebug"
 	_ "modernc.org/sqlite"
 )
 
@@ -33,7 +34,7 @@ var (
 
 func main() {
 	flag.Parse()
-	slog.SetDefault(logger.DefaultLogger)
+	slog.SetDefault(logger.DefaultProdLogger)
 
 	// Create a context that will be canceled on interrupt signals
 	ctx, stop := signal.NotifyContext(context.Background(),
@@ -70,9 +71,6 @@ func Run(
 	innerCtx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	// Setup signal handling for graceful shutdown
-	slog.Info("starting application with signal handling")
-
 	ol, err := llama.NewOllamaClient(getenv)
 	if err != nil {
 		return err
@@ -93,9 +91,8 @@ func Run(
 	}
 	fs := afero.NewBasePathFs(afero.NewOsFs(), assets.VaultLoc)
 	md := markdown.NewMD(fs)
-	// db.AddQueryHook(bundebug.NewQueryHook(bundebug.WithVerbose(true)))
+	db.AddQueryHook(bundebug.NewQueryHook(bundebug.WithVerbose(true)))
 	h := cache.NewHollywood(workers, fs, db, ti, ol, md)
-	slog.Info("starting hollywood")
 	go h.Start(innerCtx, msgCh, queCh, errCh, &wg)
 	go cache.ReadFS(innerCtx, fs, &wg, queCh, errCh)
 	go cache.Querer(innerCtx, queCh, msgCh)
@@ -104,7 +101,7 @@ func Run(
 	// Goroutine to handle wait group completion
 	go func() {
 		wg.Wait()
-		slog.Info("hollywood finished")
+		slog.Debug("hollywood finished")
 		cancel()
 	}()
 
@@ -113,7 +110,7 @@ func Run(
 		select {
 		case err := <-errCh:
 			if errors.Is(err, context.Canceled) {
-				slog.Info("received termination signal")
+				slog.Debug("received termination signal")
 				cancel() // Cancel inner context
 				return gracefulShutdown(msgCh, queCh, errCh)
 			}

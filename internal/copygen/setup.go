@@ -12,7 +12,9 @@ type Copygen interface {
 	// depth domain.Tag 2
 	ToTag(*assets.Doc) *assets.Tag
 
-	ToAsset(*assets.Doc) *assets.Asset
-
 	ToCache(*assets.Doc) *assets.Cache
+
+	CachedToPost(*assets.Cache, *assets.Doc) *assets.Post
+	CachedToProject(*assets.Cache, *assets.Doc) *assets.Project
+	CachedToTag(*assets.Cache, *assets.Doc) *assets.Tag
 }
