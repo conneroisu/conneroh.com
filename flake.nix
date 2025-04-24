@@ -8,7 +8,6 @@
       url = "github:numtide/flake-utils";
       inputs.systems.follows = "systems";
     };
-    bun2nix.url = "github:baileyluTCD/bun2nix";
   };
 
   nixConfig = {
@@ -219,7 +218,6 @@
               bun
               nodePackages.typescript-language-server
               nodePackages.prettier
-              inputs.bun2nix.defaultPackage.${pkgs.system}.bin
               svgcleaner
               sqlite-web
 

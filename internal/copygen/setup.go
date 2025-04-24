@@ -13,4 +13,6 @@ type Copygen interface {
 	ToTag(*assets.Doc) *assets.Tag
 
 	ToAsset(*assets.Doc) *assets.Asset
+
+	ToCache(*assets.Doc) *assets.Cache
 }

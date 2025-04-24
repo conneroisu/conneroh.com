@@ -68,20 +68,29 @@ type (
 )
 
 type (
+	// Cache is a any asset.
+	Cache struct {
+		bun.BaseModel `bun:"caches"`
+
+		ID   int64  `bun:"id,pk,autoincrement"`
+		Path string `bun:"path,unique"`
+		Hash string `bun:"hashed,unique"`
+
+		X float64
+		Y float64
+		Z float64
+	}
 	// Post is a post with all its projects and tags.
 	Post struct {
 		bun.BaseModel `bun:"posts"`
 
 		ID int64 `bun:"id,pk,autoincrement" `
-
-		Hash string `bun:"hashed,unique"`
-		X    float64
-		Y    float64
-		Z    float64
+		X  float64
+		Y  float64
+		Z  float64
 
 		Title       string     `bun:"title"`
 		Slug        string     `bun:"slug,unique"`
-		Path        string     `bun:"path"`
 		Description string     `bun:"description"`
 		Content     string     `bun:"content"`
 		BannerPath  string     `bun:"banner_path"`
@@ -105,14 +114,12 @@ type (
 
 		ID int64 `bun:"id,pk,autoincrement" yaml:"-"`
 
-		Hash string `bun:"hashed,unique" yaml:"-"`
-		X    float64
-		Y    float64
-		Z    float64
+		X float64
+		Y float64
+		Z float64
 
 		Title       string     `bun:"title"`
 		Slug        string     `bun:"slug,unique"`
-		Path        string     `bun:"path"`
 		Description string     `bun:"description"`
 		Content     string     `bun:"content"`
 		BannerPath  string     `bun:"banner_path"`
@@ -135,15 +142,12 @@ type (
 		bun.BaseModel `bun:"tags"`
 
 		ID int64 `bun:"id,pk,autoincrement"`
-
-		Hash string `bun:"hashed,unique"`
-		X    float64
-		Y    float64
-		Z    float64
+		X  float64
+		Y  float64
+		Z  float64
 
 		Title       string     `bun:"title"`
 		Slug        string     `bun:"slug,unique"`
-		Path        string     `bun:"path"`
 		Description string     `bun:"description"`
 		Content     string     `bun:"content"`
 		BannerPath  string     `bun:"banner_path"`
@@ -165,13 +169,10 @@ type (
 	Asset struct {
 		bun.BaseModel `bun:"assets"`
 
-		ID   int64  `bun:"id,pk,autoincrement"`
-		Path string `bun:"path,unique"`
-		Hash string `bun:"hashed,unique"`
-
-		X float64
-		Y float64
-		Z float64
+		ID int64 `bun:"id,pk,autoincrement"`
+		X  float64
+		Y  float64
+		Z  float64
 	}
 )
 

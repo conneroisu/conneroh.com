@@ -9,7 +9,6 @@ import (
 	"log/slog"
 	"mime"
 	"path/filepath"
-	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -144,7 +143,6 @@ func (a *Actor) Handle(
 ) (err error) {
 	var (
 		doc assets.Doc
-		ok  bool
 	)
 	if msg.Path == "" {
 		return eris.New("path is empty")
@@ -171,45 +169,56 @@ func (a *Actor) Handle(
 		}
 		return nil
 	case MsgTypeAsset:
-		var content []byte
-		content, err = afero.ReadFile(a.fs, msg.Path)
-		if err != nil {
-			return err
-		}
-		doc.Hash = assets.Hash(content)
-		ok, err = a.isCached(ctx, msg, &doc)
-		if err != nil {
-			return err
-		}
-		if ok {
-			return nil
-		}
-		err = Upload(ctx, a.ti, msg.Path, content)
-		if err != nil {
-			return eris.Wrapf(err, "failed to upload asset: %s", msg.Path)
-		}
-		var asset assets.Asset
-		copygen.ToAsset(&asset, &doc)
-		err = SaveAsset(ctx, a.db, &asset)
-		if err != nil {
-			return eris.Wrapf(err, "failed to save asset: %s", msg.Path)
-		}
-		return nil
-	case MsgTypeDoc:
 		var (
-			metadata *frontmatter.Data
-			content  []byte
+			content []byte
+			asset   assets.Asset
+			cache   assets.Cache
+			cacheID int
 		)
 		content, err = afero.ReadFile(a.fs, msg.Path)
 		if err != nil {
 			return err
 		}
 		doc.Hash = assets.Hash(content)
-		ok, err = a.isCached(ctx, msg, &doc)
+		cacheID, err = a.isCached(ctx, msg, &doc)
 		if err != nil {
 			return err
 		}
-		if ok {
+		if cacheID > 0 {
+			return nil
+		}
+		err = Upload(ctx, a.ti, msg.Path, content)
+		if err != nil {
+			return eris.Wrapf(err, "failed to upload asset: %s", msg.Path)
+		}
+		copygen.ToAsset(&asset, &doc)
+		err = SaveAsset(ctx, a.db, &asset)
+		if err != nil {
+			return eris.Wrapf(err, "failed to save asset: %s", msg.Path)
+		}
+		copygen.ToCache(&cache, &doc)
+		err = Cache(ctx, a.db, &cache, cacheID)
+		if err != nil {
+			return eris.Wrapf(err, "failed to cache %s", msg.Path)
+		}
+		return nil
+	case MsgTypeDoc:
+		var (
+			metadata *frontmatter.Data
+			content  []byte
+			cacheID  int
+			cache    assets.Cache
+		)
+		content, err = afero.ReadFile(a.fs, msg.Path)
+		if err != nil {
+			return err
+		}
+		doc.Hash = assets.Hash(content)
+		cacheID, err = a.isCached(ctx, msg, &doc)
+		if err != nil {
+			return err
+		}
+		if cacheID > 0 {
 			return nil
 		}
 		pCtx := parser.NewContext()
@@ -259,6 +268,12 @@ func (a *Actor) Handle(
 		if err != nil {
 			return eris.Wrapf(err, "failed to save %s", msg.Path)
 		}
+
+		copygen.ToCache(&cache, &doc)
+		err = Cache(ctx, a.db, &cache, cacheID)
+		if err != nil {
+			return eris.Wrapf(err, "failed to cache %s", msg.Path)
+		}
 	default:
 		return eris.New("unknown message type: " + string(msg.Type))
 	}
@@ -291,7 +306,6 @@ func Upload(
 	})
 
 	if err != nil {
-		// Log error but let errgroup handle it
 		return fmt.Errorf("failed to upload asset %s: %w", path, err)
 	}
 
@@ -299,69 +313,21 @@ func Upload(
 	return nil
 }
 
-func (a *Actor) isCached(ctx context.Context, msg Msg, doc *assets.Doc) (bool, error) {
-	// if content has not changed, skip
-	switch {
-	case strings.HasPrefix(msg.Path, assets.PostsLoc):
-		var p assets.Post
-		err := a.db.NewSelect().
-			Model(&p).
-			Where("path = ?", msg.Path).
-			Scan(ctx)
-		if errors.Is(err, sql.ErrNoRows) {
-			return false, nil
-		}
-		if err != nil {
-			return false, err
-		}
-		if p.Hash == doc.Hash {
-			return true, nil
-		}
-	case strings.HasPrefix(msg.Path, assets.ProjectsLoc):
-		var p assets.Project
-		err := a.db.NewSelect().
-			Model(&p).
-			Where("path = ?", msg.Path).
-			Scan(ctx)
-		if errors.Is(err, sql.ErrNoRows) {
-			return false, nil
-		}
-		if err != nil {
-			return false, err
-		}
-		if p.Hash == doc.Hash {
-			return true, nil
-		}
-	case strings.HasPrefix(msg.Path, assets.TagsLoc):
-		var t assets.Tag
-		err := a.db.NewSelect().
-			Model(&t).
-			Where("path = ?", msg.Path).
-			Scan(ctx)
-		if errors.Is(err, sql.ErrNoRows) {
-			return false, nil
-		}
-		if err != nil {
-			return false, err
-		}
-		if t.Hash == doc.Hash {
-			return true, nil
-		}
-	case strings.HasPrefix(msg.Path, assets.AssetsLoc):
-		var ass assets.Asset
-		_, err := a.db.NewSelect().
-			Model(assets.EmpAsset).
-			Where("path = ?", msg.Path).
-			Exec(ctx, &a)
-		if errors.Is(err, sql.ErrNoRows) {
-			return false, nil
-		}
-		if err != nil {
-			return false, err
-		}
-		if ass.Hash == doc.Hash {
-			return true, nil
-		}
+func (a *Actor) isCached(ctx context.Context, msg Msg, doc *assets.Doc) (int, error) {
+	var c assets.Cache
+	err := a.db.NewSelect().
+		Model(&c).
+		Where("path = ?", msg.Path).
+		Scan(ctx)
+	if errors.Is(err, sql.ErrNoRows) {
+		return int(c.ID), nil
 	}
-	return false, nil
+	if err != nil {
+		return int(c.ID), fmt.Errorf("failed to check cache: %w", err)
+	}
+	if c.Hash == doc.Hash {
+		return int(c.ID), nil
+	}
+	slog.Info("asset is not cached", "path", msg.Path)
+	return 0, nil
 }

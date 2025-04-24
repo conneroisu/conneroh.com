@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"log/slog"
 	"strings"
 
@@ -153,7 +154,6 @@ func SaveProject(
 	project *assets.Project,
 	queCh MsgChannel,
 ) error {
-	slog.Info("saving project", slog.String("hashed", project.Hash))
 	// Save the project first
 	_, err := db.NewInsert().
 		Model(project).
@@ -284,7 +284,6 @@ func SaveTag(
 	tag *assets.Tag,
 	queCh MsgChannel,
 ) error {
-	// Save the tag first
 	_, err := db.NewInsert().
 		Model(tag).
 		On("CONFLICT (slug) DO UPDATE").
@@ -509,6 +508,23 @@ func Save(
 		var tag assets.Tag
 		copygen.ToTag(&tag, doc)
 		return SaveTag(ctx, db, &tag, msgCh)
+	}
+	return nil
+}
+
+// Cache caches a document to the database.
+func Cache(
+	ctx context.Context,
+	db *bun.DB,
+	cache *assets.Cache,
+	cacheID int,
+) error {
+	_, err := db.NewUpdate().
+		Model(cache).
+		Where("id = ?", cacheID).
+		Exec(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to cache %s: %w", cache.Path, err)
 	}
 	return nil
 }

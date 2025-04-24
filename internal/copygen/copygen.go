@@ -9,13 +9,11 @@ import "github.com/conneroisu/conneroh.com/internal/assets"
 // ToPost copies a *assets.Doc to a *assets.Post.
 func ToPost(tP *assets.Post, fD *assets.Doc) {
 	// *assets.Post fields
-	tP.Hash = fD.Hash
 	tP.X = fD.X
 	tP.Y = fD.Y
 	tP.Z = fD.Z
 	tP.Title = fD.Title
 	tP.Slug = fD.Slug
-	tP.Path = fD.Path
 	tP.Description = fD.Description
 	tP.Content = fD.Content
 	tP.BannerPath = fD.BannerPath
@@ -32,13 +30,11 @@ func ToPost(tP *assets.Post, fD *assets.Doc) {
 // ToProject copies a *assets.Doc to a *assets.Project.
 func ToProject(tP *assets.Project, fD *assets.Doc) {
 	// *assets.Project fields
-	tP.Hash = fD.Hash
 	tP.X = fD.X
 	tP.Y = fD.Y
 	tP.Z = fD.Z
 	tP.Title = fD.Title
 	tP.Slug = fD.Slug
-	tP.Path = fD.Path
 	tP.Description = fD.Description
 	tP.Content = fD.Content
 	tP.BannerPath = fD.BannerPath
@@ -53,13 +49,11 @@ func ToProject(tP *assets.Project, fD *assets.Doc) {
 // ToTag copies a *assets.Doc to a *assets.Tag.
 func ToTag(tT *assets.Tag, fD *assets.Doc) {
 	// *assets.Tag fields
-	tT.Hash = fD.Hash
 	tT.X = fD.X
 	tT.Y = fD.Y
 	tT.Z = fD.Z
 	tT.Title = fD.Title
 	tT.Slug = fD.Slug
-	tT.Path = fD.Path
 	tT.Description = fD.Description
 	tT.Content = fD.Content
 	tT.BannerPath = fD.BannerPath
@@ -75,9 +69,17 @@ func ToTag(tT *assets.Tag, fD *assets.Doc) {
 // ToAsset copies a *assets.Doc to a *assets.Asset.
 func ToAsset(tA *assets.Asset, fD *assets.Doc) {
 	// *assets.Asset fields
-	tA.Path = fD.Path
-	tA.Hash = fD.Hash
 	tA.X = fD.X
 	tA.Y = fD.Y
 	tA.Z = fD.Z
+}
+
+// ToCache copies a *assets.Doc to a *assets.Cache.
+func ToCache(tC *assets.Cache, fD *assets.Doc) {
+	// *assets.Cache fields
+	tC.Path = fD.Path
+	tC.Hash = fD.Hash
+	tC.X = fD.X
+	tC.Y = fD.Y
+	tC.Z = fD.Z
 }

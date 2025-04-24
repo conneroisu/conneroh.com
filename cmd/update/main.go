@@ -4,6 +4,7 @@ package main
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"flag"
 	"fmt"
 	"log/slog"
@@ -60,9 +61,9 @@ func Run(
 	workers int,
 ) error {
 	var (
-		errCh = make(chan error) // Added buffer to avoid blocking
-		msgCh = make(cache.MsgChannel)
-		queCh = make(cache.MsgChannel) // Increased buffer size
+		errCh = make(chan error, workers) // Added buffer to avoid blocking
+		msgCh = make(cache.MsgChannel, workers)
+		queCh = make(cache.MsgChannel, workers) // Increased buffer size
 		// wg    = sync.WaitGroup{}
 		wg cwg.DebugWaitGroup
 	)
@@ -111,6 +112,11 @@ func Run(
 	for {
 		select {
 		case err := <-errCh:
+			if errors.Is(err, context.Canceled) {
+				slog.Info("received termination signal")
+				cancel() // Cancel inner context
+				return gracefulShutdown(msgCh, queCh, errCh)
+			}
 			slog.Error("error", "err", err)
 			cancel()
 			return gracefulShutdown(msgCh, queCh, errCh)

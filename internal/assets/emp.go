@@ -17,6 +17,9 @@ var (
 	// EmpAsset is a pointer to an Asset.
 	EmpAsset = new(Asset)
 
+	// EmpCache is a pointer to a Cache.
+	EmpCache = new(Cache)
+
 	// EmpPostToTag is a pointer to a PostToTag.
 	EmpPostToTag = new(PostToTag)
 	// EmpPostToPost is a pointer to a PostToPost.
@@ -78,6 +81,7 @@ func CreateTables(ctx context.Context, db *bun.DB) error {
 		EmpTag,
 		EmpProject,
 		EmpAsset,
+		EmpCache,
 	}
 
 	for _, model := range models {
