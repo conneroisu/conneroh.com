@@ -97,7 +97,7 @@ func Run(
 	h := cache.NewHollywood(workers, fs, db, ti, ol, md)
 	slog.Info("starting hollywood")
 	go h.Start(innerCtx, msgCh, queCh, errCh, &wg)
-	go cache.ReadFS(fs, &wg, queCh, errCh)
+	go cache.ReadFS(innerCtx, fs, &wg, queCh, errCh)
 	go cache.Querer(innerCtx, queCh, msgCh)
 	time.Sleep(time.Millisecond * 50)
 

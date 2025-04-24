@@ -126,7 +126,8 @@ func (a *Actor) Start(
 				if err != nil {
 					err = CtxSend(ctx, errCh, err)
 					if err != nil {
-						panic(eris.Wrap(err, "failed to send error to error channel"))
+						slog.Error("failed to send error to error channel", "err", err)
+						return
 					}
 				}
 			}()
@@ -163,9 +164,18 @@ func (a *Actor) Handle(
 				msg.Tries,
 			)
 		}
-		err = CtxSend(ctx, a.queCh, msg)
+
 		if err != nil {
-			return eris.Wrapf(err, "failed to send message to queue channel: %s", msg.Path)
+			// Only requeue if there was an error and we haven't exceeded retry count
+			select {
+			case <-ctx.Done():
+				return ctx.Err()
+			default:
+				err = CtxSend(ctx, a.queCh, msg)
+				if err != nil {
+					return eris.Wrapf(err, "failed to send message to queue channel: %s", msg.Path)
+				}
+			}
 		}
 		return nil
 	case MsgTypeAsset:
