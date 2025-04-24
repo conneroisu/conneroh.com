@@ -1,3 +1,6 @@
+//go:build !dev
+// +build !dev
+
 // Package main contains the main function for the conneroh.com website.
 package main
 
