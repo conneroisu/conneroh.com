@@ -187,6 +187,11 @@ func (a *Actor) Handle(
 		if cacheID > 0 {
 			return nil
 		}
+		copygen.ToCache(&cache, &doc)
+		err = Cache(ctx, a.db, &cache, cacheID)
+		if err != nil {
+			return eris.Wrapf(err, "failed to cache %s", msg.Path)
+		}
 		err = Upload(ctx, a.ti, msg.Path, content)
 		if err != nil {
 			return eris.Wrapf(err, "failed to upload asset: %s", msg.Path)
@@ -195,11 +200,6 @@ func (a *Actor) Handle(
 		err = SaveAsset(ctx, a.db, &asset)
 		if err != nil {
 			return eris.Wrapf(err, "failed to save asset: %s", msg.Path)
-		}
-		copygen.ToCache(&cache, &doc)
-		err = Cache(ctx, a.db, &cache, cacheID)
-		if err != nil {
-			return eris.Wrapf(err, "failed to cache %s", msg.Path)
 		}
 		return nil
 	case MsgTypeDoc:
@@ -221,6 +221,7 @@ func (a *Actor) Handle(
 		if cacheID > 0 {
 			return nil
 		}
+
 		pCtx := parser.NewContext()
 		buf := bytes.NewBufferString("")
 
@@ -255,7 +256,6 @@ func (a *Actor) Handle(
 			)
 		}
 
-		// Set slug and content
 		doc.Slug = assets.Slugify(msg.Path)
 		doc.Content = buf.String()
 
