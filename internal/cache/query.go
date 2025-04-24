@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"fmt"
 	"log/slog"
 	"strings"
 
@@ -30,11 +29,9 @@ func SavePost(
 		Set("description = EXCLUDED.description").
 		Set("content = EXCLUDED.content").
 		Set("banner_path = EXCLUDED.banner_path").
-		Set("raw_content = EXCLUDED.raw_content").
 		Set("icon = EXCLUDED.icon").
 		Set("created_at = EXCLUDED.created_at").
 		Set("updated_at = EXCLUDED.updated_at").
-		Set("hashed = EXCLUDED.hashed").
 		Set("x = EXCLUDED.x").
 		Set("y = EXCLUDED.y").
 		Set("z = EXCLUDED.z").
@@ -163,11 +160,9 @@ func SaveProject(
 		Set("description = EXCLUDED.description").
 		Set("content = EXCLUDED.content").
 		Set("banner_path = EXCLUDED.banner_path").
-		Set("raw_content = EXCLUDED.raw_content").
 		Set("icon = EXCLUDED.icon").
 		Set("created_at = EXCLUDED.created_at").
 		Set("updated_at = EXCLUDED.updated_at").
-		Set("hashed = EXCLUDED.hashed").
 		Set("x = EXCLUDED.x").
 		Set("y = EXCLUDED.y").
 		Set("z = EXCLUDED.z").
@@ -292,11 +287,9 @@ func SaveTag(
 		Set("description = EXCLUDED.description").
 		Set("content = EXCLUDED.content").
 		Set("banner_path = EXCLUDED.banner_path").
-		Set("raw_content = EXCLUDED.raw_content").
 		Set("icon = EXCLUDED.icon").
 		Set("created_at = EXCLUDED.created_at").
 		Set("updated_at = EXCLUDED.updated_at").
-		Set("hashed = EXCLUDED.hashed").
 		Set("x = EXCLUDED.x").
 		Set("y = EXCLUDED.y").
 		Set("z = EXCLUDED.z").
@@ -487,27 +480,6 @@ func Save(
 		var tag assets.Tag
 		copygen.ToTag(&tag, doc)
 		return SaveTag(ctx, db, &tag, msgCh)
-	}
-	return nil
-}
-
-// Cache caches a document to the database.
-func Cache(
-	ctx context.Context,
-	db *bun.DB,
-	cache *assets.Cache,
-	fPath string,
-) error {
-	_, err := db.NewInsert().
-		Model(cache).
-		On("CONFLICT (path) DO UPDATE").
-		Set("hashed = EXCLUDED.hashed").
-		Set("x = EXCLUDED.x").
-		Set("y = EXCLUDED.y").
-		Set("z = EXCLUDED.z").
-		Exec(ctx)
-	if err != nil {
-		return fmt.Errorf("failed to cache %s: %w", cache.Path, err)
 	}
 	return nil
 }

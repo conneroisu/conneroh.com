@@ -62,9 +62,9 @@ func Run(
 	workers int,
 ) error {
 	var (
-		errCh = make(chan error, workers) // Added buffer to avoid blocking
-		msgCh = make(cache.MsgChannel, workers)
-		queCh = make(cache.MsgChannel, workers) // Increased buffer size
+		errCh = make(chan error)
+		msgCh = make(cache.MsgChannel)
+		queCh = make(cache.MsgChannel)
 		// wg    = sync.WaitGroup{}
 		wg cwg.DebugWaitGroup
 	)
@@ -92,6 +92,7 @@ func Run(
 	fs := afero.NewBasePathFs(afero.NewOsFs(), assets.VaultLoc)
 	md := markdown.NewMD(fs)
 	db.AddQueryHook(bundebug.NewQueryHook(bundebug.WithVerbose(true)))
+
 	h := cache.NewHollywood(workers, fs, db, ti, ol, md)
 	go h.Start(innerCtx, msgCh, queCh, errCh, &wg)
 	go cache.ReadFS(innerCtx, fs, &wg, queCh, errCh)
@@ -139,12 +140,12 @@ func gracefulShutdown(msgCh, queCh cache.MsgChannel, errCh chan error) error {
 	slog.Info("performing graceful shutdown")
 
 	// Drain error channel first to capture any final errors
-	var lastErr error
+	var errs error
 drainLoop:
 	for {
 		select {
 		case err := <-errCh:
-			lastErr = err
+			errs = eris.Wrapf(errs, "error while handling error: %w", err)
 			slog.Error("error during shutdown", "err", err)
 		case <-time.After(100 * time.Millisecond):
 			break drainLoop
@@ -157,5 +158,5 @@ drainLoop:
 	close(errCh)
 
 	slog.Info("shutdown complete")
-	return lastErr
+	return errs
 }

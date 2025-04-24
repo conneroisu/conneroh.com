@@ -17,7 +17,6 @@ func ToPost(tP *assets.Post, fD *assets.Doc) {
 	tP.Description = fD.Description
 	tP.Content = fD.Content
 	tP.BannerPath = fD.BannerPath
-	tP.Icon = fD.Icon
 	tP.CreatedAt = fD.CreatedAt
 	tP.UpdatedAt = fD.UpdatedAt
 	tP.TagSlugs = fD.TagSlugs
@@ -38,7 +37,6 @@ func ToProject(tP *assets.Project, fD *assets.Doc) {
 	tP.Description = fD.Description
 	tP.Content = fD.Content
 	tP.BannerPath = fD.BannerPath
-	tP.Icon = fD.Icon
 	tP.CreatedAt = fD.CreatedAt
 	tP.UpdatedAt = fD.UpdatedAt
 	tP.TagSlugs = fD.TagSlugs
@@ -89,7 +87,6 @@ func CachedToPost(tP *assets.Post, fC *assets.Cache, fD *assets.Doc) {
 	tP.Description = fD.Description
 	tP.Content = fD.Content
 	tP.BannerPath = fD.BannerPath
-	tP.Icon = fD.Icon
 	tP.CreatedAt = fD.CreatedAt
 	tP.UpdatedAt = fD.UpdatedAt
 	tP.TagSlugs = fD.TagSlugs
@@ -112,7 +109,6 @@ func CachedToProject(tP *assets.Project, fC *assets.Cache, fD *assets.Doc) {
 	tP.Description = fD.Description
 	tP.Content = fD.Content
 	tP.BannerPath = fD.BannerPath
-	tP.Icon = fD.Icon
 	tP.CreatedAt = fD.CreatedAt
 	tP.UpdatedAt = fD.UpdatedAt
 	tP.TagSlugs = fD.TagSlugs

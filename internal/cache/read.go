@@ -33,6 +33,8 @@ func ReadFS(
 			fs,
 			".",
 			func(fPath string, info os.FileInfo, err error) error {
+				wg.Add(1)
+				defer wg.Done()
 				// Check context before processing each file
 				select {
 				case <-ctx.Done():

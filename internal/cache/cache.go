@@ -201,7 +201,7 @@ func (a *Actor) Handle(
 			return nil
 		}
 		copygen.ToCache(&cache, &doc)
-		err = Cache(ctx, a.db, &cache, msg.Path)
+		err = Cache(ctx, a.db, &cache)
 		if err != nil {
 			return eris.Wrapf(err, "failed to cache %s", msg.Path)
 		}
@@ -277,7 +277,7 @@ func (a *Actor) Handle(
 		}
 
 		copygen.ToCache(&cache, &doc)
-		err = Cache(ctx, a.db, &cache, msg.Path)
+		err = Cache(ctx, a.db, &cache)
 		if err != nil {
 			return eris.Wrapf(err, "failed to cache %s", msg.Path)
 		}
@@ -352,4 +352,24 @@ func (a *Actor) isCached(ctx context.Context, msg Msg, doc *assets.Doc) (bool, e
 	// Document found but hash is different - needs update
 	slog.Info("asset has changed", "path", msg.Path, "old_hash", c.Hash, "new_hash", doc.Hash)
 	return false, nil
+}
+
+// Cache caches a document to the database.
+func Cache(
+	ctx context.Context,
+	db *bun.DB,
+	cache *assets.Cache,
+) error {
+	_, err := db.NewInsert().
+		Model(cache).
+		On("CONFLICT (path) DO UPDATE").
+		Set("hashed = EXCLUDED.hashed").
+		Set("x = EXCLUDED.x").
+		Set("y = EXCLUDED.y").
+		Set("z = EXCLUDED.z").
+		Exec(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to cache %s: %w", cache.Path, err)
+	}
+	return nil
 }

@@ -94,7 +94,6 @@ type (
 		Description string     `bun:"description"`
 		Content     string     `bun:"content"`
 		BannerPath  string     `bun:"banner_path"`
-		Icon        string     `bun:"icon"`
 		CreatedAt   CustomTime `bun:"created_at"`
 		UpdatedAt   CustomTime `bun:"updated_at"`
 
@@ -123,7 +122,6 @@ type (
 		Description string     `bun:"description"`
 		Content     string     `bun:"content"`
 		BannerPath  string     `bun:"banner_path"`
-		Icon        string     `bun:"icon"`
 		CreatedAt   CustomTime `bun:"created_at"`
 		UpdatedAt   CustomTime `bun:"updated_at"`
 
