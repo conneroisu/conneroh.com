@@ -64,16 +64,8 @@ func ReadFS(
 					return nil
 				}
 
-				// Send with context awareness
-				select {
-				case <-ctx.Done():
-					if errors.Is(ctx.Err(), context.Canceled) {
-						return nil
-					}
-					return ctx.Err()
-				default:
-					return CtxSend(ctx, queCh, Msg{Path: fPath, Type: msgType})
-				}
+				queCh <- Msg{Path: fPath, Type: msgType}
+				return nil
 			})
 
 		if err != nil {
@@ -85,7 +77,6 @@ func ReadFS(
 	// Wait for walk to finish or context to be canceled
 	select {
 	case <-ctx.Done():
-		slog.Info("ReadFS: context canceled, exiting")
 		return
 	case err := <-walkErr:
 		select {
@@ -93,8 +84,7 @@ func ReadFS(
 			// Context already canceled, just exit
 			return
 		default:
-			// Try to send error
-			CtxSend(ctx, errCh, fmt.Errorf("error walking filesystem: %w", err))
+			errCh <- fmt.Errorf("ReadFS: %w", err)
 		}
 	case <-walkDone:
 		slog.Info("ReadFS: walk completed successfully")
