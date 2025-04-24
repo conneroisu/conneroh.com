@@ -151,10 +151,6 @@
           };
           run = {
             exec = ''
-              # ${pkgs.tailwindcss}/bin/tailwindcss -m -i ./input.css --watch \
-              #   -o $REPO_ROOT/cmd/conneroh/_static/dist/style.css \
-              #   --cwd $REPO_ROOT > /tmp/tailwind.log 2>&1 &
-              # echo $! > /tmp/tailwind.pid
               cd $REPO_ROOT && air
             '';
             description = "Run the application with air for hot reloading";
