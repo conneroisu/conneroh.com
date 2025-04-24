@@ -4,10 +4,8 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
-	"strings"
 	"time"
 
-	"github.com/rotisserie/eris"
 	"github.com/uptrace/bun"
 	"gopkg.in/yaml.v3"
 )
@@ -267,71 +265,9 @@ type (
 	}
 )
 
-// Defaults sets the default values for the document if they are missing.
-func Defaults(doc *Doc) error {
-	// Set default icon if not provided
-	if doc.Icon == "" {
-		doc.Icon = "tag"
-	}
-
-	return nil
-}
-
 // GetTitle returns the title of the embedding.
 func (emb *Doc) GetTitle() string {
 	return emb.Title
-}
-
-// Validate validate the given embedding.
-func Validate(
-	path string,
-	emb *Doc,
-) error {
-	errs := []error{}
-	if emb.Slug == "" {
-		errs = append(errs, eris.Wrapf(
-			ErrValueMissing,
-			"%s is missing slug",
-			path,
-		))
-	}
-
-	if emb.Description == "" {
-		errs = append(errs, eris.Wrapf(
-			ErrValueMissing,
-			"%s is missing description",
-			path,
-		))
-	}
-
-	if emb.Content == "" {
-		errs = append(errs, eris.Wrapf(
-			ErrValueMissing,
-			"%s is missing content",
-			path,
-		))
-	}
-
-	if strings.Contains(emb.Slug, " ") {
-		errs = append(errs, eris.Wrapf(
-			ErrValueInvalid,
-			"slug %s contains spaces",
-			path,
-		))
-	}
-
-	// TODO: Validate that the banner path is a valid image and is not null/zero
-
-	var err error
-	for _, er := range errs {
-		if er != nil {
-			err = eris.Wrapf(err, "failed validating %s", path)
-		}
-	}
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 // PagePath returns the path to the post page.

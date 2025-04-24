@@ -6,7 +6,6 @@ import (
 	"errors"
 	"log/slog"
 	"strings"
-	"sync"
 
 	"github.com/conneroisu/conneroh.com/internal/assets"
 	"github.com/conneroisu/conneroh.com/internal/copygen"
@@ -19,8 +18,8 @@ func SavePost(
 	ctx context.Context,
 	db *bun.DB,
 	post *assets.Post,
-	msgCh MsgChannel,
-	wg *sync.WaitGroup,
+	queCh MsgChannel,
+	wg waitGroup,
 ) error {
 	// Save the post first
 	_, err := db.NewInsert().
@@ -135,7 +134,7 @@ func SavePost(
 		return nil
 	}
 
-	go CtxSend(ctx, msgCh, Msg{
+	CtxSend(ctx, queCh, Msg{
 		Path:  post.Slug,
 		Type:  MsgTypeAction,
 		fn:    attrFn,
@@ -150,8 +149,8 @@ func SaveProject(
 	ctx context.Context,
 	db *bun.DB,
 	project *assets.Project,
-	msgCh MsgChannel,
-	wg *sync.WaitGroup,
+	queCh MsgChannel,
+	wg waitGroup,
 ) error {
 	slog.Info("saving project", slog.String("hashed", project.Hash))
 	// Save the project first
@@ -265,7 +264,7 @@ func SaveProject(
 		return nil
 	}
 
-	go CtxSend(ctx, msgCh, Msg{
+	CtxSend(ctx, queCh, Msg{
 		Type:  MsgTypeAction,
 		fn:    attrFn,
 		Tries: 0,
@@ -280,8 +279,8 @@ func SaveTag(
 	ctx context.Context,
 	db *bun.DB,
 	tag *assets.Tag,
-	msgCh MsgChannel,
-	wg *sync.WaitGroup,
+	queCh MsgChannel,
+	wg waitGroup,
 ) error {
 	// Save the tag first
 	_, err := db.NewInsert().
@@ -396,7 +395,7 @@ func SaveTag(
 		return nil
 	}
 
-	go CtxSend(ctx, msgCh, Msg{
+	CtxSend(ctx, queCh, Msg{
 		Path:  tag.Slug,
 		fn:    attrFn,
 		Tries: 0,
@@ -469,7 +468,7 @@ func SaveAsset(
 	path string,
 	asset *assets.Asset,
 	msgCh MsgChannel,
-	wg *sync.WaitGroup,
+	wg waitGroup,
 ) error {
 	slog.Debug("saving asset media", "path", path)
 	defer slog.Debug("saved asset media", "path", path)
@@ -495,7 +494,7 @@ func Save(
 	path string,
 	doc *assets.Doc,
 	msgCh MsgChannel,
-	wg *sync.WaitGroup,
+	wg waitGroup,
 ) error {
 	slog.Debug("saving document", "path", path)
 	defer slog.Debug("saved document", "path", path)

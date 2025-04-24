@@ -10,14 +10,12 @@ import (
 	"mime"
 	"path/filepath"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/conneroisu/conneroh.com/internal/assets"
 	"github.com/conneroisu/conneroh.com/internal/copygen"
-	"github.com/conneroisu/conneroh.com/internal/tigris"
 	"github.com/rotisserie/eris"
 	"github.com/spf13/afero"
 	"github.com/uptrace/bun"
@@ -32,21 +30,15 @@ type (
 
 	// Hollywood is a slice of actors.
 	Hollywood []*Actor
-
-	// OllamaClient is the ollama client.
-	OllamaClient interface {
-		Embeddings(
-			ctx context.Context,
-			content string,
-			emb *assets.Doc,
-		) (err error)
-	}
 )
 
 // CtxSend sends a message to the channel with a context.
-func CtxSend[T any](ctx context.Context, ch chan T, msg T, wg *sync.WaitGroup) {
-	wg.Add(1)
-	defer wg.Done()
+func CtxSend[T any](
+	ctx context.Context,
+	ch chan T,
+	msg T,
+	wg waitGroup,
+) {
 	select {
 	case <-ctx.Done():
 		return
@@ -60,8 +52,8 @@ func NewHollywood(
 	num int,
 	fs afero.Fs,
 	db *bun.DB,
-	ti tigris.Client,
-	ol OllamaClient,
+	ti tigrisClient,
+	ol ollamaClient,
 	md goldmark.Markdown,
 ) Hollywood {
 	var actors []*Actor
@@ -74,22 +66,23 @@ func NewHollywood(
 // Start starts the asset hollywood.
 func (h Hollywood) Start(
 	ctx context.Context,
-	msgCh chan Msg,
+	msgCh MsgChannel,
+	queCh MsgChannel,
 	errCh chan error,
-	wg *sync.WaitGroup,
+	wg waitGroup,
 ) {
 	for _, actor := range h {
-		go actor.Start(ctx, msgCh, errCh, wg)
+		go actor.Start(ctx, msgCh, queCh, errCh, wg)
 	}
 }
 
 // Actor is the actor for the document collection.
 type Actor struct {
-	msgCh MsgChannel
+	queCh MsgChannel
 	fs    afero.Fs
 	db    *bun.DB
-	ti    tigris.Client
-	ol    OllamaClient
+	ti    tigrisClient
+	ol    ollamaClient
 	md    goldmark.Markdown
 }
 
@@ -97,8 +90,8 @@ type Actor struct {
 func NewActor(
 	fs afero.Fs,
 	db *bun.DB,
-	ti tigris.Client,
-	ol OllamaClient,
+	ti tigrisClient,
+	ol ollamaClient,
 	md goldmark.Markdown,
 ) *Actor {
 	return &Actor{fs: fs, db: db, ti: ti, ol: ol, md: md}
@@ -128,21 +121,27 @@ type Msg struct {
 func (a *Actor) Start(
 	ctx context.Context,
 	msgCh MsgChannel,
+	queCh MsgChannel,
 	errCh chan error,
-	wg *sync.WaitGroup,
+	wg waitGroup,
 ) {
-	a.msgCh = msgCh
+	a.queCh = queCh
 	for {
 		select {
-		case <-time.After(time.Second * 5):
-			slog.Debug("cache actor", "killed", "was idle for 5 seconds")
+		case <-time.After(time.Second * 1):
+			slog.Error(
+				"cache actor",
+				"killed",
+				"was idle for 5 seconds",
+			)
+			return
 		case <-ctx.Done():
 			return
 		case msg := <-msgCh:
 			wg.Add(1)
 			err := a.Handle(ctx, wg, msg)
 			if err != nil {
-				go CtxSend(ctx, errCh, err, wg)
+				CtxSend(ctx, errCh, err, wg)
 			}
 			wg.Done()
 		}
@@ -154,13 +153,12 @@ func (a *Actor) Start(
 // (e.g. /assets/foo.md, foo.svg, etc)
 func (a *Actor) Handle(
 	ctx context.Context,
-	wg *sync.WaitGroup,
+	wg waitGroup,
 	msg Msg,
 ) (err error) {
 	var (
-		doc     assets.Doc
-		ok      bool
-		content []byte
+		doc assets.Doc
+		ok  bool
 	)
 	if msg.Path == "" {
 		return eris.New("path is empty")
@@ -173,12 +171,18 @@ func (a *Actor) Handle(
 		slog.Info("action", "tries", msg.Tries)
 		err = msg.fn()
 		msg.Tries++
-		if msg.Tries > 3 {
-			return eris.Wrapf(err, "failed to handle (path: %s) action (tries: %d)", msg.Path, msg.Tries)
+		if msg.Tries > 3 && err != nil {
+			return eris.Wrapf(
+				err,
+				"failed to handle (path: %s) action (tries: %d)",
+				msg.Path,
+				msg.Tries,
+			)
 		}
-		go CtxSend(ctx, a.msgCh, msg, wg)
+		CtxSend(ctx, a.queCh, msg, wg)
 		return nil
 	case MsgTypeAsset:
+		var content []byte
 		content, err = afero.ReadFile(a.fs, msg.Path)
 		if err != nil {
 			return err
@@ -197,12 +201,16 @@ func (a *Actor) Handle(
 		}
 		var asset assets.Asset
 		copygen.ToAsset(&asset, &doc)
-		err = SaveAsset(ctx, a.db, msg.Path, &asset, a.msgCh, wg)
+		err = SaveAsset(ctx, a.db, msg.Path, &asset, a.queCh, wg)
 		if err != nil {
 			return eris.Wrapf(err, "failed to save asset: %s", msg.Path)
 		}
 		return nil
 	case MsgTypeDoc:
+		var (
+			metadata *frontmatter.Data
+			content  []byte
+		)
 		content, err = afero.ReadFile(a.fs, msg.Path)
 		if err != nil {
 			return err
@@ -215,7 +223,6 @@ func (a *Actor) Handle(
 		if ok {
 			return nil
 		}
-		var metadata *frontmatter.Data
 		pCtx := parser.NewContext()
 		buf := bytes.NewBufferString("")
 
@@ -259,7 +266,7 @@ func (a *Actor) Handle(
 			return eris.Wrapf(err, "failed to validate %s", msg.Path)
 		}
 
-		err = Save(ctx, a.db, msg.Path, &doc, a.msgCh, wg)
+		err = Save(ctx, a.db, msg.Path, &doc, a.queCh, wg)
 		if err != nil {
 			return eris.Wrapf(err, "failed to save %s", msg.Path)
 		}
@@ -273,7 +280,7 @@ func (a *Actor) Handle(
 // This version supports concurrent uploads using multiple mutexes
 func Upload(
 	ctx context.Context,
-	client tigris.Client,
+	client tigrisClient,
 	path string,
 	data []byte,
 ) error {
@@ -308,10 +315,10 @@ func (a *Actor) isCached(ctx context.Context, msg Msg, doc *assets.Doc) (bool, e
 	switch {
 	case strings.HasPrefix(msg.Path, assets.PostsLoc):
 		var p assets.Post
-		_, err := a.db.NewSelect().
-			Model(assets.EmpPost).
+		err := a.db.NewSelect().
+			Model(&p).
 			Where("path = ?", msg.Path).
-			Exec(ctx, &p)
+			Scan(ctx)
 		if errors.Is(err, sql.ErrNoRows) {
 			return false, nil
 		}
@@ -323,10 +330,10 @@ func (a *Actor) isCached(ctx context.Context, msg Msg, doc *assets.Doc) (bool, e
 		}
 	case strings.HasPrefix(msg.Path, assets.ProjectsLoc):
 		var p assets.Project
-		_, err := a.db.NewSelect().
-			Model(assets.EmpProject).
+		err := a.db.NewSelect().
+			Model(&p).
 			Where("path = ?", msg.Path).
-			Exec(ctx, &p)
+			Scan(ctx)
 		if errors.Is(err, sql.ErrNoRows) {
 			return false, nil
 		}
@@ -338,10 +345,10 @@ func (a *Actor) isCached(ctx context.Context, msg Msg, doc *assets.Doc) (bool, e
 		}
 	case strings.HasPrefix(msg.Path, assets.TagsLoc):
 		var t assets.Tag
-		_, err := a.db.NewSelect().
-			Model(assets.EmpTag).
+		err := a.db.NewSelect().
+			Model(&t).
 			Where("path = ?", msg.Path).
-			Exec(ctx, &t)
+			Scan(ctx)
 		if errors.Is(err, sql.ErrNoRows) {
 			return false, nil
 		}

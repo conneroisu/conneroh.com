@@ -83,7 +83,7 @@ func run(
 	h := cache.NewHollywood(workers, fs, db, ti, ol, md)
 	println("starting hollywood")
 
-	go h.Start(innerCtx, msgCh, errCh, &wg)
+	go h.Start(innerCtx, msgCh, queCh, errCh, &wg)
 	go ReadFS(fs, &wg, queCh, errCh)
 	go Querer(innerCtx, queCh, msgCh)
 	time.Sleep(time.Millisecond * 50)
@@ -147,12 +147,16 @@ func ReadFS(
 			return nil
 		})
 	if err != nil {
-		errCh <- err
+		errCh <- fmt.Errorf("error walking filesystem: %w", err)
 	}
 }
 
 // Querer reads from the message channel and sends messages to the que channel.
-func Querer(ctx context.Context, queCh cache.MsgChannel, msgCh cache.MsgChannel) {
+func Querer(
+	ctx context.Context,
+	queCh cache.MsgChannel,
+	msgCh cache.MsgChannel,
+) {
 	for {
 		select {
 		case <-ctx.Done():
