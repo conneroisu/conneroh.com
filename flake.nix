@@ -76,7 +76,7 @@
           };
           generate-docs = {
             exec = ''
-              # ${pkgs.doppler}/bin/doppler run -- #$#{packages.update}/bin/update -cwd $REPO_ROOT -jobs 20
+              # ${pkgs.doppler}/bin/doppler run -- ${packages.update}/bin/update -cwd $REPO_ROOT -jobs 20
             '';
             description = "Update the generated go files from the md docs.";
           };
