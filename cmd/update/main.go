@@ -7,14 +7,14 @@ import (
 	"flag"
 	"fmt"
 	"log/slog"
-	"mime"
 	"os"
-	"path/filepath"
-	"sync"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/conneroisu/conneroh.com/internal/assets"
 	"github.com/conneroisu/conneroh.com/internal/cache"
+	"github.com/conneroisu/conneroh.com/internal/cwg"
 	"github.com/conneroisu/conneroh.com/internal/llama"
 	"github.com/conneroisu/conneroh.com/internal/logger"
 	"github.com/conneroisu/conneroh.com/internal/markdown"
@@ -33,8 +33,17 @@ var (
 func main() {
 	flag.Parse()
 	slog.SetDefault(logger.DefaultLogger)
-	if err := run(
-		context.Background(),
+
+	// Create a context that will be canceled on interrupt signals
+	ctx, stop := signal.NotifyContext(context.Background(),
+		os.Interrupt,
+		syscall.SIGTERM,
+		syscall.SIGINT,
+		syscall.SIGHUP)
+	defer stop()
+
+	if err := Run(
+		ctx,
 		os.Getenv,
 		*workers,
 	); err != nil {
@@ -44,19 +53,24 @@ func main() {
 	}
 }
 
-func run(
+// Run runs the main program, update.
+func Run(
 	ctx context.Context,
 	getenv func(string) string,
 	workers int,
 ) error {
 	var (
-		errCh = make(chan error)
-		msgCh = make(cache.MsgChannel, workers)
-		queCh = make(cache.MsgChannel, 5)
-		wg    = sync.WaitGroup{}
+		errCh = make(chan error) // Added buffer to avoid blocking
+		msgCh = make(cache.MsgChannel)
+		queCh = make(cache.MsgChannel) // Increased buffer size
+		// wg    = sync.WaitGroup{}
+		wg cwg.DebugWaitGroup
 	)
 	innerCtx, cancel := context.WithCancel(ctx)
 	defer cancel()
+
+	// Setup signal handling for graceful shutdown
+	slog.Info("starting application with signal handling")
 
 	ol, err := llama.NewOllamaClient(getenv)
 	if err != nil {
@@ -79,91 +93,66 @@ func run(
 	fs := afero.NewBasePathFs(afero.NewOsFs(), assets.VaultLoc)
 	md := markdown.NewMD(fs)
 	// db.AddQueryHook(bundebug.NewQueryHook(bundebug.WithVerbose(true)))
-
 	h := cache.NewHollywood(workers, fs, db, ti, ol, md)
-	println("starting hollywood")
-
+	slog.Info("starting hollywood")
 	go h.Start(innerCtx, msgCh, queCh, errCh, &wg)
-	go ReadFS(fs, &wg, queCh, errCh)
-	go Querer(innerCtx, queCh, msgCh)
+	go cache.ReadFS(fs, &wg, queCh, errCh)
+	go cache.Querer(innerCtx, queCh, msgCh)
 	time.Sleep(time.Millisecond * 50)
+
+	// Goroutine to handle wait group completion
 	go func() {
 		wg.Wait()
 		slog.Info("hollywood finished")
 		cancel()
 	}()
+
+	// Main loop with graceful shutdown
 	for {
 		select {
-		case <-time.After(time.Second * 1):
-			slog.Info("waiting for hollywood to finish")
-		case <-innerCtx.Done():
-			slog.Info("inner context done")
-			close(msgCh)
-			close(queCh)
-			close(errCh)
-			return nil
 		case err := <-errCh:
 			slog.Error("error", "err", err)
 			cancel()
-			close(msgCh)
-			close(queCh)
-			close(errCh)
-			return err
+			return gracefulShutdown(msgCh, queCh, errCh)
+
+		case <-ctx.Done():
+			slog.Info("received termination signal")
+			cancel() // Cancel inner context
+			return gracefulShutdown(msgCh, queCh, errCh)
+
+		case <-innerCtx.Done():
+			slog.Info("inner context done")
+			return gracefulShutdown(msgCh, queCh, errCh)
+
+		case <-time.After(time.Second * 1):
+			slog.Info("waiting for hollywood to finish", slog.Int("count", wg.Count()))
+			wg.PrintActiveDebugInfo()
 		}
 	}
 }
 
-// ReadFS reads the filesystem and sends messages to the message channel.
-func ReadFS(
-	fs afero.Fs,
-	wg *sync.WaitGroup,
-	queCh cache.MsgChannel,
-	errCh chan error,
-) {
-	wg.Add(1)
-	defer wg.Done()
-	err := afero.Walk(
-		fs,
-		".",
-		func(fPath string, info os.FileInfo, err error) error {
-			wg.Add(1)
-			defer wg.Done()
+// gracefulShutdown performs a clean shutdown by draining and closing channels
+func gracefulShutdown(msgCh, queCh cache.MsgChannel, errCh chan error) error {
+	slog.Info("performing graceful shutdown")
 
-			var msgType cache.MsgType
-			switch {
-			case err != nil:
-				return err
-			case assets.IsAllowedMediaType(fPath):
-				msgType = cache.MsgTypeAsset
-			case assets.IsAllowedDocumentType(fPath):
-				msgType = cache.MsgTypeDoc
-			case info.IsDir():
-				return nil
-			default:
-				slog.Info("skipping file", "path", fPath, "type", mime.TypeByExtension(filepath.Ext(fPath)))
-				return nil
-			}
-			queCh <- cache.Msg{Path: fPath, Type: msgType}
-			return nil
-		})
-	if err != nil {
-		errCh <- fmt.Errorf("error walking filesystem: %w", err)
-	}
-}
-
-// Querer reads from the message channel and sends messages to the que channel.
-func Querer(
-	ctx context.Context,
-	queCh cache.MsgChannel,
-	msgCh cache.MsgChannel,
-) {
+	// Drain error channel first to capture any final errors
+	var lastErr error
+drainLoop:
 	for {
 		select {
-		case <-ctx.Done():
-			return
-		case msg := <-queCh:
-			slog.Info("queing", "msg", msg)
-			msgCh <- msg
+		case err := <-errCh:
+			lastErr = err
+			slog.Error("error during shutdown", "err", err)
+		case <-time.After(100 * time.Millisecond):
+			break drainLoop
 		}
 	}
+
+	// Close all channels
+	close(msgCh)
+	close(queCh)
+	close(errCh)
+
+	slog.Info("shutdown complete")
+	return lastErr
 }

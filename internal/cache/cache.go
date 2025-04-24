@@ -10,7 +10,6 @@ import (
 	"mime"
 	"path/filepath"
 	"strings"
-	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -31,21 +30,6 @@ type (
 	// Hollywood is a slice of actors.
 	Hollywood []*Actor
 )
-
-// CtxSend sends a message to the channel with a context.
-func CtxSend[T any](
-	ctx context.Context,
-	ch chan T,
-	msg T,
-	wg waitGroup,
-) {
-	select {
-	case <-ctx.Done():
-		return
-	case ch <- msg:
-		return
-	}
-}
 
 // NewHollywood creates a new asset hollywood.
 func NewHollywood(
@@ -128,22 +112,25 @@ func (a *Actor) Start(
 	a.queCh = queCh
 	for {
 		select {
-		case <-time.After(time.Second * 1):
-			slog.Error(
-				"cache actor",
-				"killed",
-				"was idle for 5 seconds",
-			)
-			return
 		case <-ctx.Done():
 			return
-		case msg := <-msgCh:
-			wg.Add(1)
-			err := a.Handle(ctx, wg, msg)
-			if err != nil {
-				CtxSend(ctx, errCh, err, wg)
+		case msg, ok := <-msgCh:
+			if !ok {
+				// Channel closed, exit gracefully
+				slog.Info("Channel closed, exiting")
+				return
 			}
-			wg.Done()
+			func() {
+				wg.Add(1)
+				defer wg.Done()
+				err := a.Handle(ctx, msg)
+				if err != nil {
+					err = CtxSend(ctx, errCh, err)
+					if err != nil {
+						panic(eris.Wrap(err, "failed to send error to error channel"))
+					}
+				}
+			}()
 		}
 	}
 }
@@ -153,7 +140,6 @@ func (a *Actor) Start(
 // (e.g. /assets/foo.md, foo.svg, etc)
 func (a *Actor) Handle(
 	ctx context.Context,
-	wg waitGroup,
 	msg Msg,
 ) (err error) {
 	var (
@@ -179,7 +165,10 @@ func (a *Actor) Handle(
 				msg.Tries,
 			)
 		}
-		CtxSend(ctx, a.queCh, msg, wg)
+		err = CtxSend(ctx, a.queCh, msg)
+		if err != nil {
+			return eris.Wrapf(err, "failed to send message to queue channel: %s", msg.Path)
+		}
 		return nil
 	case MsgTypeAsset:
 		var content []byte
@@ -201,7 +190,7 @@ func (a *Actor) Handle(
 		}
 		var asset assets.Asset
 		copygen.ToAsset(&asset, &doc)
-		err = SaveAsset(ctx, a.db, msg.Path, &asset, a.queCh, wg)
+		err = SaveAsset(ctx, a.db, &asset)
 		if err != nil {
 			return eris.Wrapf(err, "failed to save asset: %s", msg.Path)
 		}
@@ -266,7 +255,7 @@ func (a *Actor) Handle(
 			return eris.Wrapf(err, "failed to validate %s", msg.Path)
 		}
 
-		err = Save(ctx, a.db, msg.Path, &doc, a.queCh, wg)
+		err = Save(ctx, a.db, msg.Path, &doc, a.queCh)
 		if err != nil {
 			return eris.Wrapf(err, "failed to save %s", msg.Path)
 		}

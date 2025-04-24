@@ -19,7 +19,6 @@ func SavePost(
 	db *bun.DB,
 	post *assets.Post,
 	queCh MsgChannel,
-	wg waitGroup,
 ) error {
 	// Save the post first
 	_, err := db.NewInsert().
@@ -45,48 +44,48 @@ func SavePost(
 
 	attrFn := func() error {
 		// Clear existing relationships
-		_, err = db.NewDelete().
+		_, aErr := db.NewDelete().
 			Model(assets.EmpPostToTag).
 			Where("post_id = ?", post.ID).
 			Exec(ctx)
-		if err != nil {
-			return err
+		if aErr != nil {
+			return aErr
 		}
 
-		_, err = db.NewDelete().
+		_, aErr = db.NewDelete().
 			Model(assets.EmpPostToPost).
 			Where("source_post_id = ?", post.ID).
 			Exec(ctx)
-		if err != nil {
-			return err
+		if aErr != nil {
+			return aErr
 		}
 
-		_, err = db.NewDelete().
+		_, aErr = db.NewDelete().
 			Model(assets.EmpPostToProject).
 			Where("post_id = ?", post.ID).
 			Exec(ctx)
-		if err != nil {
-			return err
+		if aErr != nil {
+			return aErr
 		}
 
 		// Create tag relationships
 		for _, tagSlug := range post.TagSlugs {
 			slog.Debug("tag rel tag", "tagSlug", tagSlug)
 			// Find the tag ID by its slug
-			relatedTag, err := FindTagBySlug(ctx, db, tagSlug, post.Slug)
-			if err != nil {
-				return err
+			relatedTag, aErr := FindTagBySlug(ctx, db, tagSlug, post.Slug)
+			if aErr != nil {
+				return aErr
 			}
 
 			// Create relationship
-			_, err = db.NewInsert().
+			_, aErr = db.NewInsert().
 				Model(&assets.PostToTag{
 					PostID: post.ID,
 					TagID:  relatedTag.ID,
 				}).
 				Exec(ctx)
-			if err != nil {
-				return err
+			if aErr != nil {
+				return aErr
 			}
 		}
 
@@ -94,20 +93,20 @@ func SavePost(
 		for _, postSlug := range post.PostSlugs {
 			slog.Debug("post rel post", "postSlug", postSlug)
 			// Find the related post ID by its slug
-			relatedPost, err := FindPostBySlug(ctx, db, postSlug, post.Slug)
-			if err != nil {
-				return err
+			relatedPost, aErr := FindPostBySlug(ctx, db, postSlug, post.Slug)
+			if aErr != nil {
+				return aErr
 			}
 
 			// Create relationship
-			_, err = db.NewInsert().
+			_, aErr = db.NewInsert().
 				Model(&assets.PostToPost{
 					SourcePostID: post.ID,
 					TargetPostID: relatedPost.ID,
 				}).
 				Exec(ctx)
-			if err != nil {
-				return err
+			if aErr != nil {
+				return aErr
 			}
 		}
 
@@ -115,31 +114,34 @@ func SavePost(
 		for _, projectSlug := range post.ProjectSlugs {
 			slog.Debug("project rel post", "projectSlug", projectSlug)
 			// Find the project ID by its slug
-			relatedProject, err := FindProjectBySlug(ctx, db, projectSlug, post.Slug)
-			if err != nil {
-				return err
+			relatedProject, aErr := FindProjectBySlug(ctx, db, projectSlug, post.Slug)
+			if aErr != nil {
+				return aErr
 			}
 
 			// Create relationship
-			_, err = db.NewInsert().
+			_, aErr = db.NewInsert().
 				Model(&assets.PostToProject{
 					PostID:    post.ID,
 					ProjectID: relatedProject.ID,
 				}).
 				Exec(ctx)
-			if err != nil {
-				return err
+			if aErr != nil {
+				return aErr
 			}
 		}
 		return nil
 	}
 
-	CtxSend(ctx, queCh, Msg{
+	err = CtxSend(ctx, queCh, Msg{
 		Path:  post.Slug,
 		Type:  MsgTypeAction,
 		fn:    attrFn,
 		Tries: 0,
-	}, wg)
+	})
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -150,7 +152,6 @@ func SaveProject(
 	db *bun.DB,
 	project *assets.Project,
 	queCh MsgChannel,
-	wg waitGroup,
 ) error {
 	slog.Info("saving project", slog.String("hashed", project.Hash))
 	// Save the project first
@@ -177,48 +178,48 @@ func SaveProject(
 
 	attrFn := func() error {
 		// Clear existing relationships
-		_, err = db.NewDelete().
+		_, aErr := db.NewDelete().
 			Model(assets.EmpProjectToTag).
 			Where("project_id = ?", project.ID).
 			Exec(ctx)
-		if err != nil {
-			return err
+		if aErr != nil {
+			return aErr
 		}
 
-		_, err = db.NewDelete().
+		_, aErr = db.NewDelete().
 			Model(assets.EmpPostToProject).
 			Where("project_id = ?", project.ID).
 			Exec(ctx)
-		if err != nil {
-			return err
+		if aErr != nil {
+			return aErr
 		}
 
-		_, err = db.NewDelete().
+		_, aErr = db.NewDelete().
 			Model(assets.EmpProjectToProject).
 			Where("source_project_id = ?", project.ID).
 			Exec(ctx)
-		if err != nil {
-			return err
+		if aErr != nil {
+			return aErr
 		}
 
 		// Create tag relationships
 		for _, tagSlug := range project.TagSlugs {
 			slog.Debug("tag rel project", "tagSlug", tagSlug)
 			// Find the tag ID by its slug
-			relatedTag, err := FindTagBySlug(ctx, db, tagSlug, project.Slug)
-			if err != nil {
-				return err
+			relatedTag, aErr := FindTagBySlug(ctx, db, tagSlug, project.Slug)
+			if aErr != nil {
+				return aErr
 			}
 
 			// Create relationship
-			_, err = db.NewInsert().
+			_, aErr = db.NewInsert().
 				Model(&assets.ProjectToTag{
 					ProjectID: project.ID,
 					TagID:     relatedTag.ID,
 				}).
 				Exec(ctx)
-			if err != nil {
-				return err
+			if aErr != nil {
+				return aErr
 			}
 		}
 
@@ -226,20 +227,20 @@ func SaveProject(
 		for _, postSlug := range project.PostSlugs {
 			slog.Debug("post rel project", "postSlug", postSlug)
 			// Find the related post ID by its slug
-			relatedPost, err := FindPostBySlug(ctx, db, postSlug, project.Slug)
-			if err != nil {
-				return err
+			relatedPost, aErr := FindPostBySlug(ctx, db, postSlug, project.Slug)
+			if aErr != nil {
+				return aErr
 			}
 
 			// Create relationship
-			_, err = db.NewInsert().
+			_, aErr = db.NewInsert().
 				Model(&assets.PostToProject{
 					ProjectID: project.ID,
 					PostID:    relatedPost.ID,
 				}).
 				Exec(ctx)
-			if err != nil {
-				return err
+			if aErr != nil {
+				return aErr
 			}
 		}
 
@@ -247,30 +248,32 @@ func SaveProject(
 		for _, projectSlug := range project.ProjectSlugs {
 			slog.Debug("project rel project", "projectSlug", projectSlug)
 			// Find the related project ID by its slug
-			relatedProject, err := FindProjectBySlug(ctx, db, projectSlug, project.Slug)
-			if err != nil {
-				return err
+			relatedProject, aErr := FindProjectBySlug(ctx, db, projectSlug, project.Slug)
+			if aErr != nil {
+				return aErr
 			}
-			_, err = db.NewInsert().
+			_, aErr = db.NewInsert().
 				Model(&assets.ProjectToProject{
 					SourceProjectID: project.ID,
 					TargetProjectID: relatedProject.ID,
 				}).
 				Exec(ctx)
-			if err != nil {
-				return err
+			if aErr != nil {
+				return aErr
 			}
 		}
 		return nil
 	}
 
-	CtxSend(ctx, queCh, Msg{
+	err = CtxSend(ctx, queCh, Msg{
 		Type:  MsgTypeAction,
 		fn:    attrFn,
 		Tries: 0,
 		Path:  project.Slug,
-	}, wg)
-
+	})
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -280,7 +283,6 @@ func SaveTag(
 	db *bun.DB,
 	tag *assets.Tag,
 	queCh MsgChannel,
-	wg waitGroup,
 ) error {
 	// Save the tag first
 	_, err := db.NewInsert().
@@ -305,49 +307,48 @@ func SaveTag(
 	}
 
 	attrFn := func() error {
-		// Clear existing relationships
-		_, err = db.NewDelete().
+		_, aErr := db.NewDelete().
 			Model(assets.EmpPostToTag).
 			Where("tag_id = ?", tag.ID).
 			Exec(ctx)
-		if err != nil {
-			return err
+		if aErr != nil {
+			return aErr
 		}
 
-		_, err = db.NewDelete().
+		_, aErr = db.NewDelete().
 			Model(assets.EmpProjectToTag).
 			Where("tag_id = ?", tag.ID).
 			Exec(ctx)
-		if err != nil {
-			return err
+		if aErr != nil {
+			return aErr
 		}
 
-		_, err = db.NewDelete().
+		_, aErr = db.NewDelete().
 			Model(assets.EmpTagToTag).
 			Where("source_tag_id = ?", tag.ID).
 			Exec(ctx)
-		if err != nil {
-			return err
+		if aErr != nil {
+			return aErr
 		}
 
 		// Create tag relationships
 		for _, tagSlug := range tag.TagSlugs {
 			slog.Debug("tag rel tag", "tagSlug", tagSlug)
 			// Find the related tag ID by its slug
-			relatedTag, err := FindTagBySlug(ctx, db, tagSlug, tag.Slug)
-			if err != nil {
-				return err
+			relatedTag, aErr := FindTagBySlug(ctx, db, tagSlug, tag.Slug)
+			if aErr != nil {
+				return aErr
 			}
 
 			// Create relationship
-			_, err = db.NewInsert().
+			_, aErr = db.NewInsert().
 				Model(&assets.TagToTag{
 					SourceTagID: tag.ID,
 					TargetTagID: relatedTag.ID,
 				}).
 				Exec(ctx)
-			if err != nil {
-				return err
+			if aErr != nil {
+				return aErr
 			}
 		}
 
@@ -355,20 +356,20 @@ func SaveTag(
 		for _, postSlug := range tag.PostSlugs {
 			slog.Debug("post rel tag", "postSlug", postSlug)
 			// Find the post ID by its slug
-			relatedPost, err := FindPostBySlug(ctx, db, postSlug, tag.Slug)
-			if err != nil {
-				return err
+			relatedPost, aErr := FindPostBySlug(ctx, db, postSlug, tag.Slug)
+			if aErr != nil {
+				return aErr
 			}
 
 			// Create relationship
-			_, err = db.NewInsert().
+			_, aErr = db.NewInsert().
 				Model(&assets.PostToTag{
 					TagID:  tag.ID,
 					PostID: relatedPost.ID,
 				}).
 				Exec(ctx)
-			if err != nil {
-				return err
+			if aErr != nil {
+				return aErr
 			}
 		}
 
@@ -376,31 +377,34 @@ func SaveTag(
 		for _, projectSlug := range tag.ProjectSlugs {
 			slog.Debug("project rel tag", "projectSlug", projectSlug)
 			// Find the project ID by its slug
-			relatedProject, err := FindProjectBySlug(ctx, db, projectSlug, tag.Slug)
-			if err != nil {
-				return err
+			relatedProject, aErr := FindProjectBySlug(ctx, db, projectSlug, tag.Slug)
+			if aErr != nil {
+				return aErr
 			}
 
 			// Create relationship
-			_, err = db.NewInsert().
+			_, aErr = db.NewInsert().
 				Model(&assets.ProjectToTag{
 					TagID:     tag.ID,
 					ProjectID: relatedProject.ID,
 				}).
 				Exec(ctx)
-			if err != nil {
-				return err
+			if aErr != nil {
+				return aErr
 			}
 		}
 		return nil
 	}
 
-	CtxSend(ctx, queCh, Msg{
+	err = CtxSend(ctx, queCh, Msg{
 		Path:  tag.Slug,
 		fn:    attrFn,
 		Tries: 0,
 		Type:  MsgTypeAction,
-	}, wg)
+	})
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -465,13 +469,8 @@ func FindProjectBySlug(ctx context.Context, db *bun.DB, slug, origin string) (*a
 func SaveAsset(
 	ctx context.Context,
 	db *bun.DB,
-	path string,
 	asset *assets.Asset,
-	msgCh MsgChannel,
-	wg waitGroup,
 ) error {
-	slog.Debug("saving asset media", "path", path)
-	defer slog.Debug("saved asset media", "path", path)
 	_, err := db.NewInsert().
 		Model(asset).
 		On("CONFLICT (path) DO UPDATE").
@@ -494,7 +493,6 @@ func Save(
 	path string,
 	doc *assets.Doc,
 	msgCh MsgChannel,
-	wg waitGroup,
 ) error {
 	slog.Debug("saving document", "path", path)
 	defer slog.Debug("saved document", "path", path)
@@ -502,15 +500,15 @@ func Save(
 	case strings.HasPrefix(path, assets.PostsLoc) && strings.HasSuffix(path, ".md"):
 		var post assets.Post
 		copygen.ToPost(&post, doc)
-		return SavePost(ctx, db, &post, msgCh, wg)
+		return SavePost(ctx, db, &post, msgCh)
 	case strings.HasPrefix(path, assets.ProjectsLoc) && strings.HasSuffix(path, ".md"):
 		var project assets.Project
 		copygen.ToProject(&project, doc)
-		return SaveProject(ctx, db, &project, msgCh, wg)
+		return SaveProject(ctx, db, &project, msgCh)
 	case strings.HasPrefix(path, assets.TagsLoc) && strings.HasSuffix(path, ".md"):
 		var tag assets.Tag
 		copygen.ToTag(&tag, doc)
-		return SaveTag(ctx, db, &tag, msgCh, wg)
+		return SaveTag(ctx, db, &tag, msgCh)
 	}
 	return nil
 }

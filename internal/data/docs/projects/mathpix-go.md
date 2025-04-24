@@ -1,14 +1,17 @@
 ---
 id: mathpix-go
-aliases: []
+aliases:
+  - mathpix-go
 tags:
   - programming-language/go
 banner_path: projects/mathpix-go.webp
 created_at: 2025-03-28T19:20:17.000-06:00
 description: A Go client library for the Mathpix API
 title: mathpix-go
-updated_at: 2025-04-14T19:23:43.000-06:00
+updated_at: 2025-04-24T10:55:50.000-06:00
 ---
+
+# mathpix-go
 
 As an electrical engineering student passionate about integrating advanced technologies into software development, I created **mathpix-go**, a Go client library designed to interface with the Mathpix API. This project facilitates seamless integration of Mathpix's Optical Character Recognition (OCR) capabilities into Go applications, enabling the conversion of images containing mathematical expressions into LaTeX code.
 
