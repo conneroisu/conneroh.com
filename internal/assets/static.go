@@ -53,7 +53,6 @@ type (
 		Description  string     `yaml:"description"`
 		Content      string     `yaml:"-"`
 		BannerPath   string     `yaml:"banner_path"`
-		RawContent   []byte     `yaml:"-"`
 		Icon         string     `yaml:"icon"`
 		CreatedAt    CustomTime `yaml:"created_at"`
 		UpdatedAt    CustomTime `yaml:"updated_at"`
@@ -88,7 +87,6 @@ type (
 		Description string     `bun:"description"`
 		Content     string     `bun:"content"`
 		BannerPath  string     `bun:"banner_path"`
-		RawContent  []byte     `bun:"raw_content"`
 		Icon        string     `bun:"icon"`
 		CreatedAt   CustomTime `bun:"created_at"`
 		UpdatedAt   CustomTime `bun:"updated_at"`
@@ -120,7 +118,6 @@ type (
 		Description string     `bun:"description"`
 		Content     string     `bun:"content"`
 		BannerPath  string     `bun:"banner_path"`
-		RawContent  []byte     `bun:"raw_content"`
 		Icon        string     `bun:"icon"`
 		CreatedAt   CustomTime `bun:"created_at"`
 		UpdatedAt   CustomTime `bun:"updated_at"`
@@ -152,7 +149,6 @@ type (
 		Description string     `bun:"description"`
 		Content     string     `bun:"content"`
 		BannerPath  string     `bun:"banner_path"`
-		RawContent  []byte     `bun:"raw_content"`
 		Icon        string     `bun:"icon"`
 		CreatedAt   CustomTime `bun:"created_at"`
 		UpdatedAt   CustomTime `bun:"updated_at"`
@@ -312,14 +308,6 @@ func Validate(
 		errs = append(errs, eris.Wrapf(
 			ErrValueMissing,
 			"%s is missing content",
-			path,
-		))
-	}
-
-	if len(emb.RawContent) == 0 {
-		errs = append(errs, eris.Wrapf(
-			ErrValueMissing,
-			"%s is missing raw content",
 			path,
 		))
 	}

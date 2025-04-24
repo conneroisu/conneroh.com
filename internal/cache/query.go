@@ -135,7 +135,7 @@ func SavePost(
 		return nil
 	}
 
-	go msgCh.CtxSend(ctx, Msg{
+	go CtxSend(ctx, msgCh, Msg{
 		Path:  post.Slug,
 		Type:  MsgTypeAction,
 		fn:    attrFn,
@@ -265,7 +265,7 @@ func SaveProject(
 		return nil
 	}
 
-	go msgCh.CtxSend(ctx, Msg{
+	go CtxSend(ctx, msgCh, Msg{
 		Type:  MsgTypeAction,
 		fn:    attrFn,
 		Tries: 0,
@@ -396,7 +396,7 @@ func SaveTag(
 		return nil
 	}
 
-	go msgCh.CtxSend(ctx, Msg{
+	go CtxSend(ctx, msgCh, Msg{
 		Path:  tag.Slug,
 		fn:    attrFn,
 		Tries: 0,

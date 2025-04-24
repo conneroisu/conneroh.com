@@ -26,8 +26,8 @@ import (
 	"go.abhg.dev/goldmark/frontmatter"
 )
 
-// MsgChannel is a cache message channel.
 type (
+	// MsgChannel is a cache message channel.
 	MsgChannel chan Msg
 
 	// Hollywood is a slice of actors.
@@ -44,14 +44,13 @@ type (
 )
 
 // CtxSend sends a message to the channel with a context.
-func (m MsgChannel) CtxSend(ctx context.Context, msg Msg, wg *sync.WaitGroup) {
+func CtxSend[T any](ctx context.Context, ch chan T, msg T, wg *sync.WaitGroup) {
 	wg.Add(1)
 	defer wg.Done()
-	time.Sleep(time.Second * 1)
 	select {
 	case <-ctx.Done():
 		return
-	case m <- msg:
+	case ch <- msg:
 		return
 	}
 }
@@ -143,7 +142,7 @@ func (a *Actor) Start(
 			wg.Add(1)
 			err := a.Handle(ctx, wg, msg)
 			if err != nil {
-				errCh <- err
+				go CtxSend(ctx, errCh, err, wg)
 			}
 			wg.Done()
 		}
@@ -159,8 +158,9 @@ func (a *Actor) Handle(
 	msg Msg,
 ) (err error) {
 	var (
-		doc assets.Doc
-		ok  bool
+		doc     assets.Doc
+		ok      bool
+		content []byte
 	)
 	if msg.Path == "" {
 		return eris.New("path is empty")
@@ -176,14 +176,14 @@ func (a *Actor) Handle(
 		if msg.Tries > 3 {
 			return eris.Wrapf(err, "failed to handle (path: %s) action (tries: %d)", msg.Path, msg.Tries)
 		}
-		go a.msgCh.CtxSend(ctx, msg, wg)
+		go CtxSend(ctx, a.msgCh, msg, wg)
 		return nil
 	case MsgTypeAsset:
-		doc.RawContent, err = afero.ReadFile(a.fs, msg.Path)
+		content, err = afero.ReadFile(a.fs, msg.Path)
 		if err != nil {
 			return err
 		}
-		doc.Hash = assets.Hash(doc.RawContent)
+		doc.Hash = assets.Hash(content)
 		ok, err = a.isCached(ctx, msg, &doc)
 		if err != nil {
 			return err
@@ -191,7 +191,7 @@ func (a *Actor) Handle(
 		if ok {
 			return nil
 		}
-		err = Upload(ctx, a.ti, msg.Path, doc.RawContent)
+		err = Upload(ctx, a.ti, msg.Path, content)
 		if err != nil {
 			return eris.Wrapf(err, "failed to upload asset: %s", msg.Path)
 		}
@@ -203,11 +203,11 @@ func (a *Actor) Handle(
 		}
 		return nil
 	case MsgTypeDoc:
-		doc.RawContent, err = afero.ReadFile(a.fs, msg.Path)
+		content, err = afero.ReadFile(a.fs, msg.Path)
 		if err != nil {
 			return err
 		}
-		doc.Hash = assets.Hash(doc.RawContent)
+		doc.Hash = assets.Hash(content)
 		ok, err = a.isCached(ctx, msg, &doc)
 		if err != nil {
 			return err
@@ -224,7 +224,7 @@ func (a *Actor) Handle(
 			return err
 		}
 
-		err = a.md.Convert(doc.RawContent, buf, parser.WithContext(pCtx))
+		err = a.md.Convert(content, buf, parser.WithContext(pCtx))
 		if err != nil {
 			return eris.Wrapf(
 				err,

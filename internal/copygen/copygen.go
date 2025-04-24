@@ -15,10 +15,10 @@ func ToPost(tP *assets.Post, fD *assets.Doc) {
 	tP.Z = fD.Z
 	tP.Title = fD.Title
 	tP.Slug = fD.Slug
+	tP.Path = fD.Path
 	tP.Description = fD.Description
 	tP.Content = fD.Content
 	tP.BannerPath = fD.BannerPath
-	tP.RawContent = fD.RawContent
 	tP.Icon = fD.Icon
 	tP.CreatedAt = fD.CreatedAt
 	tP.UpdatedAt = fD.UpdatedAt
@@ -38,10 +38,10 @@ func ToProject(tP *assets.Project, fD *assets.Doc) {
 	tP.Z = fD.Z
 	tP.Title = fD.Title
 	tP.Slug = fD.Slug
+	tP.Path = fD.Path
 	tP.Description = fD.Description
 	tP.Content = fD.Content
 	tP.BannerPath = fD.BannerPath
-	tP.RawContent = fD.RawContent
 	tP.Icon = fD.Icon
 	tP.CreatedAt = fD.CreatedAt
 	tP.UpdatedAt = fD.UpdatedAt
@@ -59,10 +59,10 @@ func ToTag(tT *assets.Tag, fD *assets.Doc) {
 	tT.Z = fD.Z
 	tT.Title = fD.Title
 	tT.Slug = fD.Slug
+	tT.Path = fD.Path
 	tT.Description = fD.Description
 	tT.Content = fD.Content
 	tT.BannerPath = fD.BannerPath
-	tT.RawContent = fD.RawContent
 	tT.Icon = fD.Icon
 	tT.CreatedAt = fD.CreatedAt
 	tT.UpdatedAt = fD.UpdatedAt
@@ -75,6 +75,7 @@ func ToTag(tT *assets.Tag, fD *assets.Doc) {
 // ToAsset copies a *assets.Doc to a *assets.Asset.
 func ToAsset(tA *assets.Asset, fD *assets.Doc) {
 	// *assets.Asset fields
+	tA.Path = fD.Path
 	tA.Hash = fD.Hash
 	tA.X = fD.X
 	tA.Y = fD.Y

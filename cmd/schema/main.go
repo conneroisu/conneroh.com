@@ -13,7 +13,6 @@ import (
 )
 
 func main() {
-
 	if err := run(context.Background()); err != nil {
 		panic(err)
 	}

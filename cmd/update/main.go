@@ -27,7 +27,7 @@ import (
 )
 
 var (
-	workers = flag.Int("jobs", 80, "number of parallel workers")
+	workers = flag.Int("jobs", 40, "number of parallel workers")
 )
 
 func main() {
