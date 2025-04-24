@@ -111,9 +111,7 @@ func Run(
 		select {
 		case err := <-errCh:
 			if errors.Is(err, context.Canceled) {
-				slog.Debug("received termination signal")
-				cancel() // Cancel inner context
-				return gracefulShutdown(msgCh, queCh, errCh)
+				continue
 			}
 			slog.Error("error", "err", err)
 			cancel()
