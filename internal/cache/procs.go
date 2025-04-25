@@ -1225,15 +1225,14 @@ func (p *Processor) updatePostRelationships(ctx context.Context, post *assets.Po
 				PostID: post.ID,
 				TagID:  tag.ID,
 			}).
-			On("CONFLICT (post_id, tag_id) DO NOTHING"). // Add conflict handling
+			On("CONFLICT (post_id, tag_id) DO NOTHING").
 			Exec(ctx)
 		if err != nil {
 			return eris.Wrapf(err, "failed to create post-tag relationship: %s -> %s", post.Slug, tagSlug)
 		}
 	}
 
-	// Create post relationships
-	for _, postSlug := range post.PostSlugs {
+	for _, postSlug := range post.PostSlugs { // Create post relationships
 		relatedPost, err := p.findPostBySlug(ctx, postSlug, post.Slug)
 		if err != nil {
 			return err
@@ -1244,7 +1243,7 @@ func (p *Processor) updatePostRelationships(ctx context.Context, post *assets.Po
 				SourcePostID: post.ID,
 				TargetPostID: relatedPost.ID,
 			}).
-			On("CONFLICT (source_post_id, target_post_id) DO NOTHING"). // Add conflict handling
+			On("CONFLICT (source_post_id, target_post_id) DO NOTHING").
 			Exec(ctx)
 
 		if err != nil {
@@ -1252,8 +1251,7 @@ func (p *Processor) updatePostRelationships(ctx context.Context, post *assets.Po
 		}
 	}
 
-	// Create project relationships
-	for _, projectSlug := range post.ProjectSlugs {
+	for _, projectSlug := range post.ProjectSlugs { // Create project relationships
 		project, err := p.findProjectBySlug(ctx, projectSlug, post.Slug)
 		if err != nil {
 			return err
@@ -1264,7 +1262,7 @@ func (p *Processor) updatePostRelationships(ctx context.Context, post *assets.Po
 				PostID:    post.ID,
 				ProjectID: project.ID,
 			}).
-			On("CONFLICT (post_id, project_id) DO NOTHING"). // Add conflict handling
+			On("CONFLICT (post_id, project_id) DO NOTHING").
 			Exec(ctx)
 
 		if err != nil {
@@ -1280,7 +1278,7 @@ func (p *Processor) updateProjectRelationships(
 	ctx context.Context,
 	project *assets.Project,
 ) error {
-	for _, projectSlug := range project.ProjectSlugs {
+	for _, projectSlug := range project.ProjectSlugs { // Create project relationships
 		relatedProject, err := p.findProjectBySlug(ctx, projectSlug, project.Slug)
 		if err != nil {
 			return err
@@ -1291,13 +1289,14 @@ func (p *Processor) updateProjectRelationships(
 				SourceProjectID: project.ID,
 				TargetProjectID: relatedProject.ID,
 			}).
-			On("CONFLICT (source_project_id, target_project_id) DO NOTHING"). // Add conflict handling
+			On("CONFLICT (source_project_id, target_project_id) DO NOTHING").
 			Exec(ctx)
 		if err != nil {
 			return eris.Wrapf(err, "failed to create project-project relationship: %s -> %s", project.Slug, projectSlug)
 		}
 	}
-	for _, tagSlug := range project.TagSlugs {
+
+	for _, tagSlug := range project.TagSlugs { // Create tag relationships
 		tag, err := p.findTagBySlug(ctx, tagSlug, project.Slug)
 		if err != nil {
 			return err
@@ -1314,7 +1313,8 @@ func (p *Processor) updateProjectRelationships(
 			return eris.Wrapf(err, "failed to create project-tag relationship: %s -> %s", project.Slug, tagSlug)
 		}
 	}
-	for _, postSlug := range project.PostSlugs {
+
+	for _, postSlug := range project.PostSlugs { // Create post relationships
 		post, err := p.findPostBySlug(ctx, postSlug, project.Slug)
 		if err != nil {
 			return err
@@ -1340,7 +1340,7 @@ func (p *Processor) updateTagRelationships(
 	ctx context.Context,
 	tag *assets.Tag,
 ) error {
-	for _, tagSlug := range tag.TagSlugs {
+	for _, tagSlug := range tag.TagSlugs { // Create tag relationships
 		relatedTag, err := p.findTagBySlug(ctx, tagSlug, tag.Slug)
 		if err != nil {
 			return err
@@ -1357,8 +1357,7 @@ func (p *Processor) updateTagRelationships(
 		}
 	}
 
-	// Create post relationships
-	for _, postSlug := range tag.PostSlugs {
+	for _, postSlug := range tag.PostSlugs { // Create post relationships
 		post, err := p.findPostBySlug(ctx, postSlug, tag.Slug)
 		if err != nil {
 			return err
@@ -1376,8 +1375,7 @@ func (p *Processor) updateTagRelationships(
 		}
 	}
 
-	// Create project relationships
-	for _, projectSlug := range tag.ProjectSlugs {
+	for _, projectSlug := range tag.ProjectSlugs { // Create project relationships
 		project, err := p.findProjectBySlug(ctx, projectSlug, tag.Slug)
 		if err != nil {
 			return err
