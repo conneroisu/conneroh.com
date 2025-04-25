@@ -32,7 +32,7 @@ func AddRoutes(
 		routing.Make(HandleHome(db)))
 	h.HandleFunc(
 		"POST /contact",
-		handleContactForm)
+		routing.Make(handleContactForm()))
 	h.Handle(
 		"GET /dist/",
 		http.FileServer(http.FS(static.Dist)))

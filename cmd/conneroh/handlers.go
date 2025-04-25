@@ -35,20 +35,27 @@ const (
 	maxSearchRoutines = 10
 )
 
-func handleContactForm(w http.ResponseWriter, r *http.Request) {
-	var form ContactForm
-	err := r.ParseForm()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
+func handleContactForm() routing.APIFunc {
+	return func(w http.ResponseWriter, r *http.Request) error {
+		var form ContactForm
+		err := r.ParseForm()
+		if err != nil {
+			return eris.Wrap(
+				err,
+				"failed to parse contact form",
+			)
+		}
+		err = encoder.Encode(form, r.PostForm)
+		if err != nil {
+			return eris.Wrap(
+				err,
+				"failed to encode contact form",
+			)
+		}
+		// TODO: Send email
+		templ.Handler(components.ThankYou()).ServeHTTP(w, r)
+		return nil
 	}
-	err = encoder.Encode(form, r.PostForm)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-	// TODO: Send email
-	templ.Handler(components.ThankYou()).ServeHTTP(w, r)
 }
 
 func listHandler(
@@ -281,12 +288,12 @@ func HandleProjects(db *bun.DB) routing.APIFunc {
 			return nil
 		}
 		if len(allProjects) == 0 {
-			_, err := db.NewSelect().Model(assets.EmpProject).
+			err := db.NewSelect().Model(&allProjects).
 				Order("created_at").
 				Relation("Tags").
 				Relation("Posts").
 				Relation("Projects").
-				Exec(r.Context(), &allProjects)
+				Scan(r.Context())
 			if err != nil {
 				return eris.Wrap(
 					err,
@@ -400,12 +407,12 @@ func HandleTags(db *bun.DB) routing.APIFunc {
 			).ServeHTTP(w, r)
 			return nil
 		}
-		_, err := db.NewSelect().Model(assets.EmpTag).
+		err := db.NewSelect().Model(&allTags).
 			Order("created_at").
 			Relation("Tags").
 			Relation("Posts").
 			Relation("Projects").
-			Exec(r.Context(), &allTags)
+			Scan(r.Context())
 		if err != nil {
 			slog.Error("failed to scan tags", "err", err)
 			return eris.Wrap(
@@ -480,12 +487,12 @@ func HandlePosts(db *bun.DB) routing.APIFunc {
 			).ServeHTTP(w, r)
 			return nil
 		}
-		_, err := db.NewSelect().Model(assets.EmpPost).
+		err := db.NewSelect().Model(&allPosts).
 			Order("created_at").
 			Relation("Tags").
 			Relation("Posts").
 			Relation("Projects").
-			Exec(r.Context(), &allPosts)
+			Scan(r.Context())
 		if err != nil {
 			return eris.Wrap(
 				err,
