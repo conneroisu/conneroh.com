@@ -53,3 +53,11 @@ func MorphableHandler(
 		}
 	}
 }
+
+// BytesHandler returns a handler that writes the given bytes to the response.
+func BytesHandler(b []byte) http.HandlerFunc {
+	return Make(func(w http.ResponseWriter, r *http.Request) error {
+		_, err := w.Write(b)
+		return err
+	})
+}
