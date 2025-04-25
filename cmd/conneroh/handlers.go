@@ -398,6 +398,7 @@ func HandleTags(db *bun.DB) routing.APIFunc {
 				layouts.Page(*tagList),
 				*tagList,
 			).ServeHTTP(w, r)
+			return nil
 		}
 		_, err := db.NewSelect().Model(assets.EmpTag).
 			Order("created_at").
@@ -445,12 +446,12 @@ func HandleTag(db *bun.DB) routing.APIFunc {
 			).ServeHTTP(w, r)
 			return nil
 		}
-		_, err := db.NewSelect().Model(assets.EmpTag).
+		err := db.NewSelect().Model(&t).
 			Where("slug = ?", routing.Slug(r)).
 			Relation("Tags").
 			Relation("Posts").
 			Relation("Projects").
-			Limit(1).Exec(r.Context(), &t)
+			Limit(1).Scan(r.Context())
 		if err != nil {
 			return eris.Wrap(
 				err,
