@@ -103,6 +103,7 @@ func Run(ctx context.Context, getenv func(string) string, numWorkers, bufferSize
 	processor.Start(processingCtx, numWorkers)
 
 	// Handle errors from the processor
+	// errWg := cwg.DebugWaitGroup{}
 	errWg := &sync.WaitGroup{}
 	errWg.Add(1)
 	go func() {
