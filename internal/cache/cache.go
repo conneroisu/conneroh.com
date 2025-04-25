@@ -326,9 +326,9 @@ func Upload(
 // - cacheID == 0 && err == nil: Document doesn't exist or has changed (needs update)
 // - err != nil: An error occurred
 func (a *Actor) isCached(ctx context.Context, msg Msg, doc *assets.Doc) (bool, error) {
-	var c assets.Cache
+	var cached assets.Cache
 	err := a.db.NewSelect().
-		Model(&c).
+		Model(&cached).
 		Where("path = ?", msg.Path).
 		Scan(ctx)
 	if errors.Is(err, sql.ErrNoRows) {
@@ -337,11 +337,11 @@ func (a *Actor) isCached(ctx context.Context, msg Msg, doc *assets.Doc) (bool, e
 	if err != nil {
 		return false, fmt.Errorf("failed to check cache: %w", err)
 	}
-	if c.Hash == doc.Hash {
+	if cached.Hash == doc.Hash {
 		slog.Debug("asset already cached and unchanged", "path", msg.Path)
 		return true, nil
 	}
-	slog.Info("asset has changed", "path", msg.Path, "old_hash", c.Hash, "new_hash", doc.Hash)
+	slog.Info("asset has changed", "path", msg.Path, "old_hash", cached.Hash, "new_hash", doc.Hash)
 	return false, nil
 }
 
