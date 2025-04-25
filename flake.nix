@@ -8,6 +8,7 @@
       url = "github:numtide/flake-utils";
       inputs.systems.follows = "systems";
     };
+    bun2nix.url = "github:baileyluTCD/bun2nix";
   };
 
   nixConfig = {
@@ -109,6 +110,18 @@
             '';
             description = "Code Generation Steps for specific directory changes.";
           };
+          generate-js = {
+             exec = ''
+               ${pkgs.bun}/bin/bun build \
+                   $REPO_ROOT/index.js \
+                   --minify \
+                   --minify-syntax \
+                   --minify-whitespace  \
+                   --minify-identifiers \
+                   --outdir $REPO_ROOT/cmd/conneroh/_static/dist/ &
+             '';
+             description = "Generate JS files";
+          };
           generate-all = {
             exec = ''
               export REPO_ROOT=$(git rev-parse --show-toplevel)
@@ -136,18 +149,6 @@
               cd -
             '';
             description = "Format code files";
-          };
-          generate-js = {
-            exec = ''
-              ${pkgs.bun}/bin/bun build \
-                  $REPO_ROOT/index.js \
-                  --minify \
-                  --minify-syntax \
-                  --minify-whitespace  \
-                  --minify-identifiers \
-                  --outdir $REPO_ROOT/cmd/conneroh/_static/dist/ &
-            '';
-            description = "Generate JS files";
           };
           run = {
             exec = ''
@@ -221,6 +222,7 @@
               nodePackages.prettier
               svgcleaner
               sqlite-web
+              inputs.bun2nix.packages.${system}.default
 
               flyctl # Infra
               openssl.dev
