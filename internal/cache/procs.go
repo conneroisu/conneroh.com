@@ -7,11 +7,11 @@ import (
 	"database/sql"
 	"errors"
 	"log/slog"
-	"mime"
 	"os"
 	"path/filepath"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -51,81 +51,68 @@ type Task struct {
 
 // Stats tracks statistics about task processing
 type Stats struct {
-	sync.Mutex
-	TotalSubmitted     int64
-	TotalCompleted     int64
-	TotalRelationships int64
-	LastActivity       time.Time
-	ScanComplete       bool
-	ShutdownInitiated  bool
+	TotalSubmitted     atomic.Int64
+	TotalCompleted     atomic.Int64
+	TotalRelationships atomic.Int64
+	lastActivityNs     atomic.Int64 // unixNano
+	scanComplete       atomic.Bool
+	shutdownInitiated  atomic.Bool
 }
 
 // RecordTaskSubmitted records that a task was submitted
 func (s *Stats) RecordTaskSubmitted() {
-	s.Lock()
-	defer s.Unlock()
-	s.TotalSubmitted++
-	s.LastActivity = time.Now()
+	s.TotalSubmitted.Add(1)
+	s.lastActivityNs.Store(time.Now().UnixNano())
 }
 
 // RecordTaskCompleted records that a task was completed
 func (s *Stats) RecordTaskCompleted() {
-	s.Lock()
-	defer s.Unlock()
-	s.TotalCompleted++
-	s.LastActivity = time.Now()
+	s.TotalCompleted.Add(1)
+	s.lastActivityNs.Store(time.Now().UnixNano())
 }
 
 // RecordRelationshipTask records that a relationship task was submitted
 func (s *Stats) RecordRelationshipTask() {
-	s.Lock()
-	defer s.Unlock()
-	s.TotalRelationships++
-	s.LastActivity = time.Now()
+	s.TotalRelationships.Add(1)
+	s.lastActivityNs.Store(time.Now().UnixNano())
 }
 
 // SetScanComplete marks that filesystem scanning is complete
 func (s *Stats) SetScanComplete() {
-	s.Lock()
-	defer s.Unlock()
-	s.ScanComplete = true
-	slog.Info("filesystem scan complete",
-		"submitted", s.TotalSubmitted,
-		"completed", s.TotalCompleted,
-		"relationships", s.TotalRelationships)
+	s.scanComplete.Store(true)
+	slog.Debug("filesystem scan complete",
+		"submitted", s.TotalSubmitted.Load(),
+		"completed", s.TotalCompleted.Load(),
+		"relationships", s.TotalRelationships.Load())
 }
 
 // IsComplete checks if all tasks are complete
 func (s *Stats) IsComplete() bool {
-	s.Lock()
-	defer s.Unlock()
-	return s.ScanComplete && (s.TotalCompleted >= s.TotalSubmitted) && !s.ShutdownInitiated
+	return s.scanComplete.Load() &&
+		(s.TotalCompleted.Load() >= s.TotalSubmitted.Load()) &&
+		!s.shutdownInitiated.Load()
 }
 
 // TimeSinceActivity returns the time since the last activity
 func (s *Stats) TimeSinceActivity() time.Duration {
-	s.Lock()
-	defer s.Unlock()
-	return time.Since(s.LastActivity)
+	lastNs := s.lastActivityNs.Load()
+	return time.Since(time.Unix(0, lastNs))
 }
 
 // SetShutdownInitiated marks that shutdown has been initiated
 func (s *Stats) SetShutdownInitiated() {
-	s.Lock()
-	defer s.Unlock()
-	s.ShutdownInitiated = true
+	s.shutdownInitiated.Store(true)
 }
 
 // LogStatus logs the current status
 func (s *Stats) LogStatus() {
-	s.Lock()
-	defer s.Unlock()
-	slog.Info("processor status",
-		"submitted", s.TotalSubmitted,
-		"completed", s.TotalCompleted,
-		"relationships", s.TotalRelationships,
-		"scanComplete", s.ScanComplete,
-		"idleTime", time.Since(s.LastActivity).String())
+	lastNs := s.lastActivityNs.Load()
+	slog.Debug("processor status",
+		"submitted", s.TotalSubmitted.Load(),
+		"completed", s.TotalCompleted.Load(),
+		"relationships", s.TotalRelationships.Load(),
+		"scanComplete", s.scanComplete.Load(),
+		"idleTime", time.Since(time.Unix(0, lastNs)).String())
 }
 
 // Processor handles processing of assets and documents
@@ -166,81 +153,80 @@ type embedder interface {
 
 // batchOperations handles batched database operations
 type batchOperations struct {
-	sync.Mutex
-	cacheUpdates    []*assets.Cache
-	batchSize       int
-	db              *bun.DB
-	updateScheduled bool
-	updateInterval  time.Duration
+	mu             sync.Mutex
+	cacheUpdates   []*assets.Cache
+	batchSize      int
+	db             *bun.DB
+	updateInterval time.Duration
+	shutdownCh     chan struct{}
 }
 
 // newBatchOperations creates a new batch operations manager
 func newBatchOperations(db *bun.DB, batchSize int) *batchOperations {
-	return &batchOperations{
+	b := &batchOperations{
 		cacheUpdates:   make([]*assets.Cache, 0, batchSize),
 		batchSize:      batchSize,
 		db:             db,
 		updateInterval: 500 * time.Millisecond,
+		shutdownCh:     make(chan struct{}),
 	}
+
+	// Start a single background goroutine for regular flushing
+	go func() {
+		ticker := time.NewTicker(b.updateInterval)
+		defer ticker.Stop()
+
+		for {
+			select {
+			case <-ticker.C:
+				b.flush(context.Background())
+			case <-b.shutdownCh:
+				// Final flush on shutdown
+				b.flush(context.Background())
+				return
+			}
+		}
+	}()
+
+	return b
 }
 
 // scheduleCacheUpdate adds a cache update to the batch
 func (b *batchOperations) scheduleCacheUpdate(ctx context.Context, cache *assets.Cache) {
-	b.Lock()
-	defer b.Unlock()
+	b.mu.Lock()
+	defer b.mu.Unlock()
 
-	// Add to queue
-	cacheCopy := *cache // Make a copy to avoid race conditions
+	// Add to queue (create a copy to avoid race conditions)
+	cacheCopy := *cache
 	b.cacheUpdates = append(b.cacheUpdates, &cacheCopy)
 
-	// If we've reached batch size or this is the first item and no update is scheduled
-	if len(b.cacheUpdates) >= b.batchSize || (len(b.cacheUpdates) == 1 && !b.updateScheduled) {
-		b.executeCacheUpdates(ctx)
-	} else if !b.updateScheduled {
-		// Schedule update after interval
-		b.updateScheduled = true
-		go func() {
-			select {
-			case <-ctx.Done():
-				// Make sure we don't leak goroutines
-				b.Lock()
-				defer b.Unlock()
-				// Don't execute if context is canceled
-				b.updateScheduled = false
-				return
-			case <-time.After(b.updateInterval):
-				b.Lock()
-				defer b.Unlock()
-				b.executeCacheUpdates(ctx)
-			}
-		}()
+	// If we've reached batch size, flush immediately
+	if len(b.cacheUpdates) >= b.batchSize {
+		// Unlock while executing to avoid deadlock
+		b.mu.Unlock()
+		b.flush(ctx)
+		b.mu.Lock()
 	}
 }
 
 // flush immediately processes any pending updates regardless of batch size
 func (b *batchOperations) flush(ctx context.Context) {
-	b.Lock()
-	defer b.Unlock()
+	b.mu.Lock()
 
-	b.executeCacheUpdates(ctx)
-	slog.Info("batch operations flushed", "pendingUpdates", len(b.cacheUpdates))
-}
-
-// executeCacheUpdates executes all pending cache updates
-func (b *batchOperations) executeCacheUpdates(ctx context.Context) {
+	// Nothing to do
 	if len(b.cacheUpdates) == 0 {
-		b.updateScheduled = false
+		b.mu.Unlock()
 		return
 	}
 
+	// Take the current batch and reset
 	updates := b.cacheUpdates
 	b.cacheUpdates = make([]*assets.Cache, 0, b.batchSize)
-	b.updateScheduled = false
 
-	// Unlock while executing the batch to allow new items to be added
-	b.Unlock()
+	// Unlock while executing the batch
+	b.mu.Unlock()
 
-	slog.Info("executing batch cache update", "count", len(updates))
+	slog.Debug("executing batch cache update", "count", len(updates))
 
 	// Use a timeout context to prevent hanging
 	execCtx, cancel := context.WithTimeout(ctx, 2*time.Second)
@@ -262,15 +248,18 @@ func (b *batchOperations) executeCacheUpdates(ctx context.Context) {
 			slog.Error("failed to batch update cache", "err", err, "count", len(updates))
 		}
 	}
+}
 
-	b.Lock()
+// shutdown stops the background flush timer and performs a final flush
+func (b *batchOperations) shutdown() {
+	close(b.shutdownCh)
 }
 
 // memCache provides an in-memory cache to reduce database queries
 type memCache struct {
-	sync.RWMutex
-	paths  map[string]string // path -> hash
-	loaded bool              // flag to track if cache has been loaded
+	once  sync.Once
+	mu    sync.RWMutex
+	paths map[string]string // path -> hash
 }
 
 // newMemCache creates a new memory cache
@@ -282,21 +271,30 @@ func newMemCache() *memCache {
 
 // Get gets a hash from the cache
 func (m *memCache) Get(path string) (string, bool) {
-	m.RLock()
-	defer m.RUnlock()
+	m.mu.RLock()
 	hash, ok := m.paths[path]
+	m.mu.RUnlock()
 	return hash, ok
 }
 
 // Set sets a hash in the cache
 func (m *memCache) Set(path, hash string) {
-	m.Lock()
-	defer m.Unlock()
+	m.mu.Lock()
 	m.paths[path] = hash
+	m.mu.Unlock()
 }
 
-// LoadFromDB loads ALL cache entries from the database in a single query
-func (m *memCache) LoadFromDB(ctx context.Context, db *bun.DB) error {
+// ensureLoaded ensures the cache is loaded from the database once
+func (m *memCache) ensureLoaded(ctx context.Context, db *bun.DB) error {
+	var loadErr error
+	m.once.Do(func() {
+		loadErr = m.loadFromDB(ctx, db)
+	})
+	return loadErr
+}
+
+// loadFromDB loads ALL cache entries from the database in a single query
+func (m *memCache) loadFromDB(ctx context.Context, db *bun.DB) error {
 	slog.Debug("loading all cache entries from database")
 
 	// Use a single query to get all cache entries
@@ -310,8 +308,8 @@ func (m *memCache) LoadFromDB(ctx context.Context, db *bun.DB) error {
 		return eris.Wrap(err, "failed to load cache from database")
 	}
 
-	m.Lock()
-	defer m.Unlock()
+	m.mu.Lock()
+	defer m.mu.Unlock()
 
 	// Reset and populate the cache
 	m.paths = make(map[string]string, len(caches))
@@ -319,15 +317,13 @@ func (m *memCache) LoadFromDB(ctx context.Context, db *bun.DB) error {
 		m.paths[cache.Path] = cache.Hash
 	}
 
-	m.loaded = true
-
 	slog.Debug("loaded all cache entries into memory", "count", len(caches))
 	return nil
 }
 
 // entityCache provides a cache for entities to reduce database lookups
 type entityCache struct {
-	sync.RWMutex
+	mu       sync.RWMutex
 	tags     map[string]*assets.Tag
 	posts    map[string]*assets.Post
 	projects map[string]*assets.Project
@@ -344,50 +340,92 @@ func newEntityCache() *entityCache {
 
 // GetTag gets a tag from the cache
 func (e *entityCache) GetTag(slug string) (*assets.Tag, bool) {
-	e.RLock()
-	defer e.RUnlock()
+	e.mu.RLock()
 	tag, ok := e.tags[slug]
+	e.mu.RUnlock()
 	return tag, ok
 }
 
 // SetTag sets a tag in the cache
 func (e *entityCache) SetTag(tag *assets.Tag) {
-	e.Lock()
-	defer e.Unlock()
+	e.mu.Lock()
 	tagCopy := *tag // Make a copy to avoid race conditions
 	e.tags[tag.Slug] = &tagCopy
+	e.mu.Unlock()
 }
 
 // GetPost gets a post from the cache
 func (e *entityCache) GetPost(slug string) (*assets.Post, bool) {
-	e.RLock()
-	defer e.RUnlock()
+	e.mu.RLock()
 	post, ok := e.posts[slug]
+	e.mu.RUnlock()
 	return post, ok
 }
 
 // SetPost sets a post in the cache
 func (e *entityCache) SetPost(post *assets.Post) {
-	e.Lock()
-	defer e.Unlock()
+	e.mu.Lock()
 	postCopy := *post // Make a copy to avoid race conditions
 	e.posts[post.Slug] = &postCopy
+	e.mu.Unlock()
 }
 
 // GetProject gets a project from the cache
 func (e *entityCache) GetProject(slug string) (*assets.Project, bool) {
-	e.RLock()
-	defer e.RUnlock()
+	e.mu.RLock()
 	project, ok := e.projects[slug]
+	e.mu.RUnlock()
 	return project, ok
 }
 
 // SetProject sets a project in the cache
 func (e *entityCache) SetProject(project *assets.Project) {
-	e.Lock()
-	defer e.Unlock()
+	e.mu.Lock()
 	projectCopy := *project // Make a copy to avoid race conditions
 	e.projects[project.Slug] = &projectCopy
+	e.mu.Unlock()
+}
+
+// Buffer pool for reusing buffers in markdown parsing
+var bufferPool = sync.Pool{
+	New: func() any {
+		return new(bytes.Buffer)
+	},
+}
+
+// Static mapping of file extensions to content types to avoid reflection
+var contentTypes = map[string]string{
+	".jpg":   "image/jpeg",
+	".jpeg":  "image/jpeg",
+	".png":   "image/png",
+	".gif":   "image/gif",
+	".svg":   "image/svg+xml",
+	".webp":  "image/webp",
+	".css":   "text/css",
+	".txt":   "text/plain",
+	".md":    "text/markdown",
+	".pdf":   "application/pdf",
+	".xml":   "application/xml",
+	".zip":   "application/zip",
+	".mp3":   "audio/mpeg",
+	".mp4":   "video/mp4",
+	".webm":  "video/webm",
+	".wav":   "audio/wav",
+	".ico":   "image/x-icon",
+	".woff":  "font/woff",
+	".woff2": "font/woff2",
+	".ttf":   "font/ttf",
+	".otf":   "font/otf",
+}
+
+// getContentType returns the content type for a file extension
+func getContentType(path string) string {
+	ext := filepath.Ext(path)
+	if contentType, ok := contentTypes[ext]; ok {
+		return contentType
+	}
+	// Fallback to standard library for unknown extensions
+	return "application/octet-stream"
 }
 
 // NewProcessor creates a new asset processor
@@ -401,14 +439,6 @@ func NewProcessor(
 ) *Processor {
 	memCache := newMemCache()
 	entityCache := newEntityCache()
-
-	// Load initial cache into memory
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	if err := memCache.LoadFromDB(ctx, db); err != nil {
-		slog.Error("failed to load cache from database", "err", err)
-	}
 
 	// Initialize SQLite for better concurrency
 	initDB(db)
@@ -426,39 +456,35 @@ func NewProcessor(
 		entityCache: entityCache,
 		dbMutex:     &sync.Mutex{},
 		batchOps:    newBatchOperations(db, 50), // Batch size of 50
-		stats:       &Stats{LastActivity: time.Now()},
-		doneCh:      make(chan struct{}), // Unbuffered channel
+		stats:       &Stats{lastActivityNs: atomic.Int64{}},
+		doneCh:      make(chan struct{}),
 	}
 }
 
 // initDB configures SQLite for better concurrency handling
 func initDB(db *bun.DB) {
 	// Set pragmas for better concurrent performance
-	_, err := db.Exec("PRAGMA journal_mode = WAL")
-	if err != nil {
-		slog.Error("failed to set journal_mode pragma", "err", err)
+	pragmas := []string{
+		"PRAGMA journal_mode = WAL",
+		"PRAGMA synchronous = NORMAL",
+		"PRAGMA busy_timeout = 5000",
+		"PRAGMA cache_size = 10000",
+		"PRAGMA temp_store = MEMORY",   // Added to use memory for temp storage
+		"PRAGMA mmap_size = 268435456", // Added to use memory mapping (256MB)
 	}
 
-	_, err = db.Exec("PRAGMA synchronous = NORMAL")
-	if err != nil {
-		slog.Error("failed to set synchronous pragma", "err", err)
+	for _, pragma := range pragmas {
+		if _, err := db.Exec(pragma); err != nil {
+			slog.Error("failed to set pragma", "pragma", pragma, "err", err)
+		}
 	}
-
-	_, err = db.Exec("PRAGMA busy_timeout = 5000")
-	if err != nil {
-		slog.Error("failed to set busy_timeout pragma", "err", err)
-	}
-
-	_, err = db.Exec("PRAGMA cache_size = 10000")
-	if err != nil {
-		slog.Error("failed to set cache_size pragma", "err", err)
-	}
-
-	slog.Info("SQLite pragmas configured for better concurrency")
 }
 
 // Start starts the processor workers
 func (p *Processor) Start(ctx context.Context, numWorkers int) {
+	// Initialize the last activity timestamp
+	p.stats.lastActivityNs.Store(time.Now().UnixNano())
+
 	// Start completion monitor
 	go p.monitorCompletion(ctx)
 
@@ -470,7 +496,7 @@ func (p *Processor) Start(ctx context.Context, numWorkers int) {
 		go p.worker(ctx, i)
 	}
 
-	slog.Info("processor started", "workers", numWorkers)
+	slog.Debug("processor started", "workers", numWorkers)
 }
 
 // monitorCompletion monitors for task completion
@@ -481,22 +507,22 @@ func (p *Processor) monitorCompletion(ctx context.Context) {
 	for {
 		select {
 		case <-ctx.Done():
-			slog.Info("completion monitor shutdown due to context cancellation")
+			slog.Debug("completion monitor shutdown due to context cancellation")
 			return
 
 		case <-ticker.C:
 			// Check if all tasks are complete
 			if p.stats.IsComplete() {
-				slog.Info("all tasks complete - EXITING PROGRAM",
-					"total", p.stats.TotalCompleted,
-					"relationships", p.stats.TotalRelationships)
+				slog.Debug("all tasks complete - EXITING PROGRAM",
+					"total", p.stats.TotalCompleted.Load(),
+					"relationships", p.stats.TotalRelationships.Load())
 
 				// Use direct exit since channel signaling may be unreliable
 				os.Exit(0)
 			}
 
 			// Check for inactivity timeout (15 seconds - reduced from 30)
-			if p.stats.ScanComplete && p.stats.TimeSinceActivity() > 15*time.Second {
+			if p.stats.scanComplete.Load() && p.stats.TimeSinceActivity() > 15*time.Second {
 				slog.Warn("inactivity timeout detected - EXITING PROGRAM",
 					"idleTime", p.stats.TimeSinceActivity().String())
 
@@ -520,7 +546,7 @@ func (p *Processor) logStatus(ctx context.Context) {
 			p.stats.LogStatus()
 
 			// Add extra diagnostics
-			slog.Info("task channel status",
+			slog.Debug("task channel status",
 				"channelCapacity", cap(p.taskCh),
 				"currentQueueSize", len(p.taskCh))
 		}
@@ -563,15 +589,6 @@ func (p *Processor) worker(ctx context.Context, id int) {
 				// Record task completion
 				p.stats.RecordTaskCompleted()
 			}()
-		default:
-			// No tasks available, sleep briefly to avoid CPU spinning
-			// This is important to prevent worker starvation
-			select {
-			case <-ctx.Done():
-				return
-			case <-time.After(5 * time.Millisecond):
-				// Just a small sleep to avoid CPU spinning
-			}
 		}
 	}
 }
@@ -593,7 +610,7 @@ func (p *Processor) SubmitTask(task Task) {
 
 // ScanFS scans the filesystem and submits tasks
 func (p *Processor) ScanFS() error {
-	slog.Info("scanning filesystem")
+	slog.Debug("scanning filesystem")
 
 	// Create a buffered list to batch submit tasks
 	var tasks []Task
@@ -649,8 +666,7 @@ func (p *Processor) ScanFS() error {
 
 // WaitForCompletion waits for all tasks to complete
 func (p *Processor) WaitForCompletion(timeout time.Duration) bool {
-	// Log that we're waiting for completion
-	slog.Info("waiting for task completion", "timeout", timeout.String())
+	slog.Debug("waiting for task completion", "timeout", timeout.String())
 
 	// Create a timer for the timeout
 	timer := time.NewTimer(timeout)
@@ -665,10 +681,15 @@ func (p *Processor) WaitForCompletion(timeout time.Duration) bool {
 	case <-timer.C:
 		// Timeout occurred
 		p.stats.LogStatus()
-		slog.Warn("timeout waiting for completion",
-			"timeout", timeout.String(),
-			"queueSize", len(p.taskCh),
-			"pendingTasks", p.stats.TotalSubmitted-p.stats.TotalCompleted)
+		slog.Warn(
+			"timeout waiting for completion",
+			"timeout",
+			timeout.String(),
+			"queueSize",
+			len(p.taskCh),
+			"pendingTasks",
+			p.stats.TotalSubmitted.Load()-p.stats.TotalCompleted.Load(),
+		)
 		return false
 	}
 }
@@ -682,18 +703,15 @@ func (p *Processor) WaitForAllTasks() {
 
 // Close properly cleans up all resources
 func (p *Processor) Close() {
-	// Make sure the batch operations are flushed
-	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
-	defer cancel()
-
-	p.batchOps.flush(ctx)
+	// Shutdown the batch operations background goroutine
+	p.batchOps.shutdown()
 
 	// Close all channels
 	close(p.taskCh)
 	close(p.errCh)
 	close(p.doneCh)
 
-	slog.Info("processor resources cleaned up")
+	slog.Debug("processor resources cleaned up")
 }
 
 // Errors returns the error channel
@@ -833,22 +851,14 @@ func (p *Processor) processDocument(ctx context.Context, task Task) error {
 }
 
 // checkCache checks if a file is already cached and unchanged
-// This version ONLY uses the memory cache
+// This version uses the memory cache with sync.Once initialization
 func (p *Processor) checkCache(ctx context.Context, path, hash string) (bool, error) {
-	// Make sure cache is loaded
-	if !p.memCache.loaded {
-		p.dbMutex.Lock()
-		if !p.memCache.loaded {
-			err := p.memCache.LoadFromDB(ctx, p.db)
-			if err != nil {
-				p.dbMutex.Unlock()
-				return false, err
-			}
-		}
-		p.dbMutex.Unlock()
+	// Make sure cache is loaded (only once)
+	if err := p.memCache.ensureLoaded(ctx, p.db); err != nil {
+		return false, err
 	}
 
-	// Check in memory cache only
+	// Check in memory cache
 	if cachedHash, ok := p.memCache.Get(path); ok {
 		if cachedHash == hash {
 			return true, nil
@@ -879,12 +889,8 @@ func (p *Processor) updateCache(ctx context.Context, path, hash string) error {
 
 // uploadToS3 uploads a file to S3
 func (p *Processor) uploadToS3(ctx context.Context, path string, data []byte) error {
-	extension := filepath.Ext(path)
-	if extension == "" {
-		return eris.Errorf("failed to get extension: %s", path)
-	}
-
-	contentType := mime.TypeByExtension(extension)
+	// Use custom content type function instead of mime.TypeByExtension
+	contentType := getContentType(path)
 
 	// Use a timeout context to prevent hanging on S3 operations
 	uploadCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
@@ -904,20 +910,27 @@ func (p *Processor) uploadToS3(ctx context.Context, path string, data []byte) er
 		return eris.Wrapf(err, "failed to upload to S3: %s", path)
 	}
 
-	slog.Info("uploaded to S3", "path", path)
+	slog.Debug("uploaded to S3", "path", path)
 	return nil
 }
 
 // parseMarkdown parses markdown content and extracts frontmatter
 func (p *Processor) parseMarkdown(content []byte, doc *assets.Doc) error {
-	pCtx := parser.NewContext()
-	buf := bytes.NewBufferString("")
+	// Get a buffer from the pool
+	buf := bufferPool.Get().(*bytes.Buffer)
+	buf.Reset()
+	defer bufferPool.Put(buf)
 
+	// Create a new parser context
+	pCtx := parser.NewContext()
+
+	// Convert markdown
 	err := p.md.Convert(content, buf, parser.WithContext(pCtx))
 	if err != nil {
 		return eris.Wrapf(err, "failed to convert markdown: %s", doc.Path)
 	}
 
+	// Extract frontmatter
 	metadata := frontmatter.Get(pCtx)
 	if metadata == nil {
 		return eris.Errorf("frontmatter is nil for %s", doc.Path)
@@ -976,7 +989,6 @@ func (p *Processor) savePost(ctx context.Context, doc *assets.Doc) error {
 
 	if err != nil {
 		if errors.Is(err, context.DeadlineExceeded) {
-			slog.Error("database timeout when saving post", "path", doc.Path)
 			return eris.New("database operation timed out")
 		}
 		return eris.Wrapf(err, "failed to save post: %s", doc.Path)
@@ -1027,7 +1039,6 @@ func (p *Processor) saveProject(ctx context.Context, doc *assets.Doc) error {
 
 	if err != nil {
 		if errors.Is(err, context.DeadlineExceeded) {
-			slog.Error("database timeout when saving project", "path", doc.Path)
 			return eris.New("database operation timed out")
 		}
 		return eris.Wrapf(err, "failed to save project: %s", doc.Path)
@@ -1078,7 +1089,6 @@ func (p *Processor) saveTag(ctx context.Context, doc *assets.Doc) error {
 
 	if err != nil {
 		if errors.Is(err, context.DeadlineExceeded) {
-			slog.Error("database timeout when saving tag", "path", doc.Path)
 			return eris.New("database operation timed out")
 		}
 		return eris.Wrapf(err, "failed to save tag: %s", doc.Path)
@@ -1099,7 +1109,10 @@ func (p *Processor) saveTag(ctx context.Context, doc *assets.Doc) error {
 }
 
 // findTagBySlug finds a tag by its slug
-func (p *Processor) findTagBySlug(ctx context.Context, slug, origin string) (*assets.Tag, error) {
+func (p *Processor) findTagBySlug(
+	ctx context.Context,
+	slug, origin string,
+) (*assets.Tag, error) {
 	// First check in-memory cache
 	if tag, ok := p.entityCache.GetTag(slug); ok {
 		return tag, nil
@@ -1125,7 +1138,11 @@ func (p *Processor) findTagBySlug(ctx context.Context, slug, origin string) (*as
 			return nil, eris.New("database operation timed out")
 		}
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, eris.Errorf("tag not found: %s (referenced from %s)", slug, origin)
+			return nil, eris.Errorf(
+				"tag not found: %s (referenced from %s)",
+				slug,
+				origin,
+			)
 		}
 		return nil, eris.Wrapf(err, "failed to find tag: %s", slug)
 	}
@@ -1162,7 +1179,11 @@ func (p *Processor) findPostBySlug(ctx context.Context, slug, origin string) (*a
 			return nil, eris.New("database operation timed out")
 		}
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, eris.Errorf("post not found: %s (referenced from %s)", slug, origin)
+			return nil, eris.Errorf(
+				"post not found: %s (referenced from %s)",
+				slug,
+				origin,
+			)
 		}
 		return nil, eris.Wrapf(err, "failed to find post: %s", slug)
 	}
@@ -1200,7 +1221,11 @@ func (p *Processor) findProjectBySlug(ctx context.Context, slug, origin string) 
 			return nil, eris.New("database operation timed out")
 		}
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, eris.Errorf("project not found: %s (referenced from %s)", slug, origin)
+			return nil, eris.Errorf(
+				"project not found: %s (referenced from %s)",
+				slug,
+				origin,
+			)
 		}
 		return nil, eris.Wrapf(err, "failed to find project: %s", slug)
 	}
@@ -1212,9 +1237,11 @@ func (p *Processor) findProjectBySlug(ctx context.Context, slug, origin string) 
 }
 
 // updatePostRelationships updates relationships for a post
-func (p *Processor) updatePostRelationships(ctx context.Context, post *assets.Post) error {
-	// Create tag relationships
-	for _, tagSlug := range post.TagSlugs {
+func (p *Processor) updatePostRelationships(
+	ctx context.Context,
+	post *assets.Post,
+) error {
+	for _, tagSlug := range post.TagSlugs { // Create tag relationships
 		tag, err := p.findTagBySlug(ctx, tagSlug, post.Slug)
 		if err != nil {
 			return err
@@ -1228,7 +1255,12 @@ func (p *Processor) updatePostRelationships(ctx context.Context, post *assets.Po
 			On("CONFLICT (post_id, tag_id) DO NOTHING").
 			Exec(ctx)
 		if err != nil {
-			return eris.Wrapf(err, "failed to create post-tag relationship: %s -> %s", post.Slug, tagSlug)
+			return eris.Wrapf(
+				err,
+				"failed to create post-tag relationship: %s -> %s",
+				post.Slug,
+				tagSlug,
+			)
 		}
 	}
 
@@ -1247,7 +1279,12 @@ func (p *Processor) updatePostRelationships(ctx context.Context, post *assets.Po
 			Exec(ctx)
 
 		if err != nil {
-			return eris.Wrapf(err, "failed to create post-post relationship: %s -> %s", post.Slug, postSlug)
+			return eris.Wrapf(
+				err,
+				"failed to create post-post relationship: %s -> %s",
+				post.Slug,
+				postSlug,
+			)
 		}
 	}
 
@@ -1266,7 +1303,12 @@ func (p *Processor) updatePostRelationships(ctx context.Context, post *assets.Po
 			Exec(ctx)
 
 		if err != nil {
-			return eris.Wrapf(err, "failed to create post-project relationship: %s -> %s", post.Slug, projectSlug)
+			return eris.Wrapf(
+				err,
+				"failed to create post-project relationship: %s -> %s",
+				post.Slug,
+				projectSlug,
+			)
 		}
 	}
 
@@ -1292,7 +1334,12 @@ func (p *Processor) updateProjectRelationships(
 			On("CONFLICT (source_project_id, target_project_id) DO NOTHING").
 			Exec(ctx)
 		if err != nil {
-			return eris.Wrapf(err, "failed to create project-project relationship: %s -> %s", project.Slug, projectSlug)
+			return eris.Wrapf(
+				err,
+				"failed to create project-project relationship: %s -> %s",
+				project.Slug,
+				projectSlug,
+			)
 		}
 	}
 
@@ -1310,7 +1357,12 @@ func (p *Processor) updateProjectRelationships(
 			On("CONFLICT (project_id, tag_id) DO NOTHING").
 			Exec(ctx)
 		if err != nil {
-			return eris.Wrapf(err, "failed to create project-tag relationship: %s -> %s", project.Slug, tagSlug)
+			return eris.Wrapf(
+				err,
+				"failed to create project-tag relationship: %s -> %s",
+				project.Slug,
+				tagSlug,
+			)
 		}
 	}
 
@@ -1328,7 +1380,12 @@ func (p *Processor) updateProjectRelationships(
 			On("CONFLICT (project_id, post_id) DO NOTHING").
 			Exec(ctx)
 		if err != nil {
-			return eris.Wrapf(err, "failed to create project-post relationship: %s -> %s", project.Slug, postSlug)
+			return eris.Wrapf(
+				err,
+				"failed to create project-post relationship: %s -> %s",
+				project.Slug,
+				postSlug,
+			)
 		}
 	}
 
@@ -1353,7 +1410,12 @@ func (p *Processor) updateTagRelationships(
 			On("CONFLICT (source_tag_id, target_tag_id) DO NOTHING").
 			Exec(ctx)
 		if err != nil {
-			return eris.Wrapf(err, "failed to create tag-tag relationship: %s -> %s", tag.Slug, tagSlug)
+			return eris.Wrapf(
+				err,
+				"failed to create tag-tag relationship: %s -> %s",
+				tag.Slug,
+				tagSlug,
+			)
 		}
 	}
 
@@ -1371,7 +1433,12 @@ func (p *Processor) updateTagRelationships(
 			On("CONFLICT (tag_id, post_id) DO NOTHING").
 			Exec(ctx)
 		if err != nil {
-			return eris.Wrapf(err, "failed to create tag-post relationship: %s -> %s", tag.Slug, postSlug)
+			return eris.Wrapf(
+				err,
+				"failed to create tag-post relationship: %s -> %s",
+				tag.Slug,
+				postSlug,
+			)
 		}
 	}
 
@@ -1389,7 +1456,12 @@ func (p *Processor) updateTagRelationships(
 			On("CONFLICT (tag_id, project_id) DO NOTHING").
 			Exec(ctx)
 		if err != nil {
-			return eris.Wrapf(err, "failed to create tag-project relationship: %s -> %s", tag.Slug, projectSlug)
+			return eris.Wrapf(
+				err,
+				"failed to create tag-project relationship: %s -> %s",
+				tag.Slug,
+				projectSlug,
+			)
 		}
 	}
 

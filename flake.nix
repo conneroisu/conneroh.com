@@ -46,6 +46,14 @@
             exec = ''${pkgs.git}/bin/git clean -fdx'';
             description = "Clean Project";
           };
+          reset-db = {
+            exec = ''
+              rm ./master.db
+              rm ./master.db-shm
+              rm ./master.db-wal
+            '';
+            description = "Reset the database";
+          };
           tests = {
             exec = ''${pkgs.go}/bin/go test -v ./...'';
             description = "Run all go tests";

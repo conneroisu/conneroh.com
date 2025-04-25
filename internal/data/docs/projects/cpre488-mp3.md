@@ -18,7 +18,7 @@ banner_path: projects/mp3.webp
 created_at: 2025-03-27T14:13:10.000-06:00
 description: Mini-project 3 for CPRE488. Linux Device Drivers, Petalinux, boot loaders, and OpenCV, oh my!
 title: CPRE488-mp3
-updated_at: 2025-04-18T18:43:51.000-06:00
+updated_at: 2025-04-25T08:18:18.000-06:00
 ---
 
 # cpre488-mp3
@@ -81,8 +81,8 @@ The `launcher_fire.c` code is a user-space application that communicates with th
 
 This configuration works for ARM because:
 
-1. It uses the ARM cross-compiler toolchain via `CROSS_COMPILE`
-2. It builds against an ARM-targeted kernel source tree (Xilinx's Linux kernel)
+1. It uses the ARM cross-compiler toolchain via `CROSS_COMPILE`.
+2. It builds against an ARM-targeted kernel source tree (Xilinx's Linux kernel).
 3. The resulting binaries will be compatible with ARM systems, specifically a Xilinx Zynq platform.
 
 ## Boot Process Analysis
