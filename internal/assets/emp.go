@@ -33,6 +33,8 @@ var (
 	EmpTagToPost = new(TagToPost)
 	// EmpTagToProject is a pointer to a TagToProject.
 	EmpTagToProject = new(TagToProject)
+	// EmpProjectToPost is a pointer to a ProjectToPost.
+	EmpProjectToPost = new(ProjectToPost)
 )
 
 // InitDB initializes the database.
@@ -56,6 +58,7 @@ func CreateTables(ctx context.Context, db *bun.DB) error {
 		EmpPostToPost,
 		EmpPostToProject,
 		EmpProjectToTag,
+		EmpProjectToPost,
 		EmpProjectToProject,
 		EmpTagToTag,
 		EmpTagToPost,
@@ -99,6 +102,7 @@ func RegisterModels(db *bun.DB) {
 		EmpPostToPost,
 		EmpPostToProject,
 		EmpProjectToTag,
+		EmpProjectToPost,
 		EmpProjectToProject,
 		EmpTagToTag,
 		EmpTagToPost,

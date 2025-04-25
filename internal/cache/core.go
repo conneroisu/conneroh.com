@@ -8,8 +8,8 @@ import (
 )
 
 type (
-	// ollamaClient is the ollama client.
-	ollamaClient interface {
+	// OllamaClient is the ollama client.
+	OllamaClient interface {
 		Embeddings(
 			ctx context.Context,
 			content string,
@@ -17,16 +17,16 @@ type (
 		) (err error)
 	}
 
-	// tigrisClient is the tigris client.
-	tigrisClient interface {
+	// TigrisClient is the tigris client.
+	TigrisClient interface {
 		PutObject(
 			ctx context.Context,
 			input *s3.PutObjectInput,
 			opts ...func(*s3.Options),
 		) (*s3.PutObjectOutput, error)
 	}
-	// waitGroup is a wait group.
-	waitGroup interface {
+	// WaitGroup is a wait group.
+	WaitGroup interface {
 		Add(delta int)
 		Done()
 		Wait()

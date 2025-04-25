@@ -1,21 +1,20 @@
-// Package main is the main package for the updated the generated code.
+// Package main is the entry point for the application
 package main
 
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"flag"
 	"fmt"
 	"log/slog"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 	"time"
 
 	"github.com/conneroisu/conneroh.com/internal/assets"
 	"github.com/conneroisu/conneroh.com/internal/cache"
-	"github.com/conneroisu/conneroh.com/internal/cwg"
 	"github.com/conneroisu/conneroh.com/internal/llama"
 	"github.com/conneroisu/conneroh.com/internal/logger"
 	"github.com/conneroisu/conneroh.com/internal/markdown"
@@ -29,14 +28,18 @@ import (
 )
 
 var (
-	workers = flag.Int("jobs", 40, "number of parallel workers")
+	workers    = flag.Int("workers", 8, "number of parallel workers")
+	taskBuffer = flag.Int("buffer", 1000, "size of task buffer")
+	dbTimeout  = flag.Duration("db-timeout", 5*time.Second, "database operation timeout")
+	batchSize  = flag.Int("batch-size", 50, "database batch operation size")
+	maxRetries = flag.Int("max-retries", 3, "maximum number of retries for failed operations")
 )
 
 func main() {
 	flag.Parse()
 	slog.SetDefault(logger.DefaultProdLogger)
 
-	// Create a context that will be canceled on interrupt signals
+	// Create context that will be canceled on interrupt signals
 	ctx, stop := signal.NotifyContext(context.Background(),
 		os.Interrupt,
 		syscall.SIGTERM,
@@ -44,117 +47,170 @@ func main() {
 		syscall.SIGHUP)
 	defer stop()
 
-	if err := Run(
-		ctx,
-		os.Getenv,
-		*workers,
-	); err != nil {
+	if err := Run(ctx, os.Getenv, *workers, *taskBuffer); err != nil {
 		formattedStr := eris.ToString(err, true)
 		fmt.Println(formattedStr)
 		os.Exit(1)
 	}
 }
 
-// Run runs the main program, update.
-func Run(
-	ctx context.Context,
-	getenv func(string) string,
-	workers int,
-) error {
-	var (
-		errCh = make(chan error)
-		msgCh = make(cache.MsgChannel)
-		queCh = make(cache.MsgChannel)
-		// wg    = sync.WaitGroup{}
-		wg cwg.DebugWaitGroup
-	)
-	innerCtx, cancel := context.WithCancel(ctx)
-	defer cancel()
-
-	ol, err := llama.NewOllamaClient(getenv)
-	if err != nil {
-		return err
-	}
-	ti, err := tigris.New(getenv)
-	if err != nil {
-		return err
-	}
-	sqldb, err := sql.Open("sqlite", assets.DBName())
-	if err != nil {
-		return err
-	}
-	defer sqldb.Close()
-	db := bun.NewDB(sqldb, sqlitedialect.New())
-	err = assets.InitDB(ctx, db)
-	if err != nil {
-		return err
-	}
-	fs := afero.NewBasePathFs(afero.NewOsFs(), assets.VaultLoc)
-	md := markdown.NewMD(fs)
-	db.AddQueryHook(bundebug.NewQueryHook(bundebug.WithVerbose(true)))
-
-	h := cache.NewHollywood(workers, fs, db, ti, ol, md)
-	go h.Start(innerCtx, msgCh, queCh, errCh, &wg)
-	go cache.ReadFS(innerCtx, fs, &wg, queCh, errCh)
-	go cache.Querer(innerCtx, queCh, msgCh)
-	time.Sleep(time.Millisecond * 50)
-
-	// Goroutine to handle wait group completion
-	go func() {
-		wg.Wait()
-		slog.Debug("hollywood finished")
-		cancel()
-	}()
-
-	// Main loop with graceful shutdown
-	for {
-		select {
-		case err := <-errCh:
-			if errors.Is(err, context.Canceled) {
-				continue
-			}
-			slog.Error("error", "err", err)
-			cancel()
-			return gracefulShutdown(msgCh, queCh, errCh)
-
-		case <-ctx.Done():
-			slog.Info("received termination signal")
-			cancel() // Cancel inner context
-			return gracefulShutdown(msgCh, queCh, errCh)
-
-		case <-innerCtx.Done():
-			slog.Info("inner context done")
-			return gracefulShutdown(msgCh, queCh, errCh)
-
-		case <-time.After(time.Second * 1):
-			slog.Info("waiting for hollywood to finish", slog.Int("count", wg.Count()))
-			wg.PrintActiveDebugInfo()
-		}
+// RunFn returns a function that runs the main application logic
+func RunFn(ctx context.Context, getenv func(string) string, numWorkers, bufferSize int) func() error {
+	return func() error {
+		return Run(ctx, getenv, numWorkers, bufferSize)
 	}
 }
 
-// gracefulShutdown performs a clean shutdown by draining and closing channels
-func gracefulShutdown(msgCh, queCh cache.MsgChannel, errCh chan error) error {
-	slog.Info("performing graceful shutdown")
+// Run executes the main application logic
+func Run(ctx context.Context, getenv func(string) string, numWorkers, bufferSize int) error {
+	// Initialize error collection
+	var errs []error
+	errMutex := &sync.Mutex{}
 
-	// Drain error channel first to capture any final errors
-	var errs error
-drainLoop:
-	for {
-		select {
-		case err := <-errCh:
-			errs = eris.Wrapf(errs, "error while handling error: %v", err)
-			slog.Error("error during shutdown", "err", err)
-		case <-time.After(100 * time.Millisecond):
-			break drainLoop
+	// Create database connection
+	sqldb, err := sql.Open("sqlite", assets.DBName())
+	if err != nil {
+		return eris.Wrap(err, "failed to open database")
+	}
+	defer sqldb.Close()
+
+	// Initialize BUN DB
+	db := bun.NewDB(sqldb, sqlitedialect.New())
+	db.AddQueryHook(bundebug.NewQueryHook(bundebug.WithVerbose(true)))
+
+	// Initialize database tables
+	if err := assets.InitDB(ctx, db); err != nil {
+		return eris.Wrap(err, "failed to initialize database")
+	}
+
+	// Initialize filesystem
+	fs := afero.NewBasePathFs(afero.NewOsFs(), assets.VaultLoc)
+
+	// Initialize dependencies
+	ol, err := llama.NewOllamaClient(getenv)
+	if err != nil {
+		return eris.Wrap(err, "failed to create Ollama client")
+	}
+
+	ti, err := tigris.New(getenv)
+	if err != nil {
+		return eris.Wrap(err, "failed to create Tigris client")
+	}
+
+	md := markdown.NewMD(fs)
+
+	// Create processor with specified number of workers
+	processor := cache.NewProcessor(fs, db, ti, ol, md, bufferSize)
+
+	// Create a context with cancellation
+	processingCtx, cancelProcessing := context.WithCancel(ctx)
+	defer cancelProcessing()
+
+	// Start the processor workers
+	processor.Start(processingCtx, numWorkers)
+
+	// Handle errors from the processor
+	errWg := &sync.WaitGroup{}
+	errWg.Add(1)
+	go func() {
+		defer errWg.Done()
+		for {
+			select {
+			case err, ok := <-processor.Errors():
+				if !ok {
+					return // Channel closed
+				}
+				errMutex.Lock()
+				errs = append(errs, err)
+				slog.Error("processing error", "err", err)
+				errMutex.Unlock()
+			case <-processingCtx.Done():
+				return
+			}
+		}
+	}()
+
+	// Scan the filesystem and submit tasks
+	slog.Info("scanning filesystem", "path", assets.VaultLoc)
+	if err := processor.ScanFS(); err != nil {
+		errMutex.Lock()
+		errs = append(errs, eris.Wrap(err, "failed to scan filesystem"))
+		errMutex.Unlock()
+		cancelProcessing() // Cancel processing on scan error
+		return combineErrors(errs)
+	}
+
+	// Set up a forced exit after an absolute timeout (3 minutes)
+	// This is an emergency fallback in case all other mechanisms fail
+	forceExitCh := make(chan struct{})
+	go func() {
+		// Wait for 3 minutes then force exit
+		time.Sleep(3 * time.Minute)
+		slog.Error("EMERGENCY TIMEOUT - forcing exit after 3 minutes")
+		close(forceExitCh)
+	}()
+
+	// Wait for completion with a timeout, or handle Ctrl+C
+	completionTimeout := 2 * time.Minute
+
+	// Create separate channels for completion waiting
+	completionDone := make(chan bool)
+
+	// Wait for completion in a separate goroutine
+	go func() {
+		completed := processor.WaitForCompletion(completionTimeout)
+		completionDone <- completed
+	}()
+
+	// Wait for either completion, context cancellation, or force exit
+	select {
+	case completed := <-completionDone:
+		if completed {
+			slog.Info("tasks completed successfully")
+		} else {
+			slog.Warn("completion timeout reached - forcing shutdown")
+			cancelProcessing()
+		}
+	case <-ctx.Done():
+		slog.Info("received termination signal")
+		cancelProcessing()
+	case <-forceExitCh:
+		slog.Error("emergency exit triggered - shutdown forced")
+		cancelProcessing()
+	}
+
+	// Wait for error handling to finish
+	errWg.Wait()
+
+	// Clean up processor
+	processor.Close()
+
+	// Check if any errors occurred
+	errMutex.Lock()
+	defer errMutex.Unlock()
+
+	if len(errs) > 0 {
+		return combineErrors(errs)
+	}
+
+	slog.Info("processing completed successfully")
+	return nil
+}
+
+// combineErrors combines multiple errors into one
+func combineErrors(errs []error) error {
+	if len(errs) == 0 {
+		return nil
+	}
+
+	var combinedErr error
+	for _, err := range errs {
+		if combinedErr == nil {
+			combinedErr = err
+		} else {
+			combinedErr = eris.Wrap(combinedErr, err.Error())
 		}
 	}
 
-	// Close all channels
-	close(msgCh)
-	close(queCh)
-	close(errCh)
-
-	slog.Info("shutdown complete")
-	return errs
+	return eris.Wrap(combinedErr, "processing completed with errors")
 }
