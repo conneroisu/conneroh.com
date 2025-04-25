@@ -70,9 +70,7 @@
           };
           generate-css = {
             exec = ''
-                export REPO_ROOT=$(git rev-parse --show-toplevel)
-
-
+              export REPO_ROOT=$(git rev-parse --show-toplevel)
               ${pkgs.templ}/bin/templ generate --log-level error
               ${pkgs.go}/bin/go run $REPO_ROOT/cmd/update-css --cwd $REPO_ROOT
               ${pkgs.tailwindcss}/bin/tailwindcss -m -i ./input.css \
@@ -114,13 +112,8 @@
           generate-all = {
             exec = ''
               export REPO_ROOT=$(git rev-parse --show-toplevel)
-              ${pkgs.templ}/bin/templ generate
-              ${pkgs.go}/bin/go run $REPO_ROOT/cmd/update-css --cwd $REPO_ROOT
-              ${pkgs.tailwindcss}/bin/tailwindcss \
-                  --minify \
-                  -i ./input.css \
-                  -o ./cmd/conneroh/_static/dist/style.css \
-                  --cwd $REPO_ROOT
+              ${pkgs.lib.getExe scriptPackages.generate-css}
+              ${pkgs.lib.getExe scriptPackages.generate-docs}
             '';
             description = "Generate all files in parallel";
           };
