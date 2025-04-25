@@ -18,3 +18,5 @@ servers
 CLAUDE.md
 tigris.yaml
 cache.sqlite
+*.db-shm
+*.db-wal

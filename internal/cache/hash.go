@@ -1,7 +1,6 @@
 package cache
 
 import (
-	"context"
 	"crypto/md5"
 	"encoding/hex"
 	"encoding/json"
@@ -13,7 +12,6 @@ import (
 	"sort"
 	"strings"
 	"sync"
-	"time"
 
 	"github.com/spf13/afero"
 )
@@ -23,18 +21,20 @@ type WorkCache map[string]string
 
 // HashCache represents a persistent cache of path hashes.
 type HashCache struct {
-	mu        sync.RWMutex
-	Paths     WorkCache
-	CachePath string
-	fs        afero.Fs
+	mu                 sync.RWMutex
+	Paths              WorkCache
+	CachePath          string
+	fs                 afero.Fs
+	lastComputedHashes WorkCache // Internal cache of last computed hashes
 }
 
 // NewHashCache creates a new cache with an optional path for persistence.
 func NewHashCache(fs afero.Fs, cachePath string) (*HashCache, error) {
 	cache := &HashCache{
-		Paths:     make(WorkCache),
-		CachePath: cachePath,
-		fs:        fs,
+		Paths:              make(WorkCache),
+		CachePath:          cachePath,
+		fs:                 fs,
+		lastComputedHashes: nil,
 	}
 
 	if cachePath != "" {
@@ -277,24 +277,58 @@ func (c *HashCache) HasGlobChanges(globPaths []string) (bool, error) {
 	for path, hash := range currentHashes {
 		cachedHash, exists := c.Paths[path]
 		if !exists || cachedHash != hash {
+			// Store the current hashes for later use in UpdateGlobHashes
+			c.mu.RUnlock()
+			c.mu.Lock()
+			c.lastComputedHashes = currentHashes
+			c.mu.Unlock()
+			c.mu.RLock()
 			return true, nil
 		}
 	}
 
-	c.UpdateGlobHashes(globPaths)
-
 	return false, nil
 }
 
-// UpdateGlobHashes computes and stores new hashes for the given glob paths.
-func (c *HashCache) UpdateGlobHashes(globPaths []string) error {
-	newHashes, err := ComputeGlobHashes(c.fs, globPaths)
-	if err != nil {
-		return err
+// UpdateGlobHashes stores new hashes for the given glob paths.
+// If useLastComputed is true, it will use the hashes from the last HasGlobChanges call.
+func (c *HashCache) UpdateGlobHashes(globPaths []string, useLastComputed bool) error {
+	var newHashes WorkCache
+	var err error
+
+	if useLastComputed && c.lastComputedHashes != nil {
+		c.mu.RLock()
+		// Check if we have pre-computed hashes for these exact paths
+		allPathsFound := true
+		for _, path := range globPaths {
+			if _, exists := c.lastComputedHashes[path]; !exists {
+				allPathsFound = false
+				break
+			}
+		}
+
+		if allPathsFound {
+			newHashes = c.lastComputedHashes
+			c.mu.RUnlock()
+		} else {
+			c.mu.RUnlock()
+			// Some paths were not in lastComputedHashes, recompute all
+			newHashes, err = ComputeGlobHashes(c.fs, globPaths)
+			if err != nil {
+				return err
+			}
+		}
+	} else {
+		// No pre-computed hashes or not requested to use them
+		newHashes, err = ComputeGlobHashes(c.fs, globPaths)
+		if err != nil {
+			return err
+		}
 	}
 
 	c.mu.Lock()
 	maps.Copy(c.Paths, newHashes)
+	c.lastComputedHashes = nil // Clear cache after using it
 	c.mu.Unlock()
 
 	return c.Save()
@@ -317,27 +351,8 @@ func (c *HashCache) OnGlobChanges(globPaths []string, fn func() error) error {
 		return err
 	}
 
-	// Update the hashes after successful execution
-	return c.UpdateGlobHashes(globPaths)
-}
-
-// WatchGlob continuously monitors glob paths for changes and runs the function when changes are detected.
-// It stops when the context is canceled.
-func (c *HashCache) WatchGlob(ctx context.Context, globPaths []string, interval time.Duration, fn func() error) error {
-	ticker := time.NewTicker(interval)
-	defer ticker.Stop()
-
-	for {
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-		case <-ticker.C:
-			err := c.OnGlobChanges(globPaths, fn)
-			if err != nil {
-				return err
-			}
-		}
-	}
+	// Update the hashes after successful execution using the already computed hashes
+	return c.UpdateGlobHashes(globPaths, true)
 }
 
 // OnGlobPathChanges is a simplified version of OnGlobChanges that uses a WorkCache directly.
@@ -367,6 +382,9 @@ func OnGlobPathChanges(fs afero.Fs, workCache WorkCache, globPaths []string, fn 
 	}
 
 	// Update the hashes after successful execution
+	if workCache == nil {
+		workCache = make(WorkCache)
+	}
 	maps.Copy(workCache, currentHashes)
 
 	return workCache, nil

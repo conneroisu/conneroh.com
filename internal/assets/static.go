@@ -169,21 +169,10 @@ type (
 	PostToTag struct {
 		bun.BaseModel `bun:"post_to_tags"`
 
-		ID     int64 `bun:"id,pk,autoincrement"`
-		PostID int64 `bun:"post_id"`
+		PostID int64 `bun:"post_id,pk"`
 		Post   *Post `bun:"rel:belongs-to,join:post_id=id"`
-		TagID  int64 `bun:"tag_id"`
+		TagID  int64 `bun:"tag_id,pk"`
 		Tag    *Tag  `bun:"rel:belongs-to,join:tag_id=id"`
-	}
-
-	// PostToPost represents a many-to-many relationship between posts and other posts
-	PostToPost struct {
-		bun.BaseModel `bun:"post_to_posts"`
-
-		SourcePostID int64 `bun:"source_post_id,pk"`
-		SourcePost   *Post `bun:"rel:belongs-to,join:source_post_id=id"`
-		TargetPostID int64 `bun:"target_post_id,pk"`
-		TargetPost   *Post `bun:"rel:belongs-to,join:target_post_id=id"`
 	}
 
 	// PostToProject represents a many-to-many relationship between posts and projects
@@ -206,6 +195,16 @@ type (
 		Tag       *Tag     `bun:"rel:belongs-to,join:tag_id=id"`
 	}
 
+	// PostToPost represents a many-to-many relationship between posts and other posts
+	PostToPost struct {
+		bun.BaseModel `bun:"post_to_posts"`
+
+		SourcePostID int64 `bun:"source_post_id,pk"`
+		SourcePost   *Post `bun:"rel:belongs-to,join:source_post_id=id"`
+		TargetPostID int64 `bun:"target_post_id,pk"`
+		TargetPost   *Post `bun:"rel:belongs-to,join:target_post_id=id"`
+	}
+
 	// ProjectToProject represents a many-to-many relationship between projects and other projects
 	ProjectToProject struct {
 		bun.BaseModel `bun:"project_to_projects"`
@@ -216,16 +215,6 @@ type (
 		TargetProject   *Project `bun:"rel:belongs-to,join:target_project_id=id"`
 	}
 
-	// ProjectToPost represents a many-to-many relationship between projects and posts
-	ProjectToPost struct {
-		bun.BaseModel `bun:"project_to_posts"`
-
-		ProjectID int64    `bun:"project_id,pk"`
-		Project   *Project `bun:"rel:belongs-to,join:project_id=id"`
-		PostID    int64    `bun:"post_id,pk"`
-		Post      *Post    `bun:"rel:belongs-to,join:post_id=id"`
-	}
-
 	// TagToTag represents a many-to-many relationship between tags and other tags
 	TagToTag struct {
 		bun.BaseModel `bun:"tag_to_tags"`
@@ -234,26 +223,6 @@ type (
 		SourceTag   *Tag  `bun:"rel:belongs-to,join:source_tag_id=id"`
 		TargetTagID int64 `bun:"target_tag_id,pk"`
 		TargetTag   *Tag  `bun:"rel:belongs-to,join:target_tag_id=id"`
-	}
-
-	// TagToPost represents a many-to-many relationship between tags and posts
-	TagToPost struct {
-		bun.BaseModel `bun:"tag_to_posts"`
-
-		TagID  int64 `bun:"tag_id,pk"`
-		Tag    *Tag  `bun:"rel:belongs-to,join:tag_id=id"`
-		PostID int64 `bun:"post_id,pk"`
-		Post   *Post `bun:"rel:belongs-to,join:post_id=id"`
-	}
-
-	// TagToProject represents a many-to-many relationship between tags and projects
-	TagToProject struct {
-		bun.BaseModel `bun:"tag_to_projects"`
-
-		TagID     int64    `bun:"tag_id,pk"`
-		Tag       *Tag     `bun:"rel:belongs-to,join:tag_id=id"`
-		ProjectID int64    `bun:"project_id,pk"`
-		Project   *Project `bun:"rel:belongs-to,join:project_id=id"`
 	}
 )
 

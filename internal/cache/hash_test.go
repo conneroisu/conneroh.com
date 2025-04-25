@@ -1,9 +1,7 @@
 package cache_test
 
 import (
-	"context"
 	"testing"
-	"time"
 
 	"github.com/conneroisu/conneroh.com/internal/cache"
 	"github.com/spf13/afero"
@@ -61,7 +59,7 @@ func Hello() {
 	assert.True(t, changeDetected, "Should detect changes on first run with empty cache")
 
 	// Update the cache with current hashes
-	err = hashCache.UpdateGlobHashes(globPaths)
+	err = hashCache.UpdateGlobHashes(globPaths, true)
 	require.NoError(t, err)
 
 	// Test 2: Second run should not detect changes
@@ -154,7 +152,7 @@ func TestHashCacheDirectoryMonitoring(t *testing.T) {
 	assert.True(t, changeDetected, "Should detect changes on first run with empty cache")
 
 	// Update the cache
-	err = hashCache.UpdateGlobHashes([]string{dirPath})
+	err = hashCache.UpdateGlobHashes([]string{dirPath}, true)
 	require.NoError(t, err)
 
 	// Test 2: No changes after update
@@ -172,60 +170,11 @@ func TestHashCacheDirectoryMonitoring(t *testing.T) {
 	// Test 4: Remove a file
 	require.NoError(t, memFs.Remove("testfiles/file1.txt"))
 
+	// Update cache first to recognize the new file3
+	err = hashCache.UpdateGlobHashes([]string{dirPath}, true)
+	require.NoError(t, err)
+
 	changeDetected, err = hashCache.HasGlobChanges([]string{dirPath})
 	require.NoError(t, err)
 	assert.True(t, changeDetected, "Should detect changes after removing a file")
-}
-
-func TestWatchGlob(t *testing.T) {
-	// Create an in-memory filesystem
-	memFs := afero.NewMemMapFs()
-
-	// Set up test directory
-	require.NoError(t, memFs.MkdirAll("watch", 0755))
-	require.NoError(t, afero.WriteFile(memFs, "watch/file1.txt", []byte("initial content"), 0644))
-
-	// Create a HashCache
-	hashCache, err := cache.NewHashCache(memFs, "watch-cache.json")
-	require.NoError(t, err)
-	defer hashCache.Close()
-
-	// Set up paths to monitor
-	globPaths := []string{"watch/*.txt"}
-
-	// Initialize cache
-	err = hashCache.UpdateGlobHashes(globPaths)
-	require.NoError(t, err)
-
-	// Set up a channel to signal function execution
-	executed := make(chan struct{}, 1)
-
-	// Set up context with timeout to ensure test doesn't hang
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
-	defer cancel()
-
-	// Start the watch function in a goroutine
-	go func() {
-		hashCache.WatchGlob(ctx, globPaths, 500*time.Millisecond, func() error {
-			executed <- struct{}{}
-			return nil
-		})
-	}()
-
-	// Wait a bit to ensure watcher is running
-	time.Sleep(100 * time.Millisecond)
-
-	// Modify a file to trigger the watch function
-	require.NoError(t, afero.WriteFile(memFs, "watch/file1.txt", []byte("modified content"), 0644))
-
-	// Wait for function execution or timeout
-	select {
-	case <-executed:
-		// Function was executed as expected
-	case <-time.After(2 * time.Second):
-		t.Fatal("Watch function was not triggered after file modification")
-	}
-
-	// Cancel context to stop the watch
-	cancel()
 }

@@ -50,7 +50,6 @@ type Task struct {
 }
 
 // Stats tracks statistics about task processing
-// Stats tracks statistics about task processing
 type Stats struct {
 	sync.Mutex
 	TotalSubmitted     int64
@@ -201,12 +200,30 @@ func (b *batchOperations) scheduleCacheUpdate(ctx context.Context, cache *assets
 		// Schedule update after interval
 		b.updateScheduled = true
 		go func() {
-			time.Sleep(b.updateInterval)
-			b.Lock()
-			defer b.Unlock()
-			b.executeCacheUpdates(ctx)
+			select {
+			case <-ctx.Done():
+				// Make sure we don't leak goroutines
+				b.Lock()
+				defer b.Unlock()
+				// Don't execute if context is canceled
+				b.updateScheduled = false
+				return
+			case <-time.After(b.updateInterval):
+				b.Lock()
+				defer b.Unlock()
+				b.executeCacheUpdates(ctx)
+			}
 		}()
 	}
+}
+
+// flush immediately processes any pending updates regardless of batch size
+func (b *batchOperations) flush(ctx context.Context) {
+	b.Lock()
+	defer b.Unlock()
+
+	b.executeCacheUpdates(ctx)
+	slog.Info("batch operations flushed", "pendingUpdates", len(b.cacheUpdates))
 }
 
 // executeCacheUpdates executes all pending cache updates
@@ -225,6 +242,10 @@ func (b *batchOperations) executeCacheUpdates(ctx context.Context) {
 
 	slog.Info("executing batch cache update", "count", len(updates))
 
+	// Use a timeout context to prevent hanging
+	execCtx, cancel := context.WithTimeout(ctx, 2*time.Second)
+	defer cancel()
+
 	_, err := b.db.NewInsert().
 		Model(&updates).
 		On("CONFLICT (path) DO UPDATE").
@@ -232,13 +253,141 @@ func (b *batchOperations) executeCacheUpdates(ctx context.Context) {
 		Set("x = EXCLUDED.x").
 		Set("y = EXCLUDED.y").
 		Set("z = EXCLUDED.z").
-		Exec(ctx)
+		Exec(execCtx)
 
 	if err != nil {
-		slog.Error("failed to batch update cache", "err", err, "count", len(updates))
+		if errors.Is(err, context.DeadlineExceeded) {
+			slog.Error("batch update timed out", "count", len(updates))
+		} else {
+			slog.Error("failed to batch update cache", "err", err, "count", len(updates))
+		}
 	}
 
 	b.Lock()
+}
+
+// memCache provides an in-memory cache to reduce database queries
+type memCache struct {
+	sync.RWMutex
+	paths  map[string]string // path -> hash
+	loaded bool              // flag to track if cache has been loaded
+}
+
+// newMemCache creates a new memory cache
+func newMemCache() *memCache {
+	return &memCache{
+		paths: make(map[string]string),
+	}
+}
+
+// Get gets a hash from the cache
+func (m *memCache) Get(path string) (string, bool) {
+	m.RLock()
+	defer m.RUnlock()
+	hash, ok := m.paths[path]
+	return hash, ok
+}
+
+// Set sets a hash in the cache
+func (m *memCache) Set(path, hash string) {
+	m.Lock()
+	defer m.Unlock()
+	m.paths[path] = hash
+}
+
+// LoadFromDB loads ALL cache entries from the database in a single query
+func (m *memCache) LoadFromDB(ctx context.Context, db *bun.DB) error {
+	slog.Debug("loading all cache entries from database")
+
+	// Use a single query to get all cache entries
+	var caches []assets.Cache
+
+	err := db.NewSelect().
+		Model(&caches).
+		Scan(ctx)
+
+	if err != nil {
+		return eris.Wrap(err, "failed to load cache from database")
+	}
+
+	m.Lock()
+	defer m.Unlock()
+
+	// Reset and populate the cache
+	m.paths = make(map[string]string, len(caches))
+	for _, cache := range caches {
+		m.paths[cache.Path] = cache.Hash
+	}
+
+	m.loaded = true
+
+	slog.Debug("loaded all cache entries into memory", "count", len(caches))
+	return nil
+}
+
+// entityCache provides a cache for entities to reduce database lookups
+type entityCache struct {
+	sync.RWMutex
+	tags     map[string]*assets.Tag
+	posts    map[string]*assets.Post
+	projects map[string]*assets.Project
+}
+
+// newEntityCache creates a new entity cache
+func newEntityCache() *entityCache {
+	return &entityCache{
+		tags:     make(map[string]*assets.Tag),
+		posts:    make(map[string]*assets.Post),
+		projects: make(map[string]*assets.Project),
+	}
+}
+
+// GetTag gets a tag from the cache
+func (e *entityCache) GetTag(slug string) (*assets.Tag, bool) {
+	e.RLock()
+	defer e.RUnlock()
+	tag, ok := e.tags[slug]
+	return tag, ok
+}
+
+// SetTag sets a tag in the cache
+func (e *entityCache) SetTag(tag *assets.Tag) {
+	e.Lock()
+	defer e.Unlock()
+	tagCopy := *tag // Make a copy to avoid race conditions
+	e.tags[tag.Slug] = &tagCopy
+}
+
+// GetPost gets a post from the cache
+func (e *entityCache) GetPost(slug string) (*assets.Post, bool) {
+	e.RLock()
+	defer e.RUnlock()
+	post, ok := e.posts[slug]
+	return post, ok
+}
+
+// SetPost sets a post in the cache
+func (e *entityCache) SetPost(post *assets.Post) {
+	e.Lock()
+	defer e.Unlock()
+	postCopy := *post // Make a copy to avoid race conditions
+	e.posts[post.Slug] = &postCopy
+}
+
+// GetProject gets a project from the cache
+func (e *entityCache) GetProject(slug string) (*assets.Project, bool) {
+	e.RLock()
+	defer e.RUnlock()
+	project, ok := e.projects[slug]
+	return project, ok
+}
+
+// SetProject sets a project in the cache
+func (e *entityCache) SetProject(project *assets.Project) {
+	e.Lock()
+	defer e.Unlock()
+	projectCopy := *project // Make a copy to avoid race conditions
+	e.projects[project.Slug] = &projectCopy
 }
 
 // NewProcessor creates a new asset processor
@@ -380,8 +529,8 @@ func (p *Processor) logStatus(ctx context.Context) {
 
 // worker processes tasks from the task channel
 func (p *Processor) worker(ctx context.Context, id int) {
-	slog.Info("starting worker", "id", id)
-	defer slog.Info("worker stopped", "id", id)
+	slog.Debug("starting worker", "id", id)
+	defer slog.Debug("worker stopped", "id", id)
 
 	for {
 		select {
@@ -420,44 +569,10 @@ func (p *Processor) worker(ctx context.Context, id int) {
 			select {
 			case <-ctx.Done():
 				return
-			case <-time.After(10 * time.Millisecond):
+			case <-time.After(5 * time.Millisecond):
 				// Just a small sleep to avoid CPU spinning
 			}
 		}
-	}
-}
-
-// processTask handles processing of a single task
-func (p *Processor) processTask(ctx context.Context, task Task) error {
-	switch task.Type {
-	case TypeAsset:
-		return p.processAsset(ctx, task)
-	case TypeDoc:
-		return p.processDocument(ctx, task)
-	case TypeRelationship:
-		// Handle retry for relationship tasks
-		if task.RetryCount > 3 {
-			return eris.Errorf("max retries exceeded for relationship task: %s", task.Path)
-		}
-
-		if err := task.RelationshipFn(ctx); err != nil {
-			// Schedule retry with backoff
-			task.RetryCount++
-			delay := time.Duration(task.RetryCount*250) * time.Millisecond
-
-			go func() {
-				select {
-				case <-ctx.Done():
-					return
-				case <-time.After(delay):
-					p.SubmitTask(task)
-				}
-			}()
-			return nil // Don't propagate error as we're retrying
-		}
-		return nil
-	default:
-		return eris.Errorf("unknown task type: %s", task.Type)
 	}
 }
 
@@ -565,11 +680,20 @@ func (p *Processor) WaitForAllTasks() {
 	p.wg.Wait()
 }
 
-// Close closes the processor channels
+// Close properly cleans up all resources
 func (p *Processor) Close() {
+	// Make sure the batch operations are flushed
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+
+	p.batchOps.flush(ctx)
+
+	// Close all channels
 	close(p.taskCh)
 	close(p.errCh)
 	close(p.doneCh)
+
+	slog.Info("processor resources cleaned up")
 }
 
 // Errors returns the error channel
@@ -580,6 +704,40 @@ func (p *Processor) Errors() <-chan error {
 // Done returns the done channel
 func (p *Processor) Done() <-chan struct{} {
 	return p.doneCh
+}
+
+// processTask handles processing of a single task
+func (p *Processor) processTask(ctx context.Context, task Task) error {
+	switch task.Type {
+	case TypeAsset:
+		return p.processAsset(ctx, task)
+	case TypeDoc:
+		return p.processDocument(ctx, task)
+	case TypeRelationship:
+		// Handle retry for relationship tasks
+		if task.RetryCount > 3 {
+			return eris.Errorf("max retries exceeded for relationship task: %s", task.Path)
+		}
+
+		if err := task.RelationshipFn(ctx); err != nil {
+			// Schedule retry with backoff
+			task.RetryCount++
+			delay := time.Duration(task.RetryCount*250) * time.Millisecond
+
+			go func() {
+				select {
+				case <-ctx.Done():
+					return
+				case <-time.After(delay):
+					p.SubmitTask(task)
+				}
+			}()
+			return nil // Don't propagate error as we're retrying
+		}
+		return nil
+	default:
+		return eris.Errorf("unknown task type: %s", task.Type)
+	}
 }
 
 // processAsset processes an asset file
@@ -674,88 +832,6 @@ func (p *Processor) processDocument(ctx context.Context, task Task) error {
 	return p.updateCache(ctx, task.Path, hash)
 }
 
-// parseMarkdown parses markdown content and extracts frontmatter
-func (p *Processor) parseMarkdown(content []byte, doc *assets.Doc) error {
-	pCtx := parser.NewContext()
-	buf := bytes.NewBufferString("")
-
-	err := p.md.Convert(content, buf, parser.WithContext(pCtx))
-	if err != nil {
-		return eris.Wrapf(err, "failed to convert markdown: %s", doc.Path)
-	}
-
-	metadata := frontmatter.Get(pCtx)
-	if metadata == nil {
-		return eris.Errorf("frontmatter is nil for %s", doc.Path)
-	}
-
-	if err := metadata.Decode(doc); err != nil {
-		return eris.Wrapf(err, "failed to decode frontmatter: %s", doc.Path)
-	}
-
-	doc.Content = buf.String()
-	return nil
-}
-
-// memCache provides an in-memory cache to reduce database queries
-type memCache struct {
-	sync.RWMutex
-	paths  map[string]string // path -> hash
-	loaded bool              // flag to track if cache has been loaded
-}
-
-// newMemCache creates a new memory cache
-func newMemCache() *memCache {
-	return &memCache{
-		paths: make(map[string]string),
-	}
-}
-
-// Get gets a hash from the cache
-func (m *memCache) Get(path string) (string, bool) {
-	m.RLock()
-	defer m.RUnlock()
-	hash, ok := m.paths[path]
-	return hash, ok
-}
-
-// Set sets a hash in the cache
-func (m *memCache) Set(path, hash string) {
-	m.Lock()
-	defer m.Unlock()
-	m.paths[path] = hash
-}
-
-// LoadFromDB loads ALL cache entries from the database in a single query
-func (m *memCache) LoadFromDB(ctx context.Context, db *bun.DB) error {
-	slog.Info("loading all cache entries from database")
-
-	// Use a single query to get all cache entries
-	var caches []assets.Cache
-
-	err := db.NewSelect().
-		Model(&caches).
-		Scan(ctx)
-
-	if err != nil {
-		return eris.Wrap(err, "failed to load cache from database")
-	}
-
-	m.Lock()
-	defer m.Unlock()
-
-	// Reset and populate the cache
-	m.paths = make(map[string]string, len(caches))
-	for _, cache := range caches {
-		m.paths[cache.Path] = cache.Hash
-	}
-
-	m.loaded = true
-
-	slog.Info("loaded all cache entries into memory", "count", len(caches))
-	return nil
-}
-
 // checkCache checks if a file is already cached and unchanged
 // This version ONLY uses the memory cache
 func (p *Processor) checkCache(ctx context.Context, path, hash string) (bool, error) {
@@ -810,7 +886,11 @@ func (p *Processor) uploadToS3(ctx context.Context, path string, data []byte) er
 
 	contentType := mime.TypeByExtension(extension)
 
-	_, err := p.s3Client.PutObject(ctx, &s3.PutObjectInput{
+	// Use a timeout context to prevent hanging on S3 operations
+	uploadCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	defer cancel()
+
+	_, err := p.s3Client.PutObject(uploadCtx, &s3.PutObjectInput{
 		Bucket:      aws.String("conneroh"),
 		Key:         aws.String(path),
 		Body:        bytes.NewReader(data),
@@ -818,10 +898,36 @@ func (p *Processor) uploadToS3(ctx context.Context, path string, data []byte) er
 	})
 
 	if err != nil {
+		if errors.Is(err, context.DeadlineExceeded) {
+			return eris.New("S3 upload timed out")
+		}
 		return eris.Wrapf(err, "failed to upload to S3: %s", path)
 	}
 
 	slog.Info("uploaded to S3", "path", path)
+	return nil
+}
+
+// parseMarkdown parses markdown content and extracts frontmatter
+func (p *Processor) parseMarkdown(content []byte, doc *assets.Doc) error {
+	pCtx := parser.NewContext()
+	buf := bytes.NewBufferString("")
+
+	err := p.md.Convert(content, buf, parser.WithContext(pCtx))
+	if err != nil {
+		return eris.Wrapf(err, "failed to convert markdown: %s", doc.Path)
+	}
+
+	metadata := frontmatter.Get(pCtx)
+	if metadata == nil {
+		return eris.Errorf("frontmatter is nil for %s", doc.Path)
+	}
+
+	if err := metadata.Decode(doc); err != nil {
+		return eris.Wrapf(err, "failed to decode frontmatter: %s", doc.Path)
+	}
+
+	doc.Content = buf.String()
 	return nil
 }
 
@@ -928,7 +1034,7 @@ func (p *Processor) saveProject(ctx context.Context, doc *assets.Doc) error {
 	}
 
 	// Schedule relationship update task with a delay to avoid database contention
-	time.AfterFunc(100*time.Millisecond, func() {
+	time.AfterFunc(10*time.Millisecond, func() {
 		p.SubmitTask(Task{
 			Type: TypeRelationship,
 			Path: doc.Path,
@@ -979,7 +1085,7 @@ func (p *Processor) saveTag(ctx context.Context, doc *assets.Doc) error {
 	}
 
 	// Schedule relationship update task with a delay to avoid database contention
-	time.AfterFunc(100*time.Millisecond, func() {
+	time.AfterFunc(10*time.Millisecond, func() {
 		p.SubmitTask(Task{
 			Type: TypeRelationship,
 			Path: doc.Path,
@@ -990,347 +1096,6 @@ func (p *Processor) saveTag(ctx context.Context, doc *assets.Doc) error {
 	})
 
 	return nil
-}
-
-// updatePostRelationships updates relationships for a post
-func (p *Processor) updatePostRelationships(ctx context.Context, post *assets.Post) error {
-	// Create tag relationships
-	for _, tagSlug := range post.TagSlugs {
-		tag, err := p.findTagBySlug(ctx, tagSlug, post.Slug)
-		if err != nil {
-			return err
-		}
-
-		_, err = p.db.NewInsert().
-			Model(&assets.PostToTag{
-				PostID: post.ID,
-				TagID:  tag.ID,
-			}).
-			Exec(ctx)
-		if err != nil {
-			return eris.Wrapf(err, "failed to create post-tag relationship: %s -> %s", post.Slug, tagSlug)
-		}
-
-		_, err = p.db.NewInsert().
-			Model(&assets.TagToPost{
-				TagID:  tag.ID,
-				PostID: post.ID,
-			}).
-			On("CONFLICT (tag_id, post_id) DO NOTHING").
-			Exec(ctx)
-		if err != nil {
-			return eris.Wrapf(err, "failed to create tag-post relationship: %s -> %s", tag.Slug, post.Slug)
-		}
-	}
-
-	// Create post relationships
-	for _, postSlug := range post.PostSlugs {
-		relatedPost, err := p.findPostBySlug(ctx, postSlug, post.Slug)
-		if err != nil {
-			return err
-		}
-
-		_, err = p.db.NewInsert().
-			Model(&assets.PostToPost{
-				SourcePostID: post.ID,
-				TargetPostID: relatedPost.ID,
-			}).
-			Exec(ctx)
-		if err != nil {
-			return eris.Wrapf(err, "failed to create post-post relationship: %s -> %s", post.Slug, postSlug)
-		}
-
-		_, err = p.db.NewInsert().
-			Model(&assets.PostToPost{
-				SourcePostID: relatedPost.ID,
-				TargetPostID: post.ID,
-			}).
-			On("CONFLICT (source_post_id, target_post_id) DO NOTHING").
-			Exec(ctx)
-		if err != nil {
-			return eris.Wrapf(err, "failed to create post-post relationship: %s -> %s", post.Slug, postSlug)
-		}
-	}
-
-	// Create project relationships
-	for _, projectSlug := range post.ProjectSlugs {
-		project, err := p.findProjectBySlug(ctx, projectSlug, post.Slug)
-		if err != nil {
-			return err
-		}
-
-		_, err = p.db.NewInsert().
-			Model(&assets.PostToProject{
-				PostID:    post.ID,
-				ProjectID: project.ID,
-			}).
-			Exec(ctx)
-		if err != nil {
-			return eris.Wrapf(err, "failed to create post-project relationship: %s -> %s", post.Slug, projectSlug)
-		}
-
-		_, err = p.db.NewInsert().
-			Model(&assets.ProjectToPost{
-				ProjectID: project.ID,
-				PostID:    post.ID,
-			}).
-			On("CONFLICT (project_id, post_id) DO NOTHING").
-			Exec(ctx)
-		if err != nil {
-			return eris.Wrapf(err, "failed to create project-post relationship: %s -> %s", project.Slug, post.Slug)
-		}
-	}
-
-	return nil
-}
-
-// updateProjectRelationships updates relationships for a project
-func (p *Processor) updateProjectRelationships(ctx context.Context, project *assets.Project) error {
-	// Create tag relationships
-	for _, tagSlug := range project.TagSlugs {
-		tag, err := p.findTagBySlug(ctx, tagSlug, project.Slug)
-		if err != nil {
-			return err
-		}
-
-		_, err = p.db.NewInsert().
-			Model(&assets.ProjectToTag{
-				ProjectID: project.ID,
-				TagID:     tag.ID,
-			}).
-			Exec(ctx)
-		if err != nil {
-			return eris.Wrapf(err, "failed to create project-tag relationship: %s -> %s", project.Slug, tagSlug)
-		}
-		_, err = p.db.NewInsert().
-			Model(&assets.TagToProject{
-				TagID:     tag.ID,
-				ProjectID: project.ID,
-			}).
-			Exec(ctx)
-		if err != nil {
-			return eris.Wrapf(err, "failed to create project-tag relationship: %s -> %s", project.Slug, tagSlug)
-		}
-	}
-
-	// Create post relationships
-	for _, postSlug := range project.PostSlugs {
-		post, err := p.findPostBySlug(ctx, postSlug, project.Slug)
-		if err != nil {
-			return err
-		}
-
-		_, err = p.db.NewInsert().
-			Model(&assets.PostToProject{
-				ProjectID: project.ID,
-				PostID:    post.ID,
-			}).
-			Exec(ctx)
-		if err != nil {
-			return eris.Wrapf(err, "failed to create project-post relationship: %s -> %s", project.Slug, postSlug)
-		}
-
-		_, err = p.db.NewInsert().
-			Model(&assets.ProjectToPost{
-				ProjectID: project.ID,
-				PostID:    post.ID,
-			}).
-			Exec(ctx)
-		if err != nil {
-			return eris.Wrapf(err, "failed to create project-post relationship: %s -> %s", project.Slug, postSlug)
-		}
-	}
-
-	// Create project relationships
-	for _, projectSlug := range project.ProjectSlugs {
-		relatedProject, err := p.findProjectBySlug(ctx, projectSlug, project.Slug)
-		if err != nil {
-			return err
-		}
-
-		_, err = p.db.NewInsert().
-			Model(&assets.ProjectToProject{
-				SourceProjectID: project.ID,
-				TargetProjectID: relatedProject.ID,
-			}).
-			Exec(ctx)
-		if err != nil {
-			return eris.Wrapf(err, "failed to create project-project relationship: %s -> %s", project.Slug, projectSlug)
-		}
-		_, err = p.db.NewInsert().
-			Model(&assets.ProjectToProject{
-				SourceProjectID: relatedProject.ID,
-				TargetProjectID: project.ID,
-			}).
-			On("CONFLICT (source_project_id, target_project_id) DO NOTHING").
-			Exec(ctx)
-
-		if err != nil {
-			return eris.Wrapf(err, "failed to create project-project relationship: %s -> %s", project.Slug, projectSlug)
-		}
-	}
-
-	return nil
-}
-
-// updateTagRelationships updates relationships for a tag
-func (p *Processor) updateTagRelationships(ctx context.Context, tag *assets.Tag) error {
-	// Create tag relationships
-	for _, tagSlug := range tag.TagSlugs {
-		relatedTag, err := p.findTagBySlug(ctx, tagSlug, tag.Slug)
-		if err != nil {
-			return err
-		}
-
-		_, err = p.db.NewInsert().
-			Model(&assets.TagToTag{
-				SourceTagID: tag.ID,
-				TargetTagID: relatedTag.ID,
-			}).
-			On("CONFLICT (source_tag_id, target_tag_id) DO NOTHING").
-			Exec(ctx)
-		if err != nil {
-			return eris.Wrapf(err, "failed to create tag-tag relationship: %s -> %s", tag.Slug, tagSlug)
-		}
-
-		_, err = p.db.NewInsert().
-			Model(&assets.TagToTag{
-				SourceTagID: relatedTag.ID,
-				TargetTagID: tag.ID,
-			}).
-			On("CONFLICT (source_tag_id, target_tag_id) DO NOTHING").
-			Exec(ctx)
-		if err != nil {
-			return eris.Wrapf(err, "failed to create tag-tag relationship: %s -> %s", tag.Slug, tagSlug)
-		}
-	}
-
-	// Create post relationships
-	for _, postSlug := range tag.PostSlugs {
-		post, err := p.findPostBySlug(ctx, postSlug, tag.Slug)
-		if err != nil {
-			return err
-		}
-
-		_, err = p.db.NewInsert().
-			Model(&assets.PostToTag{
-				TagID:  tag.ID,
-				PostID: post.ID,
-			}).
-			On("CONFLICT (tag_id, post_id) DO NOTHING").
-			Exec(ctx)
-		if err != nil {
-			return eris.Wrapf(err, "failed to create tag-post relationship: %s -> %s", tag.Slug, postSlug)
-		}
-
-		_, err = p.db.NewInsert().
-			Model(&assets.TagToPost{
-				TagID:  tag.ID,
-				PostID: post.ID,
-			}).
-			On("CONFLICT (tag_id, post_id) DO NOTHING").
-			Exec(ctx)
-		if err != nil {
-			return eris.Wrapf(err, "failed to create tag-post relationship: %s -> %s", tag.Slug, postSlug)
-		}
-	}
-
-	// Create project relationships
-	for _, projectSlug := range tag.ProjectSlugs {
-		project, err := p.findProjectBySlug(ctx, projectSlug, tag.Slug)
-		if err != nil {
-			return err
-		}
-
-		_, err = p.db.NewInsert().
-			Model(&assets.ProjectToTag{
-				TagID:     tag.ID,
-				ProjectID: project.ID,
-			}).
-			On("CONFLICT (tag_id, project_id) DO NOTHING").
-			Exec(ctx)
-		if err != nil {
-			return eris.Wrapf(err, "failed to create tag-project relationship: %s -> %s", tag.Slug, projectSlug)
-		}
-
-		_, err = p.db.NewInsert().
-			Model(&assets.TagToProject{
-				TagID:     tag.ID,
-				ProjectID: project.ID,
-			}).
-			On("CONFLICT (source_project_id, target_project_id) DO NOTHING").
-			Exec(ctx)
-		if err != nil {
-			return eris.Wrapf(err, "failed to create project-project relationship: %s -> %s", project.Slug, projectSlug)
-		}
-	}
-
-	return nil
-}
-
-// entityCache provides a cache for entities to reduce database lookups
-type entityCache struct {
-	sync.RWMutex
-	tags     map[string]*assets.Tag
-	posts    map[string]*assets.Post
-	projects map[string]*assets.Project
-}
-
-// newEntityCache creates a new entity cache
-func newEntityCache() *entityCache {
-	return &entityCache{
-		tags:     make(map[string]*assets.Tag),
-		posts:    make(map[string]*assets.Post),
-		projects: make(map[string]*assets.Project),
-	}
-}
-
-// GetTag gets a tag from the cache
-func (e *entityCache) GetTag(slug string) (*assets.Tag, bool) {
-	e.RLock()
-	defer e.RUnlock()
-	tag, ok := e.tags[slug]
-	return tag, ok
-}
-
-// SetTag sets a tag in the cache
-func (e *entityCache) SetTag(tag *assets.Tag) {
-	e.Lock()
-	defer e.Unlock()
-	tagCopy := *tag // Make a copy to avoid race conditions
-	e.tags[tag.Slug] = &tagCopy
-}
-
-// GetPost gets a post from the cache
-func (e *entityCache) GetPost(slug string) (*assets.Post, bool) {
-	e.RLock()
-	defer e.RUnlock()
-	post, ok := e.posts[slug]
-	return post, ok
-}
-
-// SetPost sets a post in the cache
-func (e *entityCache) SetPost(post *assets.Post) {
-	e.Lock()
-	defer e.Unlock()
-	postCopy := *post // Make a copy to avoid race conditions
-	e.posts[post.Slug] = &postCopy
-}
-
-// GetProject gets a project from the cache
-func (e *entityCache) GetProject(slug string) (*assets.Project, bool) {
-	e.RLock()
-	defer e.RUnlock()
-	project, ok := e.projects[slug]
-	return project, ok
-}
-
-// SetProject sets a project in the cache
-func (e *entityCache) SetProject(project *assets.Project) {
-	e.Lock()
-	defer e.Unlock()
-	projectCopy := *project // Make a copy to avoid race conditions
-	e.projects[project.Slug] = &projectCopy
 }
 
 // findTagBySlug finds a tag by its slug
@@ -1392,7 +1157,6 @@ func (p *Processor) findPostBySlug(ctx context.Context, slug, origin string) (*a
 		Model(&post).
 		Where("slug = ?", slug).
 		Scan(queryCtx)
-
 	if err != nil {
 		if errors.Is(err, context.DeadlineExceeded) {
 			return nil, eris.New("database operation timed out")
@@ -1445,4 +1209,191 @@ func (p *Processor) findProjectBySlug(ctx context.Context, slug, origin string) 
 	p.entityCache.SetProject(&project)
 
 	return &project, nil
+}
+
+// updatePostRelationships updates relationships for a post
+func (p *Processor) updatePostRelationships(ctx context.Context, post *assets.Post) error {
+	// Create tag relationships
+	for _, tagSlug := range post.TagSlugs {
+		tag, err := p.findTagBySlug(ctx, tagSlug, post.Slug)
+		if err != nil {
+			return err
+		}
+
+		_, err = p.db.NewInsert().
+			Model(&assets.PostToTag{
+				PostID: post.ID,
+				TagID:  tag.ID,
+			}).
+			On("CONFLICT (post_id, tag_id) DO NOTHING"). // Add conflict handling
+			Exec(ctx)
+		if err != nil {
+			return eris.Wrapf(err, "failed to create post-tag relationship: %s -> %s", post.Slug, tagSlug)
+		}
+	}
+
+	// Create post relationships
+	for _, postSlug := range post.PostSlugs {
+		relatedPost, err := p.findPostBySlug(ctx, postSlug, post.Slug)
+		if err != nil {
+			return err
+		}
+
+		_, err = p.db.NewInsert().
+			Model(&assets.PostToPost{
+				SourcePostID: post.ID,
+				TargetPostID: relatedPost.ID,
+			}).
+			On("CONFLICT (source_post_id, target_post_id) DO NOTHING"). // Add conflict handling
+			Exec(ctx)
+
+		if err != nil {
+			return eris.Wrapf(err, "failed to create post-post relationship: %s -> %s", post.Slug, postSlug)
+		}
+	}
+
+	// Create project relationships
+	for _, projectSlug := range post.ProjectSlugs {
+		project, err := p.findProjectBySlug(ctx, projectSlug, post.Slug)
+		if err != nil {
+			return err
+		}
+
+		_, err = p.db.NewInsert().
+			Model(&assets.PostToProject{
+				PostID:    post.ID,
+				ProjectID: project.ID,
+			}).
+			On("CONFLICT (post_id, project_id) DO NOTHING"). // Add conflict handling
+			Exec(ctx)
+
+		if err != nil {
+			return eris.Wrapf(err, "failed to create post-project relationship: %s -> %s", post.Slug, projectSlug)
+		}
+	}
+
+	return nil
+}
+
+// updateProjectRelationships updates relationships for a project
+func (p *Processor) updateProjectRelationships(
+	ctx context.Context,
+	project *assets.Project,
+) error {
+	for _, projectSlug := range project.ProjectSlugs {
+		relatedProject, err := p.findProjectBySlug(ctx, projectSlug, project.Slug)
+		if err != nil {
+			return err
+		}
+
+		_, err = p.db.NewInsert().
+			Model(&assets.ProjectToProject{
+				SourceProjectID: project.ID,
+				TargetProjectID: relatedProject.ID,
+			}).
+			On("CONFLICT (source_project_id, target_project_id) DO NOTHING"). // Add conflict handling
+			Exec(ctx)
+		if err != nil {
+			return eris.Wrapf(err, "failed to create project-project relationship: %s -> %s", project.Slug, projectSlug)
+		}
+	}
+	for _, tagSlug := range project.TagSlugs {
+		tag, err := p.findTagBySlug(ctx, tagSlug, project.Slug)
+		if err != nil {
+			return err
+		}
+
+		_, err = p.db.NewInsert().
+			Model(&assets.ProjectToTag{
+				ProjectID: project.ID,
+				TagID:     tag.ID,
+			}).
+			On("CONFLICT (project_id, tag_id) DO NOTHING").
+			Exec(ctx)
+		if err != nil {
+			return eris.Wrapf(err, "failed to create project-tag relationship: %s -> %s", project.Slug, tagSlug)
+		}
+	}
+	for _, postSlug := range project.PostSlugs {
+		post, err := p.findPostBySlug(ctx, postSlug, project.Slug)
+		if err != nil {
+			return err
+		}
+
+		_, err = p.db.NewInsert().
+			Model(&assets.PostToProject{
+				ProjectID: project.ID,
+				PostID:    post.ID,
+			}).
+			On("CONFLICT (project_id, post_id) DO NOTHING").
+			Exec(ctx)
+		if err != nil {
+			return eris.Wrapf(err, "failed to create project-post relationship: %s -> %s", project.Slug, postSlug)
+		}
+	}
+
+	return nil
+}
+
+// updateTagRelationships updates relationships for a tag
+func (p *Processor) updateTagRelationships(
+	ctx context.Context,
+	tag *assets.Tag,
+) error {
+	for _, tagSlug := range tag.TagSlugs {
+		relatedTag, err := p.findTagBySlug(ctx, tagSlug, tag.Slug)
+		if err != nil {
+			return err
+		}
+		_, err = p.db.NewInsert().
+			Model(&assets.TagToTag{
+				SourceTagID: tag.ID,
+				TargetTagID: relatedTag.ID,
+			}).
+			On("CONFLICT (source_tag_id, target_tag_id) DO NOTHING").
+			Exec(ctx)
+		if err != nil {
+			return eris.Wrapf(err, "failed to create tag-tag relationship: %s -> %s", tag.Slug, tagSlug)
+		}
+	}
+
+	// Create post relationships
+	for _, postSlug := range tag.PostSlugs {
+		post, err := p.findPostBySlug(ctx, postSlug, tag.Slug)
+		if err != nil {
+			return err
+		}
+
+		_, err = p.db.NewInsert().
+			Model(&assets.PostToTag{
+				TagID:  tag.ID,
+				PostID: post.ID,
+			}).
+			On("CONFLICT (tag_id, post_id) DO NOTHING").
+			Exec(ctx)
+		if err != nil {
+			return eris.Wrapf(err, "failed to create tag-post relationship: %s -> %s", tag.Slug, postSlug)
+		}
+	}
+
+	// Create project relationships
+	for _, projectSlug := range tag.ProjectSlugs {
+		project, err := p.findProjectBySlug(ctx, projectSlug, tag.Slug)
+		if err != nil {
+			return err
+		}
+
+		_, err = p.db.NewInsert().
+			Model(&assets.ProjectToTag{
+				TagID:     tag.ID,
+				ProjectID: project.ID,
+			}).
+			On("CONFLICT (tag_id, project_id) DO NOTHING").
+			Exec(ctx)
+		if err != nil {
+			return eris.Wrapf(err, "failed to create tag-project relationship: %s -> %s", tag.Slug, projectSlug)
+		}
+	}
+
+	return nil
 }
