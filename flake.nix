@@ -111,16 +111,16 @@
             description = "Code Generation Steps for specific directory changes.";
           };
           generate-js = {
-             exec = ''
-               ${pkgs.bun}/bin/bun build \
-                   $REPO_ROOT/index.js \
-                   --minify \
-                   --minify-syntax \
-                   --minify-whitespace  \
-                   --minify-identifiers \
-                   --outdir $REPO_ROOT/cmd/conneroh/_static/dist/ &
-             '';
-             description = "Generate JS files";
+            exec = ''
+              ${pkgs.bun}/bin/bun build \
+                  $REPO_ROOT/index.js \
+                  --minify \
+                  --minify-syntax \
+                  --minify-whitespace  \
+                  --minify-identifiers \
+                  --outdir $REPO_ROOT/cmd/conneroh/_static/dist/ &
+            '';
+            description = "Generate JS files";
           };
           generate-all = {
             exec = ''
