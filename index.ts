@@ -19,5 +19,4 @@ Alpine.start();
 
 import htmx from "htmx.org";
 
-htmx.logAll();
 htmx.config.globalViewTransitions = true;
