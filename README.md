@@ -214,7 +214,7 @@ Alpine.js is used for client-side interactivity:
 
 ## Contributing
 
-This project is personal, but suggestions and bug reports are welcome. Please open an issue or submit a pull request.
+This project is personal, but suggestions and bug reports are most welcome. Please open an issue or submit a pull request.
 
 ## Author
 
