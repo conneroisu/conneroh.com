@@ -18,7 +18,6 @@ func ToPost(tP *assets.Post, fD *assets.Doc) {
 	tP.Content = fD.Content
 	tP.BannerPath = fD.BannerPath
 	tP.CreatedAt = fD.CreatedAt
-	tP.UpdatedAt = fD.UpdatedAt
 	tP.TagSlugs = fD.TagSlugs
 	tP.PostSlugs = fD.PostSlugs
 	tP.ProjectSlugs = fD.ProjectSlugs
@@ -38,7 +37,6 @@ func ToProject(tP *assets.Project, fD *assets.Doc) {
 	tP.Content = fD.Content
 	tP.BannerPath = fD.BannerPath
 	tP.CreatedAt = fD.CreatedAt
-	tP.UpdatedAt = fD.UpdatedAt
 	tP.TagSlugs = fD.TagSlugs
 	tP.PostSlugs = fD.PostSlugs
 	tP.ProjectSlugs = fD.ProjectSlugs
@@ -57,7 +55,6 @@ func ToTag(tT *assets.Tag, fD *assets.Doc) {
 	tT.BannerPath = fD.BannerPath
 	tT.Icon = fD.Icon
 	tT.CreatedAt = fD.CreatedAt
-	tT.UpdatedAt = fD.UpdatedAt
 	tT.TagSlugs = fD.TagSlugs
 	tT.PostSlugs = fD.PostSlugs
 	tT.ProjectSlugs = fD.ProjectSlugs
@@ -88,7 +85,6 @@ func CachedToPost(tP *assets.Post, fC *assets.Cache, fD *assets.Doc) {
 	tP.Content = fD.Content
 	tP.BannerPath = fD.BannerPath
 	tP.CreatedAt = fD.CreatedAt
-	tP.UpdatedAt = fD.UpdatedAt
 	tP.TagSlugs = fD.TagSlugs
 	tP.PostSlugs = fD.PostSlugs
 	tP.ProjectSlugs = fD.ProjectSlugs
@@ -110,7 +106,6 @@ func CachedToProject(tP *assets.Project, fC *assets.Cache, fD *assets.Doc) {
 	tP.Content = fD.Content
 	tP.BannerPath = fD.BannerPath
 	tP.CreatedAt = fD.CreatedAt
-	tP.UpdatedAt = fD.UpdatedAt
 	tP.TagSlugs = fD.TagSlugs
 	tP.PostSlugs = fD.PostSlugs
 	tP.ProjectSlugs = fD.ProjectSlugs
@@ -131,7 +126,6 @@ func CachedToTag(tT *assets.Tag, fC *assets.Cache, fD *assets.Doc) {
 	tT.BannerPath = fD.BannerPath
 	tT.Icon = fD.Icon
 	tT.CreatedAt = fD.CreatedAt
-	tT.UpdatedAt = fD.UpdatedAt
 	tT.TagSlugs = fD.TagSlugs
 	tT.PostSlugs = fD.PostSlugs
 	tT.ProjectSlugs = fD.ProjectSlugs

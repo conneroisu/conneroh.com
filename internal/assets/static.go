@@ -95,7 +95,7 @@ type (
 		Content     string     `bun:"content"`
 		BannerPath  string     `bun:"banner_path"`
 		CreatedAt   CustomTime `bun:"created_at"`
-		UpdatedAt   CustomTime `bun:"updated_at"`
+		// UpdatedAt   CustomTime `bun:"updated_at"`
 
 		TagSlugs     []string
 		PostSlugs    []string
@@ -123,7 +123,7 @@ type (
 		Content     string     `bun:"content"`
 		BannerPath  string     `bun:"banner_path"`
 		CreatedAt   CustomTime `bun:"created_at"`
-		UpdatedAt   CustomTime `bun:"updated_at"`
+		// UpdatedAt   CustomTime `bun:"updated_at"`
 
 		TagSlugs     []string `bun:"tag_slugs"`
 		PostSlugs    []string `bun:"post_slugs"`
@@ -151,7 +151,7 @@ type (
 		BannerPath  string     `bun:"banner_path"`
 		Icon        string     `bun:"icon"`
 		CreatedAt   CustomTime `bun:"created_at"`
-		UpdatedAt   CustomTime `bun:"updated_at"`
+		// UpdatedAt   CustomTime `bun:"updated_at"`
 
 		TagSlugs     []string `bun:"tag_slugs"`
 		PostSlugs    []string `bun:"post_slugs"`
