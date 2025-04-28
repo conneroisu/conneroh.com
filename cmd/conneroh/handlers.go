@@ -267,11 +267,11 @@ func HandleHome(db *bun.DB) func(w http.ResponseWriter, r *http.Request) error {
 			&allProjects,
 			&allTags,
 		)
+		homePage = &home
 		routing.CompMorphableHandler(
 			layouts.Page,
 			home,
 		).ServeHTTP(w, r)
-		homePage = &home
 		return nil
 	}
 }
@@ -373,8 +373,8 @@ func HandleProject(db *bun.DB) routing.APIFunc {
 			slug = routing.Slug(r)
 		)
 		if c, ok = projectMap[slug]; ok {
-			routing.MorphableHandler(
-				layouts.Page(c),
+			routing.CompMorphableHandler(
+				layouts.Page,
 				c,
 			).ServeHTTP(w, r)
 			return nil
@@ -475,11 +475,11 @@ func HandleTag(db *bun.DB) routing.APIFunc {
 			)
 		}
 		comp = views.Tag(&tag)
+		tagMap[slug] = comp
 		routing.CompMorphableHandler(
 			layouts.Page,
 			comp,
 		).ServeHTTP(w, r)
-		tagMap[slug] = comp
 		return nil
 	}
 }
@@ -517,11 +517,11 @@ func HandlePosts(db *bun.DB) routing.APIFunc {
 			1,
 			(len(allPosts)+routing.MaxListLargeItems-1)/routing.MaxListLargeItems,
 		)
+		postList = &posts
 		routing.CompMorphableHandler(
 			layouts.Page,
 			posts,
 		).ServeHTTP(w, r)
-		postList = &posts
 		return nil
 	}
 }
