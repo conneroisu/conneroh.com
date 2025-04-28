@@ -152,6 +152,7 @@
           };
           run = {
             exec = ''
+              export DEBUG=true
               cd $REPO_ROOT && air
             '';
             description = "Run the application with air for hot reloading";
