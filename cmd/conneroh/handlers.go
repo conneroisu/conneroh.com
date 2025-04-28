@@ -53,6 +53,7 @@ func handleContactForm() routing.APIFunc {
 			)
 		}
 		// TODO: Send email
+
 		templ.Handler(components.ThankYou()).ServeHTTP(w, r)
 		return nil
 	}

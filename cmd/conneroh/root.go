@@ -36,7 +36,7 @@ const (
 	readHeaderTimeout = 5 * time.Second
 )
 
-// NewServer creates a new web-ui server
+// NewServer creates a new server.
 func NewServer(
 	ctx context.Context,
 ) (http.Handler, error) {
@@ -50,7 +50,9 @@ func NewServer(
 	db := bun.NewDB(sqlDB, sqlitedialect.New())
 	assets.RegisterModels(db)
 
-	db.AddQueryHook(bundebug.NewQueryHook(bundebug.WithVerbose(true)))
+	if os.Getenv("DEBUG") == "true" {
+		db.AddQueryHook(bundebug.NewQueryHook(bundebug.WithVerbose(true)))
+	}
 	err = AddRoutes(ctx, mux, db)
 	if err != nil {
 		return nil, eris.Wrap(err, "error adding routes")
@@ -151,7 +153,7 @@ func Run(
 			)
 		}
 
-		// Wait for all goroutines to finish
+		// Wait for all go-routines to finish
 		slog.Info("waiting for server shutdown to complete")
 		wg.Wait()
 		slog.Info("server shutdown completed")

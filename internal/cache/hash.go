@@ -96,7 +96,7 @@ func SplitGlobPath(globPath string) (string, string) {
 
 	// Find the last directory separator before a glob character
 	lastSep := -1
-	for i := 0; i < len(globPath); i++ {
+	for i := range len(globPath) {
 		if globPath[i] == '/' || globPath[i] == '\\' {
 			lastSep = i
 		}
@@ -185,14 +185,20 @@ func hashDir(fs afero.Fs, path string, globPattern string) (string, error) {
 		}
 
 		// Include the relative path in the hash
-		io.WriteString(h, relPath)
+		_, err = io.WriteString(h, relPath)
+		if err != nil {
+			return "", err
+		}
 
 		fileHash, err := hashFile(fs, file)
 		if err != nil {
 			return "", err
 		}
 
-		io.WriteString(h, fileHash)
+		_, err = io.WriteString(h, fileHash)
+		if err != nil {
+			return "", err
+		}
 	}
 
 	return hex.EncodeToString(h.Sum(nil)), nil
@@ -221,7 +227,7 @@ func aferoGlob(fs afero.Fs, pattern string) ([]string, error) {
 	}
 	defer dirFile.Close()
 
-	dirList, err := dirFile.(afero.File).Readdirnames(-1)
+	dirList, err := dirFile.Readdirnames(-1)
 	if err != nil {
 		return nil, err
 	}
