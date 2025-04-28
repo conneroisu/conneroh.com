@@ -981,7 +981,6 @@ func (p *Processor) savePost(ctx context.Context, doc *assets.Doc) error {
 		Set("content = EXCLUDED.content").
 		Set("banner_path = EXCLUDED.banner_path").
 		Set("created_at = EXCLUDED.created_at").
-		Set("updated_at = EXCLUDED.updated_at").
 		Set("x = EXCLUDED.x").
 		Set("y = EXCLUDED.y").
 		Set("z = EXCLUDED.z").
@@ -1031,7 +1030,6 @@ func (p *Processor) saveProject(ctx context.Context, doc *assets.Doc) error {
 		Set("content = EXCLUDED.content").
 		Set("banner_path = EXCLUDED.banner_path").
 		Set("created_at = EXCLUDED.created_at").
-		Set("updated_at = EXCLUDED.updated_at").
 		Set("x = EXCLUDED.x").
 		Set("y = EXCLUDED.y").
 		Set("z = EXCLUDED.z").
@@ -1081,7 +1079,6 @@ func (p *Processor) saveTag(ctx context.Context, doc *assets.Doc) error {
 		Set("content = EXCLUDED.content").
 		Set("banner_path = EXCLUDED.banner_path").
 		Set("created_at = EXCLUDED.created_at").
-		Set("updated_at = EXCLUDED.updated_at").
 		Set("x = EXCLUDED.x").
 		Set("y = EXCLUDED.y").
 		Set("z = EXCLUDED.z").
