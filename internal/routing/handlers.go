@@ -54,6 +54,21 @@ func MorphableHandler(
 	}
 }
 
+// CompMorphableHandler returns a handler that checks for the presence of the
+func CompMorphableHandler(
+	wrapper func(comp templ.Component) templ.Component,
+	morph templ.Component,
+) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var header = r.Header.Get(hx.HdrRequest)
+		if header == "" {
+			templ.Handler(wrapper(morph)).ServeHTTPStreamed(w, r)
+		} else {
+			templ.Handler(morph).ServeHTTPStreamed(w, r)
+		}
+	}
+}
+
 // BytesHandler returns a handler that writes the given bytes to the response.
 func BytesHandler(b []byte) http.HandlerFunc {
 	return Make(func(w http.ResponseWriter, r *http.Request) error {

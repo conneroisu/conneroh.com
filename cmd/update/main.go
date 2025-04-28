@@ -29,9 +29,6 @@ import (
 var (
 	workers    = flag.Int("workers", 20, "number of parallel workers")
 	taskBuffer = flag.Int("buffer", 1000, "size of task buffer")
-	// dbTimeout  = flag.Duration("db-timeout", 5*time.Second, "database operation timeout")
-	// batchSize  = flag.Int("batch-size", 50, "database batch operation size")
-	// maxRetries = flag.Int("max-retries", 3, "maximum number of retries for failed operations")
 )
 
 func main() {
@@ -68,6 +65,7 @@ func Run(ctx context.Context, getenv func(string) string, numWorkers, bufferSize
 
 	// Initialize BUN DB
 	db := bun.NewDB(sqldb, sqlitedialect.New())
+
 	// db.AddQueryHook(bundebug.NewQueryHook(bundebug.WithVerbose(true)))
 
 	// Initialize database tables

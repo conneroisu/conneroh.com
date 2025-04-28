@@ -220,8 +220,8 @@ func HandleHome(db *bun.DB) func(w http.ResponseWriter, r *http.Request) error {
 	var homePage *templ.Component
 	return func(w http.ResponseWriter, r *http.Request) error {
 		if homePage != nil {
-			routing.MorphableHandler(
-				layouts.Page(*homePage),
+			routing.CompMorphableHandler(
+				layouts.Page,
 				*homePage,
 			).ServeHTTP(w, r)
 			return nil
@@ -267,8 +267,8 @@ func HandleHome(db *bun.DB) func(w http.ResponseWriter, r *http.Request) error {
 			&allProjects,
 			&allTags,
 		)
-		routing.MorphableHandler(
-			layouts.Page(home),
+		routing.CompMorphableHandler(
+			layouts.Page,
 			home,
 		).ServeHTTP(w, r)
 		homePage = &home
@@ -282,8 +282,8 @@ func HandleProjects(db *bun.DB) routing.APIFunc {
 	var projectList *templ.Component
 	return func(w http.ResponseWriter, r *http.Request) error {
 		if projectList != nil {
-			routing.MorphableHandler(
-				layouts.Page(*projectList),
+			routing.CompMorphableHandler(
+				layouts.Page,
 				*projectList,
 			).ServeHTTP(w, r)
 			return nil
@@ -311,8 +311,11 @@ func HandleProjects(db *bun.DB) routing.APIFunc {
 			1,
 			(len(allProjects)+routing.MaxListLargeItems-1)/routing.MaxListLargeItems,
 		)
-		routing.MorphableHandler(layouts.Page(projects), projects).ServeHTTP(w, r)
 		projectList = &projects
+		routing.CompMorphableHandler(
+			layouts.Page,
+			projects,
+		).ServeHTTP(w, r)
 		return nil
 	}
 }
@@ -324,14 +327,14 @@ func HandlePost(db *bun.DB) routing.APIFunc {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		var (
 			p    assets.Post
-			c    templ.Component
+			comp templ.Component
 			ok   bool
 			slug = routing.Slug(r)
 		)
-		if c, ok = postMap[slug]; ok {
-			routing.MorphableHandler(
-				layouts.Page(c),
-				c,
+		if comp, ok = postMap[slug]; ok {
+			routing.CompMorphableHandler(
+				layouts.Page,
+				comp,
 			).ServeHTTP(w, r)
 			return nil
 		}
@@ -348,10 +351,12 @@ func HandlePost(db *bun.DB) routing.APIFunc {
 				"failed to scan post",
 			)
 		}
-		c = views.Post(&p)
-		routing.MorphableHandler(layouts.Page(c), c).
-			ServeHTTP(w, r)
-		postMap[slug] = c
+		comp = views.Post(&p)
+		postMap[slug] = comp
+		routing.CompMorphableHandler(
+			layouts.Page,
+			comp,
+		).ServeHTTP(w, r)
 		return nil
 	}
 }
@@ -387,11 +392,11 @@ func HandleProject(db *bun.DB) routing.APIFunc {
 			)
 		}
 		c = views.Project(&p)
-		routing.MorphableHandler(
-			layouts.Page(c),
+		projectMap[slug] = c
+		routing.CompMorphableHandler(
+			layouts.Page,
 			c,
 		).ServeHTTP(w, r)
-		projectMap[slug] = c
 		return nil
 	}
 }
@@ -402,8 +407,8 @@ func HandleTags(db *bun.DB) routing.APIFunc {
 	var tagList *templ.Component
 	return func(w http.ResponseWriter, r *http.Request) error {
 		if tagList != nil {
-			routing.MorphableHandler(
-				layouts.Page(*tagList),
+			routing.CompMorphableHandler(
+				layouts.Page,
 				*tagList,
 			).ServeHTTP(w, r)
 			return nil
@@ -430,8 +435,11 @@ func HandleTags(db *bun.DB) routing.APIFunc {
 			1,
 			(len(allTags)+routing.MaxListSmallItems-1)/routing.MaxListSmallItems,
 		)
-		routing.MorphableHandler(layouts.Page(tags), tags).ServeHTTP(w, r)
 		tagList = &tags
+		routing.CompMorphableHandler(
+			layouts.Page,
+			tags,
+		).ServeHTTP(w, r)
 		return nil
 	}
 }
@@ -442,19 +450,19 @@ func HandleTag(db *bun.DB) routing.APIFunc {
 	var tagMap = map[string]templ.Component{}
 	return func(w http.ResponseWriter, r *http.Request) error {
 		var (
-			t    assets.Tag
-			c    templ.Component
+			tag  assets.Tag
+			comp templ.Component
 			ok   bool
 			slug = routing.Slug(r)
 		)
-		if c, ok = tagMap[slug]; ok {
-			routing.MorphableHandler(
-				layouts.Page(c),
-				c,
+		if comp, ok = tagMap[slug]; ok {
+			routing.CompMorphableHandler(
+				layouts.Page,
+				comp,
 			).ServeHTTP(w, r)
 			return nil
 		}
-		err := db.NewSelect().Model(&t).
+		err := db.NewSelect().Model(&tag).
 			Where("slug = ?", routing.Slug(r)).
 			Relation("Tags").
 			Relation("Posts").
@@ -466,12 +474,12 @@ func HandleTag(db *bun.DB) routing.APIFunc {
 				"failed to scan tag",
 			)
 		}
-		c = views.Tag(&t)
-		routing.MorphableHandler(
-			layouts.Page(c),
-			c,
+		comp = views.Tag(&tag)
+		routing.CompMorphableHandler(
+			layouts.Page,
+			comp,
 		).ServeHTTP(w, r)
-		tagMap[slug] = c
+		tagMap[slug] = comp
 		return nil
 	}
 }
@@ -482,8 +490,8 @@ func HandlePosts(db *bun.DB) routing.APIFunc {
 	var postList *templ.Component
 	return func(w http.ResponseWriter, r *http.Request) error {
 		if postList != nil {
-			routing.MorphableHandler(
-				layouts.Page(*postList),
+			routing.CompMorphableHandler(
+				layouts.Page,
 				*postList,
 			).ServeHTTP(w, r)
 			return nil
@@ -509,7 +517,10 @@ func HandlePosts(db *bun.DB) routing.APIFunc {
 			1,
 			(len(allPosts)+routing.MaxListLargeItems-1)/routing.MaxListLargeItems,
 		)
-		routing.MorphableHandler(layouts.Page(posts), posts).ServeHTTP(w, r)
+		routing.CompMorphableHandler(
+			layouts.Page,
+			posts,
+		).ServeHTTP(w, r)
 		postList = &posts
 		return nil
 	}
