@@ -340,7 +340,11 @@
               "NIX_SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
             ];
           };
-          copyToRoot = [conneroh pkgs.cacert];
+          copyToRoot = [
+            conneroh
+            pkgs.cacert
+            ./master.db
+          ];
         };
         deployPackage = let
           settingsFormat = pkgs.formats.toml {};

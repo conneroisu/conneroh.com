@@ -20,4 +20,3 @@ tigris.yaml
 cache.sqlite
 *.db-shm
 *.db-wal
-.pre-commit-config.yaml
