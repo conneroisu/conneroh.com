@@ -310,8 +310,8 @@
         vendorHash = null;
         # Create a derivation for the database file
         databaseFiles = pkgs.runCommand "database-files" {} ''
-          mkdir -p $out
-          cp ${./master.db} $out/master.db
+          mkdir -p $out/root
+          cp ${./master.db} $out/root/master.db
         '';
       in rec {
         conneroh = pkgs.buildGo124Module {
