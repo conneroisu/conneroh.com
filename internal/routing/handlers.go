@@ -1,7 +1,6 @@
 package routing
 
 import (
-	"fmt"
 	"log/slog"
 	"net/http"
 
@@ -16,7 +15,7 @@ var (
 		slog.Error(
 			"api error",
 			"err",
-			fmt.Sprintf("%T", err),
+			err.Error(),
 			"method",
 			r.Method,
 			"path",
