@@ -422,7 +422,7 @@
             ${pkgs.flyctl}/bin/fly deploy \
               --remote-only \
               -c "$CONFIG_FILE" \
-              -i "$REGISTY" \
+              -i "$REGISTY:latest" \
               -t "$TOKEN"
           '';
       };
