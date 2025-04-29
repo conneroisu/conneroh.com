@@ -308,6 +308,11 @@
         version = self.shortRev or "dirty";
         src = ./.;
         vendorHash = null;
+        # Create a derivation for the database file
+        databaseFiles = pkgs.runCommand "database-files" {} ''
+          mkdir -p $out
+          cp ${./master.db} $out/master.db
+        '';
       in rec {
         conneroh = pkgs.buildGo124Module {
           inherit src vendorHash version;
@@ -343,7 +348,7 @@
           copyToRoot = [
             conneroh
             pkgs.cacert
-            ./master.db
+            databaseFiles
           ];
         };
         deployPackage = let
