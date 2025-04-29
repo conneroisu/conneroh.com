@@ -9,7 +9,6 @@
       inputs.systems.follows = "systems";
     };
     bun2nix.url = "github:baileyluTCD/bun2nix";
-    pre-commit-hooks.url = "github:cachix/git-hooks.nix";
   };
 
   nixConfig = {
@@ -425,16 +424,6 @@
               -i "$REGISTY:latest" \
               -t "$TOKEN"
           '';
-      };
-      checks.pre-commit-check = inputs.pre-commit-hooks.lib.${system}.run {
-        src = ./.;
-        hooks = {
-          alejandra.enable = true;
-          deadnix.enable = true;
-          gofmt.enable = true;
-          golangci-lint.enable = true;
-          statix.enable = true;
-        };
       };
     });
 }
