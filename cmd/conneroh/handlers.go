@@ -532,6 +532,9 @@ func searchHandler(
 	return func(w http.ResponseWriter, r *http.Request) {
 	}
 }
+// filter returns a paginated slice of items matching the search query, ranked by relevance across multiple fields.
+// The function scores and filters items concurrently, prioritizing matches in the title, description, content, tags, and icon fields depending on the item type.
+// Results are sorted by descending relevance before pagination. If the query is empty, all items are returned paginated.
 func filter[T any](
 	items []T,
 	query string,
