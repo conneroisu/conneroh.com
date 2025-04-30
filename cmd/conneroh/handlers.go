@@ -541,6 +541,10 @@ func filter[T any](
 ) ([]T, int) {
 	// If query is empty, return all items
 	if query == "" {
+		sort.Slice(items, func(i, j int) bool {
+			return strings.ToLower(titleGetter(items[i])) <
+				strings.ToLower(titleGetter(items[j]))
+		})
 		return routing.Paginate(items, page, pageSize)
 	}
 
