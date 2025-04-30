@@ -5,6 +5,8 @@ import (
 	"embed"
 )
 
+// TODO: Remove these embeds?
+
 // Posts contains all posts.
 //
 //go:embed posts/*

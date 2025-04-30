@@ -3,9 +3,9 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"flag"
 	"fmt"
-	"io"
 	"os"
 	"time"
 
@@ -13,104 +13,26 @@ import (
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/layouts"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/views"
 	"github.com/conneroisu/conneroh.com/internal/assets"
-	"github.com/conneroisu/conneroh.com/internal/data/gen"
 	"github.com/conneroisu/conneroh.com/internal/routing"
 	"github.com/conneroisu/twerge"
+	"github.com/rotisserie/eris"
+	"github.com/uptrace/bun"
+	"github.com/uptrace/bun/dialect/sqlitedialect"
+	"github.com/uptrace/bun/extra/bundebug"
+
+	_ "modernc.org/sqlite"
 )
 
 var cwd = flag.String("cwd", "", "current working directory")
 
-func genCSS(ctx context.Context) error {
-	var (
-		_ = layouts.Page(views.Home(
-			&gen.AllPosts,
-			&gen.AllProjects,
-			&gen.AllTags,
-		)).Render(ctx, io.Discard)
-		_ = layouts.Page(views.List(
-			routing.PostPluralPath,
-			&gen.AllPosts,
-			&gen.AllProjects,
-			&gen.AllTags,
-			"",
-			1,
-			10,
-		)).Render(ctx, io.Discard)
-		_ = layouts.Page(views.List(
-			routing.ProjectPluralPath,
-			&gen.AllPosts,
-			&gen.AllProjects,
-			&gen.AllTags,
-			"",
-			1,
-			10,
-		)).Render(ctx, io.Discard)
-		_ = layouts.Page(views.List(
-			routing.TagsPluralPath,
-			&gen.AllPosts,
-			&gen.AllProjects,
-			&gen.AllTags,
-			"",
-			1,
-			10,
-		)).Render(ctx, io.Discard)
-		_ = components.TagControl(
-			&assets.Tag{},
-		).Render(ctx, io.Discard)
-		_ = layouts.Page(views.Post(
-			gen.AllPosts[0],
-			&gen.AllPosts,
-			&gen.AllProjects,
-			&gen.AllTags,
-		)).Render(ctx, io.Discard)
-		_ = layouts.Page(views.Project(
-			gen.AllProjects[0],
-			&gen.AllPosts,
-			&gen.AllProjects,
-			&gen.AllTags,
-		)).Render(ctx, io.Discard)
-		_ = layouts.Page(views.Tag(
-			gen.AllTags[0],
-			&gen.AllPosts,
-			&gen.AllProjects,
-			&gen.AllTags,
-		)).Render(ctx, io.Discard)
-		_ = views.Post(
-			gen.AllPosts[0],
-			&gen.AllPosts,
-			&gen.AllProjects,
-			&gen.AllTags,
-		).Render(ctx, io.Discard)
-		_ = layouts.Layout("hello").Render(ctx, io.Discard)
-	)
-	content := twerge.GenerateClassMapCode("css")
-	f, err := os.Create("internal/data/css/classes.go")
-	if err != nil {
-		return err
+func main() {
+	if err := run(context.Background()); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
 	}
-	defer func() {
-		err = f.Close()
-		if err != nil {
-			panic(err)
-		}
-	}()
-	_, err = f.WriteString(content)
-	if err != nil {
-		return err
-	}
-	err = twerge.GenerateTailwind("input.css")
-	if err != nil {
-		return err
-	}
-	err = twerge.GenerateTempl("internal/data/css/classes.templ")
-	if err != nil {
-		return err
-	}
-	println("Generated classes.go.")
-	return nil
 }
 
-func main() {
+func run(ctx context.Context) error {
 	start := time.Now()
 	defer func() {
 		elapsed := time.Since(start)
@@ -123,7 +45,100 @@ func main() {
 			panic(err)
 		}
 	}
-	if err := genCSS(context.Background()); err != nil {
+	sqlDB, err := sql.Open("sqlite", assets.DBName())
+	if err != nil {
 		panic(err)
 	}
+	db := bun.NewDB(sqlDB, sqlitedialect.New())
+	assets.RegisterModels(db)
+	db.AddQueryHook(bundebug.NewQueryHook(bundebug.WithVerbose(true)))
+
+	var (
+		allPosts    []*assets.Post
+		allProjects []*assets.Project
+		allTags     []*assets.Tag
+	)
+
+	err = db.NewSelect().
+		Model(&allPosts).
+		Relation("Tags").
+		Relation("Posts").
+		Relation("Projects").
+		Scan(ctx)
+	if err != nil {
+		return eris.Wrapf(err, "(update-css) failed to get posts")
+	}
+	err = db.NewSelect().
+		Model(&allProjects).
+		Relation("Tags").
+		Relation("Posts").
+		Relation("Projects").
+		Scan(ctx)
+	if err != nil {
+		return eris.Wrapf(err, "(update-css) failed to get projects")
+	}
+	err = db.NewSelect().
+		Model(&allTags).
+		Relation("Tags").
+		Relation("Posts").
+		Relation("Projects").
+		Scan(ctx)
+	if err != nil {
+		return eris.Wrapf(err, "(update-css) failed to get tags")
+	}
+	return twerge.CodeGen(
+		twerge.Default(),
+		"internal/data/css/classes.go",
+		"input.css",
+		"internal/data/css/classes.html",
+		layouts.Page(views.Home(
+			&allPosts,
+			&allProjects,
+			&allTags,
+		)),
+		layouts.Page(views.List(
+			routing.PostPluralPath,
+			&allPosts,
+			&allProjects,
+			&allTags,
+			"",
+			1,
+			10,
+		)),
+		layouts.Page(views.List(
+			routing.ProjectPluralPath,
+			&allPosts,
+			&allProjects,
+			&allTags,
+			"",
+			1,
+			10,
+		)),
+		layouts.Page(views.List(
+			routing.TagsPluralPath,
+			&allPosts,
+			&allProjects,
+			&allTags,
+			"",
+			1,
+			10,
+		)),
+		components.TagControl(
+			&assets.Tag{},
+		),
+		layouts.Page(views.Post(
+			allPosts[0],
+		)),
+		layouts.Page(views.Project(
+			allProjects[0],
+		)),
+		layouts.Page(views.Tag(
+			allTags[0],
+		)),
+		views.Post(
+			allPosts[0],
+		),
+		layouts.Layout("hello"),
+		components.ThankYou(),
+	)
 }

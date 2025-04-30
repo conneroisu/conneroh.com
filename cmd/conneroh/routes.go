@@ -2,121 +2,70 @@ package conneroh
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
 	"net/http"
 
 	static "github.com/conneroisu/conneroh.com/cmd/conneroh/_static"
-	"github.com/conneroisu/conneroh.com/cmd/conneroh/layouts"
-	"github.com/conneroisu/conneroh.com/cmd/conneroh/views"
-	"github.com/conneroisu/conneroh.com/internal/data/gen"
+	"github.com/conneroisu/conneroh.com/internal/assets"
 	"github.com/conneroisu/conneroh.com/internal/routing"
+	"github.com/uptrace/bun"
+)
+
+var (
+	// Instance Caches
+	allPosts    = []*assets.Post{}
+	allProjects = []*assets.Project{}
+	allTags     = []*assets.Tag{}
 )
 
 // AddRoutes adds all routes to the router.
 func AddRoutes(
 	_ context.Context,
 	h *http.ServeMux,
+	db *bun.DB,
 ) error {
 	slog.Info("adding routes")
 	defer slog.Info("added routes")
 
-	h.Handle(
-		"/{$}",
-		routing.MorphableHandler(
-			layouts.Page(home),
-			home,
-		))
-	h.Handle(
-		"GET /dist/",
-		http.FileServer(http.FS(static.Dist)))
+	h.Handle("GET /dist/", http.FileServer(http.FS(static.Dist)))
+	h.HandleFunc("GET /favicon.ico", routing.BytesHandler(static.Favicon))
+
 	h.HandleFunc(
-		"GET /favicon.ico",
-		func(w http.ResponseWriter, _ *http.Request) {
-			_, _ = w.Write(static.Favicon)
-		})
+		"GET /{$}",
+		routing.Make(HandleHome(db)))
+	h.HandleFunc(
+		"POST /contact",
+		routing.Make(handleContactForm()))
 	h.HandleFunc(
 		"GET /search/all",
-		globalSearchHandler(gen.AllPosts, gen.AllProjects, gen.AllTags))
-
-	h.Handle(
+		searchHandler(db))
+	h.HandleFunc(
 		"GET /posts",
-		routing.MorphableHandler(layouts.Page(posts), posts))
+		routing.Make(HandlePosts(db)))
 	h.Handle(
 		"GET /search/posts",
-		listHandler(routing.PostPluralPath))
-
-	h.Handle(
+		routing.Make(listHandler(routing.PostPluralPath, db)))
+	h.HandleFunc(
+		"GET /post/{slug...}",
+		routing.Make(HandlePost(db)))
+	h.HandleFunc(
 		"GET /projects",
-		routing.MorphableHandler(layouts.Page(projects), projects))
+		routing.Make(HandleProjects(db)))
 	h.Handle(
 		"GET /search/projects",
-		listHandler(routing.ProjectPluralPath))
-
-	h.Handle(
+		routing.Make(listHandler(routing.ProjectPluralPath, db)))
+	h.HandleFunc(
+		"GET /project/{slug...}",
+		routing.Make(HandleProject(db)))
+	h.HandleFunc(
 		"GET /tags",
-		routing.MorphableHandler(layouts.Page(tags), tags))
+		routing.Make(HandleTags(db)))
 	h.Handle(
 		"GET /search/tags",
-		listHandler(routing.TagsPluralPath))
-
-	for _, p := range gen.AllPosts {
-		h.Handle(
-			fmt.Sprintf("GET /post/%s", p.Slug),
-			routing.MorphableHandler(
-				layouts.Page(views.Post(
-					p,
-					&gen.AllPosts,
-					&gen.AllProjects,
-					&gen.AllTags,
-				)),
-				views.Post(
-					p,
-					&gen.AllPosts,
-					&gen.AllProjects,
-					&gen.AllTags,
-				),
-			),
-		)
-	}
-	for _, p := range gen.AllProjects {
-		h.Handle(
-			fmt.Sprintf("GET /project/%s", p.Slug),
-			routing.MorphableHandler(
-				layouts.Page(views.Project(
-					p,
-					&gen.AllPosts,
-					&gen.AllProjects,
-					&gen.AllTags,
-				)),
-				views.Project(
-					p,
-					&gen.AllPosts,
-					&gen.AllProjects,
-					&gen.AllTags,
-				),
-			),
-		)
-	}
-	for _, t := range gen.AllTags {
-		h.Handle(
-			fmt.Sprintf("GET /tag/%s", t.Slug),
-			routing.MorphableHandler(
-				layouts.Page(views.Tag(
-					t,
-					&gen.AllPosts,
-					&gen.AllProjects,
-					&gen.AllTags,
-				)),
-				views.Tag(
-					t,
-					&gen.AllPosts,
-					&gen.AllProjects,
-					&gen.AllTags,
-				),
-			),
-		)
-	}
+		routing.Make(listHandler(routing.TagsPluralPath, db)))
+	h.HandleFunc(
+		"GET /tag/{slug...}",
+		routing.Make(HandleTag(db)))
 
 	return nil
 }

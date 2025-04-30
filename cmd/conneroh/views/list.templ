@@ -137,14 +137,16 @@ templ ListResults(
 			case routing.ProjectPluralPath:
 				for i, project := range *projects {
 					if i < routing.MaxListLargeItems {
-						@components.ProjectItem(project,
+						@components.ProjectItem(
+							project,
 							templ.Attributes{
 								"class":       twerge.It("bg-gray-800 transition-all flex transform hover:-translate-y-3 flex-col shadow-md rounded-lg hover:shadow-lg duration-300 overflow-hidden h-full"),
 								"hx-target":   "#bodiody",
 								"hx-get":      project.PagePath(),
 								"hx-push-url": "true",
 								"preload":     "mouseover",
-							})
+							},
+						)
 					}
 				}
 			case routing.TagsPluralPath:

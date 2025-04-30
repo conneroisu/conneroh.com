@@ -1,7 +1,110 @@
 # twerge
 <!-- https://pkg.go.dev/github.com/conneroisu/twerge -->
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/conneroisu/twerge.svg)](https://pkg.go.dev/github.com/conneroisu/twerge)
+[![Go Report Card](https://goreportcard.com/badge/github.com/conneroisu/twerge)](https://goreportcard.com/report/github.com/conneroisu/twerge)
+[![GoDoc](https://godoc.org/github.com/conneroisu/twerge?status.svg)](https://godoc.org/github.com/conneroisu/twerge)
+
+![Logo](./assets/twerge.png)
+
 generates tailwind merges and classes from go templ sources
+
+## Usage
+
+You can install this library using the following command:
+
+```bash
+go get github.com/conneroisu/twerge@latest
+```
+
+You can then use `twerge` in your `.templ` files like so:
+
+```go
+package views
+
+import "github.com/conneroisu/twerge"
+
+templ ExampleTempl() {
+    <div class=twerge.It("bg-blue-500 text-blue-700")>
+        <h1 class=twerge.It("text-2xl font-bold")>Hello, world!</h1>
+    </div>
+}
+```
+
+This will generate the following CSS in a code generation step:
+
+```css
+/* twerge:begin */
+.tw-1 {
+    @apply bg-blue-500 text-blue-700;
+}
+.tw-2 {
+    @apply text-2xl font-bold;
+}
+/* twerge:end */
+```
+
+To generate the CSS, you can use the `CodeGen` function:
+
+```go
+import "github.com/conneroisu/twerge"
+
+func main() {
+    g := twerge.Default()
+    err := g.CodeGen(
+        g, 
+        "views/view.go",
+        "views/views.css",
+        "views/views.html",
+        views.ExampleTempl(),
+    )
+    if err != nil {
+        panic(err)
+    }
+}
+```
+
+## Development
+
+With a working [nix](https://nixos.org/) and [direnv](https://direnv.net/) installed, run the following commands to get started:
+```bash
+direnv allow
+```
+
+Project structure:
+```bash
+./.
+├── assets
+│   └── twerge.png
+├── benchmarks
+│   └── regexs
+│       └── main_test.go
+├── CLAUDE.md
+├── doc # documentation
+│   ├── book.toml # book configuration
+│   └── src # documentation source
+│       └── ...
+├── doc.go
+├── examples # examples
+├── flake.lock
+├── flake.nix
+├── go.mod # go module
+├── go.sum # go module checksums
+├── internal
+│   └── files # utilities for working with files
+│       ├── doc.go
+│       ├── interpolate.go
+│       ├── jen.go
+│       └── paths.go
+├── LICENSE # license
+├── LLMS.txt # notes for llms
+├── README.md # this file
+├── config.go # twerge configuration
+├── config_test.go # twerge configuration tests
+├── twerge.go # twerge implementation
+├── twerge_test.go # twerge tests
+└── tw.go # twerge code generation implementations
+```
 
 <!-- gomarkdoc:embed:start -->
 
@@ -31,112 +134,139 @@ className := twerge.Generate("text-red-500 bg-blue-500")
 // Returns something like: "tw-Ab3F5g7"
 ```
 
-Runtime Static Map Usage:
-
-```
-// Pre-register common classes
-twerge.RegisterClasses(map[string]string{
-  "bg-blue-500 text-white": "tw-btn-blue",
-  "bg-red-500 text-white": "tw-btn-red",
-})
-
-// Generate a class name at runtime
-className := twerge.RuntimeGenerate("p-4 m-2")
-// Returns a deterministic class name, stored in the runtime map
-
-// Generate CSS for all registered classes
-css := twerge.GetRuntimeClassHTML()
-// Returns CSS like: ".tw-btn-blue { @apply bg-blue-500 text-white; }"
-```
-
-For templ users:
-
-```
-<div class={ twerge.Merge("bg-blue-500 p-4 bg-red-500") }>
-  Using merged classes directly
-</div>
-
-<div class={ twerge.RuntimeGenerate("bg-blue-500 p-4") }>
-  Using runtime generated class name
-</div>
-
-<style>
-  @unsafe {
-    twerge.GetRuntimeClassHTML()
-  }
-</style>
-```
-
 ## Index
 
-- [Variables](<#variables>)
-- [func Generate\(classes string\) string](<#Generate>)
-- [func GenerateClassMapCode\(\) string](<#GenerateClassMapCode>)
-- [func GenerateTailwind\(inputPath, outputPath string, classMap map\[string\]string\) error](<#GenerateTailwind>)
-- [func WriteClassMapFile\(filepath string\) error](<#WriteClassMapFile>)
+- [func CodeGen\(g \*Generator, goPath string, cssPath string, htmlPath string, comps ...templ.Component\) error](<#CodeGen>)
+- [func If\(ok bool, trueClass string, falseClass string\) string](<#If>)
+- [func It\(raw string\) string](<#It>)
+- [func SetDefault\(g \*Generator\)](<#SetDefault>)
+- [type CacheValue](<#CacheValue>)
+- [type Generator](<#Generator>)
+  - [func Default\(\) \*Generator](<#Default>)
+  - [func New\(h Handler\) \*Generator](<#New>)
+  - [func \(Generator\) Cache\(\) map\[string\]CacheValue](<#Generator.Cache>)
+  - [func \(g \*Generator\) It\(classes string\) string](<#Generator.It>)
+- [type Handler](<#Handler>)
 
 
-## Variables
-
-<a name="ClassMapStr"></a>ClassMapStr is a map of class strings to their generated class names This variable can be populated by code generation or manually
-
-```go
-var ClassMapStr = make(map[string]string)
-```
-
-<a name="Merge"></a>
-
-```go
-var (
-    // Merge is the default template merger
-    // It takes a space-delimited string of TailwindCSS classes and returns a merged string
-    // It also adds the merged class to the ClassMapStr when used
-    // It will quickly return the generated class name from ClassMapStr if available
-    Merge = createTwMerge(nil, nil)
-)
-```
-
-<a name="Generate"></a>
-## func [Generate](<https://github.com/conneroisu/tmplmerge/blob/main/gen.go#L30>)
+<a name="CodeGen"></a>
+## func CodeGen
 
 ```go
-func Generate(classes string) string
+func CodeGen(g *Generator, goPath string, cssPath string, htmlPath string, comps ...templ.Component) error
 ```
 
-Generate creates a short unique CSS class name from the merged classes
+CodeGen generates all the code needed to use Twerge statically.
 
-<a name="GenerateClassMapCode"></a>
-## func [GenerateClassMapCode](<https://github.com/conneroisu/tmplmerge/blob/main/gen.go#L75>)
+<a name="If"></a>
+## func If
 
 ```go
-func GenerateClassMapCode() string
+func If(ok bool, trueClass string, falseClass string) string
 ```
 
-GenerateClassMapCode generates Go code for a variable containing the class mapping
+If returns a short unique CSS class name from the merged classes taking an additional boolean parameter.
 
-<a name="GenerateTailwind"></a>
-## func [GenerateTailwind](<https://github.com/conneroisu/tmplmerge/blob/main/utils.go#L71>)
+<a name="It"></a>
+## func It
 
 ```go
-func GenerateTailwind(inputPath, outputPath string, classMap map[string]string) error
+func It(raw string) string
 ```
 
-GenerateTailwind creates an input CSS file for the Tailwind CLI that includes all the @apply directives from the provided class map.
+It returns a short unique CSS class name from the merged classes.
 
-This is useful for building a production CSS file with Tailwind's CLI.
-
-The marker is used to identify the start and end of the @apply directives generated by Twerge.
-
-<a name="WriteClassMapFile"></a>
-## func [WriteClassMapFile](<https://github.com/conneroisu/tmplmerge/blob/main/gen.go#L109>)
+<a name="SetDefault"></a>
+## func SetDefault
 
 ```go
-func WriteClassMapFile(filepath string) error
+func SetDefault(g *Generator)
 ```
 
-WriteClassMapFile writes the generated class map to the specified file
+SetDefault sets the default [Generator](<#Generator>).
+
+<a name="CacheValue"></a>
+## type CacheValue
+
+CacheValue contains the value of a cache entry.
+
+It is used to store the generated and merged classes.
+
+As twerge is meant to be used statically, aka at build/compile time, it is trying to maxmimize performance at runtime.
+
+```go
+type CacheValue struct {
+    Generated string
+    Merged    string
+}
+```
+
+<a name="Generator"></a>
+## type Generator
+
+Generator generates all the code needed to use Twerge statically.
+
+At runtime, it uses the statically defined code, if configured, to map the class names to the generated class names.
+
+```go
+type Generator struct{ Handler Handler }
+```
+
+<a name="Default"></a>
+### func Default
+
+```go
+func Default() *Generator
+```
+
+Default returns the default [Generator](<#Generator>).
+
+<a name="New"></a>
+### func New
+
+```go
+func New(h Handler) *Generator
+```
+
+New creates a new Generator with the given non\-nil Handler.
+
+<a name="Generator.Cache"></a>
+### func \(Generator\) Cache
+
+```go
+func (Generator) Cache() map[string]CacheValue
+```
+
+Cache returns the cache of the [Generator](<#Generator>).
+
+<a name="Generator.It"></a>
+### func \(\*Generator\) It
+
+```go
+func (g *Generator) It(classes string) string
+```
+
+It returns a short unique CSS class name from the merged classes.
+
+If the class name already exists, it will return the existing class name.
+
+If the class name does not exist, it will generate a new class name and return it.
+
+<a name="Handler"></a>
+## type Handler
+
+Handler is the interface that needs to be implemented to customize the behavior of the [Generator](<#Generator>).
+
+```go
+type Handler interface {
+    It(string) string
+    Cache() map[string]CacheValue
+    SetCache(map[string]CacheValue)
+}
+```
 
 Generated by [gomarkdoc](<https://github.com/princjef/gomarkdoc>)
 
 
 <!-- gomarkdoc:embed:end -->
+

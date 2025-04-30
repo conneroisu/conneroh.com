@@ -11,53 +11,52 @@ var (
 		"full":   true,
 		"screen": true,
 	}
-	lengthUnitRegex = regexp.MustCompile(`\d+(%|px|r?em|[sdl]?v([hwib]|min|max)|pt|pc|in|cm|mm|cap|ch|ex|r?lh|cq(w|h|i|b|min|max))|\b(calc|min|max|clamp)\(.+\)|^0$`)
-	colorFnRegex    = regexp.MustCompile(`^(rgba?|hsla?|hwb|(ok)?(lab|lch))\(.+\)$`)
-	arbitraryRegex  = regexp.MustCompile(`(?i)^\[(?:([a-z-]+):)?(.+)\]$`)
-	shirtPattern    = regexp.MustCompile(`^(\d+(\.\d+)?)?(xs|sm|md|lg|xl)$`)
-	shardowPattern  = regexp.MustCompile(`^(inset_)?-?((\d+)?\.?(\d+)[a-z]+|0)_-?((\d+)?\.?(\d+)[a-z]+|0)`)
-
-	sizeLabels  = map[string]bool{"length": true, "size": true, "percentage": true}
-	imageLabels = map[string]bool{"image": true, "url": true}
+	lengthUnitRegex        = regexp.MustCompile(`\d+(%|px|r?em|[sdl]?v([hwib]|min|max)|pt|pc|in|cm|mm|cap|ch|ex|r?lh|cq(w|h|i|b|min|max))|\b(calc|min|max|clamp)\(.+\)|^0$`)
+	colorFnRegex           = regexp.MustCompile(`^(rgba?|hsla?|hwb|(ok)?(lab|lch))\(.+\)$`)
+	arbitraryRegex         = regexp.MustCompile(`(?i)^\[(?:([a-z-]+):)?(.+)\]$`)
+	shirtPattern           = regexp.MustCompile(`^(\d+(\.\d+)?)?(xs|sm|md|lg|xl)$`)
+	shardowPattern         = regexp.MustCompile(`^(inset_)?-?((\d+)?\.?(\d+)[a-z]+|0)_-?((\d+)?\.?(\d+)[a-z]+|0)`)
+	arbitraryPropertyRegex = regexp.MustCompile(`^\[(.+)\]$`)
+	sizeLabels             = map[string]bool{"length": true, "size": true, "percentage": true}
+	imageLabels            = map[string]bool{"image": true, "url": true}
 )
 
 // config is the configuration for the template merger
-type config struct {
-	// defaults should be good enough
-	// hover:bg-red-500 -> :
-	ModifierSeparator rune
-	// bg-red-500 -> -
-	ClassSeparator rune
-	// !bg-red-500 -> !
-	ImportantModifier rune
-	// used for bg-red-500/50 (50% opacity) -> /
-	PostfixModifier rune
-	// optional
-	Prefix string
-	// CACHE
-	MaxCacheSize int
-	// This is a large map of all the classes and their validators -> see default-config.go
-	ClassGroups classPart
-	// class group with conflict + conflicting groups -> if "p" is set all others are removed
-	// p: ['px', 'py', 'ps', 'pe', 'pt', 'pr', 'pb', 'pl']
-	ConflictingClassGroups conflictingClassGroups
-}
-
-// classGroupValidator is a validator for a class group
-type classGroupValidator struct {
-	Fn           func(string) bool
-	ClassGroupID string
-}
-
-// classPart is a part of a class group
-type classPart struct {
-	NextPart     map[string]classPart
-	Validators   []classGroupValidator
-	ClassGroupID string
-}
-
-// conflictingClassGroups is a map of class groups that conflict with each other
-type conflictingClassGroups map[string][]string
+type (
+	config struct {
+		// defaults should be good enough
+		// hover:bg-red-500 -> :
+		ModifierSeparator rune
+		// bg-red-500 -> -
+		ClassSeparator rune
+		// !bg-red-500 -> !
+		ImportantModifier rune
+		// used for bg-red-500/50 (50% opacity) -> /
+		PostfixModifier rune
+		// optional
+		Prefix string
+		// CACHE
+		MaxCacheSize int
+		// This is a large map of all the classes and their validators -> see default-config.go
+		ClassGroups classPart
+		// class group with conflict + conflicting groups -> if "p" is set all others are removed
+		// p: ['px', 'py', 'ps', 'pe', 'pt', 'pr', 'pb', 'pl']
+		ConflictingClassGroups conflictingClassGroups
+	}
+	// classGroupValidator is a validator for a class group
+	classGroupValidator struct {
+		Fn           func(string) bool
+		ClassGroupID string
+	}
+	// classPart is a part of a class group
+	classPart struct {
+		NextPart     map[string]classPart
+		Validators   []classGroupValidator
+		ClassGroupID string
+	}
+	// conflictingClassGroups is a map of class groups that conflict with each other
+	conflictingClassGroups map[string][]string
+)
 
 func getBreaks(groupID string) map[string]classPart {
 	return map[string]classPart{
@@ -98,22 +97,18 @@ func getBreaks(groupID string) map[string]classPart {
 		},
 	}
 }
-
 func isAny(_ string) bool {
 	return true
 }
-
 func isNever(_ string) bool {
 	return false
 }
-
 func isLength(val string) bool {
 	if isNumber(val) || stringLengths[val] || isFraction(val) {
 		return true
 	}
 	return false
 }
-
 func isArbitraryLength(val string) bool {
 	return labelIsArbitraryValue(val, "length", isLengthOnly)
 }
@@ -132,54 +127,43 @@ func isArbitraryPosition(val string) bool {
 func isArbitrarySize(val string) bool {
 	return labelIsArbitraryValue(val, sizeLabels, isNever)
 }
-
 func isArbitraryImage(val string) bool {
 	return labelIsArbitraryValue(val, imageLabels, isImage)
 }
 func isArbitraryShadow(val string) bool {
 	return labelIsArbitraryValue(val, "", isShadow)
 }
-
 func isArbitraryValue(val string) bool {
 	return arbitraryRegex.MatchString(val)
 }
-
 func isPercent(val string) bool {
 	return val[len(val)-1] == '%' && isNumber(val[:len(val)-1])
 }
-
 func isTshirtSize(val string) bool {
 	return shirtPattern.MatchString(val)
 }
-
 func isShadow(val string) bool {
 	return shardowPattern.MatchString(val)
 }
-
 func isImage(val string) bool {
 	pattern := regexp.MustCompile(`^(url|image|image-set|cross-fade|element|(repeating-)?(linear|radial|conic)-gradient)\(.+\)$`)
 	return pattern.MatchString(val)
 }
-
 func isFraction(val string) bool {
 	pattern := regexp.MustCompile(`^\d+\/\d+$`)
 	return pattern.MatchString(val)
 }
-
 func isNumber(val string) bool {
 	return isInteger(val) || isFloat(val)
 }
-
 func isInteger(val string) bool {
 	_, err := strconv.Atoi(val)
 	return err == nil
 }
-
 func isFloat(val string) bool {
 	_, err := strconv.ParseFloat(val, 64)
 	return err == nil
 }
-
 func isLengthOnly(val string) bool {
 	return lengthUnitRegex.MatchString(val) && !colorFnRegex.MatchString(val)
 }
@@ -198,7 +182,6 @@ func labelIsArbitraryValue(
 			if t, ok := label.(string); ok {
 				return res[1] == t
 			}
-
 			if t, ok := label.(map[string]bool); ok {
 				return t[res[1]]
 			}
@@ -218,52 +201,130 @@ var defaultConfig = &config{
 	PostfixModifier:   '/',
 	MaxCacheSize:      1000,
 	ConflictingClassGroups: conflictingClassGroups{
-		"overflow":         {"overflow-x", "overflow-y"},
-		"overscroll":       {"overscroll-x", "overscroll-y"},
-		"inset":            {"inset-x", "inset-y", "start", "end", "top", "right", "bottom", "left"},
-		"inset-x":          {"right", "left"},
-		"inset-y":          {"top", "bottom"},
-		"flex":             {"basis", "grow", "shrink"},
-		"gap":              {"gap-x", "gap-y"},
-		"p":                {"px", "py", "ps", "pe", "pt", "pr", "pb", "pl"},
-		"px":               {"pr", "pl"},
-		"py":               {"pt", "pb"},
-		"m":                {"mx", "my", "ms", "me", "mt", "mr", "mb", "ml"},
-		"mx":               {"mr", "ml"},
-		"my":               {"mt", "mb"},
-		"size":             {"w", "h"},
-		"font-size":        {"leading"},
-		"fvn-normal":       {"fvn-ordinal", "fvn-slashed-zero", "fvn-figure", "fvn-spacing", "fvn-fraction"},
+		"overflow":   {"overflow-x", "overflow-y"},
+		"overscroll": {"overscroll-x", "overscroll-y"},
+		"inset": {
+			"inset-x",
+			"inset-y",
+			"start",
+			"end",
+			"top",
+			"right",
+			"bottom",
+			"left",
+		},
+		"inset-x": {"right", "left"},
+		"inset-y": {"top", "bottom"},
+		"flex":    {"basis", "grow", "shrink"},
+		"gap":     {"gap-x", "gap-y"},
+		"p": {
+			"px",
+			"py",
+			"ps",
+			"pe",
+			"pt",
+			"pr",
+			"pb",
+			"pl",
+		},
+		"px": {"pr", "pl"},
+		"py": {"pt", "pb"},
+		"m": {
+			"mx",
+			"my",
+			"ms",
+			"me",
+			"mt",
+			"mr",
+			"mb",
+			"ml",
+		},
+		"mx":        {"mr", "ml"},
+		"my":        {"mt", "mb"},
+		"size":      {"w", "h"},
+		"font-size": {"leading"},
+		"fvn-normal": {
+			"fvn-ordinal",
+			"fvn-slashed-zero",
+			"fvn-figure",
+			"fvn-spacing",
+			"fvn-fraction",
+		},
 		"fvn-ordinal":      {"fvn-normal"},
 		"fvn-slashed-zero": {"fvn-normal"},
 		"fvn-figure":       {"fvn-normal"},
 		"fvn-spacing":      {"fvn-normal"},
 		"fvn-fraction":     {"fvn-normal"},
 		"line-clamp":       {"display", "overflow"},
-		"rounded":          {"rounded-s", "rounded-e", "rounded-t", "rounded-r", "rounded-b", "rounded-l", "rounded-ss", "rounded-se", "rounded-ee", "rounded-es", "rounded-tl", "rounded-tr", "rounded-br", "rounded-bl"},
-		"rounded-s":        {"rounded-ss", "rounded-es"},
-		"rounded-e":        {"rounded-se", "rounded-ee"},
-		"rounded-t":        {"rounded-tl", "rounded-tr"},
-		"rounded-r":        {"rounded-tr", "rounded-br"},
-		"rounded-b":        {"rounded-br", "rounded-bl"},
-		"rounded-l":        {"rounded-tl", "rounded-bl"},
-		"border-spacing":   {"border-spacing-x", "border-spacing-y"},
-		"border-w":         {"border-w-s", "border-w-e", "border-w-t", "border-w-r", "border-w-b", "border-w-l"},
-		"border-w-x":       {"border-w-r", "border-w-l"},
-		"border-w-y":       {"border-w-t", "border-w-b"},
-		"border-color":     {"border-color-t", "border-color-r", "border-color-b", "border-color-l"},
-		"border-color-x":   {"border-color-r", "border-color-l"},
-		"border-color-y":   {"border-color-t", "border-color-b"},
-		"scroll-m":         {"scroll-mx", "scroll-my", "scroll-ms", "scroll-me", "scroll-mt", "scroll-mr", "scroll-mb", "scroll-ml"},
-		"scroll-mx":        {"scroll-mr", "scroll-ml"},
-		"scroll-my":        {"scroll-mt", "scroll-mb"},
-		"scroll-p":         {"scroll-px", "scroll-py", "scroll-ps", "scroll-pe", "scroll-pt", "scroll-pr", "scroll-pb", "scroll-pl"},
-		"scroll-px":        {"scroll-pr", "scroll-pl"},
-		"scroll-py":        {"scroll-pt", "scroll-pb"},
-		"touch":            {"touch-x", "touch-y", "touch-pz"},
-		"touch-x":          {"touch"},
-		"touch-y":          {"touch"},
-		"touch-pz":         {"touch"},
+		"rounded": {
+			"rounded-s",
+			"rounded-e",
+			"rounded-t",
+			"rounded-r",
+			"rounded-b",
+			"rounded-l",
+			"rounded-ss",
+			"rounded-se",
+			"rounded-ee",
+			"rounded-es",
+			"rounded-tl",
+			"rounded-tr",
+			"rounded-br",
+			"rounded-bl",
+		},
+		"rounded-s":      {"rounded-ss", "rounded-es"},
+		"rounded-e":      {"rounded-se", "rounded-ee"},
+		"rounded-t":      {"rounded-tl", "rounded-tr"},
+		"rounded-r":      {"rounded-tr", "rounded-br"},
+		"rounded-b":      {"rounded-br", "rounded-bl"},
+		"rounded-l":      {"rounded-tl", "rounded-bl"},
+		"border-spacing": {"border-spacing-x", "border-spacing-y"},
+		"border-w": {
+			"border-w-s",
+			"border-w-e",
+			"border-w-t",
+			"border-w-r",
+			"border-w-b",
+			"border-w-l",
+		},
+		"border-w-x": {"border-w-r", "border-w-l"},
+		"border-w-y": {"border-w-t", "border-w-b"},
+		"border-color": {
+			"border-color-t",
+			"border-color-r",
+			"border-color-b",
+			"border-color-l",
+		},
+		"border-color-x": {"border-color-r", "border-color-l"},
+		"border-color-y": {"border-color-t", "border-color-b"},
+		"scroll-m": {
+			"scroll-mx",
+			"scroll-my",
+			"scroll-ms",
+			"scroll-me",
+			"scroll-mt",
+			"scroll-mr",
+			"scroll-mb",
+			"scroll-ml",
+		},
+		"scroll-mx": {"scroll-mr", "scroll-ml"},
+		"scroll-my": {"scroll-mt", "scroll-mb"},
+		"scroll-p": {
+			"scroll-px",
+			"scroll-py",
+			"scroll-ps",
+			"scroll-pe",
+			"scroll-pt",
+			"scroll-pr",
+			"scroll-pb",
+			"scroll-pl",
+		},
+		"scroll-px": {"scroll-pr", "scroll-pl"},
+		"scroll-py": {"scroll-pt", "scroll-pb"},
+		"touch":     {"touch-x", "touch-y", "touch-pz"},
+		"touch-x":   {"touch"},
+		"touch-y":   {"touch"},
+		"touch-pz":  {"touch"},
 	},
 	ClassGroups: classPart{
 		NextPart: map[string]classPart{
@@ -312,33 +373,29 @@ var defaultConfig = &config{
 					"after": {
 						NextPart: getBreaks("break-after"),
 					},
-
 					// Break Before @see https://tailwindcss.com/docs/break-before
 					"before": {
 						NextPart: getBreaks("break-before"),
 					},
-
 					// Break Inside
 					// @see https://tailwindcss.com/docs/break-inside
-					"inside": {
-						NextPart: map[string]classPart{
-							"auto": {
-								ClassGroupID: "break-inside",
-							},
-							"avoid": {
-								NextPart: map[string]classPart{
-									"page": {
-										ClassGroupID: "break-inside",
-									},
-									"column": {
-										ClassGroupID: "break-inside",
-									},
+					"inside": {NextPart: map[string]classPart{
+						"auto": {
+							ClassGroupID: "break-inside",
+						},
+						"avoid": {
+							NextPart: map[string]classPart{
+								"page": {
+									ClassGroupID: "break-inside",
 								},
-								ClassGroupID: "break-inside",
+								"column": {
+									ClassGroupID: "break-inside",
+								},
 							},
+							ClassGroupID: "break-inside",
 						},
 					},
-
+					},
 					// Word Break
 					// @see https://tailwindcss.com/docs/word-break
 					"normal": {
@@ -356,7 +413,6 @@ var defaultConfig = &config{
 				},
 				Validators: []classGroupValidator{},
 			},
-
 			"box": {
 				NextPart: map[string]classPart{
 					// Box Sizing
@@ -367,7 +423,6 @@ var defaultConfig = &config{
 					"content": {
 						ClassGroupID: "box",
 					},
-
 					// Box Decoration Break
 					// @see https://tailwindcss.com/docs/box-decoration-break
 					"decoration": {
@@ -381,7 +436,6 @@ var defaultConfig = &config{
 					},
 				},
 			},
-
 			// Display
 			// @see https://tailwindcss.com/docs/display
 			"block": {
@@ -693,7 +747,6 @@ var defaultConfig = &config{
 					},
 				},
 			},
-
 			"overflow": {
 				NextPart: map[string]classPart{
 					"auto": {
@@ -791,7 +844,6 @@ var defaultConfig = &config{
 				},
 				Validators: []classGroupValidator{},
 			},
-
 			"static": {
 				ClassGroupID: "position",
 			},
@@ -807,7 +859,6 @@ var defaultConfig = &config{
 			"sticky": {
 				ClassGroupID: "position",
 			},
-
 			"inset": {
 				NextPart: map[string]classPart{
 					"auto": {
@@ -3719,7 +3770,6 @@ var defaultConfig = &config{
 				},
 				ClassGroupID: "ring-w",
 			},
-
 			"shadow": {
 				NextPart: map[string]classPart{
 					"inner": {
@@ -3758,7 +3808,6 @@ var defaultConfig = &config{
 					},
 				},
 			},
-
 			"mix": {
 				NextPart: map[string]classPart{
 					"blend": {
@@ -3858,7 +3907,6 @@ var defaultConfig = &config{
 				},
 				ClassGroupID: "blur",
 			},
-
 			"brightness": {
 				NextPart: map[string]classPart{},
 				Validators: []classGroupValidator{
@@ -3873,7 +3921,6 @@ var defaultConfig = &config{
 				},
 				ClassGroupID: "brightness",
 			},
-
 			"contrast": {
 				NextPart: map[string]classPart{},
 				Validators: []classGroupValidator{
@@ -3888,7 +3935,6 @@ var defaultConfig = &config{
 				},
 				ClassGroupID: "contrast",
 			},
-
 			"drop": {
 				NextPart: map[string]classPart{
 					"shadow": {
@@ -3911,7 +3957,6 @@ var defaultConfig = &config{
 					},
 				},
 			},
-
 			"grayscale": {
 				NextPart: map[string]classPart{
 					"0": {
@@ -3926,7 +3971,6 @@ var defaultConfig = &config{
 				},
 				ClassGroupID: "grayscale",
 			},
-
 			"hue": {
 				NextPart: map[string]classPart{
 					"rotate": {
@@ -3957,7 +4001,6 @@ var defaultConfig = &config{
 				},
 				ClassGroupID: "invert",
 			},
-
 			"saturate": {
 				NextPart: map[string]classPart{},
 				Validators: []classGroupValidator{
@@ -3972,7 +4015,6 @@ var defaultConfig = &config{
 				},
 				ClassGroupID: "saturate",
 			},
-
 			"sepia": {
 				NextPart: map[string]classPart{
 					"0": {
@@ -3987,7 +4029,6 @@ var defaultConfig = &config{
 				},
 				ClassGroupID: "sepia",
 			},
-
 			"backdrop": {
 				NextPart: map[string]classPart{
 					"filter": {

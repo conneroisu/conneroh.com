@@ -3,11 +3,12 @@ id: pegwings
 aliases:
   - Pegwings
 tags: []
+banner_path: projects/pegwings.webp
 created_at: 2025-03-28T19:22:16.000-06:00
 description: A AI startup that shares similiarities with ChatGPT, Anthropic, and other AI Models with more capable models
 titile: Pegwings
 title: Pegwings
-updated_at: 2025-03-28T20:07:30.000-06:00
+updated_at: 2025-04-14T19:15:21.000-06:00
 ---
 
 # Pegwings

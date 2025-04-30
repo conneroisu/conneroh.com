@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	maxShownTags = 9
+	maxShownTags = 6
 )
 
 templ ProjectItem(
@@ -15,78 +15,163 @@ templ ProjectItem(
 	attrs templ.Attributes,
 ) {
 	<div
-		{ attrs... }
-		aria-label={ project.Title }
-		hx-target="#bodiody"
-		hx-get={ project.PagePath() }
-		hx-push-url="true"
-		preload="mouseover"
+		x-data="{ allTags: false }"
 	>
-		<div class={ twerge.It("relative w-full") }>
-			@Image(
-				project.BannerPath,
-				project.Title,
-				twerge.It("w-full h-48 object-cover"),
-			)
-		</div>
 		<div
-			class={ twerge.It("flex-grow flex p-6 flex-col") }
+			{ attrs... }
 		>
-			<h2
-				class={ twerge.It("mb-3 text-xl hover:underline font-semibold text-white line-clamp-2") }
-			>
-				{ project.Title }
-			</h2>
-			<p
-				class={ twerge.It("text-gray-300 mb-4 line-clamp-2") }
-			>
-				{ project.Description }
-			</p>
+			<div class={ twerge.It("relative w-full") }>
+				@Image(
+					project.BannerPath,
+					project.Title,
+					twerge.It("w-full h-48 object-cover"),
+				)
+			</div>
 			<div
-				class={ twerge.It("mb-4 grid-cols-2 grid flex-wrap gap-2") }
-				x-data="{ allTags: false }"
+				class={ twerge.It("flex-grow flex p-6 flex-col") }
 			>
-				for i, tag := range project.Tags {
-					if i < maxShownTags {
-						@TagControl(tag)
-					} else {
-						<div x-show="allTags">
+				<h2
+					class={ twerge.It("mb-3 text-xl hover:underline font-semibold text-white line-clamp-2") }
+				>
+					{ project.Title }
+				</h2>
+				<p
+					class={ twerge.It("text-gray-300 mb-4 line-clamp-2") }
+				>
+					{ project.Description }
+				</p>
+				<div
+					class={ twerge.It("mb-4 grid-cols-2 grid flex-wrap gap-2") }
+				>
+					for i, tag := range project.Tags[0:min(len(project.Tags), maxShownTags-1)] {
+						if i < maxShownTags-1 || len(project.Tags) == maxShownTags {
 							@TagControl(tag)
-						</div>
+						} else if i == maxShownTags {
+						}
 					}
-				}
-				if len(project.Tags) > maxShownTags {
-					<button
-						type="button"
-						class={ twerge.It("text-sm px-3 items-center flex hover:underline bg-blue-900 w-full transition-colors py-1 hover:bg-blue-800 h-8 flex-row rounded-full text-blue-200 justify-between font-medium") }
-						x-on:click.stop="allTags = !allTags"
-						x-show="!allTags"
-					>
-						@Icon("ellipsis", templ.Attributes{})
-						<span>Show More</span>
-					</button>
-					<button
-						type="button"
-						class={ twerge.It("text-sm px-3 items-center flex hover:underline bg-blue-900 w-full transition-colors py-1 hover:bg-blue-800 h-8 flex-row rounded-full text-blue-200 justify-between font-medium") }
-						x-on:click.stop="allTags = !allTags"
-						x-show="allTags"
-					>
-						@Icon("minus", templ.Attributes{})
-						<span>Show less</span>
-					</button>
+					if len(project.Tags) > maxShownTags {
+						<button
+							class={ twerge.It("text-sm px-3 items-center hover:underline bg-blue-900 w-full transition-colors py-1 hover:bg-blue-800 h-8 flex-row rounded-full text-blue-200 justify-between font-medium") }
+							x-on:click.stop="allTags = !allTags"
+							x-ref="moreTags"
+						>
+							<div
+								x-show="!allTags"
+								class="flex flex-row items-center"
+							>
+								({ strconv.Itoa(len(project.Tags[maxShownTags-1:])) }) More
+							</div>
+							<div
+								x-show="allTags"
+								class="flex flex-row items-center"
+							>
+								Show less
+							</div>
+						</button>
+					}
+				</div>
+			</div>
+			<span
+				class={ twerge.It("text-xs bg-red-500 py-1 bottom-0 px-2 rounded-tr-md text-gray-200 left-0 absolute") }
+			>
+				{ strconv.Itoa(len(project.Posts)) } posts
+			</span>
+			<span
+				class={ twerge.It("px-2 text-gray-200 bottom-0 py-1 right-0 text-xs rounded-tl-md bg-blue-500 absolute") }
+			>
+				{ strconv.Itoa(len(project.Tags)) } tags
+			</span>
+		</div>
+		if len(project.Tags) > maxShownTags {
+			<div
+				class={ twerge.It("absolute z-10 grid sm:grid-cols-2 md:grid-cols-3") }
+				x-show="allTags"
+				x-anchor.bottom.offset="$refs.moreTags"
+			>
+				for _, tag := range project.Tags[maxShownTags-1:] {
+					@TagControl(tag)
 				}
 			</div>
+		}
+	</div>
+}
+
+templ PostItem(post *assets.Post, attrs templ.Attributes) {
+	<div
+		x-data="{ allTags: false }"
+	>
+		<div
+			aria-label={ post.Title }
+			{ attrs... }
+		>
+			@Image(
+				post.BannerPath,
+				post.Title,
+				twerge.It("w-full h-48 object-cover"),
+			)
+			<div
+				class={ twerge.It("p-6") }
+			>
+				<h2
+					class={ twerge.It("mb-3 text-xl hover:underline font-semibold text-white line-clamp-2") }
+				>
+					{ post.Title }
+				</h2>
+				<p
+					class={ twerge.It("text-gray-300 mb-4 line-clamp-2") }
+				>
+					{ post.Description }
+				</p>
+				<div
+					class={ twerge.It("mb-4 grid-cols-2 grid flex-wrap gap-2") }
+				>
+					for _, tag := range post.Tags[0:min(len(post.Tags), maxShownTags-1)] {
+						@TagControl(tag)
+					}
+					if len(post.Tags) > maxShownTags {
+						<button
+							class={ twerge.It("text-sm px-3 items-center hover:underline bg-blue-900 w-full transition-colors py-1 hover:bg-blue-800 h-8 flex-row rounded-full text-blue-200 justify-between font-medium") }
+							x-on:click.stop="allTags = !allTags"
+							x-ref="moreTags"
+						>
+							<div
+								x-show="!allTags"
+								class="flex flex-row items-center"
+							>
+								({ strconv.Itoa(len(post.Tags[maxShownTags-1:])) }) More
+							</div>
+							<div
+								x-show="allTags"
+								class="flex flex-row items-center"
+							>
+								Show less
+							</div>
+						</button>
+					}
+				</div>
+			</div>
+			<span
+				class={ twerge.It("text-xs bg-red-500 py-1 bottom-0 px-2 rounded-tr-md text-gray-200 left-0 absolute") }
+			>
+				{ strconv.Itoa(len(post.Tags)) } tags | { strconv.Itoa(len(post.Projects)) } projects
+			</span>
+			<div
+				class={ twerge.It("py-1 absolute right-0 bg-blue-500 rounded-tl-md px-2 text-xs text-white bottom-0") }
+			>
+				{ post.CreatedAt.Format("Jan 02, 2006") }
+			</div>
 		</div>
-		<span
-			class={ twerge.It("text-xs bg-red-500 py-1 bottom-0 px-2 rounded-tr-md text-gray-200 left-0 absolute") }
-		>
-			{ strconv.Itoa(len(project.Posts)) } posts
-		</span>
-		<span
-			class={ twerge.It("px-2 text-gray-200 bottom-0 py-1 right-0 text-xs rounded-tl-md bg-blue-500 absolute") }
-		>
-			{ strconv.Itoa(len(project.Tags)) } tags
-		</span>
+		if len(post.Tags) > maxShownTags {
+			<div
+				class={ twerge.It("absolute z-10 grid sm:grid-cols-2 md:grid-cols-3") }
+				x-show="allTags"
+				x-anchor.bottom.offset="$refs.moreTags"
+			>
+				for _, tag := range post.Tags[maxShownTags-1:] {
+					@TagControl(tag)
+				}
+			</div>
+		}
 	</div>
 }
 
@@ -106,7 +191,10 @@ templ TagItem(tag *assets.Tag, attrs templ.Attributes) {
 			<div
 				class={ twerge.It("rounded-full h-8 justify-center items-center flex w-8 bg-gray-700") }
 			>
-				@Icon(tag.Icon, templ.Attributes{"class": "stoke-white"})
+				@Icon(tag.Icon, templ.Attributes{
+					"class": "stoke-white",
+					"style": "width: 4em; height: 4em;",
+				})
 			</div>
 		</div>
 		<div
@@ -125,75 +213,4 @@ templ TagItem(tag *assets.Tag, attrs templ.Attributes) {
 			{ strconv.Itoa(len(tag.Projects)) } projects
 		</span>
 	</a>
-}
-
-templ PostItem(post *assets.Post, attrs templ.Attributes) {
-	<div
-		aria-label={ post.Title }
-		{ attrs... }
-	>
-		@Image(
-			post.BannerPath,
-			post.Title,
-			twerge.It("w-full h-48 object-cover"),
-		)
-		<div
-			class={ twerge.It("p-6") }
-		>
-			<h2
-				class={ twerge.It("mb-3 text-xl hover:underline font-semibold text-white line-clamp-2") }
-			>
-				{ post.Title }
-			</h2>
-			<p
-				class={ twerge.It("text-gray-300 mb-4 line-clamp-2") }
-			>
-				{ post.Description }
-			</p>
-			<div
-				class={ twerge.It("mb-4 grid-cols-2 grid flex-wrap gap-2") }
-				x-data="{ allTags: false }"
-			>
-				for i, tag := range post.Tags {
-					if i < maxShownTags {
-						@TagControl(tag)
-					} else {
-						<div x-show="allTags">
-							@TagControl(tag)
-						</div>
-					}
-				}
-				if len(post.Tags) > maxShownTags {
-					<button
-						type="button"
-						class={ twerge.It("text-sm px-3 items-center flex hover:underline bg-blue-900 w-full transition-colors py-1 hover:bg-blue-800 h-8 flex-row rounded-full text-blue-200 justify-between font-medium") }
-						x-on:click.stop="allTags = !allTags"
-						x-show="!allTags"
-					>
-						@Icon("ellipsis", templ.Attributes{})
-						<span>({ strconv.Itoa(len(post.Tags) - 8) }) More</span>
-					</button>
-					<button
-						type="button"
-						class={ twerge.It("text-sm px-3 items-center flex hover:underline bg-blue-900 w-full transition-colors py-1 hover:bg-blue-800 h-8 flex-row rounded-full text-blue-200 justify-between font-medium") }
-						x-on:click.stop="allTags = !allTags"
-						x-show="allTags"
-					>
-						@Icon("minus", templ.Attributes{})
-						<span>Show less</span>
-					</button>
-				}
-			</div>
-		</div>
-		<span
-			class={ twerge.It("text-xs bg-red-500 py-1 bottom-0 px-2 rounded-tr-md text-gray-200 left-0 absolute") }
-		>
-			{ strconv.Itoa(len(post.Tags)) } tags | { strconv.Itoa(len(post.Projects)) } projects
-		</span>
-		<div
-			class={ twerge.It("py-1 absolute right-0 bg-blue-500 rounded-tl-md px-2 text-xs text-white bottom-0") }
-		>
-			{ post.CreatedAt.Format("Jan 02, 2006") }
-		</div>
-	</div>
 }

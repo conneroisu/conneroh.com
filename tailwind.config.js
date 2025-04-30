@@ -1,6 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ["./internal/data/css/classes.templ"],
+  // jit: true,
+  content: ["./internal/data/css/classes.html"],
   theme: {
     extend: {},
   },

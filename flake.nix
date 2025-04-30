@@ -3,19 +3,12 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-
+    systems.url = "github:nix-systems/default";
     flake-utils = {
       url = "github:numtide/flake-utils";
       inputs.systems.follows = "systems";
     };
     bun2nix.url = "github:baileyluTCD/bun2nix";
-    twerge = {
-      url = "github:conneroisu/twerge?tag=v0.2.9";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-utils.follows = "flake-utils";
-    };
-
-    systems.url = "github:nix-systems/default";
   };
 
   nixConfig = {
@@ -29,36 +22,38 @@
     flake-utils,
     ...
   }:
-    flake-utils.lib.eachSystem [
-      "x86_64-linux"
-      "i686-linux"
-      "x86_64-darwin"
-      "aarch64-linux"
-      "aarch64-darwin"
-    ] (system: let
-      overlay = final: prev: {go = prev.go_1_24;};
+    flake-utils.lib.eachDefaultSystem (system: let
+      overlay = final: prev: {final.go = prev.go_1_24;};
       pkgs = import inputs.nixpkgs {
         inherit system;
         overlays = [
           overlay
         ];
+        config.allowUnfree = true;
       };
       buildWithSpecificGo = pkg: pkg.override {buildGoModule = pkgs.buildGo124Module;};
     in rec {
-      devShells.default = let
-        inherit (inputs.twerge.packages."${system}") hasher;
+      devShell = let
         scripts = {
           dx = {
             exec = ''$EDITOR $REPO_ROOT/flake.nix'';
             description = "Edit flake.nix";
           };
           gx = {
-            exec = ''$EDITOR $REPO_ROOT/go.mod'';
+            exec = "$EDITOR $REPO_ROOT/go.mod";
             description = "Edit go.mod";
           };
           clean = {
             exec = ''${pkgs.git}/bin/git clean -fdx'';
             description = "Clean Project";
+          };
+          reset-db = {
+            exec = ''
+              rm ./master.db
+              rm ./master.db-shm
+              rm ./master.db-wal
+            '';
+            description = "Reset the database";
           };
           tests = {
             exec = ''${pkgs.go}/bin/go test -v ./...'';
@@ -66,59 +61,72 @@
           };
           lint = {
             exec = ''
+              export REPO_ROOT=$(git rev-parse --show-toplevel)
+
               ${pkgs.golangci-lint}/bin/golangci-lint run
               ${pkgs.statix}/bin/statix check $REPO_ROOT/flake.nix
               ${pkgs.deadnix}/bin/deadnix $REPO_ROOT/flake.nix
             '';
             description = "Run Linting Steps.";
           };
-          update = {
+          generate-css = {
             exec = ''
-              ${pkgs.doppler}/bin/doppler run -- ${packages.update}/bin/update -cwd $REPO_ROOT -jobs 20
+              export REPO_ROOT=$(git rev-parse --show-toplevel)
+              ${pkgs.templ}/bin/templ generate --log-level error
+              ${pkgs.go}/bin/go run $REPO_ROOT/cmd/update-css --cwd $REPO_ROOT
+              ${pkgs.tailwindcss}/bin/tailwindcss -i ./input.css \
+                -o $REPO_ROOT/cmd/conneroh/_static/dist/style.css \
+                --cwd $REPO_ROOT
             '';
-            description = "Update the generated go files.";
+            description = "Update the generated html and css files.";
+          };
+          generate-docs = {
+            exec = ''
+              # ${pkgs.doppler}/bin/doppler run -- ${packages.update}/bin/update -cwd $REPO_ROOT -jobs 20
+            '';
+            description = "Update the generated go files from the md docs.";
           };
           generate-reload = {
             exec = ''
-              function gen_css() {
-                ${pkgs.templ}/bin/templ generate --log-level error
-                go run $REPO_ROOT/cmd/update-css --cwd $REPO_ROOT
-                ${pkgs.tailwindcss}/bin/tailwindcss -m -i ./input.css -o ./cmd/conneroh/_static/dist/style.css --cwd $REPO_ROOT
-              }
               export REPO_ROOT=$(git rev-parse --show-toplevel) # needed
-              cd $REPO_ROOT
-              if ${hasher}/bin/hasher -dir "$REPO_ROOT/cmd/conneroh/views" -v -exclude "*_templ.go"; then
-                echo ""
-                if ${hasher}/bin/hasher -dir "$REPO_ROOT/internal/data/docs" -v -exclude "*_templ.go"; then
-                  echo ""
-                else
-                  echo "Changes detected in docs, running update script..."
-                  update
-                fi
-                if ${hasher}/bin/hasher -dir "$REPO_ROOT/cmd/conneroh/components" -v -exclude "*_templ.go"; then
-                  templ generate --log-level error
-                else
-                  echo "Changes detected in components, running update script..."
-                  gen_css
-                fi
-              else
-                echo "Changes detected in templates, running update script..."
-                gen_css
+
+              TEMPL_HASH=$(nix-hash --type sha256 --base32 $REPO_ROOT/cmd/conneroh/**/*.templ | sha256sum | cut -d' ' -f1)
+              OLD_TEMPL_HASH=$(cat $REPO_ROOT/internal/cache/templ.hash)
+
+              if [ "$OLD_TEMPL_HASH" != "$TEMPL_HASH" ]; then
+                echo "OLD_TEMPL_HASH: $OLD_TEMPL_HASH; NEW_TEMPL_HASH: $TEMPL_HASH"
+                ${pkgs.lib.getExe scriptPackages.generate-css}
+                echo "$TEMPL_HASH" > ./internal/cache/templ.hash
               fi
-              cd -
+
+              DOCS_HASH=$(nix-hash --type sha256 --base32 ./internal/data/docs/ | sha256sum | cut -d' ' -f1)
+              OLD_DOCS_HASH=$(cat $REPO_ROOT/internal/cache/docs.hash)
+
+              if [ "$OLD_DOCS_HASH" != "$DOCS_HASH" ]; then
+                echo "OLD_DOCS_HASH: $OLD_DOCS_HASH; NEW_DOCS_HASH: $DOCS_HASH"
+                ${pkgs.lib.getExe scriptPackages.generate-docs}
+                echo "$DOCS_HASH" > ./internal/cache/docs.hash
+              fi
             '';
             description = "Code Generation Steps for specific directory changes.";
+          };
+          generate-js = {
+            exec = ''
+              ${pkgs.bun}/bin/bun build \
+                  $REPO_ROOT/index.js \
+                  --minify \
+                  --minify-syntax \
+                  --minify-whitespace  \
+                  --minify-identifiers \
+                  --outdir $REPO_ROOT/cmd/conneroh/_static/dist/ &
+            '';
+            description = "Generate JS files";
           };
           generate-all = {
             exec = ''
               export REPO_ROOT=$(git rev-parse --show-toplevel)
-              ${pkgs.templ}/bin/templ generate
-              ${pkgs.go}/bin/go run $REPO_ROOT/cmd/update-css --cwd $REPO_ROOT
-              ${pkgs.tailwindcss}/bin/tailwindcss \
-                  --minify \
-                  -i ./input.css \
-                  -o ./cmd/conneroh/_static/dist/style.css \
-                  --cwd $REPO_ROOT
+              ${pkgs.lib.getExe scriptPackages.generate-css}
+              ${pkgs.lib.getExe scriptPackages.generate-docs}
             '';
             description = "Generate all files in parallel";
           };
@@ -142,27 +150,16 @@
             '';
             description = "Format code files";
           };
-          generate-js = {
-            exec = ''
-              ${pkgs.bun}/bin/bun build \
-                  $REPO_ROOT/index.js \
-                  --minify \
-                  --minify-syntax \
-                  --minify-whitespace  \
-                  --minify-identifiers \
-                  --outdir $REPO_ROOT/cmd/conneroh/_static/dist/ &
-            '';
-            description = "Generate JS files";
-          };
           run = {
-            exec = "cd $REPO_ROOT && air";
+            exec = ''
+              export DEBUG=true
+              cd $REPO_ROOT && air
+            '';
             description = "Run the application with air for hot reloading";
           };
         };
-
-        # Convert scripts to packages
         scriptPackages =
-          pkgs.lib.mapAttrsToList
+          pkgs.lib.mapAttrs
           (name: script: pkgs.writeShellScriptBin name script.exec)
           scripts;
       in
@@ -176,14 +173,15 @@
             export PLAYWRIGHT_NODEJS_PATH=${pkgs.nodejs_20}/bin/node
 
             # Browser executable paths
-            export PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=${"${pkgs.playwright-driver.browsers}/chromium-1155"}
+            export PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=${ #
+              "${pkgs.playwright-driver.browsers}/chromium-1155"
+            }
 
             echo "Playwright configured with:"
             echo "  - Browsers directory: $PLAYWRIGHT_BROWSERS_PATH"
             echo "  - Node.js path: $PLAYWRIGHT_NODEJS_PATH"
             echo "  - Chromium path: $PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH"
 
-            # Print available commands
             echo "Available commands:"
             ${pkgs.lib.concatStringsSep "\n" (
               pkgs.lib.mapAttrsToList (
@@ -197,14 +195,12 @@
           '';
           packages = with pkgs;
             [
-              # Nix
-              alejandra
+              alejandra # Nix
               nixd
               statix
               deadnix
 
-              # Go Tools
-              go_1_24
+              go_1_24 # Go Tools
               air
               templ
               golangci-lint
@@ -220,26 +216,21 @@
               pprof
               graphviz
 
-              # Web
-              tailwindcss
+              tailwindcss # Web
               tailwindcss-language-server
               bun
               nodePackages.typescript-language-server
               nodePackages.prettier
-              inputs.bun2nix.defaultPackage.${pkgs.system}.bin
+              svgcleaner
+              sqlite-web
+              inputs.bun2nix.packages.${system}.default
 
-              # Infra
-              flyctl
+              flyctl # Infra
               openssl.dev
               skopeo
+              consul
 
-              # Playwright
-              playwright-driver # Provides browser archives and driver scripts
-              (
-                if pkgs.stdenv.isDarwin
-                then pkgs.darwin.apple_sdk.frameworks.WebKit
-                else pkgs.webkitgtk
-              ) # WebKit browser
+              playwright-driver # Browser Archives and Driver Scripts
               nodejs_20 # Required for Playwright driver
               pkg-config # Needed for some browser dependencies
               at-spi2-core # Accessibility support
@@ -253,6 +244,40 @@
               gdk-pixbuf # Image loading library
               glib # Low-level core library
               gtk3 # GUI toolkit
+              (
+                pkgs.buildGoModule rec {
+                  pname = "copygen";
+                  version = "0.4.1";
+
+                  src = pkgs.fetchFromGitHub {
+                    owner = "switchupcb";
+                    repo = "copygen";
+                    rev = "v${version}";
+                    sha256 = "sha256-gdoUvTla+fRoYayUeuRha8Dkix9ACxlt0tkac0CRqwA=";
+                  };
+
+                  vendorHash = "sha256-dOIGGZWtr8F82YJRXibdw3MvohLFBQxD+Y4OkZIJc2s=";
+                  subPackages = ["."];
+                  proxyVendor = true;
+
+                  ldflags = [
+                    "-s"
+                    "-w"
+                    "-X main.version=${version}"
+                  ];
+
+                  meta = with lib; {
+                    description = "Copygen";
+                    homepage = "https://github.com/switchupcb/copygen";
+                    license = licenses.mit;
+                    maintainers = with maintainers; [
+                      connerohnesorge
+                      conneroisu
+                    ];
+                    mainProgram = "copygen";
+                  };
+                }
+              )
             ]
             ++ (with pkgs;
               lib.optionals stdenv.isDarwin [
@@ -273,16 +298,25 @@
                 nspr # NetScape Portable Runtime
                 pango # Text layout and rendering
               ])
-            # Add the generated script packages
-            ++ scriptPackages;
+            ++ builtins.attrValues scriptPackages;
         };
 
-      packages = rec {
+      packages = let
+        internal_port = 8080;
+        force_https = true;
+        processes = ["app"];
+        version = self.shortRev or "dirty";
+        src = ./.;
+        vendorHash = null;
+        # Create a derivation for the database file
+        databaseFiles = pkgs.runCommand "database-files" {} ''
+          mkdir -p $out/root
+          cp ${./master.db} $out/root/master.db
+        '';
+      in rec {
         conneroh = pkgs.buildGo124Module {
+          inherit src vendorHash version;
           name = "conneroh.com";
-          vendorHash = null;
-          version = self.shortRev or "dirty";
-          src = ./.;
           preBuild = ''
             ${pkgs.templ}/bin/templ generate
             ${pkgs.tailwindcss}/bin/tailwindcss \
@@ -294,9 +328,7 @@
           subPackages = ["."];
         };
         update = pkgs.buildGoModule {
-          vendorHash = null;
-          version = self.shortRev or "dirty";
-          src = ./.;
+          inherit src vendorHash version;
           name = "update";
           subPackages = ["./cmd/update"];
         };
@@ -307,9 +339,7 @@
           config = {
             WorkingDir = "/root";
             Cmd = ["/bin/conneroh.com"];
-            ExposedPorts = {
-              "8080/tcp" = {};
-            };
+            ExposedPorts = {"8080/tcp" = {};};
             Env = [
               "SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
               "NIX_SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
@@ -318,46 +348,91 @@
           copyToRoot = [
             conneroh
             pkgs.cacert
+            databaseFiles
           ];
         };
-        deployPackage = pkgs.writeShellScriptBin "deploy" ''
-          set -e
-          arg=$1
-          TOKEN=""
-          FLY_NAME=""
-          CONFIG_FILE=""
+        deployPackage = let
+          settingsFormat = pkgs.formats.toml {};
 
-          [ -z "$arg" ] && { echo "No argument provided. Please provide a target environment. (dev or prod)"; exit 1; }
+          flyDevConfig = {
+            app = "conneroh-com-dev";
+            primary_region = "ord";
+            build = {};
+            http_service = {
+              inherit internal_port force_https processes;
+              auto_stop_machines = "stop";
+              auto_start_machines = true;
+              min_machines_running = 0;
+            };
+            vm = [
+              {
+                memory = "512M";
+                cpu_kind = "shared";
+                cpus = 1;
+              }
+            ];
+          };
 
-          if [ "$arg" = "dev" ]; then
-            [ -z "$FLY_DEV_AUTH_TOKEN" ] && FLY_DEV_AUTH_TOKEN=$(doppler secrets get --plain FLY_DEV_AUTH_TOKEN)
-            TOKEN="$FLY_DEV_AUTH_TOKEN"
-            export FLY_NAME="conneroh-com-dev"
-            export CONFIG_FILE=${./fly.dev.toml}
-          else
-            [ -z "$FLY_AUTH_TOKEN" ] && FLY_AUTH_TOKEN=$(doppler secrets get --plain FLY_AUTH_TOKEN)
-            TOKEN="$FLY_AUTH_TOKEN"
-            export FLY_NAME="conneroh-com"
-            export CONFIG_FILE=${./fly.toml}
-          fi
+          flyProdConfig = {
+            app = "conneroh-com";
+            primary_region = "ord";
+            build = {};
+            http_service = {
+              inherit internal_port force_https processes;
+              auto_stop_machines = "stop";
+              auto_start_machines = true;
+              min_machines_running = 0;
+            };
+            vm = [
+              {
+                memory = "1gb";
+                cpu_kind = "shared";
+                cpus = 2;
+              }
+            ];
+          };
 
-          REGISTY="registry.fly.io/$FLY_NAME"
-          echo "Copying image to Fly.io... to $REGISTY"
+          flyDevToml = settingsFormat.generate "fly.dev.toml" flyDevConfig;
+          flyProdToml = settingsFormat.generate "fly.toml" flyProdConfig;
+        in
+          pkgs.writeShellScriptBin "deploy" ''
+            set -e
+            arg=$1
+            TOKEN=""
+            FLY_NAME=""
+            CONFIG_FILE=""
 
-          ${pkgs.skopeo}/bin/skopeo copy \
-            --insecure-policy \
-            docker-archive:"${C-conneroh}" \
-            "docker://$REGISTY:latest" \
-            --dest-creds x:"$TOKEN" \
-            --format v2s2
+            [ -z "$arg" ] && { echo "No argument provided. Please provide a target environment. (dev or prod)"; exit 1; }
 
-          echo "Deploying to Fly.io..."
-          ${pkgs.flyctl}/bin/fly deploy \
-            --remote-only \
-            -c "$CONFIG_FILE" \
-            -i "$REGISTY" \
-            -t "$TOKEN"
-        '';
+            if [ "$arg" = "dev" ]; then
+              [ -z "$FLY_DEV_AUTH_TOKEN" ] && FLY_DEV_AUTH_TOKEN=$(doppler secrets get --plain FLY_DEV_AUTH_TOKEN)
+              TOKEN="$FLY_DEV_AUTH_TOKEN"
+              export FLY_NAME="conneroh-com-dev"
+              export CONFIG_FILE=${flyDevToml}
+            else
+              [ -z "$FLY_AUTH_TOKEN" ] && FLY_AUTH_TOKEN=$(doppler secrets get --plain FLY_AUTH_TOKEN)
+              TOKEN="$FLY_AUTH_TOKEN"
+              export FLY_NAME="conneroh-com"
+              export CONFIG_FILE=${flyProdToml}
+            fi
+
+            REGISTY="registry.fly.io/$FLY_NAME"
+            echo "Copying image to Fly.io... to $REGISTY"
+
+            ${pkgs.skopeo}/bin/skopeo copy \
+              --insecure-policy \
+              docker-archive:"${C-conneroh}" \
+              "docker://$REGISTY:latest" \
+              --dest-creds x:"$TOKEN" \
+              --format v2s2
+
+            echo "Deploying to Fly.io..."
+            ${pkgs.flyctl}/bin/fly deploy \
+              --remote-only \
+              -c "$CONFIG_FILE" \
+              -i "$REGISTY:latest" \
+              -t "$TOKEN"
+          '';
       };
     });
 }

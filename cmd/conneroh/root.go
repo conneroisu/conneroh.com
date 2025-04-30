@@ -2,9 +2,9 @@ package conneroh
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
-	"log"
 	"log/slog"
 	"net"
 	"net/http"
@@ -14,8 +14,16 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/conneroisu/conneroh.com/internal/data/css"
-	"github.com/conneroisu/twerge"
+	"github.com/conneroisu/conneroh.com/internal/assets"
+	classes "github.com/conneroisu/conneroh.com/internal/data/css"
+	"github.com/conneroisu/conneroh.com/internal/logger"
+	"github.com/rotisserie/eris"
+	"github.com/uptrace/bun"
+	"github.com/uptrace/bun/dialect/sqlitedialect"
+	"github.com/uptrace/bun/extra/bundebug"
+
+	// SQLite driver
+	_ "modernc.org/sqlite"
 )
 
 const (
@@ -28,17 +36,26 @@ const (
 	readHeaderTimeout = 5 * time.Second
 )
 
-// NewServer creates a new web-ui server
+// NewServer creates a new server.
 func NewServer(
 	ctx context.Context,
-) http.Handler {
-	twerge.ClassMapStr = css.ClassMapStr
-	twerge.GenClassMergeStr = css.ClassMapStr
+) (http.Handler, error) {
+	classes.SetCache()
+	slog.SetDefault(logger.DefaultLogger)
 	mux := http.NewServeMux()
-	err := AddRoutes(ctx, mux)
+	sqlDB, err := sql.Open("sqlite", assets.DBName())
 	if err != nil {
-		slog.Error("error adding routes", slog.String("error", err.Error()))
-		log.Fatal(err)
+		return nil, eris.Wrap(err, "error opening database")
+	}
+	db := bun.NewDB(sqlDB, sqlitedialect.New())
+	assets.RegisterModels(db)
+
+	if os.Getenv("DEBUG") == "true" {
+		db.AddQueryHook(bundebug.NewQueryHook(bundebug.WithVerbose(true)))
+	}
+	err = AddRoutes(ctx, mux, db)
+	if err != nil {
+		return nil, eris.Wrap(err, "error adding routes")
 	}
 	slogLogHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		slog.Info(
@@ -54,7 +71,7 @@ func NewServer(
 		mux.ServeHTTP(w, r)
 	})
 	var handler http.Handler = slogLogHandler
-	return handler
+	return handler, nil
 }
 
 // Run is the entry point for the application.
@@ -62,6 +79,8 @@ func Run(
 	ctx context.Context,
 	_ func(string) string,
 ) error {
+	var wg sync.WaitGroup
+
 	start := time.Now()
 
 	// Create a separate context for signal handling
@@ -75,15 +94,13 @@ func Run(
 	)
 	defer cancel()
 
-	var (
-		httpServer *http.Server
-		wg         sync.WaitGroup
-	)
-
-	handler := NewServer(ctx) // Use original context for server setup
+	handler, err := NewServer(ctx) // Use original context for server setup
+	if err != nil {
+		return err
+	}
 
 	// Configure server with timeouts
-	httpServer = &http.Server{
+	httpServer := &http.Server{
 		Addr: net.JoinHostPort(
 			defaultHost,
 			defaultPort,
@@ -136,7 +153,7 @@ func Run(
 			)
 		}
 
-		// Wait for all goroutines to finish
+		// Wait for all go-routines to finish
 		slog.Info("waiting for server shutdown to complete")
 		wg.Wait()
 		slog.Info("server shutdown completed")

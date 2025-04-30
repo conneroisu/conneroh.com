@@ -1,24 +1,23 @@
 package assets
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"fmt"
-	"strings"
 	"time"
 
-	"github.com/rotisserie/eris"
+	"github.com/uptrace/bun"
 	"gopkg.in/yaml.v3"
 )
+
+// DBName returns the name/file of the database.
+func DBName() string {
+	return "file:master.db?_pragma=busy_timeout=5000&_pragma=journal_mode=WAL&_pragma=mmap_size=30000000000&_pragma=page_size=32768&_pragma=synchronous=FULL"
+}
 
 const (
 	// EmbedLength is the length of the full embedding.
 	EmbedLength = 768
-)
-
-var (
-	_ Embeddable = (*Post)(nil)
-	_ Embeddable = (*Project)(nil)
-	_ Embeddable = (*Tag)(nil)
-	_ Embeddable = (*Employment)(nil)
 )
 
 // CustomTime allows us to customize the YAML time parsing.
@@ -44,56 +43,192 @@ func (ct *CustomTime) UnmarshalYAML(value *yaml.Node) error {
 }
 
 type (
-	// Embeddable is an interface for embedding content.
-	Embeddable interface {
-		GetEmb() *Embedded
-		PagePath() string
-	}
-	// Post is a post with all its projects and tags.
-	Post struct {
-		Embedded
-	}
-	// Project is a project with all its posts and tags.
-	Project struct {
-		Embedded
-	}
-	// Tag is a tag with all its posts and projects.
-	Tag struct {
-		Embedded
-	}
-	// Employment is an employment of a tag.
-	Employment struct {
-		Embedded
-	}
-
-	// Embedded is a base struct for all embeddedable structs.
-	Embedded struct {
-		Title           string `yaml:"title"`
-		Slug            string `yaml:"slug"`
-		Description     string `yaml:"description"`
-		Content         string
-		BannerPath      string `yaml:"banner_path"`
-		RawContent      string
-		Icon            string    `yaml:"icon"`
-		CreatedAt       time.Time `yaml:"created_at"`
-		UpdatedAt       time.Time `yaml:"updated_at"`
-		X               float64
-		Y               float64
-		Z               float64
-		TagSlugs        []string      `yaml:"tags"`
-		PostSlugs       []string      `yaml:"posts"`
-		ProjectSlugs    []string      `yaml:"projects"`
-		EmploymentSlugs []string      `yaml:"employments"`
-		Posts           []*Post       `yaml:"-" structgen:"PostSlugs"`
-		Tags            []*Tag        `yaml:"-" structgen:"TagSlugs"`
-		Projects        []*Project    `yaml:"-" structgen:"ProjectSlugs"`
-		Employments     []*Employment `yaml:"-" structgen:"EmploymentSlugs"`
+	// Doc is a base struct for all embeddedable structs.
+	Doc struct {
+		Title        string     `yaml:"title"`
+		Path         string     `yaml:"-"`
+		Slug         string     `yaml:"slug"`
+		Description  string     `yaml:"description"`
+		Content      string     `yaml:"-"`
+		BannerPath   string     `yaml:"banner_path"`
+		Icon         string     `yaml:"icon"`
+		CreatedAt    CustomTime `yaml:"created_at"`
+		UpdatedAt    CustomTime `yaml:"updated_at"`
+		TagSlugs     []string   `yaml:"tags"`
+		PostSlugs    []string   `yaml:"posts"`
+		ProjectSlugs []string   `yaml:"projects"`
+		Hash         string     `yaml:"-"`
+		X            float64    `json:"x"`
+		Y            float64    `json:"y"`
+		Z            float64    `json:"z"`
+		Posts        []*Post    `yaml:"-"`
+		Tags         []*Tag     `yaml:"-"`
+		Projects     []*Project `yaml:"-"`
 	}
 )
 
-// GetEmb returns the embedding struct itself.
-func (emb *Embedded) GetEmb() *Embedded {
-	return emb
+type (
+	// Cache is a any asset.
+	Cache struct {
+		bun.BaseModel `bun:"caches"`
+
+		ID   int64  `bun:"id,pk,autoincrement"`
+		Path string `bun:"path,unique"`
+		Hash string `bun:"hashed,unique"`
+
+		X float64
+		Y float64
+		Z float64
+	}
+	// Post is a post with all its projects and tags.
+	Post struct {
+		bun.BaseModel `bun:"posts"`
+
+		ID int64 `bun:"id,pk,autoincrement" `
+		X  float64
+		Y  float64
+		Z  float64
+
+		Title       string     `bun:"title"`
+		Slug        string     `bun:"slug,unique"`
+		Description string     `bun:"description"`
+		Content     string     `bun:"content"`
+		BannerPath  string     `bun:"banner_path"`
+		CreatedAt   CustomTime `bun:"created_at"`
+		// UpdatedAt   CustomTime `bun:"updated_at"`
+
+		TagSlugs     []string
+		PostSlugs    []string
+		ProjectSlugs []string
+
+		// M2M relationships
+		Tags     []*Tag     `bun:"m2m:post_to_tags,join:Post=Tag"`
+		Posts    []*Post    `bun:"m2m:post_to_posts,join:SourcePost=TargetPost"`
+		Projects []*Project `bun:"m2m:post_to_projects,join:Post=Project"`
+	}
+
+	// Project is a project with all its posts and tags.
+	Project struct {
+		bun.BaseModel `bun:"projects"`
+
+		ID int64 `bun:"id,pk,autoincrement" yaml:"-"`
+
+		X float64
+		Y float64
+		Z float64
+
+		Title       string     `bun:"title"`
+		Slug        string     `bun:"slug,unique"`
+		Description string     `bun:"description"`
+		Content     string     `bun:"content"`
+		BannerPath  string     `bun:"banner_path"`
+		CreatedAt   CustomTime `bun:"created_at"`
+		// UpdatedAt   CustomTime `bun:"updated_at"`
+
+		TagSlugs     []string `bun:"tag_slugs"`
+		PostSlugs    []string `bun:"post_slugs"`
+		ProjectSlugs []string `bun:"project_slugs"`
+
+		// M2M relationships
+		Tags     []*Tag     `bun:"m2m:project_to_tags,join:Project=Tag"`
+		Posts    []*Post    `bun:"m2m:post_to_projects,join:Project=Post"`
+		Projects []*Project `bun:"m2m:project_to_projects,join:SourceProject=TargetProject"`
+	}
+
+	// Tag is a tag with all its posts and projects.
+	Tag struct {
+		bun.BaseModel `bun:"tags"`
+
+		ID int64 `bun:"id,pk,autoincrement"`
+		X  float64
+		Y  float64
+		Z  float64
+
+		Title       string     `bun:"title"`
+		Slug        string     `bun:"slug,unique"`
+		Description string     `bun:"description"`
+		Content     string     `bun:"content"`
+		BannerPath  string     `bun:"banner_path"`
+		Icon        string     `bun:"icon"`
+		CreatedAt   CustomTime `bun:"created_at"`
+		// UpdatedAt   CustomTime `bun:"updated_at"`
+
+		TagSlugs     []string `bun:"tag_slugs"`
+		PostSlugs    []string `bun:"post_slugs"`
+		ProjectSlugs []string `bun:"project_slugs"`
+
+		// M2M relationships
+		Tags     []*Tag     `bun:"m2m:tag_to_tags,join:SourceTag=TargetTag"`
+		Posts    []*Post    `bun:"m2m:post_to_tags,join:Tag=Post"`
+		Projects []*Project `bun:"m2m:project_to_tags,join:Tag=Project"`
+	}
+)
+
+type (
+	// PostToTag represents a many-to-many relationship between posts and tags
+	PostToTag struct {
+		bun.BaseModel `bun:"post_to_tags"`
+
+		PostID int64 `bun:"post_id,pk"`
+		Post   *Post `bun:"rel:belongs-to,join:post_id=id"`
+		TagID  int64 `bun:"tag_id,pk"`
+		Tag    *Tag  `bun:"rel:belongs-to,join:tag_id=id"`
+	}
+
+	// PostToProject represents a many-to-many relationship between posts and projects
+	PostToProject struct {
+		bun.BaseModel `bun:"post_to_projects"`
+
+		PostID    int64    `bun:"post_id,pk"`
+		Post      *Post    `bun:"rel:belongs-to,join:post_id=id"`
+		ProjectID int64    `bun:"project_id,pk"`
+		Project   *Project `bun:"rel:belongs-to,join:project_id=id"`
+	}
+
+	// ProjectToTag represents a many-to-many relationship between projects and tags
+	ProjectToTag struct {
+		bun.BaseModel `bun:"project_to_tags"`
+
+		ProjectID int64    `bun:"project_id,pk"`
+		Project   *Project `bun:"rel:belongs-to,join:project_id=id"`
+		TagID     int64    `bun:"tag_id,pk"`
+		Tag       *Tag     `bun:"rel:belongs-to,join:tag_id=id"`
+	}
+
+	// PostToPost represents a many-to-many relationship between posts and other posts
+	PostToPost struct {
+		bun.BaseModel `bun:"post_to_posts"`
+
+		SourcePostID int64 `bun:"source_post_id,pk"`
+		SourcePost   *Post `bun:"rel:belongs-to,join:source_post_id=id"`
+		TargetPostID int64 `bun:"target_post_id,pk"`
+		TargetPost   *Post `bun:"rel:belongs-to,join:target_post_id=id"`
+	}
+
+	// ProjectToProject represents a many-to-many relationship between projects and other projects
+	ProjectToProject struct {
+		bun.BaseModel `bun:"project_to_projects"`
+
+		SourceProjectID int64    `bun:"source_project_id,pk"`
+		SourceProject   *Project `bun:"rel:belongs-to,join:source_project_id=id"`
+		TargetProjectID int64    `bun:"target_project_id,pk"`
+		TargetProject   *Project `bun:"rel:belongs-to,join:target_project_id=id"`
+	}
+
+	// TagToTag represents a many-to-many relationship between tags and other tags
+	TagToTag struct {
+		bun.BaseModel `bun:"tag_to_tags"`
+
+		SourceTagID int64 `bun:"source_tag_id,pk"`
+		SourceTag   *Tag  `bun:"rel:belongs-to,join:source_tag_id=id"`
+		TargetTagID int64 `bun:"target_tag_id,pk"`
+		TargetTag   *Tag  `bun:"rel:belongs-to,join:target_tag_id=id"`
+	}
+)
+
+// GetTitle returns the title of the embedding.
+func (emb *Doc) GetTitle() string {
+	return emb.Title
 }
 
 // PagePath returns the path to the post page.
@@ -111,97 +246,20 @@ func (emb *Tag) PagePath() string {
 	return "/tag/" + emb.Slug
 }
 
-// PagePath returns the path to the employment page.
-func (emb *Employment) PagePath() string {
-	return "/employment/" + emb.Slug
+func (emb *Post) String() string {
+	return fmt.Sprintf("%s %s %s %d", emb.Title, emb.Slug, emb.Description, emb.ID)
 }
 
-// New creates a new instance of the given type.
-func New[
-	T Post | Project | Tag,
-](emb *Embedded) *T {
-	return &T{Embedded: *emb}
+func (emb *Project) String() string {
+	return fmt.Sprintf("%s %s %s %d", emb.Title, emb.Slug, emb.Description, emb.ID)
 }
 
-var (
-	// ErrValueMissing is returned when a value is missing.
-	ErrValueMissing = eris.Errorf("missing value")
-
-	// ErrValueInvalid is returned when the slug is invalid.
-	ErrValueInvalid = eris.Errorf("invalid value")
-)
-
-// Defaults sets the default values for the embedding if they are missing.
-func Defaults(emb *Embedded) error {
-	if emb == nil {
-		return eris.Wrap(
-			ErrValueMissing,
-			"whole embedding is nil",
-		)
-	}
-	// Set default icon if not provided
-	if emb.Icon == "" {
-		emb.Icon = "tag"
-	}
-
-	return nil
+func (emb *Tag) String() string {
+	return fmt.Sprintf("%s %s %s %d", emb.Title, emb.Slug, emb.Description, emb.ID)
 }
 
-// Validate validate the given embedding.
-func Validate(
-	emb *Embedded,
-) error {
-	if emb.Title == "" {
-		return eris.Wrapf(
-			ErrValueMissing,
-			"%s is missing title",
-			emb.RawContent,
-		)
-	}
-
-	if emb.Slug == "" {
-		return eris.Wrapf(
-			ErrValueMissing,
-			"%s is missing slug",
-			emb.Title,
-		)
-	}
-
-	if emb.Description == "" {
-		return eris.Wrapf(
-			ErrValueMissing,
-			"%s is missing description",
-			emb.Slug,
-		)
-	}
-
-	if emb.Content == "" {
-		return eris.Wrapf(
-			ErrValueMissing,
-			"%s is missing content",
-			emb.Slug,
-		)
-	}
-
-	if emb.RawContent == "" {
-		return eris.Wrapf(
-			ErrValueMissing,
-			"%s is missing raw content",
-			emb.Slug,
-		)
-	}
-
-	if strings.Contains(emb.Slug, " ") {
-		return eris.Wrapf(
-			ErrValueInvalid,
-			"slug %s contains spaces",
-			emb.Slug,
-		)
-	}
-	return nil
-}
-
-// GetTitle returns the title of the embedding.
-func (emb *Embedded) GetTitle() string {
-	return emb.Title
+// Hash calculates the hash of a file's content.
+func Hash(content []byte) string {
+	sum := md5.Sum(content)
+	return hex.EncodeToString(sum[:])
 }

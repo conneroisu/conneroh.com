@@ -18,9 +18,6 @@ import (
 // Individual Post component
 func Post(
 	post *assets.Post,
-	fullPosts *[]*assets.Post,
-	fullProjects *[]*assets.Project,
-	fullTags *[]*assets.Tag,
 ) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -111,7 +108,7 @@ func Post(
 		var templ_7745c5c3_Var8 string
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(post.Title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 26, Col: 16}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 23, Col: 16}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
@@ -146,7 +143,7 @@ func Post(
 		var templ_7745c5c3_Var11 string
 		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(post.CreatedAt.Format("Jan 2, 2006"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 32, Col: 43}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 29, Col: 43}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 		if templ_7745c5c3_Err != nil {
@@ -181,7 +178,7 @@ func Post(
 		var templ_7745c5c3_Var14 string
 		templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(readTime(post.Content))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 39, Col: 34}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 36, Col: 34}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 		if templ_7745c5c3_Err != nil {
@@ -248,7 +245,7 @@ func Post(
 			var templ_7745c5c3_Var20 string
 			templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(tag.Slug)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 49, Col: 16}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 46, Col: 16}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 			if templ_7745c5c3_Err != nil {
@@ -409,7 +406,7 @@ func Post(
 				var templ_7745c5c3_Var32 string
 				templ_7745c5c3_Var32, templ_7745c5c3_Err = templ.JoinStringErrs(project.PagePath())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 84, Col: 34}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 81, Col: 34}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var32))
 				if templ_7745c5c3_Err != nil {
@@ -422,7 +419,7 @@ func Post(
 				var templ_7745c5c3_Var33 string
 				templ_7745c5c3_Var33, templ_7745c5c3_Err = templ.JoinStringErrs(project.PagePath())
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 85, Col: 39}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 82, Col: 39}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var33))
 				if templ_7745c5c3_Err != nil {
@@ -470,7 +467,7 @@ func Post(
 				var templ_7745c5c3_Var37 string
 				templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.JoinStringErrs(project.Slug)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 95, Col: 23}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 92, Col: 23}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var37))
 				if templ_7745c5c3_Err != nil {
@@ -505,7 +502,7 @@ func Post(
 				var templ_7745c5c3_Var40 string
 				templ_7745c5c3_Var40, templ_7745c5c3_Err = templ.JoinStringErrs(project.Description)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 100, Col: 30}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `cmd/conneroh/views/posts.templ`, Line: 97, Col: 30}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var40))
 				if templ_7745c5c3_Err != nil {

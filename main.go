@@ -4,29 +4,17 @@ package main
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"os"
-	"slices"
 
 	"github.com/conneroisu/conneroh.com/cmd/conneroh"
-	"github.com/conneroisu/conneroh.com/internal/data/gen"
+	"github.com/conneroisu/conneroh.com/internal/logger"
 )
 
 func main() {
-	for _, tag := range gen.AllTags {
-		for _, post := range gen.AllPosts {
-			// for each post that has this tag add it the tag's posts
-			if slices.Contains(post.TagSlugs, tag.Slug) {
-				tag.Posts = append(tag.Posts, post)
-			}
-		}
-		for _, project := range gen.AllProjects {
-			// for each project that has this tag add it the tag's projects
-			if slices.Contains(project.TagSlugs, tag.Slug) {
-				tag.Projects = append(tag.Projects, project)
-			}
-		}
-	}
-	if err := conneroh.Run(
+	var err error
+	slog.SetDefault(logger.DefaultProdLogger)
+	if err = conneroh.Run(
 		context.Background(),
 		os.Getenv,
 	); err != nil {

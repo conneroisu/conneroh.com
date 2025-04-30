@@ -7,11 +7,11 @@ tags:
   - ideology/vim-motions
   - programming-language/typescript
   - programming-language/javascript
-banner_path: projects/vim-toggle.png
+banner_path: projects/vim-toggle.webp
 created_at: 2025-03-27T14:13:11.000-06:00
 description: Obsidian plugin to toggle between vim and normal mode.
 title: vim-toggle
-updated_at: 2025-04-11T15:46:49.000-06:00
+updated_at: 2025-04-14T19:19:44.000-06:00
 ---
 
 Github: [link](https://github.com/conneroisu/vim-toggle)
@@ -25,7 +25,7 @@ Toggle between vim and normal mode.
 # Vim Toggle Plugin Obsidian
 
 > > Toggle the state of Vim inside of Obsidian, in response to Obsidian Canvas Core Plugin Functionality.
-> > ![A gif showing the pure basics of the plugin](dist/img/projects/vim-toggle/legendary.gif)
+> > ![[projects/vim-toggle.gif]]
 > > The new Canvas Plugin has prompted me to make a small plugin to toggle the state of use of the vim editor in obsidian.
 
 # Wondering what vi/vim is?

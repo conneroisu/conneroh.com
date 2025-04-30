@@ -7,10 +7,8 @@ tags:
 created_at: 2025-03-28T19:17:42.000-06:00
 description: A Neovim plugin that seamlessly integrates Doppler's secret management
 title: doppler.nvim
-updated_at: 2025-04-10T12:49:09.000-06:00
+updated_at: 2025-04-25T06:01:13.000-06:00
 ---
-
-In the realm of modern development, managing environment secrets securely and efficiently is paramount. For Neovim users, seamlessly integrating these secrets into the editing environment can enhance productivity and security. Enter **doppler.nvim**, a plugin designed to bridge the gap between Doppler's secret management and Neovim's powerful editing capabilities.
 
 ## Understanding doppler.nvim
 

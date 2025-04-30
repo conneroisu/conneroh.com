@@ -2,148 +2,142 @@ package twerge
 
 import (
 	"bytes"
+	"context"
 	"fmt"
+	"io"
 	"os"
-	"slices"
 	"sort"
+	"strconv"
 	"strings"
+
+	"github.com/a-h/templ"
+	"github.com/conneroisu/twerge/internal/files"
+	"github.com/dave/jennifer/jen"
 )
 
 const (
-	// Section markers used to identify where generated CSS should be placed
-
 	// twergeBeginMarker is the beginning of the section where the generated CSS will be placed
 	twergeBeginMarker = "/* twerge:begin */"
 	// twergeEndMarker is the end of the section where the generated CSS will be placed
 	twergeEndMarker = "/* twerge:end */"
 )
 
-// GenerateTailwind creates an input CSS file for the Tailwind CLI
+// CodeGen generates all the code needed to use Twerge statically.
+func CodeGen(
+	g *Generator,
+	goPath string,
+	cssPath string,
+	htmlPath string,
+	comps ...templ.Component,
+) error {
+	for _, comp := range comps {
+		err := comp.Render(context.Background(), io.Discard)
+		if err != nil {
+			return err
+		}
+	}
+
+	err := generateCSS(g, cssPath)
+	if err != nil {
+		return err
+	}
+
+	err = generateHTML(g, htmlPath)
+	if err != nil {
+		return err
+	}
+
+	err = generateGo(g, goPath)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// generateCSS creates an input CSS file for the Tailwind CLI
 // that includes all the @apply directives from the provided class map.
 //
 // This is useful for building a production CSS file with Tailwind's CLI.
 //
 // The marker is used to identify the start and end of the @apply directives generated
 // by Twerge.
-func GenerateTailwind(
+func generateCSS(
+	g *Generator,
 	cssPath string,
 ) error {
-	// Read base CSS content if the file exists
-	var baseContent []byte
-	var err error
-
-	baseContent, err = os.ReadFile(cssPath)
-	if err != nil && !os.IsNotExist(err) {
-		return fmt.Errorf("error reading input file: %w", err)
+	var builder bytes.Buffer
+	keys, values := sortMap(g.Cache())
+	for i, raw := range keys {
+		builder.WriteString("/* from " + raw + " */\n")
+		builder.WriteString(".")
+		builder.WriteString(values[i].Generated)
+		builder.WriteString(" { \n\t@apply ")
+		builder.WriteString(values[i].Merged)
+		builder.WriteString("; \n}\n\n")
 	}
+	cssContent := builder.Bytes()
 
-	// If file doesn't exist, create minimal Tailwind directives
+	fil, err := os.OpenFile(cssPath, os.O_RDWR|os.O_CREATE, 0644)
 	if os.IsNotExist(err) {
-		baseContent = []byte(`@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* twerge:start */
-/* twerge:end */
-`)
-	}
-
-	// Generate Twerge CSS content
-	// Get all keys and sort them for consistent output
-
-	var builder strings.Builder
-	var gendClasses []string
-	for generated, merged := range sortMap(GenClassMergeStr) {
-		gendClasses = append(gendClasses, generated)
-		// Create a CSS rule using the generated class name and the merged Tailwind classes
-		builder.WriteString(".")
-		builder.WriteString(generated)
-		builder.WriteString(" { \n\t@apply ")
-		builder.WriteString(merged)
-		builder.WriteString("; \n}\n")
-	}
-	for givenClasses, gendClass := range ClassMapStr {
-		if slices.Contains(gendClasses, gendClass) {
-			continue
+		fil, err = os.Create(cssPath)
+		if err != nil {
+			return fmt.Errorf("error creating file: %w", err)
 		}
-		builder.WriteString(".")
-		builder.WriteString(gendClass)
-		builder.WriteString(" { \n\t@apply ")
-		builder.WriteString(Merge(givenClasses))
-		builder.WriteString("; \n}\n")
 	}
-	cssContent := builder.String()
-
-	// Add to file content
-	newContent, err := replaceBetweenMarkers(baseContent, []byte(cssContent))
 	if err != nil {
-		return fmt.Errorf("error adding twerge content: %w", err)
+		return fmt.Errorf("error opening file: %w", err)
+	}
+	defer func() {
+		ferr := fil.Close()
+		if ferr != nil {
+			fmt.Printf("error closing css file: %v", ferr)
+		}
+	}()
+
+	content, err := io.ReadAll(fil)
+	if err != nil {
+		return fmt.Errorf("error reading file: %w", err)
 	}
 
-	// Write to output path
-	err = os.WriteFile(cssPath, newContent, 0644)
+	output, err := files.InteroplateMarkers(
+		content,
+		cssContent,
+		[]byte(twergeBeginMarker),
+		[]byte(twergeEndMarker),
+	)
+
 	if err != nil {
-		return fmt.Errorf("error writing output file: %w", err)
+		return fmt.Errorf("error interpolating markers: %w", err)
+	}
+
+	err = os.WriteFile(cssPath, output, 0644)
+	if err != nil {
+		return fmt.Errorf("error writing file: %w", err)
 	}
 
 	return nil
 }
 
-func sortMap(m map[string]string) map[string]string {
-	keys := make([]string, 0, len(m))
-	for k := range m {
-		keys = append(keys, k)
-	}
-	sort.Strings(keys)
-
-	sorted := make(map[string]string, len(m))
-	for _, k := range keys {
-		sorted[k] = m[k]
-	}
-	return sorted
-}
-
-// GenerateTempl creates a .templ file that can be used to generate a CSS file
+// generateHTML creates a .templ file that can be used to generate a CSS file
 // with the provided class map.
-func GenerateTempl(
-	templPath string,
+func generateHTML(
+	g *Generator,
+	htmlPath string,
 ) error {
-	var pkgName string
-	pkgEnd := strings.LastIndex(templPath, "/")
-	if pkgEnd == -1 {
-		pkgName = "main"
-	} else {
-		pkgStart := strings.LastIndex(templPath[:pkgEnd], "/")
-		if pkgStart == -1 {
-			pkgName = "main"
-		} else {
-			pkgName = templPath[pkgStart+1 : pkgEnd]
-		}
-	}
-
 	var buf bytes.Buffer
-	buf.WriteString("// Code generated by twerge. DO NOT EDIT.\n\n")
-	buf.WriteString("package ")
-	buf.WriteString(pkgName)
+	buf.WriteString("<!-- Code generated by twerge. DO NOT EDIT. -->\n")
 	buf.WriteString("\n\n")
-	buf.WriteString("templ empty() {\n")
 	buf.WriteString("<div class=\"")
 	buf.WriteString("mb-4")
 	buf.WriteString("\"></div>\n")
-	for k := range sortMap(GenClassMergeStr) {
-		// Create a CSS rule using the generated class name and the merged Tailwind classes
+	for k := range len(g.Cache()) {
 		buf.WriteString("<div class=\"")
-		buf.WriteString(k)
+		buf.WriteString(fmt.Sprintf("tw-%d", k))
 		buf.WriteString("\"></div>\n")
 	}
-	for _, v := range sortMap(ClassMapStr) {
-		buf.WriteString("<div class=\"")
-		buf.WriteString(v)
-		buf.WriteString("\"></div>\n")
-	}
-	buf.WriteString("}")
 
-	err := os.WriteFile(templPath, buf.Bytes(), 0644)
+	err := os.WriteFile(htmlPath, buf.Bytes(), 0644)
 	if err != nil {
 		return fmt.Errorf("error writing .templ file: %w", err)
 	}
@@ -151,46 +145,85 @@ func GenerateTempl(
 	return nil
 }
 
-// replaceBetweenMarkers replaces content between twerge markers
-func replaceBetweenMarkers(content, replacement []byte) ([]byte, error) {
-	// Find begin marker
-	beginMarkerBytes := []byte(twergeBeginMarker)
-	beginIdx := bytes.Index(content, beginMarkerBytes)
-	if beginIdx == -1 {
-		// Markers don't exist, append content with markers
-		suffix := append([]byte("\n\n"), beginMarkerBytes...)
-		suffix = append(suffix, '\n')
-		suffix = append(suffix, replacement...)
-		suffix = append(suffix, '\n')
-		suffix = append(suffix, []byte(twergeEndMarker)...)
-		return append(content, suffix...), nil
+// generateGo generates Go code for a variable containing the class mapping
+func generateGo(
+	g *Generator,
+	goPath string,
+) error {
+
+	packageName, err := files.GetPackageName(goPath)
+	if err != nil {
+		return fmt.Errorf("error getting package name: %w", err)
+	}
+	// Create a new file
+	f := jen.NewFile(packageName)
+
+	// Add a package comment
+	f.PackageComment("Code generated by twerge. DO NOT EDIT.")
+
+	f.Func().Id("SetCache").Params().Block(
+		jen.Qual("github.com/conneroisu/twerge", "Default").
+			Call().Dot("Handler").Dot("SetCache").Call(jen.Id("ClassMapStr")),
+	)
+
+	// Create the ClassMapStr variable
+	f.Var().Id("ClassMapStr").Op("=").Map(jen.String()).Qual(
+		"github.com/conneroisu/twerge",
+		"CacheValue",
+	).Values(jen.DictFunc(func(d jen.Dict) {
+		for k := range g.Cache() {
+			d[jen.Lit(k)] = jen.Qual(
+				"github.com/conneroisu/twerge",
+				"CacheValue",
+			).Values(jen.Dict{
+				jen.Id("Generated"): jen.Lit(g.Cache()[k].Generated),
+				jen.Id("Merged"):    jen.Lit(g.Cache()[k].Merged),
+			})
+		}
+	}))
+
+	return files.JenFile(f, goPath)
+}
+
+// sortMap takes a map of string to CacheValue and returns two slices:
+// 1. A slice of sorted keys (sorted by the numeric part of the "tw-{num}" in the Generated field)
+// 2. A slice of corresponding CacheValues in the same order
+func sortMap(m map[string]CacheValue) ([]string, []CacheValue) {
+	// Create a slice of keys
+	keys := make([]string, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
 	}
 
-	// Find the end of the line containing the begin marker
-	beginLineEnd := beginIdx + len(beginMarkerBytes)
-	for beginLineEnd < len(content) && content[beginLineEnd] != '\n' && content[beginLineEnd] != '\r' {
-		beginLineEnd++
-	}
-	if beginLineEnd < len(content) {
-		beginLineEnd++ // Include the newline character
-	}
+	// Sort keys based on the numeric part of the Generated field
+	sort.Slice(keys, func(i, j int) bool {
+		numI := extractNumber(m[keys[i]].Generated)
+		numJ := extractNumber(m[keys[j]].Generated)
+		return numI < numJ
+	})
 
-	// Find end marker
-	endMarkerBytes := []byte(twergeEndMarker)
-	endIdx := bytes.Index(content[beginLineEnd:], endMarkerBytes)
-	if endIdx == -1 {
-		return nil, fmt.Errorf("found begin marker but no end marker")
+	// Create a slice of values in the same order as sorted keys
+	values := make([]CacheValue, len(keys))
+	for i, k := range keys {
+		values[i] = m[k]
 	}
 
-	// Adjust end marker index to be relative to the whole content
-	endIdx += beginLineEnd
+	return keys, values
+}
 
-	// Create new content with replacement
-	result := make([]byte, 0, len(content)-(endIdx-beginLineEnd)+len(replacement)+1)
-	result = append(result, content[:beginLineEnd]...)
-	result = append(result, replacement...)
-	result = append(result, '\n')
-	result = append(result, content[endIdx:]...)
+// extractNumber extracts the numeric part from "tw-{num}"
+func extractNumber(generated string) int {
+	// Split by "-" and get the last part
+	parts := strings.Split(generated, "-")
+	if len(parts) < 2 {
+		return 0
+	}
 
-	return result, nil
+	// Convert to int
+	num, err := strconv.Atoi(parts[len(parts)-1])
+	if err != nil {
+		return 0
+	}
+
+	return num
 }

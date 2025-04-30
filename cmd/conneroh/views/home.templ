@@ -31,13 +31,13 @@ templ Home(
 						Conner Ohnesorge
 					</h1>
 					<p
-						aria-label="About Me"
+						aria-label="summary"
 						class={ twerge.It("text-xl text-gray-300 mb-8 max-w-md") }
 					>
 						Electrical Engineer & Software Developer specialized in creating robust, scalable, and elegant solutions.
 					</p>
 					<p
-						aria-label="Education"
+						aria-label="education"
 						class={ twerge.It("text-xl text-gray-300 mb-8 max-w-md") }
 					>
 						Electrical Engineering Bachelors Degree and Minor in Computer Science from
@@ -126,10 +126,17 @@ templ Home(
 			>
 				for i, project := range *fullProjects {
 					if i < 6 {
-						@components.ProjectItem(project,
+						@components.ProjectItem(
+							project,
 							templ.Attributes{
-								"class": twerge.It("bg-gray-900 transition-all flex transform hover:-translate-y-3 flex-col shadow-md rounded-lg hover:shadow-lg duration-300 overflow-hidden h-full cursor-pointer"),
-							})
+								"class":       twerge.It("bg-gray-900 transition-all flex transform hover:-translate-y-3 flex-col shadow-md rounded-lg hover:shadow-lg duration-300 overflow-hidden h-full cursor-pointer"),
+								"aria-label":  project.Title,
+								"hx-target":   "#bodiody",
+								"hx-get":      project.PagePath(),
+								"hx-push-url": "true",
+								"preload":     "mouseover",
+							},
+						)
 					}
 				}
 			</div>
@@ -166,7 +173,11 @@ templ Home(
 				for i, post := range *fullPosts {
 					if i < 4 {
 						@components.PostItem(post, templ.Attributes{
-							"class": twerge.It("overflow-hidden bg-gray-800 transform rounded-lg transition-all hover:shadow-lg duration-300 shadow-md hover:-translate-y-1 cursor-pointer"),
+							"class":       twerge.It("overflow-hidden bg-gray-800 transform rounded-lg transition-all hover:shadow-lg duration-300 shadow-md hover:-translate-y-1 cursor-pointer"),
+							"hx-target":   "#bodiody",
+							"hx-get":      post.PagePath(),
+							"hx-push-url": post.PagePath(),
+							"preload":     "mouseover",
 						})
 					}
 				}
@@ -203,9 +214,16 @@ templ Home(
 			>
 				for i, tag := range *fullTags {
 					if i < 28 {
-						@components.TagItem(tag, templ.Attributes{
-							"class": twerge.It("p-6 rounded-lg overflow-hidden bg-gray-900 shadow-md hover:shadow-lg duration-300 transform transition-all hover:-translate-y-1"),
-						})
+						@components.TagItem(
+							tag,
+							templ.Attributes{
+								"class":       twerge.It("p-6 rounded-lg overflow-hidden bg-gray-900 shadow-md hover:shadow-lg duration-300 transform transition-all hover:-translate-y-1"),
+								"hx-target":   "#bodiody",
+								"hx-get":      tag.PagePath(),
+								"hx-push-url": "true",
+								"preload":     "mouseover",
+							},
+						)
 					}
 				}
 			</div>
@@ -262,80 +280,7 @@ templ Home(
 						@components.Icon("mail", templ.Attributes{})
 					</a>
 				</div>
-				<form
-					class={ twerge.It("bg-gray-800 p-8 rounded-lg space-y-6 shadow-md") }
-				>
-					<div
-						class={ twerge.It("gap-6 grid grid-cols-1 md:grid-cols-2") }
-					>
-						<div>
-							<label
-								for="name"
-								class={ twerge.It("mb-1 block text-sm font-medium text-gray-300") }
-							>
-								Name
-							</label>
-							<input
-								type="text"
-								id="name"
-								name="name"
-								class={ twerge.It("py-2 bg-gray-700 focus:outline-none border-gray-600 w-full focus:ring-blue-500 border px-4 text-white rounded-md focus:ring-2") }
-								required
-							/>
-						</div>
-						<div>
-							<label
-								for="email"
-								class={ twerge.It("mb-1 block text-sm font-medium text-gray-300") }
-							>
-								Email
-							</label>
-							<input
-								type="email"
-								id="email"
-								name="email"
-								class={ twerge.It("py-2 bg-gray-700 focus:outline-none border-gray-600 w-full focus:ring-blue-500 border px-4 text-white rounded-md focus:ring-2") }
-								required
-							/>
-						</div>
-					</div>
-					<div>
-						<label
-							for="subject"
-							class={ twerge.It("mb-1 block text-sm font-medium text-gray-300") }
-						>
-							Subject
-						</label>
-						<input
-							type="text"
-							id="subject"
-							name="subject"
-							class={ twerge.It("py-2 bg-gray-700 focus:outline-none border-gray-600 w-full focus:ring-blue-500 border px-4 text-white rounded-md focus:ring-2") }
-							required
-						/>
-					</div>
-					<div>
-						<label
-							for="message"
-							class={ twerge.It("mb-1 block text-sm font-medium text-gray-300") }
-						>
-							Message
-						</label>
-						<textarea
-							id="message"
-							name="message"
-							rows="4"
-							class={ twerge.It("py-2 bg-gray-700 focus:outline-none border-gray-600 w-full focus:ring-blue-500 border px-4 text-white rounded-md focus:ring-2") }
-							required
-						></textarea>
-					</div>
-					<button
-						type="submit"
-						class={ twerge.It("rounded-md font-medium text-white transition-colors focus:ring-offset-2 focus:ring-2 focus:ring-blue-500 w-full hover:bg-blue-700 bg-blue-600 py-3 focus:outline-none px-6") }
-					>
-						Send Message
-					</button>
-				</form>
+				@components.Form()
 			</div>
 		</div>
 	</section>
