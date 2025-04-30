@@ -539,19 +539,103 @@ func filter[T any](
 	pageSize int,
 	titleGetter func(T) string,
 ) ([]T, int) {
-	p := pool.New().WithMaxGoroutines(maxSearchRoutines)
+	// If query is empty, return all items
+	if query == "" {
+		return routing.Paginate(items, page, pageSize)
+	}
 
-	// Use a mutex to safely collect results
+	p := pool.New().WithMaxGoroutines(maxSearchRoutines)
+	query = strings.ToLower(query)
+
+	// Use a mutex to safely collect results with relevance score
+	type searchResult struct {
+		item  T
+		score int // Higher is better match
+	}
+
 	var mu sync.Mutex
-	filtered := make([]T, 0)
+	results := make([]searchResult, 0)
 
 	for i := range items {
 		item := items[i]
 		p.Go(func() {
+			var score int
+			var matchFound bool
+
+			// Check title match (highest priority)
 			title := titleGetter(item)
-			if strings.Contains(strings.ToLower(title), strings.ToLower(query)) {
+			if title != "" {
+				titleLower := strings.ToLower(title)
+				if strings.Contains(titleLower, query) {
+					score += 100
+					matchFound = true
+					// Exact title match gets bonus points
+					if titleLower == query {
+						score += 50
+					}
+				}
+			}
+
+			// Check in other fields based on type
+			switch v := any(item).(type) {
+			case *assets.Post:
+				// Check description
+				if strings.Contains(strings.ToLower(v.Description), query) {
+					score += 50
+					matchFound = true
+				}
+				// Check content
+				if strings.Contains(strings.ToLower(v.Content), query) {
+					score += 30
+					matchFound = true
+				}
+				// Check tags
+				for _, tag := range v.Tags {
+					if tag != nil && strings.Contains(strings.ToLower(tag.Title), query) {
+						score += 25
+						matchFound = true
+					}
+				}
+			case *assets.Project:
+				// Check description
+				if strings.Contains(strings.ToLower(v.Description), query) {
+					score += 50
+					matchFound = true
+				}
+				// Check content
+				if strings.Contains(strings.ToLower(v.Content), query) {
+					score += 30
+					matchFound = true
+				}
+				// Check tags
+				for _, tag := range v.Tags {
+					if tag != nil && strings.Contains(strings.ToLower(tag.Title), query) {
+						score += 25
+						matchFound = true
+					}
+				}
+			case *assets.Tag:
+				// Check description
+				if strings.Contains(strings.ToLower(v.Description), query) {
+					score += 50
+					matchFound = true
+				}
+				// Check content
+				if strings.Contains(strings.ToLower(v.Content), query) {
+					score += 30
+					matchFound = true
+				}
+				// Check icon name if it matches query
+				if v.Icon != "" && strings.Contains(strings.ToLower(v.Icon), query) {
+					score += 10
+					matchFound = true
+				}
+			}
+
+			// If any match found, add to results
+			if matchFound {
 				mu.Lock()
-				filtered = append(filtered, item)
+				results = append(results, searchResult{item, score})
 				mu.Unlock()
 			}
 		})
@@ -559,10 +643,16 @@ func filter[T any](
 
 	p.Wait()
 
-	// Sort results to ensure consistent pagination
-	sort.Slice(filtered, func(i, j int) bool {
-		return titleGetter(filtered[i]) < titleGetter(filtered[j])
+	// Sort results by relevance score (highest first)
+	sort.Slice(results, func(i, j int) bool {
+		return results[i].score > results[j].score
 	})
+
+	// Extract just the items from the sorted results
+	filtered := make([]T, len(results))
+	for i, result := range results {
+		filtered[i] = result.item
+	}
 
 	// Paginate the filtered results
 	return routing.Paginate(filtered, page, pageSize)
