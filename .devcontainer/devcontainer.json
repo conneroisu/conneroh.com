@@ -5,5 +5,23 @@
     "ghcr.io/forwardsoftware/devcontainer-features/go-mod-cache:1": {
       "go-version": "1.24"
     }
-  }
+  },
+  "customizations": {
+		"vscode": {
+			"extensions": [
+				"nicolasdschmidt.lunar-pink",
+				"github.copilot",
+				"github.copilot-chat",
+        "vscodevim.vim",
+        "JasonMcGhee.claude-debugs-for-you",
+        "golang.Go",
+        "a-h.templ",
+        "jnoortheen.nix-ide",
+        "DavidAnson.vscode-markdownlint",
+        "VisualStudioExptTeam.vscodeintellicode",
+        "christian-kohler.path-intellisense",
+        "qwtel.sqlite-viewer"
+			]
+		}
+	}
 }
