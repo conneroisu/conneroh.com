@@ -1,10 +1,13 @@
 {
   "image": "mcr.microsoft.com/devcontainers/universal:2",
+  "postCreateCommand": "direnv allow",
   "features": {
     "ghcr.io/devcontainers/features/nix:1": {
       "flakeUri": "github:conneroisu/conneroh.com#devShells.default"
     },
     "ghcr.io/devcontainers-extra/features/direnv:1": {},
-    "ghcr.io/forwardsoftware/devcontainer-features/go-mod-cache:1": {}
+    "ghcr.io/forwardsoftware/devcontainer-features/go-mod-cache:1": {
+      "go-version": "1.24"
+    }
   }
 }
