@@ -2,10 +2,10 @@
   description = "Personal Website for Conner Ohnesorge";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/0.1.791944.tar.gz";
     systems.url = "github:nix-systems/default";
     flake-utils = {
-      url = "github:numtide/flake-utils";
+      url = "https://flakehub.com/f/numtide/flake-utils/0.1.102.tar.gz";
       inputs.systems.follows = "systems";
     };
     bun2nix.url = "github:baileyluTCD/bun2nix";
