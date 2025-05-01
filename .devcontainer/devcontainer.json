@@ -8,6 +8,10 @@
   },
   "customizations": {
 		"vscode": {
+      "settings": {
+       "editor.formatOnSave": true,
+       "editor.lineNumbers": "relative"
+      },
 			"extensions": [
 				"nicolasdschmidt.lunar-pink",
 				"github.copilot",
@@ -20,7 +24,9 @@
         "DavidAnson.vscode-markdownlint",
         "VisualStudioExptTeam.vscodeintellicode",
         "christian-kohler.path-intellisense",
-        "qwtel.sqlite-viewer"
+        "qwtel.sqlite-viewer",
+        "danprince.vsnetrw",
+        "eamodio.gitlens"
 			]
 		}
 	}
