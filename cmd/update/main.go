@@ -33,7 +33,7 @@ var (
 
 func main() {
 	flag.Parse()
-	slog.SetDefault(logger.DefaultProdLogger)
+	slog.SetDefault(logger.DefaultLogger)
 
 	// Create context that will be canceled on interrupt signals
 	ctx, stop := signal.NotifyContext(context.Background(),
@@ -114,7 +114,7 @@ func Run(ctx context.Context, getenv func(string) string, numWorkers, bufferSize
 				}
 				errMutex.Lock()
 				errs = append(errs, err)
-				slog.Error("processing error", "err", err)
+				fmt.Print("processing error", "err", err)
 				errMutex.Unlock()
 			case <-processingCtx.Done():
 				return

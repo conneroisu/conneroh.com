@@ -760,31 +760,31 @@ func (p *Processor) processTask(ctx context.Context, task Task) error {
 
 // processAsset processes an asset file
 func (p *Processor) processAsset(ctx context.Context, task Task) error {
-	// Read file if content wasn't provided
-	var content []byte
 	var err error
 
-	if task.Content != nil {
-		content = task.Content
-	} else {
-		content, err = afero.ReadFile(p.fs, task.Path)
+	// Read file if content wasn't provided
+	if task.Content == nil {
+		task.Content, err = afero.ReadFile(p.fs, task.Path)
 		if err != nil {
 			return eris.Wrapf(err, "failed to read asset: %s", task.Path)
 		}
 	}
 
 	// Calculate hash
-	hash := assets.Hash(content)
+	hash := assets.Hash(task.Content)
 
 	// Check if asset is already cached and unchanged
-	if isCached, err := p.checkCache(ctx, task.Path, hash); err != nil {
+	isCached, err := p.checkCache(ctx, task.Path, hash)
+	if err != nil {
 		return err
-	} else if isCached {
+	}
+	if isCached {
+		slog.Debug("asset cached", "path", task.Path)
 		return nil // Skip if already cached and unchanged
 	}
 
 	// Upload to S3
-	if err := p.uploadToS3(ctx, task.Path, content); err != nil {
+	if err := p.uploadToS3(ctx, task.Path, task.Content); err != nil {
 		return err
 	}
 
@@ -1322,7 +1322,6 @@ func (p *Processor) updateProjectRelationships(
 		if err != nil {
 			return err
 		}
-
 		_, err = p.db.NewInsert().
 			Model(&assets.ProjectToProject{
 				SourceProjectID: project.ID,
@@ -1345,7 +1344,6 @@ func (p *Processor) updateProjectRelationships(
 		if err != nil {
 			return err
 		}
-
 		_, err = p.db.NewInsert().
 			Model(&assets.ProjectToTag{
 				ProjectID: project.ID,
@@ -1368,7 +1366,6 @@ func (p *Processor) updateProjectRelationships(
 		if err != nil {
 			return err
 		}
-
 		_, err = p.db.NewInsert().
 			Model(&assets.PostToProject{
 				ProjectID: project.ID,
@@ -1444,7 +1441,6 @@ func (p *Processor) updateTagRelationships(
 		if err != nil {
 			return err
 		}
-
 		_, err = p.db.NewInsert().
 			Model(&assets.ProjectToTag{
 				TagID:     tag.ID,

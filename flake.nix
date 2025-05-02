@@ -118,7 +118,7 @@
                   --minify-syntax \
                   --minify-whitespace  \
                   --minify-identifiers \
-                  --outdir $REPO_ROOT/cmd/conneroh/_static/dist/ &
+                  --outdir $REPO_ROOT/cmd/conneroh/_static/dist/
             '';
             description = "Generate JS files";
           };
@@ -314,7 +314,7 @@
           cp ${./master.db} $out/root/master.db
         '';
       in rec {
-        conneroh = pkgs.buildGo124Module {
+        conneroh = pkgs.buildGoModule {
           inherit src vendorHash version;
           name = "conneroh.com";
           preBuild = ''
