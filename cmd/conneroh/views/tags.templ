@@ -34,6 +34,17 @@ templ Tag(
 			</div>
 		</header>
 		<div
+			class={ twerge.It("bg-gray-800 rounded-lg mb-8 overflow-hidden p-6 shadow-lg") }
+		>
+			<div
+				class={ twerge.It("max-w-none my-6 text-gray-300 leading-relaxed") }
+			>
+				<article>
+					@templ.Raw(tag.Content)
+				</article>
+			</div>
+		</div>
+		<div
 			x-data="{ activeTab: 'posts' }"
 			class={ twerge.It("mb-8") }
 		>
@@ -46,6 +57,7 @@ templ Tag(
 				>
 					<button
 						@click="activeTab = 'posts'"
+						:aria-selected="activeTab === 'posts'"
 						:class={
 							fmt.Sprintf("{'%s': activeTab === 'posts', '%s': activeTab !== 'posts'}",
 								twerge.It("text-blue-500 border-blue-500"),
@@ -57,6 +69,7 @@ templ Tag(
 					</button>
 					<button
 						@click="activeTab = 'projects'"
+						:aria-selected="activeTab === 'projects'"
 						:class={
 							fmt.Sprintf("{'%s': activeTab === 'projects', '%s': activeTab !== 'projects'}",
 								twerge.It("text-blue-500 border-blue-500"),
@@ -68,6 +81,7 @@ templ Tag(
 					</button>
 					<button
 						@click="activeTab = 'related'"
+						:aria-current="activeTab === 'related'"
 						:class={
 							fmt.Sprintf("{'%s': activeTab === 'related', '%s': activeTab !== 'related'}",
 								twerge.It("text-blue-500 border-blue-500"),
@@ -81,6 +95,7 @@ templ Tag(
 			</div>
 			// Posts Tab
 			<div
+				role="tabpanel"
 				x-show="activeTab === 'posts'"
 			>
 				@List(
@@ -94,6 +109,7 @@ templ Tag(
 			</div>
 			// Projects Tab
 			<div
+				role="tabpanel"
 				x-show="activeTab === 'projects'"
 				x-cloak
 			>
@@ -108,6 +124,7 @@ templ Tag(
 			</div>
 			// Related Tags Tab
 			<div
+				role="tabpanel"
 				x-show="activeTab === 'related'"
 				x-cloak
 			>

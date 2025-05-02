@@ -7,7 +7,7 @@ tags: []
 created_at: 2025-03-28T19:54:01.000-06:00
 description: "ENGL 314: Technical Communication"
 title: ENGL314
-updated_at: 2025-04-29T16:47:42.000-06:00
+updated_at: 2025-05-02T13:12:20.000-06:00
 ---
 
 # Reflecting on ENGL 314: Technical Communication
