@@ -224,6 +224,7 @@
               svgcleaner
               sqlite-web
               inputs.bun2nix.packages.${system}.default
+              htmx-lsp2
 
               flyctl # Infra
               openssl.dev
