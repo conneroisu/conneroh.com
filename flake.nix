@@ -11,12 +11,6 @@
     bun2nix.url = "github:baileyluTCD/bun2nix";
   };
 
-  nixConfig = {
-    extra-substituters = ''https://conneroisu.cachix.org'';
-    extra-trusted-public-keys = ''conneroisu.cachix.org-1:PgOlJ8/5i/XBz2HhKZIYBSxNiyzalr1B/63T74lRcU0='';
-    extra-experimental-features = "nix-command flakes";
-  };
-
   outputs = inputs @ {
     self,
     flake-utils,
