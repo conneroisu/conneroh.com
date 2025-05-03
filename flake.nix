@@ -318,7 +318,7 @@
           cp ${./master.db} $out/root/master.db
         '';
       in
-        rec {
+        {
           conneroh = pkgs.buildGoModule {
             inherit src vendorHash version;
             name = "conneroh.com";
@@ -351,7 +351,7 @@
               ];
             };
             copyToRoot = [
-              conneroh
+              self.packages.${system}.conneroh
               pkgs.cacert
               databaseFiles
             ];
@@ -400,44 +400,57 @@
             flyDevToml = settingsFormat.generate "fly.dev.toml" flyDevConfig;
             flyProdToml = settingsFormat.generate "fly.toml" flyProdConfig;
           in
-            pkgs.writeShellScriptBin "deploy" ''
-              set -e
-              arg=$1
-              TOKEN=""
-              FLY_NAME=""
-              CONFIG_FILE=""
+            pkgs.writeShellApplication {
+              name = "deployPackage";
+              runtimeInputs = [
+                pkgs.doppler
+                pkgs.skopeo
+                pkgs.flyctl
+                pkgs.cacert
+              ];
+              bashOptions = [
+                "errexit"
+                "pipefail"
+              ];
+              text = ''
+                set -e
+                arg=$1
+                TOKEN=""
+                FLY_NAME=""
+                CONFIG_FILE=""
 
-              [ -z "$arg" ] && { echo "No argument provided. Please provide a target environment. (dev or prod)"; exit 1; }
+                [ -z "$arg" ] && { echo "No argument provided. Please provide a target environment. (dev or prod)"; exit 1; }
 
-              if [ "$arg" = "dev" ]; then
-                [ -z "$FLY_DEV_AUTH_TOKEN" ] && FLY_DEV_AUTH_TOKEN=$(doppler secrets get --plain FLY_DEV_AUTH_TOKEN)
-                TOKEN="$FLY_DEV_AUTH_TOKEN"
-                export FLY_NAME="conneroh-com-dev"
-                export CONFIG_FILE=${flyDevToml}
-              else
-                [ -z "$FLY_AUTH_TOKEN" ] && FLY_AUTH_TOKEN=$(doppler secrets get --plain FLY_AUTH_TOKEN)
-                TOKEN="$FLY_AUTH_TOKEN"
-                export FLY_NAME="conneroh-com"
-                export CONFIG_FILE=${flyProdToml}
-              fi
+                if [ "$arg" = "dev" ]; then
+                  [ -z "$FLY_DEV_AUTH_TOKEN" ] && FLY_DEV_AUTH_TOKEN="$(doppler secrets get --plain FLY_DEV_AUTH_TOKEN)"
+                  TOKEN="$FLY_DEV_AUTH_TOKEN"
+                  export FLY_NAME="conneroh-com-dev"
+                  export CONFIG_FILE=${flyDevToml}
+                else
+                  [ -z "$FLY_AUTH_TOKEN" ] && FLY_AUTH_TOKEN="$(doppler secrets get --plain FLY_AUTH_TOKEN)"
+                  TOKEN="$FLY_AUTH_TOKEN"
+                  export FLY_NAME="conneroh-com"
+                  export CONFIG_FILE=${flyProdToml}
+                fi
 
-              REGISTY="registry.fly.io/$FLY_NAME"
-              echo "Copying image to Fly.io... to $REGISTY"
+                REGISTY="registry.fly.io/$FLY_NAME"
+                echo "Copying image to Fly.io... to $REGISTY"
 
-              ${pkgs.skopeo}/bin/skopeo copy \
-                --insecure-policy \
-                docker-archive:"${C-conneroh}" \
-                "docker://$REGISTY:latest" \
-                --dest-creds x:"$TOKEN" \
-                --format v2s2
+                skopeo copy \
+                  --insecure-policy \
+                  docker-archive:"${self.packages.${system}.C-conneroh}" \
+                  "docker://$REGISTY:latest" \
+                  --dest-creds x:"$TOKEN" \
+                  --format v2s2
 
-              echo "Deploying to Fly.io..."
-              ${pkgs.flyctl}/bin/fly deploy \
-                --remote-only \
-                -c "$CONFIG_FILE" \
-                -i "$REGISTY:latest" \
-                -t "$TOKEN"
-            '';
+                echo "Deploying to Fly.io..."
+                fly deploy \
+                  --remote-only \
+                  -c "$CONFIG_FILE" \
+                  -i "$REGISTY:latest" \
+                  -t "$TOKEN"
+              '';
+            };
         }
         // pkgs.lib.genAttrs (builtins.attrNames scripts) (name: scriptPackages.${name});
     });
