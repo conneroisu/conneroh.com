@@ -28,11 +28,23 @@
       buildWithSpecificGo = pkg: pkg.override {buildGoModule = pkgs.buildGo124Module;};
       scripts = {
         dx = {
-          exec = ''$EDITOR $REPO_ROOT/flake.nix'';
+          exec = ''
+            REPO_ROOT="$(git rev-parse --show-toplevel)"
+            $EDITOR "$REPO_ROOT"/flake.nix
+          '';
+          deps = [
+            pkgs.git
+          ];
           description = "Edit flake.nix";
         };
         gx = {
-          exec = "$EDITOR $REPO_ROOT/go.mod";
+          exec = ''
+            REPO_ROOT="$(git rev-parse --show-toplevel)"
+            $EDITOR "$REPO_ROOT"/go.mod
+          '';
+          deps = [
+            pkgs.git
+          ];
           description = "Edit go.mod";
         };
         clean = {
@@ -48,111 +60,161 @@
           description = "Reset the database";
         };
         tests = {
-          exec = ''${pkgs.go}/bin/go test -v ./...'';
+          exec = ''
+            REPO_ROOT="$(git rev-parse --show-toplevel)"
+            go test -v "$REPO_ROOT"/...
+          '';
+          deps = [
+            pkgs.go
+          ];
           description = "Run all go tests";
         };
         lint = {
           exec = ''
-              export REPO_ROOT=$(git rev-parse --show-toplevel)
+            REPO_ROOT="$(git rev-parse --show-toplevel)"
 
-            ${pkgs.golangci-lint}/bin/golangci-lint run
-            ${pkgs.statix}/bin/statix check $REPO_ROOT/flake.nix
-            ${pkgs.deadnix}/bin/deadnix $REPO_ROOT/flake.nix
+            golangci-lint run
+            statix check "$REPO_ROOT"/flake.nix
+            deadnix "$REPO_ROOT"/flake.nix
           '';
-          description = "Run Linting Steps.";
+          deps = [
+            pkgs.golangci-lint
+            pkgs.statix
+            pkgs.deadnix
+          ];
+          description = "Run Nix/Go Linting Steps.";
         };
         generate-css = {
           exec = ''
-            export REPO_ROOT=$(git rev-parse --show-toplevel)
-            ${pkgs.templ}/bin/templ generate --log-level error
-            ${pkgs.go}/bin/go run $REPO_ROOT/cmd/update-css --cwd $REPO_ROOT
-            ${pkgs.tailwindcss}/bin/tailwindcss -i ./input.css \
-                -o $REPO_ROOT/cmd/conneroh/_static/dist/style.css \
-                --cwd $REPO_ROOT
+            REPO_ROOT="$(git rev-parse --show-toplevel)"
+
+            templ generate --log-level error
+            go run "$REPO_ROOT"/cmd/update-css --cwd "$REPO_ROOT"
+            tailwindcss -i ./input.css \
+                -o "$REPO_ROOT"/cmd/conneroh/_static/dist/style.css \
+                --cwd "$REPO_ROOT"
           '';
+          deps = [
+            pkgs.tailwindcss
+            pkgs.templ
+            pkgs.go
+          ];
           description = "Update the generated html and css files.";
         };
         generate-docs = {
           exec = ''
-            # ${pkgs.doppler}/bin/doppler run -- ${self.packages."${system}".update}/bin/update -cwd $REPO_ROOT -jobs 20
+            doppler run -- update -jobs 20
           '';
+          deps = [
+            pkgs.doppler
+            self.packages."${system}".update
+          ];
           description = "Update the generated go files from the md docs.";
         };
         generate-reload = {
           exec = ''
-            export REPO_ROOT=$(git rev-parse --show-toplevel) # needed
+            REPO_ROOT="$(git rev-parse --show-toplevel)" # needed
 
-            TEMPL_HASH=$(nix-hash --type sha256 --base32 $REPO_ROOT/cmd/conneroh/**/*.templ | sha256sum | cut -d' ' -f1)
-            OLD_TEMPL_HASH=$(cat $REPO_ROOT/internal/cache/templ.hash)
+            TEMPL_HASH=$(nix-hash --type sha256 --base32 "$REPO_ROOT"/cmd/conneroh/**/*.templ | sha256sum | cut -d' ' -f1)
+            OLD_TEMPL_HASH=$(cat "$REPO_ROOT"/internal/cache/templ.hash)
 
             if [ "$OLD_TEMPL_HASH" != "$TEMPL_HASH" ]; then
               echo "OLD_TEMPL_HASH: $OLD_TEMPL_HASH; NEW_TEMPL_HASH: $TEMPL_HASH"
-              ${pkgs.lib.getExe scriptPackages.generate-css}
+              generate-css
               echo "$TEMPL_HASH" > ./internal/cache/templ.hash
             fi
 
             DOCS_HASH=$(nix-hash --type sha256 --base32 ./internal/data/docs/ | sha256sum | cut -d' ' -f1)
-            OLD_DOCS_HASH=$(cat $REPO_ROOT/internal/cache/docs.hash)
+            OLD_DOCS_HASH=$(cat "$REPO_ROOT"/internal/cache/docs.hash)
 
             if [ "$OLD_DOCS_HASH" != "$DOCS_HASH" ]; then
               echo "OLD_DOCS_HASH: $OLD_DOCS_HASH; NEW_DOCS_HASH: $DOCS_HASH"
-              ${pkgs.lib.getExe scriptPackages.generate-docs}
+              generate-docs
               echo "$DOCS_HASH" > ./internal/cache/docs.hash
             fi
           '';
+          deps = [
+            (pkgs.lib.getExe scriptPackages.generate-docs)
+            (pkgs.lib.getExe scriptPackages.generate-css)
+          ];
           description = "Code Generation Steps for specific directory changes.";
         };
         generate-js = {
           exec = ''
-            ${pkgs.bun}/bin/bun build \
-                  $REPO_ROOT/index.js \
+            REPO_ROOT="$(git rev-parse --show-toplevel)"
+            bun build \
+                  "$REPO_ROOT"/index.js \
                   --minify \
                   --minify-syntax \
                   --minify-whitespace  \
                   --minify-identifiers \
-                  --outdir $REPO_ROOT/cmd/conneroh/_static/dist/
+                  --outdir "$REPO_ROOT"/cmd/conneroh/_static/dist/
           '';
+          deps = [
+            pkgs.bun
+          ];
           description = "Generate JS files";
         };
         generate-all = {
           exec = ''
-            export REPO_ROOT=$(git rev-parse --show-toplevel)
-            ${pkgs.lib.getExe scriptPackages.generate-css}
-            ${pkgs.lib.getExe scriptPackages.generate-docs}
+            generate-css
+            generate-docs
           '';
+          deps = [
+            (pkgs.lib.getExe scriptPackages.generate-css)
+            (pkgs.lib.getExe scriptPackages.generate-docs)
+          ];
           description = "Generate all files in parallel";
         };
         format = {
           exec = ''
-            cd $(git rev-parse --show-toplevel)
-            ${pkgs.go}/bin/go fmt ./...
-            ${pkgs.git}/bin/git ls-files \
+            cd "$(git rev-parse --show-toplevel)"
+            go fmt ./...
+            git ls-files \
                 --others \
                 --exclude-standard \
                 --cached \
                 -- '*.js' '*.ts' '*.css' '*.md' '*.json' \
                 | xargs prettier --write
-            ${pkgs.golines}/bin/golines \
+            golines \
                 -l \
                 -w \
                 --max-len=80 \
                 --shorten-comments \
                 --ignored-dirs=.direnv .
-              cd -
+            cd -
           '';
+          deps = [
+            pkgs.go
+            pkgs.git
+            pkgs.golines
+          ];
           description = "Format code files";
         };
         run = {
           exec = ''
             export DEBUG=true
-            cd $REPO_ROOT && air
+            cd "$(git rev-parse --show-toplevel)" && air
           '';
+          deps = [
+            pkgs.air
+            pkgs.git
+          ];
           description = "Run the application with air for hot reloading";
         };
       };
       scriptPackages =
         pkgs.lib.mapAttrs
-        (name: script: pkgs.writeShellScriptBin name script.exec)
+        (
+          name: script:
+          # Create a script with dependencies
+            pkgs.writeShellApplication {
+              inherit name;
+              text = script.exec;
+              # Add runtime dependencies
+              runtimeInputs = script.deps or [];
+            }
+        )
         scripts;
     in {
       devShell = pkgs.mkShell {
