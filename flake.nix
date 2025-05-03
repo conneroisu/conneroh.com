@@ -259,12 +259,6 @@
           (builtins.attrNames scripts)
         );
 
-      # Build flags to strip debugging symbols and reduce binary size
-      commonGoBuildFlags = [
-        "-ldflags=-s -w" # Strip debug info
-        "-trimpath" # Remove file paths
-      ];
-
       # Define common attributes to avoid recursion
       goModuleCommon = {
         version = self.shortRev or "dirty";
@@ -279,9 +273,6 @@
 
         # Only include subPackages to minimize what's built
         subPackages = ["./cmd/conneroh"];
-
-        # Use build flags to reduce binary size
-        buildFlags = commonGoBuildFlags;
 
         # Use upx to compress the binary if needed
         nativeBuildInputs = [
@@ -310,7 +301,6 @@
         pname = "update";
         inherit (goModuleCommon) version src vendorHash;
         subPackages = ["./cmd/update"];
-        buildFlags = commonGoBuildFlags;
         doCheck = false;
       };
 
@@ -319,7 +309,6 @@
         pname = "update-slim";
         inherit (goModuleCommon) version src vendorHash;
         subPackages = ["./cmd/update"];
-        buildFlags = commonGoBuildFlags;
         doCheck = false;
         meta.mainProgram = "update"; # Ensure binary name matches
       };
