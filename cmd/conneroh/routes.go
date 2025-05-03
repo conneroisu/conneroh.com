@@ -28,7 +28,6 @@ func AddRoutes(
 	defer slog.Info("added routes")
 
 	h.Handle("GET /dist/", http.FileServer(http.FS(static.Dist)))
-	h.HandleFunc("GET /favicon.ico", routing.BytesHandler(static.Favicon))
 
 	h.HandleFunc(
 		"GET /{$}",
