@@ -202,6 +202,7 @@
             svgcleaner
             sqlite-web
             inputs.bun2nix.packages.${system}.default
+            harper
 
             flyctl # Infra
             openssl.dev
