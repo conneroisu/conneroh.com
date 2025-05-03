@@ -323,7 +323,7 @@
           conneroh = pkgs.buildGoModule {
             inherit src vendorHash version;
             name = "conneroh.com";
-            buildInputs = [
+            nativeBuildInputs = [
               pkgs.templ
               pkgs.tailwindcss
             ];
