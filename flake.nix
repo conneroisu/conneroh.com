@@ -48,8 +48,9 @@
           description = "Edit go.mod";
         };
         clean = {
-          exec = ''${pkgs.git}/bin/git clean -fdx'';
+          exec = ''git clean -fdx'';
           description = "Clean Project";
+          deps = [pkgs.git];
         };
         reset-db = {
           exec = ''
@@ -231,10 +232,11 @@
           )}
 
           echo "Git Status:"
-          ${pkgs.git}/bin/git status
+          git status
         '';
         packages = with pkgs;
           [
+            inputs.bun2nix.packages.${system}.default
             alejandra # Nix
             nixd
             statix
@@ -263,7 +265,6 @@
             nodePackages.prettier
             svgcleaner
             sqlite-web
-            inputs.bun2nix.packages.${system}.default
             harper
 
             flyctl # Infra
@@ -322,9 +323,13 @@
           conneroh = pkgs.buildGoModule {
             inherit src vendorHash version;
             name = "conneroh.com";
+            buildInputs = [
+              pkgs.templ
+              pkgs.tailwindcss
+            ];
             preBuild = ''
-              ${pkgs.templ}/bin/templ generate
-              ${pkgs.tailwindcss}/bin/tailwindcss \
+              templ generate
+              tailwindcss \
                   --minify \
                   -i ./input.css \
                   -o ./cmd/conneroh/_static/dist/style.css \
@@ -352,7 +357,6 @@
             };
             copyToRoot = [
               self.packages.${system}.conneroh
-              pkgs.cacert
               databaseFiles
             ];
           };
@@ -402,11 +406,11 @@
           in
             pkgs.writeShellApplication {
               name = "deployPackage";
-              runtimeInputs = [
-                pkgs.doppler
-                pkgs.skopeo
-                pkgs.flyctl
-                pkgs.cacert
+              runtimeInputs = with pkgs; [
+                doppler
+                skopeo
+                flyctl
+                cacert
               ];
               bashOptions = [
                 "errexit"
