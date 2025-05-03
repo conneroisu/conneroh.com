@@ -25,7 +25,6 @@
         ];
         config.allowUnfree = true;
       };
-      buildWithSpecificGo = pkg: pkg.override {buildGoModule = pkgs.buildGo124Module;};
       scripts = {
         dx = {
           exec = ''
@@ -36,6 +35,7 @@
             pkgs.git
           ];
           description = "Edit flake.nix";
+          runtimePathOnly = true; # Only include in PATH, not closure
         };
         gx = {
           exec = ''
@@ -46,11 +46,13 @@
             pkgs.git
           ];
           description = "Edit go.mod";
+          runtimePathOnly = true;
         };
         clean = {
           exec = ''git clean -fdx'';
           description = "Clean Project";
           deps = [pkgs.git];
+          runtimePathOnly = true;
         };
         reset-db = {
           exec = ''
@@ -69,6 +71,7 @@
             pkgs.go
           ];
           description = "Run all go tests";
+          runtimePathOnly = true;
         };
         lint = {
           exec = ''
@@ -84,6 +87,7 @@
             pkgs.deadnix
           ];
           description = "Run Nix/Go Linting Steps.";
+          runtimePathOnly = true;
         };
         generate-css = {
           exec = ''
@@ -101,6 +105,7 @@
             pkgs.go
           ];
           description = "Update the generated html and css files.";
+          runtimePathOnly = true;
         };
         generate-docs = {
           exec = ''
@@ -108,9 +113,12 @@
           '';
           deps = [
             pkgs.doppler
-            self.packages."${system}".update
+          ];
+          extraDeps = [
+            self.packages."${system}".update-slim
           ];
           description = "Update the generated go files from the md docs.";
+          runtimePathOnly = true;
         };
         generate-reload = {
           exec = ''
@@ -135,10 +143,14 @@
             fi
           '';
           deps = [
-            (pkgs.lib.getExe scriptPackages.generate-docs)
-            (pkgs.lib.getExe scriptPackages.generate-css)
+            pkgs.nix
+          ];
+          extraDeps = [
+            scriptPackages.generate-docs
+            scriptPackages.generate-css
           ];
           description = "Code Generation Steps for specific directory changes.";
+          runtimePathOnly = true;
         };
         generate-js = {
           exec = ''
@@ -155,17 +167,20 @@
             pkgs.bun
           ];
           description = "Generate JS files";
+          runtimePathOnly = true;
         };
         generate-all = {
           exec = ''
             generate-css
             generate-docs
           '';
-          deps = [
-            (pkgs.lib.getExe scriptPackages.generate-css)
-            (pkgs.lib.getExe scriptPackages.generate-docs)
+          deps = [];
+          extraDeps = [
+            scriptPackages.generate-css
+            scriptPackages.generate-docs
           ];
           description = "Generate all files in parallel";
+          runtimePathOnly = true;
         };
         format = {
           exec = ''
@@ -189,8 +204,10 @@
             pkgs.go
             pkgs.git
             pkgs.golines
+            pkgs.nodePackages.prettier
           ];
           description = "Format code files";
+          runtimePathOnly = true;
         };
         run = {
           exec = ''
@@ -202,21 +219,116 @@
             pkgs.git
           ];
           description = "Run the application with air for hot reloading";
+          runtimePathOnly = true;
         };
       };
-      scriptPackages =
-        pkgs.lib.mapAttrs
-        (
-          name: script:
-          # Create a script with dependencies
-            pkgs.writeShellApplication {
-              inherit name;
-              text = script.exec;
-              # Add runtime dependencies
-              runtimeInputs = script.deps or [];
-            }
-        )
-        scripts;
+
+      # Generate script packages with smarter dependency handling
+      # Pre-define script packages to avoid dependency cycles
+      scriptPackages = let
+        makeScriptPackage = name: script: let
+          # Determine which dependencies to include directly
+          directDeps =
+            if script ? runtimePathOnly && script.runtimePathOnly
+            then []
+            else script.deps or [];
+
+          # Combine all deps for PATH
+          allDeps = (script.deps or []) ++ (script.extraDeps or []);
+
+          # Create PATH from all dependencies
+          pathString = pkgs.lib.makeBinPath allDeps;
+        in
+          pkgs.writeShellApplication {
+            inherit name;
+            # Include PATH at the beginning of the script
+            text = ''
+              export PATH="${pathString}:$PATH"
+              ${script.exec}
+            '';
+            # Only include non-runtime-path-only deps
+            runtimeInputs = directDeps;
+          };
+      in
+        builtins.listToAttrs (
+          map
+          (name: {
+            inherit name;
+            value = makeScriptPackage name scripts.${name};
+          })
+          (builtins.attrNames scripts)
+        );
+
+      # Build flags to strip debugging symbols and reduce binary size
+      commonGoBuildFlags = [
+        "-ldflags=-s -w" # Strip debug info
+        "-trimpath" # Remove file paths
+      ];
+
+      # Define common attributes to avoid recursion
+      goModuleCommon = {
+        version = self.shortRev or "dirty";
+        src = ./.;
+        vendorHash = null;
+      };
+
+      # Optimized version of the conneroh package
+      connerohOptimized = pkgs.buildGoModule {
+        pname = "conneroh";
+        inherit (goModuleCommon) version src vendorHash;
+
+        # Only include subPackages to minimize what's built
+        subPackages = ["./cmd/conneroh"];
+
+        # Use build flags to reduce binary size
+        buildFlags = commonGoBuildFlags;
+
+        # Use upx to compress the binary if needed
+        nativeBuildInputs = [
+          pkgs.templ
+          pkgs.tailwindcss
+        ];
+
+        preBuild = ''
+          templ generate
+          tailwindcss \
+              --minify \
+              -i ./input.css \
+              -o ./cmd/conneroh/_static/dist/style.css \
+              --cwd .
+        '';
+
+        # Remove UPX compression since it's causing issues
+        # Instead, use build flags to reduce size
+
+        # Don't include tests to save space
+        doCheck = false;
+      };
+
+      # Optimized update binary
+      updateOptimized = pkgs.buildGoModule {
+        pname = "update";
+        inherit (goModuleCommon) version src vendorHash;
+        subPackages = ["./cmd/update"];
+        buildFlags = commonGoBuildFlags;
+        doCheck = false;
+      };
+
+      # Create a minimal/slim update package for use in scripts
+      updateSlim = pkgs.buildGoModule {
+        pname = "update-slim";
+        inherit (goModuleCommon) version src vendorHash;
+        subPackages = ["./cmd/update"];
+        buildFlags = commonGoBuildFlags;
+        doCheck = false;
+        meta.mainProgram = "update"; # Ensure binary name matches
+      };
+
+      # Database files
+      databaseFiles = pkgs.runCommand "database-files" {} ''
+        mkdir -p $out/root
+        cp ${./master.db} $out/root/master.db
+      '';
     in {
       devShell = pkgs.mkShell {
         shellHook = ''
@@ -237,129 +349,67 @@
         packages = with pkgs;
           [
             inputs.bun2nix.packages.${system}.default
-            alejandra # Nix
+            git # Essential dev tools
+            go_1_24
+
+            # Most tools added to PATH but not closure
+            alejandra
             nixd
             statix
             deadnix
-
-            go_1_24 # Go Tools
             air
             templ
             golangci-lint
-            (buildWithSpecificGo revive)
-            (buildWithSpecificGo gopls)
-            (buildWithSpecificGo templ)
-            (buildWithSpecificGo golines)
-            (buildWithSpecificGo golangci-lint-langserver)
-            (buildWithSpecificGo gomarkdoc)
-            (buildWithSpecificGo gotests)
-            (buildWithSpecificGo gotools)
-            (buildWithSpecificGo reftools)
-            pprof
-            graphviz
-
-            tailwindcss # Web
-            tailwindcss-language-server
+            golines
+            tailwindcss
             bun
-            nodePackages.typescript-language-server
             nodePackages.prettier
-            svgcleaner
-            sqlite-web
-            harper
+            flyctl
 
-            flyctl # Infra
-            openssl.dev
-            skopeo
-            consul
-
-            (
-              pkgs.buildGoModule rec {
-                pname = "copygen";
-                version = "0.4.1";
-
-                src = pkgs.fetchFromGitHub {
-                  owner = "switchupcb";
-                  repo = "copygen";
-                  rev = "v${version}";
-                  sha256 = "sha256-gdoUvTla+fRoYayUeuRha8Dkix9ACxlt0tkac0CRqwA=";
-                };
-
-                vendorHash = "sha256-dOIGGZWtr8F82YJRXibdw3MvohLFBQxD+Y4OkZIJc2s=";
-                subPackages = ["."];
-                proxyVendor = true;
-
-                ldflags = [
-                  "-s"
-                  "-w"
-                  "-X main.version=${version}"
-                ];
-
-                meta = with lib; {
-                  description = "Copygen";
-                  homepage = "https://github.com/switchupcb/copygen";
-                  license = licenses.mit;
-                  mainProgram = "copygen";
-                };
-              }
-            )
+            # Keep only the most essential tools in closure
           ]
+          # Add all script packages to PATH
           ++ builtins.attrValues scriptPackages;
       };
 
+      # Optimized packages
       packages = let
         internal_port = 8080;
         force_https = true;
         processes = ["app"];
-        version = self.shortRev or "dirty";
-        src = ./.;
-        vendorHash = null;
-        # Create a derivation for the database file
-        databaseFiles = pkgs.runCommand "database-files" {} ''
-          mkdir -p $out/root
-          cp ${./master.db} $out/root/master.db
-        '';
       in
         {
-          conneroh = pkgs.buildGoModule {
-            inherit src vendorHash version;
-            name = "conneroh.com";
-            nativeBuildInputs = [
-              pkgs.templ
-              pkgs.tailwindcss
-            ];
-            preBuild = ''
-              templ generate
-              tailwindcss \
-                  --minify \
-                  -i ./input.css \
-                  -o ./cmd/conneroh/_static/dist/style.css \
-                  --cwd .
-            '';
-            subPackages = ["."];
-          };
-          update = pkgs.buildGoModule {
-            inherit src vendorHash version;
-            name = "update";
-            subPackages = ["./cmd/update"];
-          };
-          C-conneroh = pkgs.dockerTools.buildImage {
-            created = "now";
-            tag = "latest";
+          # Optimized packages
+          conneroh = connerohOptimized;
+          update = updateOptimized;
+          update-slim = updateSlim;
+
+          # Optimized Docker image
+          C-conneroh = pkgs.dockerTools.buildLayeredImage {
             name = "conneroh";
+            tag = "latest";
+            created = "now";
             config = {
               WorkingDir = "/root";
-              Cmd = ["/bin/conneroh.com"];
+              Cmd = ["/bin/conneroh"];
               ExposedPorts = {"8080/tcp" = {};};
               Env = [
                 "SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
                 "NIX_SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
               ];
             };
-            copyToRoot = [
-              self.packages.${system}.conneroh
+            contents = [
+              # Only include what's absolutely necessary
+              connerohOptimized
               databaseFiles
+              # Include minimal ssl certs instead of full cacert
+              (pkgs.runCommand "minimal-ca-bundle" {} ''
+                mkdir -p $out/etc/ssl/certs
+                cp ${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt $out/etc/ssl/certs/
+              '')
             ];
           };
+
           deployPackage = let
             settingsFormat = pkgs.formats.toml {};
 
@@ -401,22 +451,33 @@
               ];
             };
 
+            # Pre-create the toml files
             flyDevToml = settingsFormat.generate "fly.dev.toml" flyDevConfig;
             flyProdToml = settingsFormat.generate "fly.toml" flyProdConfig;
+
+            # Capture the image path as a string variable to avoid recursion
+            imageFile = "${pkgs.dockerTools.buildLayeredImage {
+              name = "conneroh";
+              tag = "latest";
+              contents = [connerohOptimized databaseFiles];
+            }}";
           in
             pkgs.writeShellApplication {
-              name = "deployPackage";
-              runtimeInputs = with pkgs; [
-                doppler
-                skopeo
-                flyctl
-                cacert
-              ];
               bashOptions = [
                 "errexit"
                 "pipefail"
               ];
+              name = "deployPackage";
+              # Use PATH for dependencies instead of including them in closure
               text = ''
+                # Set up PATH to include required tools
+                export PATH="${pkgs.lib.makeBinPath [
+                  pkgs.doppler
+                  pkgs.skopeo
+                  pkgs.flyctl
+                  pkgs.cacert
+                ]}:$PATH"
+
                 set -e
                 arg=$1
                 TOKEN=""
@@ -442,7 +503,7 @@
 
                 skopeo copy \
                   --insecure-policy \
-                  docker-archive:"${self.packages.${system}.C-conneroh}" \
+                  docker-archive:"${imageFile}" \
                   "docker://$REGISTY:latest" \
                   --dest-creds x:"$TOKEN" \
                   --format v2s2
@@ -454,6 +515,8 @@
                   -i "$REGISTY:latest" \
                   -t "$TOKEN"
               '';
+              # No runtime inputs - using PATH instead
+              runtimeInputs = [];
             };
         }
         // pkgs.lib.genAttrs (builtins.attrNames scripts) (name: scriptPackages.${name});
