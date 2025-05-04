@@ -312,148 +312,150 @@
         processes = ["app"];
         version = self.shortRev or "dirty";
         src = ./.;
-        vendorHash = null;
+        vendorHash = "sha256-Nun3Q8Z0Gepi8ovNEr1BupZeZP4AKbRHZQ8os6pfo/8=";
         # Create a derivation for the database file
         databaseFiles = pkgs.runCommand "database-files" {} ''
           mkdir -p $out/root
           cp ${./master.db} $out/root/master.db
         '';
-      in {
-        conneroh = pkgs.buildGoModule {
-          inherit src vendorHash version;
-          name = "conneroh.com";
-          nativeBuildInputs = [
-            pkgs.templ
-            pkgs.tailwindcss
-          ];
-          preBuild = ''
-            templ generate
-            tailwindcss \
-                --minify \
-                -i ./input.css \
-                -o ./cmd/conneroh/_static/dist/style.css \
-                --cwd .
-          '';
-          subPackages = ["."];
-        };
-        update = pkgs.buildGoModule {
-          inherit src vendorHash version;
-          name = "update";
-          subPackages = ["./cmd/update"];
-        };
-        C-conneroh = pkgs.dockerTools.buildImage {
-          created = "now";
-          tag = "latest";
-          name = "conneroh";
-          config = {
-            WorkingDir = "/root";
-            Cmd = ["/bin/conneroh.com"];
-            ExposedPorts = {"8080/tcp" = {};};
-            Env = [
-              "SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
-              "NIX_SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
+      in
+        {
+          conneroh = pkgs.buildGoModule {
+            inherit src vendorHash version;
+            name = "conneroh.com";
+            nativeBuildInputs = [
+              pkgs.templ
+              pkgs.tailwindcss
             ];
-          };
-          copyToRoot = [
-            self.packages.${system}.conneroh
-            databaseFiles
-          ];
-        };
-        deployPackage = let
-          settingsFormat = pkgs.formats.toml {};
-
-          flyDevConfig = {
-            app = "conneroh-com-dev";
-            primary_region = "ord";
-            build = {};
-            http_service = {
-              inherit internal_port force_https processes;
-              auto_stop_machines = "stop";
-              auto_start_machines = true;
-              min_machines_running = 0;
-            };
-            vm = [
-              {
-                memory = "512M";
-                cpu_kind = "shared";
-                cpus = 1;
-              }
-            ];
-          };
-
-          flyProdConfig = {
-            app = "conneroh-com";
-            primary_region = "ord";
-            build = {};
-            http_service = {
-              inherit internal_port force_https processes;
-              auto_stop_machines = "stop";
-              auto_start_machines = true;
-              min_machines_running = 0;
-            };
-            vm = [
-              {
-                memory = "1gb";
-                cpu_kind = "shared";
-                cpus = 2;
-              }
-            ];
-          };
-
-          flyDevToml = settingsFormat.generate "fly.dev.toml" flyDevConfig;
-          flyProdToml = settingsFormat.generate "fly.toml" flyProdConfig;
-        in
-          pkgs.writeShellApplication {
-            name = "deployPackage";
-            runtimeInputs = with pkgs; [
-              doppler
-              skopeo
-              flyctl
-              cacert
-            ];
-            bashOptions = [
-              "errexit"
-              "pipefail"
-            ];
-            text = ''
-              set -e
-              arg=$1
-              TOKEN=""
-              FLY_NAME=""
-              CONFIG_FILE=""
-
-              [ -z "$arg" ] && { echo "No argument provided. Please provide a target environment. (dev or prod)"; exit 1; }
-
-              if [ "$arg" = "dev" ]; then
-                [ -z "$FLY_DEV_AUTH_TOKEN" ] && FLY_DEV_AUTH_TOKEN="$(doppler secrets get --plain FLY_DEV_AUTH_TOKEN)"
-                TOKEN="$FLY_DEV_AUTH_TOKEN"
-                export FLY_NAME="conneroh-com-dev"
-                export CONFIG_FILE=${flyDevToml}
-              else
-                [ -z "$FLY_AUTH_TOKEN" ] && FLY_AUTH_TOKEN="$(doppler secrets get --plain FLY_AUTH_TOKEN)"
-                TOKEN="$FLY_AUTH_TOKEN"
-                export FLY_NAME="conneroh-com"
-                export CONFIG_FILE=${flyProdToml}
-              fi
-
-              REGISTY="registry.fly.io/$FLY_NAME"
-              echo "Copying image to Fly.io... to $REGISTY"
-
-              skopeo copy \
-                --insecure-policy \
-                docker-archive:"${self.packages.${system}.C-conneroh}" \
-                "docker://$REGISTY:latest" \
-                --dest-creds x:"$TOKEN" \
-                --format v2s2
-
-              echo "Deploying to Fly.io..."
-              fly deploy \
-                --remote-only \
-                -c "$CONFIG_FILE" \
-                -i "$REGISTY:latest" \
-                -t "$TOKEN"
+            preBuild = ''
+              templ generate
+              tailwindcss \
+                  --minify \
+                  -i ./input.css \
+                  -o ./cmd/conneroh/_static/dist/style.css \
+                  --cwd .
             '';
+            subPackages = ["."];
           };
-      };
+          update = pkgs.buildGoModule {
+            inherit src vendorHash version;
+            name = "update";
+            subPackages = ["./cmd/update"];
+          };
+          C-conneroh = pkgs.dockerTools.buildImage {
+            created = "now";
+            tag = "latest";
+            name = "conneroh";
+            config = {
+              WorkingDir = "/root";
+              Cmd = ["/bin/conneroh.com"];
+              ExposedPorts = {"8080/tcp" = {};};
+              Env = [
+                "SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
+                "NIX_SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
+              ];
+            };
+            copyToRoot = [
+              self.packages.${system}.conneroh
+              databaseFiles
+            ];
+          };
+          deployPackage = let
+            settingsFormat = pkgs.formats.toml {};
+
+            flyDevConfig = {
+              app = "conneroh-com-dev";
+              primary_region = "ord";
+              build = {};
+              http_service = {
+                inherit internal_port force_https processes;
+                auto_stop_machines = "stop";
+                auto_start_machines = true;
+                min_machines_running = 0;
+              };
+              vm = [
+                {
+                  memory = "512M";
+                  cpu_kind = "shared";
+                  cpus = 1;
+                }
+              ];
+            };
+
+            flyProdConfig = {
+              app = "conneroh-com";
+              primary_region = "ord";
+              build = {};
+              http_service = {
+                inherit internal_port force_https processes;
+                auto_stop_machines = "stop";
+                auto_start_machines = true;
+                min_machines_running = 0;
+              };
+              vm = [
+                {
+                  memory = "1gb";
+                  cpu_kind = "shared";
+                  cpus = 2;
+                }
+              ];
+            };
+
+            flyDevToml = settingsFormat.generate "fly.dev.toml" flyDevConfig;
+            flyProdToml = settingsFormat.generate "fly.toml" flyProdConfig;
+          in
+            pkgs.writeShellApplication {
+              name = "deployPackage";
+              runtimeInputs = with pkgs; [
+                doppler
+                skopeo
+                flyctl
+                cacert
+              ];
+              bashOptions = [
+                "errexit"
+                "pipefail"
+              ];
+              text = ''
+                set -e
+                arg=$1
+                TOKEN=""
+                FLY_NAME=""
+                CONFIG_FILE=""
+
+                [ -z "$arg" ] && { echo "No argument provided. Please provide a target environment. (dev or prod)"; exit 1; }
+
+                if [ "$arg" = "dev" ]; then
+                  [ -z "$FLY_DEV_AUTH_TOKEN" ] && FLY_DEV_AUTH_TOKEN="$(doppler secrets get --plain FLY_DEV_AUTH_TOKEN)"
+                  TOKEN="$FLY_DEV_AUTH_TOKEN"
+                  export FLY_NAME="conneroh-com-dev"
+                  export CONFIG_FILE=${flyDevToml}
+                else
+                  [ -z "$FLY_AUTH_TOKEN" ] && FLY_AUTH_TOKEN="$(doppler secrets get --plain FLY_AUTH_TOKEN)"
+                  TOKEN="$FLY_AUTH_TOKEN"
+                  export FLY_NAME="conneroh-com"
+                  export CONFIG_FILE=${flyProdToml}
+                fi
+
+                REGISTY="registry.fly.io/$FLY_NAME"
+                echo "Copying image to Fly.io... to $REGISTY"
+
+                skopeo copy \
+                  --insecure-policy \
+                  docker-archive:"${self.packages.${system}.C-conneroh}" \
+                  "docker://$REGISTY:latest" \
+                  --dest-creds x:"$TOKEN" \
+                  --format v2s2
+
+                echo "Deploying to Fly.io..."
+                fly deploy \
+                  --remote-only \
+                  -c "$CONFIG_FILE" \
+                  -i "$REGISTY:latest" \
+                  -t "$TOKEN"
+              '';
+            };
+        }
+        // pkgs.lib.genAttrs (builtins.attrNames scripts) (name: scriptPackages.${name});
     });
 }
