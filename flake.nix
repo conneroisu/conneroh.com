@@ -25,6 +25,7 @@
         ];
         config.allowUnfree = true;
       };
+      buildWithSpecificGo = pkg: pkg.override {buildGoModule = pkgs.buildGo124Module;};
       scripts = {
         dx = {
           exec = ''
@@ -35,7 +36,6 @@
             pkgs.git
           ];
           description = "Edit flake.nix";
-          runtimePathOnly = true; # Only include in PATH, not closure
         };
         gx = {
           exec = ''
@@ -46,13 +46,11 @@
             pkgs.git
           ];
           description = "Edit go.mod";
-          runtimePathOnly = true;
         };
         clean = {
           exec = ''git clean -fdx'';
           description = "Clean Project";
           deps = [pkgs.git];
-          runtimePathOnly = true;
         };
         reset-db = {
           exec = ''
@@ -71,7 +69,6 @@
             pkgs.go
           ];
           description = "Run all go tests";
-          runtimePathOnly = true;
         };
         lint = {
           exec = ''
@@ -87,7 +84,6 @@
             pkgs.deadnix
           ];
           description = "Run Nix/Go Linting Steps.";
-          runtimePathOnly = true;
         };
         generate-css = {
           exec = ''
@@ -105,7 +101,6 @@
             pkgs.go
           ];
           description = "Update the generated html and css files.";
-          runtimePathOnly = true;
         };
         generate-docs = {
           exec = ''
@@ -113,12 +108,9 @@
           '';
           deps = [
             pkgs.doppler
-          ];
-          extraDeps = [
-            self.packages."${system}".update-slim
+            self.packages."${system}".update
           ];
           description = "Update the generated go files from the md docs.";
-          runtimePathOnly = true;
         };
         generate-reload = {
           exec = ''
@@ -143,14 +135,10 @@
             fi
           '';
           deps = [
-            pkgs.nix
-          ];
-          extraDeps = [
-            scriptPackages.generate-docs
-            scriptPackages.generate-css
+            (pkgs.lib.getExe scriptPackages.generate-docs)
+            (pkgs.lib.getExe scriptPackages.generate-css)
           ];
           description = "Code Generation Steps for specific directory changes.";
-          runtimePathOnly = true;
         };
         generate-js = {
           exec = ''
@@ -167,20 +155,17 @@
             pkgs.bun
           ];
           description = "Generate JS files";
-          runtimePathOnly = true;
         };
         generate-all = {
           exec = ''
             generate-css
             generate-docs
           '';
-          deps = [];
-          extraDeps = [
-            scriptPackages.generate-css
-            scriptPackages.generate-docs
+          deps = [
+            (pkgs.lib.getExe scriptPackages.generate-css)
+            (pkgs.lib.getExe scriptPackages.generate-docs)
           ];
           description = "Generate all files in parallel";
-          runtimePathOnly = true;
         };
         format = {
           exec = ''
@@ -204,10 +189,8 @@
             pkgs.go
             pkgs.git
             pkgs.golines
-            pkgs.nodePackages.prettier
           ];
           description = "Format code files";
-          runtimePathOnly = true;
         };
         run = {
           exec = ''
@@ -219,105 +202,21 @@
             pkgs.git
           ];
           description = "Run the application with air for hot reloading";
-          runtimePathOnly = true;
         };
       };
-
-      # Generate script packages with smarter dependency handling
-      # Pre-define script packages to avoid dependency cycles
-      scriptPackages = let
-        makeScriptPackage = name: script: let
-          # Determine which dependencies to include directly
-          directDeps =
-            if script ? runtimePathOnly && script.runtimePathOnly
-            then []
-            else script.deps or [];
-
-          # Combine all deps for PATH
-          allDeps = (script.deps or []) ++ (script.extraDeps or []);
-
-          # Create PATH from all dependencies
-          pathString = pkgs.lib.makeBinPath allDeps;
-        in
-          pkgs.writeShellApplication {
-            inherit name;
-            # Include PATH at the beginning of the script
-            text = ''
-              export PATH="${pathString}:$PATH"
-              ${script.exec}
-            '';
-            # Only include non-runtime-path-only deps
-            runtimeInputs = directDeps;
-          };
-      in
-        builtins.listToAttrs (
-          map
-          (name: {
-            inherit name;
-            value = makeScriptPackage name scripts.${name};
-          })
-          (builtins.attrNames scripts)
-        );
-
-      # Define common attributes to avoid recursion
-      goModuleCommon = {
-        version = self.shortRev or "dirty";
-        src = ./.;
-        vendorHash = null;
-      };
-
-      # Optimized version of the conneroh package
-      connerohOptimized = pkgs.buildGoModule {
-        pname = "conneroh";
-        inherit (goModuleCommon) version src vendorHash;
-
-        # Only include subPackages to minimize what's built
-        subPackages = ["./cmd/conneroh"];
-
-        # Use upx to compress the binary if needed
-        nativeBuildInputs = [
-          pkgs.templ
-          pkgs.tailwindcss
-        ];
-
-        preBuild = ''
-          templ generate
-          tailwindcss \
-              --minify \
-              -i ./input.css \
-              -o ./cmd/conneroh/_static/dist/style.css \
-              --cwd .
-        '';
-
-        # Remove UPX compression since it's causing issues
-        # Instead, use build flags to reduce size
-
-        # Don't include tests to save space
-        doCheck = false;
-      };
-
-      # Optimized update binary
-      updateOptimized = pkgs.buildGoModule {
-        pname = "update";
-        inherit (goModuleCommon) version src vendorHash;
-        subPackages = ["./cmd/update"];
-        doCheck = false;
-      };
-
-      # Create a minimal/slim update package for use in scripts
-      updateSlim = pkgs.buildGoModule {
-        pname = "update-slim";
-        inherit (goModuleCommon) version src vendorHash;
-        subPackages = ["./cmd/update"];
-        doCheck = false;
-        meta.mainProgram = "update"; # Ensure binary name matches
-      };
-
-      # Database files
-      databaseFiles = pkgs.runCommand "database-files" {} ''
-        mkdir -p $out/root
-        cp ${./master.db} $out/root/master.db
-      '';
+      scriptPackages =
+        pkgs.lib.mapAttrs
+        (
+          name: script:
+          # Create a script with dependencies
+            pkgs.writeShellApplication {
+              inherit name;
+              text = script.exec;
+              # Add runtime dependencies
+              runtimeInputs = script.deps or [];
+            }
+        )
+        scripts;
     in {
       devShell = pkgs.mkShell {
         shellHook = ''
@@ -338,176 +237,223 @@
         packages = with pkgs;
           [
             inputs.bun2nix.packages.${system}.default
-            git # Essential dev tools
-            go_1_24
-
-            # Most tools added to PATH but not closure
-            alejandra
+            alejandra # Nix
             nixd
             statix
             deadnix
+
+            go_1_24 # Go Tools
             air
             templ
             golangci-lint
-            golines
-            tailwindcss
-            bun
-            nodePackages.prettier
-            flyctl
+            (buildWithSpecificGo revive)
+            (buildWithSpecificGo gopls)
+            (buildWithSpecificGo templ)
+            (buildWithSpecificGo golines)
+            (buildWithSpecificGo golangci-lint-langserver)
+            (buildWithSpecificGo gomarkdoc)
+            (buildWithSpecificGo gotests)
+            (buildWithSpecificGo gotools)
+            (buildWithSpecificGo reftools)
+            pprof
+            graphviz
 
-            # Keep only the most essential tools in closure
+            tailwindcss # Web
+            tailwindcss-language-server
+            bun
+            nodePackages.typescript-language-server
+            nodePackages.prettier
+            svgcleaner
+            sqlite-web
+            harper
+
+            flyctl # Infra
+            openssl.dev
+            skopeo
+            consul
+
+            (
+              pkgs.buildGoModule rec {
+                pname = "copygen";
+                version = "0.4.1";
+
+                src = pkgs.fetchFromGitHub {
+                  owner = "switchupcb";
+                  repo = "copygen";
+                  rev = "v${version}";
+                  sha256 = "sha256-gdoUvTla+fRoYayUeuRha8Dkix9ACxlt0tkac0CRqwA=";
+                };
+
+                vendorHash = "sha256-dOIGGZWtr8F82YJRXibdw3MvohLFBQxD+Y4OkZIJc2s=";
+                subPackages = ["."];
+                proxyVendor = true;
+
+                ldflags = [
+                  "-s"
+                  "-w"
+                  "-X main.version=${version}"
+                ];
+
+                meta = with lib; {
+                  description = "Copygen";
+                  homepage = "https://github.com/switchupcb/copygen";
+                  license = licenses.mit;
+                  mainProgram = "copygen";
+                };
+              }
+            )
           ]
-          # Add all script packages to PATH
           ++ builtins.attrValues scriptPackages;
       };
 
-      # Optimized packages
       packages = let
         internal_port = 8080;
         force_https = true;
         processes = ["app"];
-      in
-        {
-          # Optimized packages
-          conneroh = connerohOptimized;
-          update = updateOptimized;
-          update-slim = updateSlim;
+        version = self.shortRev or "dirty";
+        src = ./.;
+        vendorHash = null;
+        # Create a derivation for the database file
+        databaseFiles = pkgs.runCommand "database-files" {} ''
+          mkdir -p $out/root
+          cp ${./master.db} $out/root/master.db
+        '';
+      in {
+        conneroh = pkgs.buildGoModule {
+          inherit src vendorHash version;
+          name = "conneroh.com";
+          nativeBuildInputs = [
+            pkgs.templ
+            pkgs.tailwindcss
+          ];
+          preBuild = ''
+            templ generate
+            tailwindcss \
+                --minify \
+                -i ./input.css \
+                -o ./cmd/conneroh/_static/dist/style.css \
+                --cwd .
+          '';
+          subPackages = ["."];
+        };
+        update = pkgs.buildGoModule {
+          inherit src vendorHash version;
+          name = "update";
+          subPackages = ["./cmd/update"];
+        };
+        C-conneroh = pkgs.dockerTools.buildImage {
+          created = "now";
+          tag = "latest";
+          name = "conneroh";
+          config = {
+            WorkingDir = "/root";
+            Cmd = ["/bin/conneroh.com"];
+            ExposedPorts = {"8080/tcp" = {};};
+            Env = [
+              "SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
+              "NIX_SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
+            ];
+          };
+          copyToRoot = [
+            self.packages.${system}.conneroh
+            databaseFiles
+          ];
+        };
+        deployPackage = let
+          settingsFormat = pkgs.formats.toml {};
 
-          # Optimized Docker image
-          C-conneroh = pkgs.dockerTools.buildLayeredImage {
-            name = "conneroh";
-            tag = "latest";
-            created = "now";
-            config = {
-              WorkingDir = "/root";
-              Cmd = ["/bin/conneroh"];
-              ExposedPorts = {"8080/tcp" = {};};
-              Env = [
-                "SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
-                "NIX_SSL_CERT_FILE=${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt"
-              ];
+          flyDevConfig = {
+            app = "conneroh-com-dev";
+            primary_region = "ord";
+            build = {};
+            http_service = {
+              inherit internal_port force_https processes;
+              auto_stop_machines = "stop";
+              auto_start_machines = true;
+              min_machines_running = 0;
             };
-            contents = [
-              # Only include what's absolutely necessary
-              connerohOptimized
-              databaseFiles
-              # Include minimal ssl certs instead of full cacert
-              (pkgs.runCommand "minimal-ca-bundle" {} ''
-                mkdir -p $out/etc/ssl/certs
-                cp ${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt $out/etc/ssl/certs/
-              '')
+            vm = [
+              {
+                memory = "512M";
+                cpu_kind = "shared";
+                cpus = 1;
+              }
             ];
           };
 
-          deployPackage = let
-            settingsFormat = pkgs.formats.toml {};
-
-            flyDevConfig = {
-              app = "conneroh-com-dev";
-              primary_region = "ord";
-              build = {};
-              http_service = {
-                inherit internal_port force_https processes;
-                auto_stop_machines = "stop";
-                auto_start_machines = true;
-                min_machines_running = 0;
-              };
-              vm = [
-                {
-                  memory = "512M";
-                  cpu_kind = "shared";
-                  cpus = 1;
-                }
-              ];
+          flyProdConfig = {
+            app = "conneroh-com";
+            primary_region = "ord";
+            build = {};
+            http_service = {
+              inherit internal_port force_https processes;
+              auto_stop_machines = "stop";
+              auto_start_machines = true;
+              min_machines_running = 0;
             };
+            vm = [
+              {
+                memory = "1gb";
+                cpu_kind = "shared";
+                cpus = 2;
+              }
+            ];
+          };
 
-            flyProdConfig = {
-              app = "conneroh-com";
-              primary_region = "ord";
-              build = {};
-              http_service = {
-                inherit internal_port force_https processes;
-                auto_stop_machines = "stop";
-                auto_start_machines = true;
-                min_machines_running = 0;
-              };
-              vm = [
-                {
-                  memory = "1gb";
-                  cpu_kind = "shared";
-                  cpus = 2;
-                }
-              ];
-            };
+          flyDevToml = settingsFormat.generate "fly.dev.toml" flyDevConfig;
+          flyProdToml = settingsFormat.generate "fly.toml" flyProdConfig;
+        in
+          pkgs.writeShellApplication {
+            name = "deployPackage";
+            runtimeInputs = with pkgs; [
+              doppler
+              skopeo
+              flyctl
+              cacert
+            ];
+            bashOptions = [
+              "errexit"
+              "pipefail"
+            ];
+            text = ''
+              set -e
+              arg=$1
+              TOKEN=""
+              FLY_NAME=""
+              CONFIG_FILE=""
 
-            # Pre-create the toml files
-            flyDevToml = settingsFormat.generate "fly.dev.toml" flyDevConfig;
-            flyProdToml = settingsFormat.generate "fly.toml" flyProdConfig;
+              [ -z "$arg" ] && { echo "No argument provided. Please provide a target environment. (dev or prod)"; exit 1; }
 
-            # Capture the image path as a string variable to avoid recursion
-            imageFile = "${pkgs.dockerTools.buildLayeredImage {
-              name = "conneroh";
-              tag = "latest";
-              contents = [connerohOptimized databaseFiles];
-            }}";
-          in
-            pkgs.writeShellApplication {
-              bashOptions = [
-                "errexit"
-                "pipefail"
-              ];
-              name = "deployPackage";
-              # Use PATH for dependencies instead of including them in closure
-              text = ''
-                # Set up PATH to include required tools
-                export PATH="${pkgs.lib.makeBinPath [
-                  pkgs.doppler
-                  pkgs.skopeo
-                  pkgs.flyctl
-                  pkgs.cacert
-                ]}:$PATH"
+              if [ "$arg" = "dev" ]; then
+                [ -z "$FLY_DEV_AUTH_TOKEN" ] && FLY_DEV_AUTH_TOKEN="$(doppler secrets get --plain FLY_DEV_AUTH_TOKEN)"
+                TOKEN="$FLY_DEV_AUTH_TOKEN"
+                export FLY_NAME="conneroh-com-dev"
+                export CONFIG_FILE=${flyDevToml}
+              else
+                [ -z "$FLY_AUTH_TOKEN" ] && FLY_AUTH_TOKEN="$(doppler secrets get --plain FLY_AUTH_TOKEN)"
+                TOKEN="$FLY_AUTH_TOKEN"
+                export FLY_NAME="conneroh-com"
+                export CONFIG_FILE=${flyProdToml}
+              fi
 
-                set -e
-                arg=$1
-                TOKEN=""
-                FLY_NAME=""
-                CONFIG_FILE=""
+              REGISTY="registry.fly.io/$FLY_NAME"
+              echo "Copying image to Fly.io... to $REGISTY"
 
-                [ -z "$arg" ] && { echo "No argument provided. Please provide a target environment. (dev or prod)"; exit 1; }
+              skopeo copy \
+                --insecure-policy \
+                docker-archive:"${self.packages.${system}.C-conneroh}" \
+                "docker://$REGISTY:latest" \
+                --dest-creds x:"$TOKEN" \
+                --format v2s2
 
-                if [ "$arg" = "dev" ]; then
-                  [ -z "$FLY_DEV_AUTH_TOKEN" ] && FLY_DEV_AUTH_TOKEN="$(doppler secrets get --plain FLY_DEV_AUTH_TOKEN)"
-                  TOKEN="$FLY_DEV_AUTH_TOKEN"
-                  export FLY_NAME="conneroh-com-dev"
-                  export CONFIG_FILE=${flyDevToml}
-                else
-                  [ -z "$FLY_AUTH_TOKEN" ] && FLY_AUTH_TOKEN="$(doppler secrets get --plain FLY_AUTH_TOKEN)"
-                  TOKEN="$FLY_AUTH_TOKEN"
-                  export FLY_NAME="conneroh-com"
-                  export CONFIG_FILE=${flyProdToml}
-                fi
-
-                REGISTY="registry.fly.io/$FLY_NAME"
-                echo "Copying image to Fly.io... to $REGISTY"
-
-                skopeo copy \
-                  --insecure-policy \
-                  docker-archive:"${imageFile}" \
-                  "docker://$REGISTY:latest" \
-                  --dest-creds x:"$TOKEN" \
-                  --format v2s2
-
-                echo "Deploying to Fly.io..."
-                fly deploy \
-                  --remote-only \
-                  -c "$CONFIG_FILE" \
-                  -i "$REGISTY:latest" \
-                  -t "$TOKEN"
-              '';
-              # No runtime inputs - using PATH instead
-              runtimeInputs = [];
-            };
-        }
-        // pkgs.lib.genAttrs (builtins.attrNames scripts) (name: scriptPackages.${name});
+              echo "Deploying to Fly.io..."
+              fly deploy \
+                --remote-only \
+                -c "$CONFIG_FILE" \
+                -i "$REGISTY:latest" \
+                -t "$TOKEN"
+            '';
+          };
+      };
     });
 }
