@@ -1,0 +1,57 @@
+▶ Checking flake output sizes for system: x86_64-linux
+
+── C-conneroh ──
+archive: 751240 bytes, closure: 751240 bytes
+
+── clean ──
+archive: 696 bytes, closure: 343536704 bytes
+
+── conneroh ──
+archive: 96 bytes, closure: 96 bytes
+
+── deployPackage ──
+archive: 1976 bytes, closure: 242399232 bytes
+
+── dx ──
+archive: 752 bytes, closure: 343536760 bytes
+
+── format ──
+archive: 1168 bytes, closure: 758903944 bytes
+
+── generate-all ──
+archive: 776 bytes, closure: 389160464 bytes
+
+── generate-css ──
+archive: 1056 bytes, closure: 345754400 bytes
+
+── generate-docs ──
+archive: 784 bytes, closure: 80738208 bytes
+
+── generate-js ──
+archive: 928 bytes, closure: 134429208 bytes
+
+── generate-reload ──
+archive: 1560 bytes, closure: 479623392 bytes
+
+── gx ──
+archive: 752 bytes, closure: 343536760 bytes
+
+── lint ──
+archive: 944 bytes, closure: 100636648 bytes
+
+── reset-db ──
+archive: 672 bytes, closure: 34497992 bytes
+
+── run ──
+archive: 800 bytes, closure: 353071800 bytes
+
+── tests ──
+archive: 752 bytes, closure: 290660656 bytes
+
+── update ──
+archive: 30777128 bytes, closure: 66455640 bytes
+
+── update-slim ──
+archive: 30777128 bytes, closure: 66455640 bytes
+
+▶ Checked flake output sizes for system: x86_64-linux
