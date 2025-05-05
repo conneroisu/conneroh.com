@@ -175,8 +175,17 @@
           exec = ''
             export DEBUG=true
             go run main.go &
+            GO_PID=$!
+
+            # Give the server a moment to start up
+            sleep 2
+
             URLS=$(katana -u http://localhost:8080 -sb)
             URL_COUNT=$(echo "$URLS" | wc -l)
+
+            # Kill the Go process regardless of test outcome
+            kill $GO_PID
+
             if [ "$URL_COUNT" -lt 10 ]; then
                 echo "Error: katana found only $URL_COUNT URLs, which is less than the required minimum of 10."
                 exit 1
