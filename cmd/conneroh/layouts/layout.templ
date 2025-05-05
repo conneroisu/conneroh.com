@@ -28,18 +28,18 @@ templ Layout(title string) {
 			<meta name="revisit-after" content="7 days"/>
 			<meta name="language" content="English"/>
 			<!-- Open Graph / Social Media Meta Tags -->
-			<meta property="og:title" content="{ title } | Conner Ohnesorge - Portfolio"/>
+			<meta property="og:title" content={ title + " | Conner Ohnesorge - Portfolio" }/>
 			<meta property="og:description" content="Conner Ohnesorge's portfolio showcasing professional work, projects, and expertise."/>
 			<meta property="og:type" content="website"/>
-			<meta property="og:url" content="https://yourwebsite.com"/>
-			<meta property="og:image" content="https://yourwebsite.com/dist/profile-image.jpg"/>
+			<meta property="og:url" content="https://conneroh.com"/>
+			<meta property="og:image" content="https://conneroh.com/dist/hero.jpeg"/>
 			<!-- Twitter Card Meta Tags -->
 			<meta name="twitter:card" content="summary_large_image"/>
-			<meta name="twitter:title" content="{ title } | Conner Ohnesorge - Portfolio"/>
+			<meta name="twitter:title" content={ title + " | Conner Ohnesorge - Portfolio" }/>
 			<meta name="twitter:description" content="Conner Ohnesorge's portfolio showcasing professional work, projects, and expertise."/>
-			<meta name="twitter:image" content="https://yourwebsite.com/dist/profile-image.jpg"/>
+			<meta name="twitter:image" content="https://conneroh.com/dist/hero.jpeg"/>
 			<!-- Canonical URL -->
-			<link rel="canonical" href="https://yourwebsite.com"/>
+			<link rel="canonical" href="https://conneroh.com"/>
 			<!-- Stylesheets and Scripts -->
 			<link rel="stylesheet" href="/dist/style.css"/>
 			<script type="module" src="/dist/index.js"></script>
@@ -53,13 +53,14 @@ templ Layout(title string) {
 					"name": "Conner Ohnesorge",
 					"url": "https://yourwebsite.com",
 					"sameAs": [
-						"https://github.com/username",
-						"https://linkedin.com/in/username",
-						"https://twitter.com/username"
+						"https://github.com/conneroisu",
+						"https://linkedin.com/in/conner-ohnesorge-b720a4238",
+						"https://x.com/ConnerOhnesorge"
+						"https://twitter.com/ConnerOhnesorge"
 					],
-					"jobTitle": "Your Job Title",
+					"jobTitle": "Electrical Engineer & Software Developer",
 					"worksFor": {
-						"@type": "Organization",
+						"@type": "Organization"
 						"name": "Your Company"
 					}
 				}

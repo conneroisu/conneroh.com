@@ -234,6 +234,7 @@
             svgcleaner
             sqlite-web
             harper
+            htmx-lsp
             vscode-langservers-extracted
 
             flyctl # Infra
