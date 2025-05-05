@@ -9,13 +9,11 @@
       inputs.systems.follows = "systems";
     };
     bun2nix.url = "github:baileyluTCD/bun2nix";
-    flake-schemas.url = "https://flakehub.com/f/DeterminateSystems/flake-schemas/*";
   };
 
   outputs = inputs @ {
     self,
     flake-utils,
-    flake-schemas,
     ...
   }:
     flake-utils.lib.eachDefaultSystem (system: let
@@ -188,7 +186,6 @@
         )
         scripts;
     in {
-      schemas = flake-schemas.schemas;
       devShells.default = pkgs.mkShell {
         shellHook = ''
           export REPO_ROOT=$(git rev-parse --show-toplevel)
