@@ -34,9 +34,7 @@
             REPO_ROOT="$(git rev-parse --show-toplevel)"
             $EDITOR "$REPO_ROOT"/flake.nix
           '';
-          deps = [
-            pkgs.git
-          ];
+          deps = [pkgs.git];
           description = "Edit flake.nix";
         };
         gx = {
@@ -44,9 +42,7 @@
             REPO_ROOT="$(git rev-parse --show-toplevel)"
             $EDITOR "$REPO_ROOT"/go.mod
           '';
-          deps = [
-            pkgs.git
-          ];
+          deps = [pkgs.git];
           description = "Edit go.mod";
         };
         clean = {
@@ -137,9 +133,7 @@
                   --minify-identifiers \
                   --outdir "$REPO_ROOT"/cmd/conneroh/_static/dist/
           '';
-          deps = [
-            pkgs.bun
-          ];
+          deps = with pkgs; [bun git];
           description = "Generate JS files";
         };
         generate-all = {
