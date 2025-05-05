@@ -171,6 +171,23 @@
           deps = with pkgs; [air git];
           description = "Run the application with air for hot reloading";
         };
+        run-test = {
+          exec = ''
+            export DEBUG=true
+            go run main.go &
+            URLS=$(katana -u http://localhost:8080 -sb)
+            URL_COUNT=$(echo "$URLS" | wc -l)
+            if [ "$URL_COUNT" -lt 10 ]; then
+                echo "Error: katana found only $URL_COUNT URLs, which is less than the required minimum of 10."
+                exit 1
+            else
+                echo "Success: katana found $URL_COUNT URLs, which meets or exceeds the required minimum of 10."
+                exit 0
+            fi
+          '';
+          deps = with pkgs; [katana git];
+          description = "Run the application with air for hot reloading";
+        };
       };
       scriptPackages =
         pkgs.lib.mapAttrs
@@ -236,6 +253,7 @@
             harper
             htmx-lsp
             vscode-langservers-extracted
+            katana
 
             flyctl # Infra
             openssl.dev
@@ -312,6 +330,8 @@
             name = "update";
             subPackages = ["./cmd/update"];
             doCheck = false;
+            outputHashMode = "recursive";
+            outputHashAlgo = "sha256";
           };
           C-conneroh = pkgs.dockerTools.buildImage {
             created = "now";

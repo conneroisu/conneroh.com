@@ -306,12 +306,12 @@
 
 /* from container mx-auto lg:px-8 sm:px-6 px-4 */
 .tw-2 { 
-	@apply container lg:px-8 sm:px-6 px-4 mx-auto; 
+	@apply container sm:px-6 px-4 mx-auto lg:px-8; 
 }
 
 /* from justify-between h-16 flex items-center */
 .tw-3 { 
-	@apply items-center justify-between h-16 flex; 
+	@apply justify-between h-16 flex items-center; 
 }
 
 /* from items-center flex */
@@ -321,12 +321,12 @@
 
 /* from p-2 focus:outline-none sm:hidden hover:text-white hover:bg-gray-700 rounded-md text-gray-300 mr-2 */
 .tw-5 { 
-	@apply p-2 hover:bg-gray-700 focus:outline-none sm:hidden rounded-md mr-2 hover:text-white text-gray-300; 
+	@apply hover:text-white sm:hidden rounded-md mr-2 focus:outline-none hover:bg-gray-700 text-gray-300 p-2; 
 }
 
 /* from text-white cursor-pointer pr-4 text-xl font-bold */
 .tw-6 { 
-	@apply font-bold text-white cursor-pointer pr-4 text-xl; 
+	@apply text-white cursor-pointer pr-4 text-xl font-bold; 
 }
 
 /* from space-x-8 hidden sm:flex items-center ml-8 */
@@ -336,7 +336,7 @@
 
 /* from hover:text-white cursor-pointer text-gray-300 */
 .tw-8 { 
-	@apply hover:text-white cursor-pointer text-gray-300; 
+	@apply cursor-pointer text-gray-300 hover:text-white; 
 }
 
 /* from relative */
@@ -346,27 +346,27 @@
 
 /* from items-center hidden md:flex */
 .tw-10 { 
-	@apply md:flex items-center hidden; 
+	@apply items-center hidden md:flex; 
 }
 
 /* from p-2 transition-colors hover:text-white hover:bg-gray-700 text-gray-300 rounded-md */
 .tw-11 { 
-	@apply hover:bg-gray-700 p-2 transition-colors hover:text-white text-gray-300 rounded-md; 
+	@apply transition-colors hover:text-white p-2 rounded-md text-gray-300 hover:bg-gray-700; 
 }
 
 /* from overflow-hidden shadow-lg mt-2 top-full absolute rounded-lg w-80 right-0 z-30 bg-gray-800 */
 .tw-12 { 
-	@apply overflow-hidden shadow-lg mt-2 absolute z-30 bg-gray-800 rounded-lg w-80 right-0 top-full; 
+	@apply w-80 z-30 rounded-lg shadow-lg top-full absolute overflow-hidden right-0 bg-gray-800 mt-2; 
 }
 
 /* from border-gray-700 border-b p-3 */
 .tw-13 { 
-	@apply p-3 border-gray-700 border-b; 
+	@apply border-b p-3 border-gray-700; 
 }
 
 /* from border border-gray-600 py-2 focus:ring-blue-500 focus:ring-2 pr-4 focus:outline-none rounded-md bg-gray-700 text-white w-full pl-10 */
 .tw-14 { 
-	@apply pr-4 bg-gray-700 pl-10 focus:ring-blue-500 rounded-md text-white focus:ring-2 py-2 focus:outline-none w-full border border-gray-600; 
+	@apply pr-4 py-2 focus:ring-blue-500 focus:ring-2 text-white rounded-md pl-10 bg-gray-700 w-full border-gray-600 focus:outline-none border; 
 }
 
 /* from text-gray-500 absolute left-3 top-2.5 */
@@ -376,7 +376,7 @@
 
 /* from w-5 h-5 */
 .tw-16 { 
-	@apply w-5 h-5; 
+	@apply h-5 w-5; 
 }
 
 /* from md:hidden text-gray-300 hover:text-white focus:outline-none */
@@ -386,7 +386,7 @@
 
 /* from md:hidden px-4 fixed inset-0 z-50 bg-gray-900 pt-16 pb-4 */
 .tw-18 { 
-	@apply fixed z-50 pt-16 pb-4 inset-0 px-4 bg-gray-900 md:hidden; 
+	@apply pt-16 md:hidden fixed z-50 bg-gray-900 pb-4 px-4 inset-0; 
 }
 
 /* from text-gray-300 hover:text-white absolute top-4 right-4 */
@@ -401,7 +401,7 @@
 
 /* from font-bold text-white mb-4 text-xl */
 .tw-21 { 
-	@apply font-bold text-white mb-4 text-xl; 
+	@apply text-xl font-bold text-white mb-4; 
 }
 
 /* from relative mb-4 */
@@ -411,7 +411,7 @@
 
 /* from pr-4 border bg-gray-800 rounded-lg focus:outline-none py-3 pl-10 focus:ring-blue-500 w-full focus:ring-2 text-white border-gray-600 */
 .tw-23 { 
-	@apply w-full border-gray-600 bg-gray-800 focus:ring-blue-500 focus:ring-2 pr-4 focus:outline-none pl-10 border text-white rounded-lg py-3; 
+	@apply focus:outline-none border-gray-600 pr-4 rounded-lg w-full pl-10 text-white focus:ring-blue-500 focus:ring-2 border bg-gray-800 py-3; 
 }
 
 /* from absolute left-3 top-3.5 text-gray-500 */
@@ -431,7 +431,7 @@
 
 /* from w-5 mx-auto animate-spin h-5 */
 .tw-27 { 
-	@apply w-5 mx-auto animate-spin h-5; 
+	@apply animate-spin h-5 w-5 mx-auto; 
 }
 
 /* from opacity-25 */
@@ -446,12 +446,12 @@
 
 /* from pb-4 space-y-1 sm:hidden pt-2 */
 .tw-30 { 
-	@apply pt-2 pb-4 space-y-1 sm:hidden; 
+	@apply pb-4 space-y-1 sm:hidden pt-2; 
 }
 
 /* from text-base text-gray-300 hover:bg-gray-700 hover:text-white pl-3 pr-4 block py-2 font-medium */
 .tw-31 { 
-	@apply pr-4 block py-2 text-base pl-3 font-medium text-gray-300 hover:bg-gray-700 hover:text-white; 
+	@apply text-base text-gray-300 hover:bg-gray-700 hover:text-white pl-3 block py-2 pr-4 font-medium; 
 }
 
 /* from bg-gradient-to-b from-gray-900 to-gray-800 py-20 */
@@ -461,27 +461,27 @@
 
 /* from container px-4 mx-auto */
 .tw-33 { 
-	@apply container px-4 mx-auto; 
+	@apply px-4 mx-auto container; 
 }
 
 /* from flex-col lg:flex-row items-center justify-between flex */
 .tw-34 { 
-	@apply flex-col lg:flex-row items-center justify-between flex; 
+	@apply items-center justify-between flex flex-col lg:flex-row; 
 }
 
 /* from lg:w-1/2 mb-10 lg:mb-0 */
 .tw-35 { 
-	@apply mb-10 lg:mb-0 lg:w-1/2; 
+	@apply lg:w-1/2 mb-10 lg:mb-0; 
 }
 
 /* from mb-4 md:text-5xl text-4xl leading-tight font-bold lg:text-6xl text-white */
 .tw-36 { 
-	@apply mb-4 md:text-5xl font-bold lg:text-6xl text-4xl leading-tight text-white; 
+	@apply text-4xl font-bold lg:text-6xl mb-4 leading-tight text-white md:text-5xl; 
 }
 
 /* from text-xl text-gray-300 mb-8 max-w-md */
 .tw-37 { 
-	@apply text-xl text-gray-300 mb-8 max-w-md; 
+	@apply text-gray-300 mb-8 max-w-md text-xl; 
 }
 
 /* from hover:underline */
@@ -491,17 +491,17 @@
 
 /* from flex-wrap gap-4 flex */
 .tw-39 { 
-	@apply gap-4 flex flex-wrap; 
+	@apply flex-wrap gap-4 flex; 
 }
 
 /* from py-3 text-gray-900 rounded-md hover:opacity-90 font-medium transition-opacity bg-white px-6 */
 .tw-40 { 
-	@apply transition-opacity font-medium px-6 py-3 rounded-md hover:opacity-90 bg-white text-gray-900; 
+	@apply py-3 rounded-md bg-white text-gray-900 px-6 hover:opacity-90 font-medium transition-opacity; 
 }
 
 /* from font-medium border-gray-600 py-3 rounded-md px-6 text-gray-300 transition-colors hover:bg-gray-800 border */
 .tw-41 { 
-	@apply hover:bg-gray-800 py-3 text-gray-300 rounded-md font-medium transition-colors border-gray-600 px-6 border; 
+	@apply px-6 transition-colors font-medium py-3 rounded-md text-gray-300 border border-gray-600 hover:bg-gray-800; 
 }
 
 /* from lg:w-1/2 relative */
@@ -511,27 +511,27 @@
 
 /* from mx-auto rounded-full h-64 bg-blue-600 relative md:w-80 md:h-80 w-64 shadow-lg */
 .tw-43 { 
-	@apply rounded-full bg-blue-600 mx-auto md:w-80 w-64 h-64 md:h-80 shadow-lg relative; 
+	@apply md:w-80 h-64 relative w-64 mx-auto md:h-80 rounded-full bg-blue-600 shadow-lg; 
 }
 
 /* from flex text-white justify-center inset-0 font-bold items-center absolute text-xl */
 .tw-44 { 
-	@apply justify-center items-center text-xl flex text-white font-bold absolute inset-0; 
+	@apply flex absolute font-bold items-center text-xl text-white justify-center inset-0; 
 }
 
 /* from rounded-full bg-blue-600 relative mx-auto shadow-lg */
 .tw-45 { 
-	@apply rounded-full relative bg-blue-600 shadow-lg mx-auto; 
+	@apply bg-blue-600 mx-auto shadow-lg relative rounded-full; 
 }
 
 /* from -right-4 h-24 -bottom-4 rounded-full w-24 z-0 absolute bg-purple-600 */
 .tw-46 { 
-	@apply absolute h-24 -bottom-4 z-0 rounded-full w-24 bg-purple-600 -right-4; 
+	@apply z-0 absolute bg-purple-600 w-24 -right-4 h-24 -bottom-4 rounded-full; 
 }
 
 /* from z-0 absolute h-16 bg-pink-600 -top-4 rounded-full -left-4 w-16 */
 .tw-47 { 
-	@apply -left-4 -top-4 absolute bg-pink-600 rounded-full z-0 h-16 w-16; 
+	@apply w-16 absolute -top-4 rounded-full z-0 bg-pink-600 -left-4 h-16; 
 }
 
 /* from bg-gray-800 py-16 */
@@ -541,12 +541,12 @@
 
 /* from justify-between items-center mb-12 pr-4 flex flex-col md:flex-row */
 .tw-49 { 
-	@apply justify-between items-center mb-12 pr-4 flex flex-col md:flex-row; 
+	@apply md:flex-row justify-between items-center mb-12 pr-4 flex flex-col; 
 }
 
 /* from mb-4 text-3xl font-bold text-white */
 .tw-50 { 
-	@apply mb-4 text-3xl font-bold text-white; 
+	@apply font-bold text-white mb-4 text-3xl; 
 }
 
 /* from font-medium flex items-center text-blue-400 hover:underline text-lg */
@@ -556,12 +556,12 @@
 
 /* from grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 grid */
 .tw-52 { 
-	@apply md:grid-cols-2 lg:grid-cols-3 gap-8 grid grid-cols-1; 
+	@apply grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 grid; 
 }
 
 /* from bg-gray-900 transition-all flex transform hover:-translate-y-3 flex-col shadow-md rounded-lg hover:shadow-lg duration-300 overflow-hidden h-full cursor-pointer */
 .tw-53 { 
-	@apply hover:-translate-y-3 duration-300 transition-all overflow-hidden bg-gray-900 transform shadow-md hover:shadow-lg cursor-pointer rounded-lg flex flex-col h-full; 
+	@apply transform hover:-translate-y-3 rounded-lg transition-all h-full bg-gray-900 shadow-md hover:shadow-lg duration-300 flex overflow-hidden flex-col cursor-pointer; 
 }
 
 /* from relative w-full */
@@ -571,17 +571,17 @@
 
 /* from w-full h-48 object-cover */
 .tw-55 { 
-	@apply w-full h-48 object-cover; 
+	@apply object-cover w-full h-48; 
 }
 
 /* from flex-grow flex p-6 flex-col */
 .tw-56 { 
-	@apply flex-grow flex flex-col p-6; 
+	@apply flex-grow flex-col flex p-6; 
 }
 
 /* from mb-3 text-xl hover:underline font-semibold text-white line-clamp-2 */
 .tw-57 { 
-	@apply font-semibold line-clamp-2 mb-3 text-xl hover:underline text-white; 
+	@apply font-semibold line-clamp-2 mb-3 text-xl text-white hover:underline; 
 }
 
 /* from text-gray-300 mb-4 line-clamp-2 */
@@ -596,7 +596,7 @@
 
 /* from hover:bg-blue-800 flex font-medium text-blue-200 px-3 py-1 flex-row text-sm hover:underline rounded-full h-8 items-center transition-colors justify-between bg-blue-900 */
 .tw-60 { 
-	@apply transition-colors hover:underline justify-between px-3 text-sm rounded-full items-center bg-blue-900 flex font-medium text-blue-200 py-1 h-8 hover:bg-blue-800 flex-row; 
+	@apply flex bg-blue-900 font-medium text-blue-200 h-8 px-3 rounded-full transition-colors hover:bg-blue-800 flex-row hover:underline justify-between text-sm items-center py-1; 
 }
 
 /* from items-center flex pr-3 */
@@ -606,22 +606,22 @@
 
 /* from text-xs bg-red-500 py-1 bottom-0 px-2 rounded-tr-md text-gray-200 left-0 absolute */
 .tw-62 { 
-	@apply bottom-0 left-0 absolute py-1 px-2 rounded-tr-md text-gray-200 text-xs bg-red-500; 
+	@apply px-2 rounded-tr-md bottom-0 text-gray-200 left-0 absolute text-xs bg-red-500 py-1; 
 }
 
 /* from px-2 text-gray-200 bottom-0 py-1 right-0 text-xs rounded-tl-md bg-blue-500 absolute */
 .tw-63 { 
-	@apply text-gray-200 right-0 text-xs px-2 bottom-0 py-1 rounded-tl-md bg-blue-500 absolute; 
+	@apply bg-blue-500 absolute text-gray-200 bottom-0 rounded-tl-md px-2 py-1 right-0 text-xs; 
 }
 
 /* from text-sm px-3 items-center hover:underline bg-blue-900 w-full transition-colors py-1 hover:bg-blue-800 h-8 flex-row rounded-full text-blue-200 justify-between font-medium */
 .tw-64 { 
-	@apply justify-between hover:underline hover:bg-blue-800 rounded-full text-blue-200 px-3 transition-colors py-1 text-sm items-center w-full bg-blue-900 h-8 flex-row font-medium; 
+	@apply px-3 bg-blue-900 justify-between transition-colors flex-row text-blue-200 items-center text-sm hover:underline w-full hover:bg-blue-800 h-8 font-medium py-1 rounded-full; 
 }
 
 /* from absolute z-10 grid sm:grid-cols-2 md:grid-cols-3 */
 .tw-65 { 
-	@apply md:grid-cols-3 absolute z-10 grid sm:grid-cols-2; 
+	@apply sm:grid-cols-2 md:grid-cols-3 absolute z-10 grid; 
 }
 
 /* from bg-gray-900 py-16 */
@@ -636,7 +636,7 @@
 
 /* from overflow-hidden bg-gray-800 transform rounded-lg transition-all hover:shadow-lg duration-300 shadow-md hover:-translate-y-1 cursor-pointer */
 .tw-68 { 
-	@apply bg-gray-800 shadow-md transform hover:-translate-y-1 overflow-hidden rounded-lg transition-all duration-300 hover:shadow-lg cursor-pointer; 
+	@apply bg-gray-800 transform rounded-lg transition-all duration-300 shadow-md hover:-translate-y-1 cursor-pointer overflow-hidden hover:shadow-lg; 
 }
 
 /* from p-6 */
@@ -646,37 +646,37 @@
 
 /* from py-1 absolute right-0 bg-blue-500 rounded-tl-md px-2 text-xs text-white bottom-0 */
 .tw-70 { 
-	@apply bottom-0 py-1 absolute right-0 rounded-tl-md text-xs text-white bg-blue-500 px-2; 
+	@apply py-1 right-0 bg-blue-500 px-2 text-xs absolute rounded-tl-md text-white bottom-0; 
 }
 
 /* from grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 */
 .tw-71 { 
-	@apply grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 grid; 
+	@apply gap-8 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4; 
 }
 
 /* from p-6 rounded-lg overflow-hidden bg-gray-900 shadow-md hover:shadow-lg duration-300 transform transition-all hover:-translate-y-1 */
 .tw-72 { 
-	@apply transform duration-300 transition-all hover:-translate-y-1 rounded-lg overflow-hidden shadow-md hover:shadow-lg p-6 bg-gray-900; 
+	@apply transition-all rounded-lg hover:-translate-y-1 overflow-hidden p-6 transform hover:shadow-lg bg-gray-900 shadow-md duration-300; 
 }
 
 /* from items-center justify-between mb-3 flex p-6 */
 .tw-73 { 
-	@apply items-center mb-3 p-6 justify-between flex; 
+	@apply items-center p-6 justify-between mb-3 flex; 
 }
 
 /* from font-semibold text-white text-xl */
 .tw-74 { 
-	@apply text-xl font-semibold text-white; 
+	@apply font-semibold text-white text-xl; 
 }
 
 /* from rounded-full h-8 justify-center items-center flex w-8 bg-gray-700 */
 .tw-75 { 
-	@apply bg-gray-700 justify-center flex w-8 h-8 items-center rounded-full; 
+	@apply w-8 bg-gray-700 justify-center items-center h-8 flex rounded-full; 
 }
 
 /* from text-center max-w-2xl mx-auto */
 .tw-76 { 
-	@apply mx-auto text-center max-w-2xl; 
+	@apply text-center max-w-2xl mx-auto; 
 }
 
 /* from text-gray-300 mb-8 */
@@ -686,27 +686,27 @@
 
 /* from justify-center gap-4 mb-8 flex flex-wrap */
 .tw-78 { 
-	@apply gap-4 mb-8 flex flex-wrap justify-center; 
+	@apply mb-8 flex flex-wrap justify-center gap-4; 
 }
 
 /* from hover:bg-blue-400 w-12 rounded-full bg-gray-700 transition-colors flex text-gray-300 h-12 items-center justify-center */
 .tw-79 { 
-	@apply flex text-gray-300 items-center rounded-full bg-gray-700 transition-colors hover:bg-blue-400 h-12 w-12 justify-center; 
+	@apply rounded-full transition-colors flex justify-center hover:bg-blue-400 w-12 bg-gray-700 text-gray-300 h-12 items-center; 
 }
 
 /* from bg-gray-700 w-12 text-gray-300 justify-center hover:bg-gray-800 transition-colors rounded-full h-12 items-center flex */
 .tw-80 { 
-	@apply h-12 justify-center items-center flex w-12 text-gray-300 hover:bg-gray-800 transition-colors rounded-full bg-gray-700; 
+	@apply flex w-12 text-gray-300 transition-colors rounded-full items-center bg-gray-700 justify-center hover:bg-gray-800 h-12; 
 }
 
 /* from h-12 transition-colors justify-center rounded-full text-gray-300 bg-gray-700 flex w-12 items-center hover:bg-red-500 */
 .tw-81 { 
-	@apply text-gray-300 flex justify-center rounded-full bg-gray-700 items-center h-12 w-12 hover:bg-red-500 transition-colors; 
+	@apply transition-colors rounded-full bg-gray-700 w-12 hover:bg-red-500 justify-center items-center h-12 text-gray-300 flex; 
 }
 
 /* from bg-gray-800 p-8 rounded-lg space-y-6 shadow-md */
 .tw-82 { 
-	@apply p-8 rounded-lg shadow-md bg-gray-800 space-y-6; 
+	@apply shadow-md p-8 space-y-6 bg-gray-800 rounded-lg; 
 }
 
 /* from gap-6 grid grid-cols-1 md:grid-cols-2 */
@@ -721,17 +721,17 @@
 
 /* from py-2 bg-gray-700 focus:outline-none border-gray-600 w-full focus:ring-blue-500 border px-4 text-white rounded-md focus:ring-2 */
 .tw-85 { 
-	@apply bg-gray-700 border py-2 border-gray-600 w-full focus:ring-blue-500 focus:outline-none px-4 text-white focus:ring-2 rounded-md; 
+	@apply px-4 focus:ring-blue-500 border focus:outline-none border-gray-600 rounded-md py-2 focus:ring-2 w-full text-white bg-gray-700; 
 }
 
 /* from rounded-md font-medium text-white transition-colors focus:ring-offset-2 focus:ring-2 focus:ring-blue-500 w-full hover:bg-blue-700 bg-blue-600 py-3 focus:outline-none px-6 */
 .tw-86 { 
-	@apply py-3 font-medium transition-colors px-6 rounded-md focus:ring-blue-500 hover:bg-blue-700 focus:ring-2 w-full text-white focus:ring-offset-2 bg-blue-600 focus:outline-none; 
+	@apply font-medium focus:ring-2 focus:ring-offset-2 bg-blue-600 focus:outline-none px-6 rounded-md py-3 w-full focus:ring-blue-500 hover:bg-blue-700 text-white transition-colors; 
 }
 
 /* from bg-gray-800 border-t border-gray-700 py-12 */
 .tw-87 { 
-	@apply bg-gray-800 border-gray-700 py-12 border-t; 
+	@apply py-12 bg-gray-800 border-t border-gray-700; 
 }
 
 /* from container mx-auto px-4 */
@@ -741,7 +741,7 @@
 
 /* from flex flex-col md:flex-row justify-between items-center */
 .tw-89 { 
-	@apply md:flex-row justify-between items-center flex flex-col; 
+	@apply flex flex-col md:flex-row justify-between items-center; 
 }
 
 /* from mb-6 md:mb-0 */
@@ -751,7 +751,7 @@
 
 /* from text-white text-xl font-bold mb-2 */
 .tw-91 { 
-	@apply font-bold mb-2 text-white text-xl; 
+	@apply mb-2 text-white text-xl font-bold; 
 }
 
 /* from text-gray-400 */
@@ -761,17 +761,17 @@
 
 /* from flex flex-wrap gap-4 justify-center */
 .tw-93 { 
-	@apply flex-wrap gap-4 justify-center flex; 
+	@apply gap-4 justify-center flex flex-wrap; 
 }
 
 /* from text-gray-400 hover:text-blue-400 transition-colors */
 .tw-94 { 
-	@apply hover:text-blue-400 transition-colors text-gray-400; 
+	@apply transition-colors text-gray-400 hover:text-blue-400; 
 }
 
 /* from mt-8 pt-8 border-t border-gray-700 flex flex-col md:flex-row justify-between items-center */
 .tw-95 { 
-	@apply pt-8 border-t border-gray-700 flex flex-col mt-8 md:flex-row justify-between items-center; 
+	@apply pt-8 border-t flex-col md:flex-row mt-8 border-gray-700 flex justify-between items-center; 
 }
 
 /* from text-gray-500 text-sm */
@@ -786,12 +786,12 @@
 
 /* from text-gray-500 hover:text-gray-300 text-sm mx-2 transition-colors */
 .tw-98 { 
-	@apply mx-2 transition-colors text-gray-500 hover:text-gray-300 text-sm; 
+	@apply hover:text-gray-300 text-sm mx-2 transition-colors text-gray-500; 
 }
 
 /* from px-4 container mx-auto py-8 */
 .tw-99 { 
-	@apply px-4 container mx-auto py-8; 
+	@apply mx-auto py-8 container px-4; 
 }
 
 /* from text-3xl font-bold mb-6 text-white */
@@ -801,12 +801,12 @@
 
 /* from w-full focus:outline-none border rounded-md pr-4 py-2 pl-10 bg-gray-700 text-white focus:ring-2 border-gray-600 focus:ring-blue-500 */
 .tw-101 { 
-	@apply border-gray-600 focus:outline-none w-full focus:ring-2 py-2 focus:ring-blue-500 pl-10 bg-gray-700 text-white rounded-md border pr-4; 
+	@apply focus:ring-2 border-gray-600 border pl-10 rounded-md pr-4 py-2 w-full text-white focus:ring-blue-500 focus:outline-none bg-gray-700; 
 }
 
 /* from htmx-indicator top-2.5 text-blue-500 absolute right-3 */
 .tw-102 { 
-	@apply htmx-indicator text-blue-500 absolute right-3 top-2.5; 
+	@apply htmx-indicator top-2.5 text-blue-500 absolute right-3; 
 }
 
 /* from animate-spin h-5 w-5 */
@@ -821,7 +821,7 @@
 
 /* from px-4 container mx-auto py-2 */
 .tw-105 { 
-	@apply px-4 container mx-auto py-2; 
+	@apply py-2 px-4 container mx-auto; 
 }
 
 /* from flex justify-center items-center mt-8 space-x-2 */
@@ -831,37 +831,37 @@
 
 /* from px-3 bg-gray-800 transition-colors rounded-md border py-2 border-gray-700 text-gray-300 hover:bg-gray-700 opacity-50 flex items-center */
 .tw-107 { 
-	@apply hover:bg-gray-700 items-center border py-2 flex bg-gray-800 rounded-md transition-colors px-3 text-gray-300 border-gray-700 opacity-50; 
+	@apply hover:bg-gray-700 transition-colors border opacity-50 px-3 bg-gray-800 py-2 flex items-center rounded-md border-gray-700 text-gray-300; 
 }
 
 /* from hidden md:flex space-x-2 */
 .tw-108 { 
-	@apply hidden md:flex space-x-2; 
+	@apply space-x-2 hidden md:flex; 
 }
 
 /* from bg-blue-600 font-medium px-3 py-2 text-white rounded-md */
 .tw-109 { 
-	@apply rounded-md font-medium py-2 text-white bg-blue-600 px-3; 
+	@apply py-2 text-white rounded-md font-medium px-3 bg-blue-600; 
 }
 
 /* from px-3 bg-gray-800 transition-colors rounded-md border py-2 border-gray-700 text-gray-300 hover:bg-gray-700 */
 .tw-110 { 
-	@apply border bg-gray-800 transition-colors rounded-md px-3 py-2 text-gray-300 border-gray-700 hover:bg-gray-700; 
+	@apply px-3 border-gray-700 bg-gray-800 rounded-md border text-gray-300 transition-colors py-2 hover:bg-gray-700; 
 }
 
 /* from text-gray-400 px-2 py-1 */
 .tw-111 { 
-	@apply py-1 text-gray-400 px-2; 
+	@apply text-gray-400 px-2 py-1; 
 }
 
 /* from flex md:hidden space-x-2 */
 .tw-112 { 
-	@apply space-x-2 flex md:hidden; 
+	@apply flex md:hidden space-x-2; 
 }
 
 /* from px-3 bg-gray-800 transition-colors rounded-md border py-2 border-gray-700 text-gray-300 hover:bg-gray-700 flex items-center */
 .tw-113 { 
-	@apply transition-colors items-center bg-gray-800 border border-gray-700 flex px-3 rounded-md hover:bg-gray-700 py-2 text-gray-300; 
+	@apply border bg-gray-800 text-gray-300 items-center px-3 transition-colors border-gray-700 hover:bg-gray-700 rounded-md flex py-2; 
 }
 
 /* from grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 grid */
@@ -871,12 +871,12 @@
 
 /* from bg-gray-800 transition-all flex transform hover:-translate-y-3 flex-col shadow-md rounded-lg hover:shadow-lg duration-300 overflow-hidden h-full */
 .tw-115 { 
-	@apply transition-all transform hover:shadow-lg shadow-md rounded-lg bg-gray-800 hover:-translate-y-3 flex-col duration-300 overflow-hidden flex h-full; 
+	@apply hover:shadow-lg overflow-hidden transition-all shadow-md duration-300 h-full hover:-translate-y-3 bg-gray-800 flex transform rounded-lg flex-col; 
 }
 
 /* from p-6 rounded-lg overflow-hidden bg-gray-800 shadow-md hover:shadow-lg duration-300 transform transition-all hover:-translate-y-1 */
 .tw-116 { 
-	@apply bg-gray-800 hover:-translate-y-1 overflow-hidden shadow-md hover:shadow-lg duration-300 transition-all transform p-6 rounded-lg; 
+	@apply bg-gray-800 p-6 rounded-lg overflow-hidden hover:shadow-lg transition-all hover:-translate-y-1 shadow-md duration-300 transform; 
 }
 
 /* from mb-8 */
@@ -886,7 +886,7 @@
 
 /* from font-bold text-white mb-4 text-4xl */
 .tw-118 { 
-	@apply font-bold text-white mb-4 text-4xl; 
+	@apply text-white mb-4 text-4xl font-bold; 
 }
 
 /* from mb-6 flex items-center text-gray-400 */
@@ -901,17 +901,17 @@
 
 /* from flex flex-wrap gap-2 mb-8 */
 .tw-121 { 
-	@apply flex-wrap gap-2 mb-8 flex; 
+	@apply flex flex-wrap gap-2 mb-8; 
 }
 
 /* from px-3 font-medium text-sm py-1 inline-block hover:bg-blue-800 text-blue-200 bg-blue-900 rounded-full transition-colors */
 .tw-122 { 
-	@apply rounded-full text-sm py-1 bg-blue-900 transition-colors inline-block text-blue-200 px-3 font-medium hover:bg-blue-800; 
+	@apply transition-colors px-3 text-sm inline-block bg-blue-900 font-medium text-blue-200 hover:bg-blue-800 rounded-full py-1; 
 }
 
 /* from bg-gray-800 rounded-lg mb-8 overflow-hidden p-6 shadow-lg */
 .tw-123 { 
-	@apply mb-8 shadow-lg rounded-lg p-6 bg-gray-800 overflow-hidden; 
+	@apply p-6 overflow-hidden mb-8 bg-gray-800 rounded-lg shadow-lg; 
 }
 
 /* from max-w-none my-6 text-gray-300 leading-relaxed */
@@ -921,7 +921,7 @@
 
 /* from pt-8 mt-12 border-t border-gray-700 */
 .tw-125 { 
-	@apply pt-8 mt-12 border-t border-gray-700; 
+	@apply border-t border-gray-700 pt-8 mt-12; 
 }
 
 /* from text-2xl font-bold text-white mb-4 */
@@ -931,7 +931,7 @@
 
 /* from grid grid-cols-1 md:grid-cols-2 gap-4 */
 .tw-127 { 
-	@apply grid grid-cols-1 md:grid-cols-2 gap-4; 
+	@apply gap-4 grid grid-cols-1 md:grid-cols-2; 
 }
 
 /* from mb-6 flex-row flex gap-2 */
@@ -941,12 +941,12 @@
 
 /* from w-full md:h-96 object-center rounded-lg object-cover shadow-md mb-8 h-64 */
 .tw-129 { 
-	@apply h-64 rounded-lg mb-8 w-full object-center object-cover md:h-96 shadow-md; 
+	@apply w-full rounded-lg h-64 shadow-md mb-8 md:h-96 object-center object-cover; 
 }
 
 /* from pb-4 mb-4 border-b border-gray-700 */
 .tw-130 { 
-	@apply mb-4 border-b border-gray-700 pb-4; 
+	@apply pb-4 mb-4 border-b border-gray-700; 
 }
 
 /* from font-semibold text-white text-2xl */
@@ -956,7 +956,7 @@
 
 /* from h-1 bg-blue-500 mt-2 w-16 */
 .tw-132 { 
-	@apply h-1 bg-blue-500 mt-2 w-16; 
+	@apply w-16 h-1 bg-blue-500 mt-2; 
 }
 
 /* from max-w-none */
@@ -971,12 +971,12 @@
 
 /* from items-center text-sm text-gray-400 mt-6 flex */
 .tw-135 { 
-	@apply text-gray-400 mt-6 flex items-center text-sm; 
+	@apply items-center text-sm text-gray-400 mt-6 flex; 
 }
 
 /* from text-white mb-4 text-2xl font-semibold */
 .tw-136 { 
-	@apply text-white mb-4 text-2xl font-semibold; 
+	@apply text-2xl font-semibold text-white mb-4; 
 }
 
 /* from mb-12 text-center */
@@ -986,12 +986,12 @@
 
 /* from p-4 inline-block */
 .tw-138 { 
-	@apply inline-block p-4; 
+	@apply p-4 inline-block; 
 }
 
 /* from text-xl text-gray-300 max-w-2xl mx-auto */
 .tw-139 { 
-	@apply max-w-2xl mx-auto text-xl text-gray-300; 
+	@apply text-gray-300 max-w-2xl mx-auto text-xl; 
 }
 
 /* from border-b border-gray-700 mb-6 */
@@ -1001,12 +1001,12 @@
 
 /* from space-x-8 flex */
 .tw-141 { 
-	@apply flex space-x-8; 
+	@apply space-x-8 flex; 
 }
 
 /* from px-1 sm:text-base text-sm font-medium py-4 border-b-2 */
 .tw-142 { 
-	@apply font-medium border-b-2 sm:text-base text-sm py-4 px-1; 
+	@apply py-4 text-sm font-medium border-b-2 px-1 sm:text-base; 
 }
 
 /* from text-blue-500 border-blue-500 */
@@ -1021,22 +1021,22 @@
 
 /* from bg-blue-500 p-8 rounded-lg shadow-md text-center */
 .tw-145 { 
-	@apply p-8 shadow-md rounded-lg text-center bg-blue-500; 
+	@apply shadow-md text-center rounded-lg bg-blue-500 p-8; 
 }
 
 /* from mb-6 flex justify-center */
 .tw-146 { 
-	@apply justify-center mb-6 flex; 
+	@apply mb-6 flex justify-center; 
 }
 
 /* from bg-green-600 rounded-full p-4 w-16 h-16 flex items-center justify-center */
 .tw-147 { 
-	@apply justify-center bg-green-600 p-4 flex h-16 rounded-full w-16 items-center; 
+	@apply p-4 w-16 h-16 flex items-center rounded-full bg-green-600 justify-center; 
 }
 
 /* from h-8 w-8 text-white */
 .tw-148 { 
-	@apply w-8 text-white h-8; 
+	@apply h-8 w-8 text-white; 
 }
 
 /* from text-white mb-6 */
