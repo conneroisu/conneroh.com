@@ -32,9 +32,7 @@
             REPO_ROOT="$(git rev-parse --show-toplevel)"
             $EDITOR "$REPO_ROOT"/flake.nix
           '';
-          deps = [
-            pkgs.git
-          ];
+          deps = [pkgs.git];
           description = "Edit flake.nix";
         };
         gx = {
@@ -42,9 +40,7 @@
             REPO_ROOT="$(git rev-parse --show-toplevel)"
             $EDITOR "$REPO_ROOT"/go.mod
           '';
-          deps = [
-            pkgs.git
-          ];
+          deps = [pkgs.git];
           description = "Edit go.mod";
         };
         clean = {
@@ -65,24 +61,19 @@
             REPO_ROOT="$(git rev-parse --show-toplevel)"
             go test -v "$REPO_ROOT"/...
           '';
-          deps = [
-            pkgs.go
-          ];
+          deps = [pkgs.go];
           description = "Run all go tests";
         };
         lint = {
           exec = ''
             REPO_ROOT="$(git rev-parse --show-toplevel)"
+            templ generate
 
             golangci-lint run
             statix check "$REPO_ROOT"/flake.nix
             deadnix "$REPO_ROOT"/flake.nix
           '';
-          deps = [
-            pkgs.golangci-lint
-            pkgs.statix
-            pkgs.deadnix
-          ];
+          deps = with pkgs; [golangci-lint statix deadnix templ];
           description = "Run Nix/Go Linting Steps.";
         };
         generate-css = {
@@ -95,21 +86,14 @@
                 -o "$REPO_ROOT"/cmd/conneroh/_static/dist/style.css \
                 --cwd "$REPO_ROOT"
           '';
-          deps = [
-            pkgs.tailwindcss
-            pkgs.templ
-            pkgs.go
-          ];
+          deps = with pkgs; [tailwindcss templ go];
           description = "Update the generated html and css files.";
         };
         generate-docs = {
           exec = ''
-            doppler run -- update -jobs 20
+            doppler run -- update
           '';
-          deps = [
-            pkgs.doppler
-            self.packages."${system}".update
-          ];
+          deps = with pkgs; [doppler self.packages."${system}".update];
           description = "Update the generated go files from the md docs.";
         };
         generate-reload = {
@@ -134,10 +118,7 @@
               echo "$DOCS_HASH" > ./internal/cache/docs.hash
             fi
           '';
-          deps = [
-            (pkgs.lib.getExe scriptPackages.generate-docs)
-            (pkgs.lib.getExe scriptPackages.generate-css)
-          ];
+          deps = with self.packages."${system}"; [generate-docs generate-css];
           description = "Code Generation Steps for specific directory changes.";
         };
         generate-js = {
@@ -151,9 +132,7 @@
                   --minify-identifiers \
                   --outdir "$REPO_ROOT"/cmd/conneroh/_static/dist/
           '';
-          deps = [
-            pkgs.bun
-          ];
+          deps = with pkgs; [bun git];
           description = "Generate JS files";
         };
         generate-all = {
@@ -161,10 +140,7 @@
             generate-css
             generate-docs
           '';
-          deps = [
-            (pkgs.lib.getExe scriptPackages.generate-css)
-            (pkgs.lib.getExe scriptPackages.generate-docs)
-          ];
+          deps = with self.packages."${system}"; [generate-css generate-docs];
           description = "Generate all files in parallel";
         };
         format = {
@@ -185,11 +161,7 @@
                 --ignored-dirs=.direnv .
             cd -
           '';
-          deps = [
-            pkgs.go
-            pkgs.git
-            pkgs.golines
-          ];
+          deps = with pkgs; [go git golines];
           description = "Format code files";
         };
         run = {
@@ -197,10 +169,33 @@
             export DEBUG=true
             cd "$(git rev-parse --show-toplevel)" && air
           '';
-          deps = [
-            pkgs.air
-            pkgs.git
-          ];
+          deps = with pkgs; [air git];
+          description = "Run the application with air for hot reloading";
+        };
+        run-test = {
+          exec = ''
+            export DEBUG=true
+            go run main.go &
+            GO_PID=$!
+
+            # Give the server a moment to start up
+            sleep 2
+
+            URLS=$(katana -u http://localhost:8080 -sb)
+            URL_COUNT=$(echo "$URLS" | wc -l)
+
+            # Kill the Go process regardless of test outcome
+            kill $GO_PID
+
+            if [ "$URL_COUNT" -lt 10 ]; then
+                echo "Error: katana found only $URL_COUNT URLs, which is less than the required minimum of 10."
+                exit 1
+            else
+                echo "Success: katana found $URL_COUNT URLs, which meets or exceeds the required minimum of 10."
+                exit 0
+            fi
+          '';
+          deps = with pkgs; [katana git];
           description = "Run the application with air for hot reloading";
         };
       };
@@ -218,7 +213,7 @@
         )
         scripts;
     in {
-      devShell = pkgs.mkShell {
+      devShells.default = pkgs.mkShell {
         shellHook = ''
           export REPO_ROOT=$(git rev-parse --show-toplevel)
           export CGO_CFLAGS="-O2"
@@ -266,6 +261,9 @@
             svgcleaner
             sqlite-web
             harper
+            htmx-lsp
+            vscode-langservers-extracted
+            katana
 
             flyctl # Infra
             openssl.dev
@@ -312,35 +310,39 @@
         processes = ["app"];
         version = self.shortRev or "dirty";
         src = ./.;
-        vendorHash = "sha256-Nun3Q8Z0Gepi8ovNEr1BupZeZP4AKbRHZQ8os6pfo/8=";
+        vendorHash = "sha256-BUI6XA3RnQWKrNohX1iC3UxXpc+9WcHxrnX+bxgEpTU=";
         # Create a derivation for the database file
         databaseFiles = pkgs.runCommand "database-files" {} ''
           mkdir -p $out/root
           cp ${./master.db} $out/root/master.db
         '';
+
+        preBuild = ''
+          ${pkgs.templ}/bin/templ generate
+          ${pkgs.tailwindcss}/bin/tailwindcss \
+              --minify \
+              -i ./input.css \
+              -o ./cmd/conneroh/_static/dist/style.css \
+              --cwd .
+        '';
       in
         {
           conneroh = pkgs.buildGoModule {
-            inherit src vendorHash version;
+            inherit src vendorHash version preBuild;
             name = "conneroh.com";
             nativeBuildInputs = [
               pkgs.templ
               pkgs.tailwindcss
             ];
-            preBuild = ''
-              templ generate
-              tailwindcss \
-                  --minify \
-                  -i ./input.css \
-                  -o ./cmd/conneroh/_static/dist/style.css \
-                  --cwd .
-            '';
             subPackages = ["."];
           };
           update = pkgs.buildGoModule {
-            inherit src vendorHash version;
+            inherit src vendorHash version preBuild;
             name = "update";
             subPackages = ["./cmd/update"];
+            doCheck = false;
+            outputHashMode = "recursive";
+            outputHashAlgo = "sha256";
           };
           C-conneroh = pkgs.dockerTools.buildImage {
             created = "now";

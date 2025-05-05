@@ -34,6 +34,7 @@ require (
 
 require (
 	github.com/BurntSushi/toml v1.2.1 // indirect
+	github.com/VojtaStruhar/goldmark-obsidian-callout v0.1.0 // indirect
 	github.com/alecthomas/chroma/v2 v2.2.0 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.6.10 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.3.34 // indirect

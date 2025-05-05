@@ -1,4 +1,5 @@
 # Conner Ohnesorge's Portfolio
+[![built with nix](https://builtwithnix.org/badge.svg)](https://builtwithnix.org)
 
 A personal portfolio website built with Go and modern web technologies, showcasing projects, blog posts, and skills.
 

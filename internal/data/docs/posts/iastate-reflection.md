@@ -5,6 +5,8 @@ aliases:
 tags:
   - ide/vivado
   - ide/vitis
+  - hdl/vhdl
+  - programming-language/c
   - edu/iastate/ageds461
   - edu/iastate/arch321
   - edu/iastate/ee201
@@ -19,13 +21,19 @@ banner_path: posts/iastate-reflect.webp
 created_at: 2025-03-27T05:48:53.000-06:00
 description: This is a reflection on my time at Iowa State University.
 projects:
+  - kreative-docuvet
   - cpre488-mp1
   - cpre488-mp2
+  - cpre488-mp3
+  - cpre488-mp4
 title: A Reflective Journey - Navigating Your Cumulative Experience at Iowa State University
-updated_at: 2025-04-12T12:07:49.000-06:00
+updated_at: 2025-05-05T06:29:04.000-06:00
 ---
 
 # A Reflective Journey: Navigating Your Cumulative Experience at Iowa State University
+
+> [!note]+ Author's Note
+> This post was an assignment for the [Iowa State University](https://www.iastate.edu/) undergraduate course [CprE 494](/edu/iastate/cpre494).
 
 ## Introduction
 

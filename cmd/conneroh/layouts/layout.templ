@@ -1,30 +1,453 @@
 package layouts
 
-import "github.com/conneroisu/twerge"
+import (
+	"fmt"
+	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
+	"github.com/conneroisu/twerge"
+	"strings"
+	"time"
+)
+
+templ Page(comp templ.Component) {
+	@Layout("Page") {
+		@comp
+	}
+}
 
 templ Layout(title string) {
 	<!DOCTYPE html>
 	<html lang="en">
 		<head>
-			<title>{ title }</title>
+			<title>{ title } | Conner Ohnesorge - Portfolio</title>
 			<meta charset="UTF-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1"/>
+			<meta name="description" content="Conner Ohnesorge's portfolio showcasing professional work, projects, and expertise."/>
+			<meta name="keywords" content="Conner Ohnesorge, portfolio, developer, professional, projects"/>
+			<meta name="author" content="Conner Ohnesorge"/>
 			<meta name="robots" content="index, follow"/>
 			<meta name="revisit-after" content="7 days"/>
 			<meta name="language" content="English"/>
+			<!-- Open Graph / Social Media Meta Tags -->
+			<meta property="og:title" content={ title + " | Conner Ohnesorge - Portfolio" }/>
+			<meta property="og:description" content="Conner Ohnesorge's portfolio showcasing professional work, projects, and expertise."/>
+			<meta property="og:type" content="website"/>
+			<meta property="og:url" content="https://conneroh.com"/>
+			<meta property="og:image" content="https://conneroh.com/dist/hero.jpeg"/>
+			// Twitter Card Meta Tags
+			<meta name="twitter:card" content="summary_large_image"/>
+			<meta name="twitter:title" content={ title + " | Conner Ohnesorge - Portfolio" }/>
+			<meta name="twitter:description" content="Conner Ohnesorge's portfolio showcasing professional work, projects, and expertise."/>
+			<meta name="twitter:image" content="https://conneroh.com/dist/hero.jpeg"/>
+			// Canonical URL 
+			<link rel="canonical" href="https://conneroh.com"/>
+			// Stylesheets and Scripts
 			<link rel="stylesheet" href="/dist/style.css"/>
 			<script type="module" src="/dist/index.js"></script>
 			<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 			<link rel="shortcut icon" href="/dist/favicon.ico" type="image/x-icon"/>
+			// Structured Data / Schema.org
+			<script type="application/ld+json">
+				{
+					"@context": "https://schema.org",
+					"@type": "Person",
+					"name": "Conner Ohnesorge",
+					"url": "https://yourwebsite.com",
+					"sameAs": [
+						"https://github.com/conneroisu",
+						"https://linkedin.com/in/conner-ohnesorge-b720a4238",
+						"https://x.com/ConnerOhnesorge",
+						"https://twitter.com/ConnerOhnesorge"
+					],
+					"jobTitle": "Electrical Engineer & Software Developer",
+					"worksFor": {
+						"@type": "Organization",
+						"name": "Your Company"
+					}
+				}
+			</script>
 		</head>
 		<body
 			class={ twerge.It("bg-gray-900") }
 			hx-ext="preload"
 		>
 			@header()
-			<div id="bodiody">
+			<main id="bodiody">
 				{ children... }
-			</div>
+			</main>
+			<footer class={ twerge.It("bg-gray-800 border-t border-gray-700 py-12") }>
+				<div class={ twerge.It("container mx-auto px-4") }>
+					<div class={ twerge.It("flex flex-col md:flex-row justify-between items-center") }>
+						<div class={ twerge.It("mb-6 md:mb-0") }>
+							<h3 class={ twerge.It("text-white text-xl font-bold mb-2") }>Conner Ohnesorge</h3>
+							<p class={ twerge.It("text-gray-400") }>Electrical Engineer & Software Developer</p>
+						</div>
+						<div class={ twerge.It("flex flex-wrap gap-4 justify-center") }>
+							<a href="https://www.linkedin.com/in/conner-ohnesorge-b720a4238" class={ twerge.It("text-gray-400 hover:text-blue-400 transition-colors") }>
+								LinkedIn
+							</a>
+							<a href="https://github.com/conneroisu" class={ twerge.It("text-gray-400 hover:text-blue-400 transition-colors") }>
+								GitHub
+							</a>
+							<a href="https://x.com/ConnerOhnesorge" class={ twerge.It("text-gray-400 hover:text-blue-400 transition-colors") }>
+								Twitter
+							</a>
+							<a href="mailto:conneroisu@outlook.com" class={ twerge.It("text-gray-400 hover:text-blue-400 transition-colors") }>
+								Email
+							</a>
+						</div>
+					</div>
+					<div class={ twerge.It("mt-8 pt-8 border-t border-gray-700 flex flex-col md:flex-row justify-between items-center") }>
+						<p class={ twerge.It("text-gray-500 text-sm") }>&copy; { currentYear() } Conner Ohnesorge. All rights reserved.</p>
+						<div class={ twerge.It("mt-4 md:mt-0") }>
+							<a href="/posts" class={ twerge.It("text-gray-500 hover:text-gray-300 text-sm mx-2 transition-colors") }>Posts</a>
+							<a href="/projects" class={ twerge.It("text-gray-500 hover:text-gray-300 text-sm mx-2 transition-colors") }>Projects</a>
+							<a href="/tags" class={ twerge.It("text-gray-500 hover:text-gray-300 text-sm mx-2 transition-colors") }>Tags</a>
+							<a href="#contact" class={ twerge.It("text-gray-500 hover:text-gray-300 text-sm mx-2 transition-colors") }>Contact</a>
+						</div>
+					</div>
+				</div>
+			</footer>
 		</body>
 	</html>
+}
+
+// Helper function to get current year for copyright
+func currentYear() string {
+	return fmt.Sprintf("%d", time.Now().Year())
+}
+
+templ header() {
+	<header>
+		<nav
+			class={ twerge.It("border-gray-800 border-b") }
+		>
+			<div
+				class={ twerge.It("container mx-auto lg:px-8 sm:px-6 px-4") }
+				x-data="{ isMenuOpen: false }"
+			>
+				<div
+					class={ twerge.It("justify-between h-16 flex items-center") }
+				>
+					// Left side: Logo and navigation links
+					<div
+						class={ twerge.It("items-center flex") }
+					>
+						// Mobile menu button
+						@components.Icon("menu", templ.Attributes{
+							"class":  twerge.It("p-2 focus:outline-none sm:hidden hover:text-white hover:bg-gray-700 rounded-md text-gray-300 mr-2"),
+							"@click": "isMenuOpen = !isMenuOpen",
+						})
+						// Logo - visible on all screens
+						<a
+							class={ twerge.It("text-white cursor-pointer pr-4 text-xl font-bold") }
+							hx-get="/"
+							hx-push-url="/"
+							hx-target="#bodiody"
+							aria-label="Back to Home"
+						>
+							Conner Ohnesorge
+						</a>
+						// Desktop navigation links
+						<div
+							class={ twerge.It("space-x-8 hidden sm:flex items-center ml-8") }
+							preload="mouseover"
+						>
+							<a
+								class={ twerge.It("hover:text-white cursor-pointer text-gray-300") }
+								hx-target="#bodiody"
+								hx-get="/projects"
+								hx-push-url="true"
+							>
+								Projects
+							</a>
+							<a
+								class={ twerge.It("hover:text-white cursor-pointer text-gray-300") }
+								hx-target="#bodiody"
+								hx-get="/posts"
+								hx-push-url="true"
+								preload="mouseover"
+							>
+								Posts
+							</a>
+							<a
+								class={ twerge.It("hover:text-white cursor-pointer text-gray-300") }
+								hx-target="#bodiody"
+								hx-get="/tags"
+								hx-push-url="true"
+								preload="mouseover"
+							>
+								Tags
+							</a>
+						</div>
+					</div>
+					// Right side: Search component - shared for both desktop and mobile
+					@search()
+				</div>
+				// Mobile navigation menu - toggled by button
+				<div
+					x-show="isMenuOpen"
+					class={ twerge.It("pb-4 space-y-1 sm:hidden pt-2") }
+					x-transition:enter="transition ease-out duration-200"
+					x-transition:enter-start="opacity-0 transform -translate-y-2"
+					x-transition:enter-end="transform translate-y-0 opacity-100"
+					x-transition:leave="transition ease-in duration-150"
+					x-transition:leave-start="transform translate-y-0 opacity-100"
+					x-transition:leave-end="opacity-0 transform -translate-y-2"
+				>
+					<a
+						class={ twerge.It("text-base text-gray-300 hover:bg-gray-700 hover:text-white pl-3 pr-4 block py-2 font-medium") }
+						hx-target="#bodiody"
+						hx-get="/projects"
+						hx-push-url="true"
+						@click="isMenuOpen = false"
+						preload="ontouchstart"
+					>
+						Projects
+					</a>
+					<a
+						class={ twerge.It("text-base text-gray-300 hover:bg-gray-700 hover:text-white pl-3 pr-4 block py-2 font-medium") }
+						hx-target="#bodiody"
+						hx-get="/posts"
+						hx-push-url="/posts"
+						@click="isMenuOpen = false"
+						preload="ontouchstart"
+					>
+						Posts
+					</a>
+					<a
+						class={ twerge.It("text-base text-gray-300 hover:bg-gray-700 hover:text-white pl-3 pr-4 block py-2 font-medium") }
+						hx-target="#bodiody"
+						hx-get="/tags"
+						hx-push-url="true"
+						@click="isMenuOpen = false"
+						preload="ontouchstart"
+					>
+						Tags
+					</a>
+				</div>
+			</div>
+		</nav>
+	</header>
+}
+
+templ Icon(
+	id string,
+	attrs templ.Attributes,
+) {
+	<img
+		src={ fmt.Sprintf("https://conneroh.fly.storage.tigris.dev/svg/%s.svg", id) }
+		{ attrs... }
+	/>
+}
+
+templ search() {
+	<div
+		class={ twerge.It("relative") }
+		x-data="{
+			isSearchOpen: false,
+		}"
+	>
+		// Desktop search
+		<div
+			class={ twerge.It("items-center hidden md:flex") }
+		>
+			<button
+				@click="isSearchOpen = !isSearchOpen"
+				class={ twerge.It("p-2 transition-colors hover:text-white hover:bg-gray-700 text-gray-300 rounded-md") }
+			>
+				@components.Icon("search", templ.Attributes{})
+			</button>
+			// Search dropdown
+			<div
+				x-show="isSearchOpen"
+				@click.away="isSearchOpen = false"
+				class={ twerge.It("overflow-hidden shadow-lg mt-2 top-full absolute rounded-lg w-80 right-0 z-30 bg-gray-800") }
+				x-transition:enter="transition ease-out duration-200"
+				x-transition:enter-start="opacity-0 scale-95"
+				x-transition:enter-end="opacity-100 scale-100"
+				x-transition:leave="transition ease-in duration-150"
+				x-transition:leave-start="opacity-100 scale-100"
+				x-transition:leave-end="opacity-0 scale-95"
+			>
+				// Search input
+				<div
+					class={ twerge.It("border-gray-700 border-b p-3") }
+				>
+					<div
+						class={ twerge.It("relative") }
+					>
+						<input
+							x-ref="searchInput"
+							hx-get="/search/all"
+							hx-trigger="keyup changed delay:400ms, search"
+							hx-target="#search-results-container"
+							hx-indicator="#loading-indicator"
+							class={ twerge.It("border border-gray-600 py-2 focus:ring-blue-500 focus:ring-2 pr-4 focus:outline-none rounded-md bg-gray-700 text-white w-full pl-10") }
+							type="search"
+							placeholder="Search site..."
+							aria-label="Search"
+							@keydown.escape="isSearchOpen = false"
+						/>
+						<div
+							class={ twerge.It("text-gray-500 absolute left-3 top-2.5") }
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class={ twerge.It("w-5 h-5") }
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+							</svg>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		// Mobile search toggle button
+		<button
+			@click="isSearchOpen = !isSearchOpen"
+			class={ twerge.It("md:hidden text-gray-300 hover:text-white focus:outline-none") }
+		>
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				class={ twerge.It("w-5 h-5") }
+				x-show="!isSearchOpen"
+				fill="none"
+				viewBox="0 0 24 24"
+				stroke="currentColor"
+			>
+				<path
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					stroke-width="2"
+					d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+				></path>
+			</svg>
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				class={ twerge.It("w-5 h-5") }
+				x-show="isSearchOpen"
+				fill="none"
+				viewBox="0 0 24 24"
+				stroke="currentColor"
+			>
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+			</svg>
+		</button>
+		// Mobile search panel
+		<div
+			x-show="isSearchOpen"
+			class={ twerge.It("md:hidden px-4 fixed inset-0 z-50 bg-gray-900 pt-16 pb-4") }
+			x-transition:enter="transition ease-out duration-200"
+			x-transition:enter-start="opacity-0"
+			x-transition:enter-end="opacity-100"
+			x-transition:leave="transition ease-in duration-150"
+			x-transition:leave-start="opacity-100"
+			x-transition:leave-end="opacity-0"
+		>
+			// Close button for mobile
+			<button
+				@click="isSearchOpen = false"
+				class={ twerge.It("text-gray-300 hover:text-white absolute top-4 right-4") }
+			>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					class={ twerge.It("h-6 w-6") }
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+				>
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+				</svg>
+			</button>
+			<h2
+				class={ twerge.It("font-bold text-white mb-4 text-xl") }
+			>Search</h2>
+			// Mobile search input
+			<div
+				class={ twerge.It("relative mb-4") }
+			>
+				<input
+					x-ref="mobileSearchInput"
+					hx-get="/search/all"
+					hx-trigger="keyup changed delay:400ms, search"
+					hx-target="#search-results-container"
+					hx-indicator="#loading-indicator"
+					class={ twerge.It("pr-4 border bg-gray-800 rounded-lg focus:outline-none py-3 pl-10 focus:ring-blue-500 w-full focus:ring-2 text-white border-gray-600") }
+					type="search"
+					placeholder="Search site..."
+					aria-label="Search"
+				/>
+				<div
+					class={ twerge.It("absolute left-3 top-3.5 text-gray-500") }
+				>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class={ twerge.It("w-5 h-5") }
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+					>
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+					</svg>
+				</div>
+			</div>
+			// Mobile results container (using the same ID as desktop)
+			<div
+				id="search-results-container"
+				class={ twerge.It("max-h-64 overflow-y-auto") }
+			>
+				// Loading indicator
+				<div
+					id="loading-indicator"
+					class={ twerge.It("htmx-indicator text-center p-4 text-gray-400") }
+				>
+					<svg
+						class={ twerge.It("w-5 mx-auto animate-spin h-5") }
+						xmlns="http://www.w3.org/2000/svg"
+						fill="none"
+						viewBox="0 0 24 24"
+					>
+						<circle
+							class={ twerge.It("opacity-25") }
+							cx="12"
+							cy="12"
+							r="10"
+							stroke="currentColor"
+							stroke-width="4"
+						></circle>
+						<path
+							class={ twerge.It("opacity-75") }
+							fill="currentColor"
+							d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+						></path>
+					</svg>
+				</div>
+			</div>
+		</div>
+	</div>
+}
+
+// Unified template for search results that works for both desktop and mobile
+templ searchResults(
+	query string,
+	results []SearchResult,
+) {
+}
+
+// Helper type for search results
+type SearchResult struct {
+	Title string
+	URL   string
+	Type  string
+}
+
+// Helper function to capitalize first letter of a string
+func capitalize(s string) string {
+	if s == "" {
+		return ""
+	}
+	return strings.ToUpper(s[:1]) + s[1:]
 }
