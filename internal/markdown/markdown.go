@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	callout "github.com/VojtaStruhar/goldmark-obsidian-callout"
 	mathjax "github.com/litao91/goldmark-mathjax"
 	enclave "github.com/quail-ink/goldmark-enclave"
 	"github.com/quail-ink/goldmark-enclave/core"
@@ -37,6 +38,7 @@ func NewMD(
 			&wikilink.Extender{
 				Resolver: newResolver(fs),
 			},
+			callout.ObsidianCallout,
 			extension.GFM,
 			extension.Footnote,
 			extension.Strikethrough,

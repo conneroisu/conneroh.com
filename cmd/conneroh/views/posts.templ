@@ -77,27 +77,40 @@ templ Post(
 					class={ twerge.It("grid grid-cols-1 md:grid-cols-2 gap-4") }
 				>
 					for _, project := range post.Projects {
-						<a
-							hx-get={ project.PagePath() }
-							hx-push-url={ project.PagePath() }
-							hx-target="#bodiody"
-							hx-indicator="#bodiody"
-							preload="mouseover"
-							class={ twerge.It("rounded-lg bg-gray-800 hover:bg-gray-700 flex transition-colors items-center p-4") }
-						>
-							<div>
-								<h3
-									class={ twerge.It("text-white font-medium") }
-								>
-									{ project.Slug }
-								</h3>
-								<p
-									class={ twerge.It("line-clamp-2 text-gray-400 text-sm") }
-								>
-									{ project.Description }
-								</p>
-							</div>
-						</a>
+						@components.ProjectItem(
+							project,
+							templ.Attributes{
+								"class":       twerge.It("bg-gray-800 transition-all flex transform hover:-translate-y-3 flex-col shadow-md rounded-lg hover:shadow-lg duration-300 overflow-hidden h-full"),
+								"hx-target":   "#bodiody",
+								"hx-get":      project.PagePath(),
+								"hx-push-url": "true",
+								"preload":     "mouseover",
+							},
+						)
+					}
+				</div>
+			</div>
+		}
+		if len(post.Posts) > 0 {
+			<div
+				class={ twerge.It("pt-8 mt-12 border-t border-gray-700") }
+			>
+				<h2
+					class={ twerge.It("text-2xl font-bold text-white mb-4") }
+				>
+					Related Posts
+				</h2>
+				<div
+					class={ twerge.It("gap-6 grid grid-cols-1 md:grid-cols-2") }
+				>
+					for _, post := range post.Posts {
+						@components.PostItem(post, templ.Attributes{
+							"class":       twerge.It("bg-gray-800 rounded-lg shadow-md overflow-hidden p-6"),
+							"hx-target":   "#bodiody",
+							"hx-get":      post.PagePath(),
+							"hx-push-url": post.PagePath(),
+							"preload":     "mouseover",
+						})
 					}
 				</div>
 			</div>

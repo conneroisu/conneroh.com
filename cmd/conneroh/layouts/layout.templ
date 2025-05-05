@@ -2,6 +2,12 @@ package layouts
 
 import "github.com/conneroisu/twerge"
 
+templ Page(comp templ.Component) {
+	@Layout("Page") {
+		@comp
+	}
+}
+
 templ Layout(title string) {
 	<!DOCTYPE html>
 	<html lang="en">
