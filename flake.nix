@@ -67,12 +67,13 @@
         lint = {
           exec = ''
             REPO_ROOT="$(git rev-parse --show-toplevel)"
+            templ generate
 
             golangci-lint run
             statix check "$REPO_ROOT"/flake.nix
             deadnix "$REPO_ROOT"/flake.nix
           '';
-          deps = with pkgs; [golangci-lint statix deadnix];
+          deps = with pkgs; [golangci-lint statix deadnix templ];
           description = "Run Nix/Go Linting Steps.";
         };
         generate-css = {
@@ -315,27 +316,28 @@
           mkdir -p $out/root
           cp ${./master.db} $out/root/master.db
         '';
+
+        preBuild = ''
+          ${pkgs.templ}/bin/templ generate
+          ${pkgs.tailwindcss}/bin/tailwindcss \
+              --minify \
+              -i ./input.css \
+              -o ./cmd/conneroh/_static/dist/style.css \
+              --cwd .
+        '';
       in
         {
           conneroh = pkgs.buildGoModule {
-            inherit src vendorHash version;
+            inherit src vendorHash version preBuild;
             name = "conneroh.com";
             nativeBuildInputs = [
               pkgs.templ
               pkgs.tailwindcss
             ];
-            preBuild = ''
-              templ generate
-              tailwindcss \
-                  --minify \
-                  -i ./input.css \
-                  -o ./cmd/conneroh/_static/dist/style.css \
-                  --cwd .
-            '';
             subPackages = ["."];
           };
           update = pkgs.buildGoModule {
-            inherit src vendorHash version;
+            inherit src vendorHash version preBuild;
             name = "update";
             subPackages = ["./cmd/update"];
             doCheck = false;
