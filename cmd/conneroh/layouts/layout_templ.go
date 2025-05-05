@@ -1374,7 +1374,7 @@ func search() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 112, "<input x-ref=\"mobileSearchInput\" hx-get=\"/api/search\" hx-trigger=\"keyup changed delay:400ms, search\" hx-target=\"#search-results-container\" hx-indicator=\"#loading-indicator\" class=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 112, "<input x-ref=\"mobileSearchInput\" hx-get=\"/search/all\" hx-trigger=\"keyup changed delay:400ms, search\" hx-target=\"#search-results-container\" hx-indicator=\"#loading-indicator\" class=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
