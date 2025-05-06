@@ -131,26 +131,26 @@
           deps = with pkgs; [tailwindcss templ go];
           description = "Update the generated html and css files.";
         };
-        generate-docs= {
+        generate-docs = {
             exec = ''
               REPO_ROOT="$(git rev-parse --show-toplevel)"
 
-              # Generate the content as a temporary file
-              TEMP_FILE=$(mktemp)
-              cat > "$TEMP_FILE" << EOF
-            ${pkgs.lib.concatStringsSep "\n" (
-              pkgs.lib.mapAttrsToList (
-                name: script: "  ${name} - ${script.description}"
-              )
-              scripts
-            )}
-            EOF
+              # Create a temporary file with the content to insert
+              TEMP_CONTENT=$(mktemp)
+
+              # Generate the content in the temporary file - each command on its own line
+              ${pkgs.lib.concatMapStrings (
+                name: let script = builtins.getAttr name scripts; in
+                ''
+                echo "  ${name} - ${script.description}" >> "$TEMP_CONTENT"
+                ''
+              ) (builtins.attrNames scripts)}
 
               # Use the interpolate command with the content from the file
-              interpolate "$REPO_ROOT"/README.md "<!-- BEGIN_MARKER -->" "<!-- END_MARKER -->" "$(cat "$TEMP_FILE")"
+              interpolate "$REPO_ROOT"/README.md "<!-- BEGIN_MARKER -->" "<!-- END_MARKER -->" "$(cat "$TEMP_CONTENT")"
 
               # Clean up
-              rm "$TEMP_FILE"
+              rm "$TEMP_CONTENT"
             '';
             deps = with pkgs; [doppler coreutils self.packages."${system}".interpolate];
             description = "Update the generated documentation files.";
