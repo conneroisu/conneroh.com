@@ -135,14 +135,14 @@
           exec = ''
               REPO_ROOT="$(git rev-parse --show-toplevel)"
 
-              interpolate $REPO_ROOT/README.md "<!-- BEGIN_MARKER -->" "<!-- END_MARKER -->" '${pkgs.lib.concatStringsSep "\n" (
+              interpolate "$REPO_ROOT"/README.md "<!-- BEGIN_MARKER -->" "<!-- END_MARKER -->" '${pkgs.lib.concatStringsSep "\n" (
                 pkgs.lib.mapAttrsToList (
                   name: script: ''echo "  ${name} - ${script.description}"''
                 )
                 scripts
               )}'
           '';
-          deps = with pkgs; [doppler self.packages."${system}".update self.packages."${system}".interpolate];
+          deps = with pkgs; [doppler self.packages."${system}".interpolate];
           description = "Update the generated all docmentation files.";
         };
         generate-db = {
