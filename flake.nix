@@ -292,6 +292,7 @@
             inputs.bun2nix.packages.${system}.default
             alejandra # Nix
             nixd
+            nil
             statix
             deadnix
 
