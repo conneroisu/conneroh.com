@@ -295,7 +295,6 @@
             harper
             htmx-lsp
             vscode-langservers-extracted
-            katana
 
             flyctl # Infra
             openssl.dev
