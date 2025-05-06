@@ -132,18 +132,22 @@
           description = "Update the generated html and css files.";
         };
         generate-docs= {
-          exec = ''
+            exec = ''
               REPO_ROOT="$(git rev-parse --show-toplevel)"
 
-              interpolate "$REPO_ROOT"/README.md "<!-- BEGIN_MARKER -->" "<!-- END_MARKER -->" '${pkgs.lib.concatStringsSep "\n" (
+              # Create the content to interpolate
+              CONTENT=$(${pkgs.lib.concatStringsSep "\n" (
                 pkgs.lib.mapAttrsToList (
-                  name: script: ''echo "  ${name} - ${script.description}"''
+                  name: script: ''  ${name} - ${script.description}''
                 )
                 scripts
-              )}'
-          '';
-          deps = with pkgs; [doppler self.packages."${system}".interpolate];
-          description = "Update the generated all docmentation files.";
+              )})
+
+              # Use the interpolate command with the generated content
+              interpolate "$REPO_ROOT"/README.md "<!-- BEGIN_MARKER -->" "<!-- END_MARKER -->" "$CONTENT"
+            '';
+            deps = with pkgs; [doppler self.packages."${system}".interpolate];
+            description = "Update the generated documentation files.";
         };
         generate-db = {
           exec = ''
