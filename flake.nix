@@ -76,6 +76,50 @@
           deps = with pkgs; [golangci-lint statix deadnix templ];
           description = "Run Nix/Go Linting Steps.";
         };
+        interpolate = {
+          exec = ''
+              # Usage: ./interpolate.sh input_file start_marker end_marker replacement_text
+
+              input_file="$1"
+              start_marker="$2"
+              end_marker="$3"
+              replacement="$4"
+
+              # Create a temporary file
+              temp_file=$(mktemp)
+
+              # Process the file in three parts:
+              # 1. Copy everything before the start marker
+              # 2. Add the replacement text
+              # 3. Copy everything after the end marker
+              awk -v start="$start_marker" -v end="$end_marker" -v repl="$replacement" '
+                # Flag to track if we are in the section to replace
+                BEGIN { in_section = 0 }
+
+                # If we find the start marker and are not yet in the section
+                $0 ~ start && !in_section {
+                  print $0    # Print the start marker line
+                  print repl  # Print the replacement text
+                  in_section = 1
+                  next
+                }
+
+                # If we find the end marker and are in the section
+                $0 ~ end && in_section {
+                  in_section = 0
+                  print $0    # Print the end marker line
+                }
+
+                # Print lines outside the section
+                !in_section { print $0 }
+              ' "$input_file" > "$temp_file"
+
+              # Replace the original file with the modified content
+              mv "$temp_file" "$input_file"
+          '';
+          deps = with pkgs; [templ];
+          description = "Interpolate templates";
+        };
         generate-css = {
           exec = ''
             REPO_ROOT="$(git rev-parse --show-toplevel)"
@@ -89,7 +133,14 @@
           deps = with pkgs; [tailwindcss templ go];
           description = "Update the generated html and css files.";
         };
-        generate-docs = {
+        generate-docs= {
+          exec = ''
+              REPO_ROOT="$(git rev-parse --show-toplevel)"
+          '';
+          deps = with pkgs; [doppler self.packages."${system}".update];
+          description = "Update the generated all docmentation files.";
+        };
+        generate-db = {
           exec = ''
             doppler run -- update
           '';
@@ -114,11 +165,11 @@
 
             if [ "$OLD_DOCS_HASH" != "$DOCS_HASH" ]; then
               echo "OLD_DOCS_HASH: $OLD_DOCS_HASH; NEW_DOCS_HASH: $DOCS_HASH"
-              generate-docs
+              generate-db
               echo "$DOCS_HASH" > ./internal/cache/docs.hash
             fi
           '';
-          deps = with self.packages."${system}"; [generate-docs generate-css];
+          deps = with self.packages."${system}"; [generate-db generate-css];
           description = "Code Generation Steps for specific directory changes.";
         };
         generate-js = {
@@ -137,10 +188,12 @@
         };
         generate-all = {
           exec = ''
-            generate-css
-            generate-docs
+            generate-css &
+            generate-db &
+            generate-js &
+            wait
           '';
-          deps = with self.packages."${system}"; [generate-css generate-docs];
+          deps = with self.packages."${system}"; [generate-css generate-db generate-js];
           description = "Generate all files in parallel";
         };
         format = {
