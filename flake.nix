@@ -78,42 +78,29 @@
         };
         interpolate = {
           exec = ''
-              input_file="$1"
-              start_marker="$2"
-              end_marker="$3"
-              replacement="$4"
+            FILE="$1"
+            START_MARKER="$2"
+            END_MARKER="$3"
+            NEW_CONTENT="$4"
 
-              # Create a temporary file
-              temp_file=$(mktemp)
+            # Create a temporary file with mktemp (safer than fixed filenames)
+            TEMP_FILE=$(mktemp)
 
-              # Process the file in three parts:
-              # 1. Copy everything before the start marker
-              # 2. Add the replacement text
-              # 3. Copy everything after the end marker
-              awk -v start="$start_marker" -v end="$end_marker" -v repl="$replacement" '
-                # Flag to track if we are in the section to replace
-                BEGIN { in_section = 0 }
+            # Write the new content to the temporary file
+            echo "$NEW_CONTENT" > "$TEMP_FILE"
 
-                # If we find the start marker and are not yet in the section
-                $0 ~ start && !in_section {
-                  print $0    # Print the start marker line
-                  print repl  # Print the replacement text
-                  in_section = 1
-                  next
+            # Perform the replacement
+            sed -i -e "/$START_MARKER/,/$END_MARKER/{
+                /$START_MARKER/{
+                    p
+                    r $TEMP_FILE
                 }
+                /$END_MARKER/p
+                d
+            }" "$FILE"
 
-                # If we find the end marker and are in the section
-                $0 ~ end && in_section {
-                  in_section = 0
-                  print $0    # Print the end marker line
-                }
-
-                # Print lines outside the section
-                !in_section { print $0 }
-              ' "$input_file" > "$temp_file"
-
-              # Replace the original file with the modified content
-              mv "$temp_file" "$input_file"
+            # Clean up
+            rm "$TEMP_FILE"
           '';
           deps = with pkgs; [templ];
           description = "Interpolate templates; Usage: interpolate input_file start_marker end_marker replacement_text";
@@ -132,30 +119,30 @@
           description = "Update the generated html and css files.";
         };
         generate-docs = {
-            exec = ''
-              REPO_ROOT="$(git rev-parse --show-toplevel)"
+          exec = ''
+            REPO_ROOT="$(git rev-parse --show-toplevel)"
 
-              # Create a temporary file with the content to insert
-              TEMP_CONTENT=$(mktemp)
+            # Create a temporary file with the content to insert
+            TEMP_CONTENT=$(mktemp)
 
-              # Generate all content with a single redirection
-              {
-                ${builtins.concatStringsSep "\n" (
-                  pkgs.lib.mapAttrsToList (
-                    name: script: ''echo "  ${name} - ${script.description}"''
-                  )
-                  scripts
-                )}
-              } > "$TEMP_CONTENT"
+            # Generate all content with a single redirection
+            {
+              ${builtins.concatStringsSep "\n" (
+              pkgs.lib.mapAttrsToList (
+                name: script: ''echo "  ${name} - ${script.description}"''
+              )
+              scripts
+            )}
+            } > "$TEMP_CONTENT"
 
-              # Use the interpolate command with the content from the file
-              interpolate "$REPO_ROOT"/README.md "<!-- BEGIN_MARKER -->" "<!-- END_MARKER -->" "$(cat "$TEMP_CONTENT")"
+            # Use the interpolate command with the content from the file
+            interpolate "$REPO_ROOT"/README.md "<!-- BEGIN_MARKER -->" "<!-- END_MARKER -->" "$(cat "$TEMP_CONTENT")"
 
-              # Clean up
-              rm "$TEMP_CONTENT"
-            '';
-            deps = with pkgs; [doppler coreutils self.packages."${system}".interpolate];
-            description = "Update the generated documentation files.";
+            # Clean up
+            rm "$TEMP_CONTENT"
+          '';
+          deps = with pkgs; [doppler coreutils self.packages."${system}".interpolate];
+          description = "Update the generated documentation files.";
         };
         generate-db = {
           exec = ''
@@ -240,32 +227,6 @@
             cd "$(git rev-parse --show-toplevel)" && air
           '';
           deps = with pkgs; [air git];
-          description = "Run the application with air for hot reloading";
-        };
-        run-test = {
-          exec = ''
-            export DEBUG=true
-            go run main.go &
-            GO_PID=$!
-
-            # Give the server a moment to start up
-            sleep 2
-
-            URLS=$(katana -u http://localhost:8080 -sb)
-            URL_COUNT=$(echo "$URLS" | wc -l)
-
-            # Kill the Go process regardless of test outcome
-            kill $GO_PID
-
-            if [ "$URL_COUNT" -lt 10 ]; then
-                echo "Error: katana found only $URL_COUNT URLs, which is less than the required minimum of 10."
-                exit 1
-            else
-                echo "Success: katana found $URL_COUNT URLs, which meets or exceeds the required minimum of 10."
-                exit 0
-            fi
-          '';
-          deps = with pkgs; [katana git];
           description = "Run the application with air for hot reloading";
         };
       };

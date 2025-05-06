@@ -91,7 +91,22 @@ Usage
 
 ```bash
 <!-- BEGIN_MARKER -->
-
+  clean - Clean Project
+  dx - Edit flake.nix
+  format - Format code files
+  generate-all - Generate all files in parallel
+  generate-css - Update the generated html and css files.
+  generate-db - Update the generated go files from the md docs.
+  generate-docs - Update the generated documentation files.
+  generate-js - Generate JS files
+  generate-reload - Code Generation Steps for specific directory changes.
+  gx - Edit go.mod
+  interpolate - Interpolate templates; Usage: interpolate input_file start_marker end_marker replacement_text
+  lint - Run Nix/Go Linting Steps.
+  reset-db - Reset the database
+  run - Run the application with air for hot reloading
+  run-test - Run the application with air for hot reloading
+  tests - Run all go tests
 <!-- END_MARKER -->
 ```
 
