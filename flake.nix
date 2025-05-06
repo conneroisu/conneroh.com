@@ -78,8 +78,6 @@
         };
         interpolate = {
           exec = ''
-              # Usage: ./interpolate.sh input_file start_marker end_marker replacement_text
-
               input_file="$1"
               start_marker="$2"
               end_marker="$3"
@@ -118,7 +116,7 @@
               mv "$temp_file" "$input_file"
           '';
           deps = with pkgs; [templ];
-          description = "Interpolate templates";
+          description = "Interpolate templates; Usage: interpolate input_file start_marker end_marker replacement_text";
         };
         generate-css = {
           exec = ''
@@ -136,8 +134,15 @@
         generate-docs= {
           exec = ''
               REPO_ROOT="$(git rev-parse --show-toplevel)"
+
+              interpolate $REPO_ROOT/README.md "<!-- BEGIN_MARKER -->" "<!-- END_MARKER -->" '${pkgs.lib.concatStringsSep "\n" (
+                pkgs.lib.mapAttrsToList (
+                  name: script: ''echo "  ${name} - ${script.description}"''
+                )
+                scripts
+              )}'
           '';
-          deps = with pkgs; [doppler self.packages."${system}".update];
+          deps = with pkgs; [doppler self.packages."${system}".update self.packages."${system}".interpolate];
           description = "Update the generated all docmentation files.";
         };
         generate-db = {
