@@ -135,18 +135,24 @@
             exec = ''
               REPO_ROOT="$(git rev-parse --show-toplevel)"
 
-              # Create the content to interpolate
-              CONTENT=$(${pkgs.lib.concatStringsSep "\n" (
-                pkgs.lib.mapAttrsToList (
-                  name: script: ''  ${name} - ${script.description}''
-                )
-                scripts
-              )})
+              # Generate the content as a temporary file
+              TEMP_FILE=$(mktemp)
+              cat > "$TEMP_FILE" << EOF
+            ${pkgs.lib.concatStringsSep "\n" (
+              pkgs.lib.mapAttrsToList (
+                name: script: "  ${name} - ${script.description}"
+              )
+              scripts
+            )}
+            EOF
 
-              # Use the interpolate command with the generated content
-              interpolate "$REPO_ROOT"/README.md "<!-- BEGIN_MARKER -->" "<!-- END_MARKER -->" "$CONTENT"
+              # Use the interpolate command with the content from the file
+              interpolate "$REPO_ROOT"/README.md "<!-- BEGIN_MARKER -->" "<!-- END_MARKER -->" "$(cat "$TEMP_FILE")"
+
+              # Clean up
+              rm "$TEMP_FILE"
             '';
-            deps = with pkgs; [doppler self.packages."${system}".interpolate];
+            deps = with pkgs; [doppler coreutils self.packages."${system}".interpolate];
             description = "Update the generated documentation files.";
         };
         generate-db = {
