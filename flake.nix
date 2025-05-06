@@ -372,8 +372,6 @@
             name = "update";
             subPackages = ["./cmd/update"];
             doCheck = false;
-            outputHashMode = "recursive";
-            outputHashAlgo = "sha256";
           };
           C-conneroh = pkgs.dockerTools.buildImage {
             created = "now";
