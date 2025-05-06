@@ -138,13 +138,15 @@
               # Create a temporary file with the content to insert
               TEMP_CONTENT=$(mktemp)
 
-              # Generate the content in the temporary file - each command on its own line
-              ${pkgs.lib.concatMapStrings (
-                name: let script = builtins.getAttr name scripts; in
-                ''
-                echo "  ${name} - ${script.description}" >> "$TEMP_CONTENT"
-                ''
-              ) (builtins.attrNames scripts)}
+              # Generate all content with a single redirection
+              {
+                ${builtins.concatStringsSep "\n" (
+                  pkgs.lib.mapAttrsToList (
+                    name: script: ''echo "  ${name} - ${script.description}"''
+                  )
+                  scripts
+                )}
+              } > "$TEMP_CONTENT"
 
               # Use the interpolate command with the content from the file
               interpolate "$REPO_ROOT"/README.md "<!-- BEGIN_MARKER -->" "<!-- END_MARKER -->" "$(cat "$TEMP_CONTENT")"
