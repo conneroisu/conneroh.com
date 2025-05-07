@@ -396,7 +396,7 @@
         conneroh = pkgs.buildGoModule {
           inherit src version preBuild;
 
-          vendorHash = "sha256-BUI6XA3RnQWKrNohX1iC3UxXpc+9WcHxrnX+bxgEpTU=";
+          vendorHash = "sha256-kOGauV5dMTcHvSR7uWvY1dcKR4WqlWccDfnXtycsRVI=";
           name = "conneroh.com";
           goSum = ./../../go.sum;
           nativeBuildInputs = [
@@ -407,7 +407,7 @@
         };
         update = pkgs.buildGoModule {
           inherit src version preBuild;
-          vendorHash = "sha256-BUI6XA3RnQWKrNohX1iC3UxXpc+9WcHxrnX+bxgEpTU=";
+          vendorHash = "sha256-kOGauV5dMTcHvSR7uWvY1dcKR4WqlWccDfnXtycsRVI=";
           goSum = ./../../go.sum;
           name = "update";
           subPackages = ["./cmd/update"];
