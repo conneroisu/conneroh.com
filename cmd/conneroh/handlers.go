@@ -219,6 +219,7 @@ func listHandler(
 func HandleHome(db *bun.DB) func(w http.ResponseWriter, r *http.Request) error {
 	var homePage *templ.Component
 	return func(w http.ResponseWriter, r *http.Request) error {
+		var err error
 		if homePage != nil {
 			routing.MorphableHandler(
 				layouts.Page,
@@ -226,41 +227,47 @@ func HandleHome(db *bun.DB) func(w http.ResponseWriter, r *http.Request) error {
 			).ServeHTTP(w, r)
 			return nil
 		}
-		err := db.NewSelect().Model(&allPosts).
-			Order("updated_at").
-			Relation("Tags").
-			Relation("Posts").
-			Relation("Projects").
-			Scan(r.Context())
-		if err != nil {
-			return eris.Wrap(
-				err,
-				"failed to scan posts for home page",
-			)
+		if len(allPosts) == 0 {
+			err = db.NewSelect().Model(&allPosts).
+				Order("updated_at").
+				Relation("Tags").
+				Relation("Posts").
+				Relation("Projects").
+				Scan(r.Context())
+			if err != nil {
+				return eris.Wrap(
+					err,
+					"failed to scan posts for home page",
+				)
+			}
 		}
-		err = db.NewSelect().Model(&allProjects).
-			Order("updated_at").
-			Relation("Tags").
-			Relation("Posts").
-			Relation("Projects").
-			Scan(r.Context())
-		if err != nil {
-			return eris.Wrap(
-				err,
-				"failed to scan projects for home page",
-			)
+		if len(allProjects) == 0 {
+			err = db.NewSelect().Model(&allProjects).
+				Order("updated_at").
+				Relation("Tags").
+				Relation("Posts").
+				Relation("Projects").
+				Scan(r.Context())
+			if err != nil {
+				return eris.Wrap(
+					err,
+					"failed to scan projects for home page",
+				)
+			}
 		}
-		err = db.NewSelect().Model(&allTags).
-			Order("updated_at").
-			Relation("Tags").
-			Relation("Posts").
-			Relation("Projects").
-			Scan(r.Context())
-		if err != nil {
-			return eris.Wrap(
-				err,
-				"failed to scan tags for home page",
-			)
+		if len(allTags) == 0 {
+			err = db.NewSelect().Model(&allTags).
+				Order("updated_at").
+				Relation("Tags").
+				Relation("Posts").
+				Relation("Projects").
+				Scan(r.Context())
+			if err != nil {
+				return eris.Wrap(
+					err,
+					"failed to scan tags for home page",
+				)
+			}
 		}
 		var home = views.Home(
 			&allPosts,
@@ -420,7 +427,6 @@ func HandleTags(db *bun.DB) routing.APIFunc {
 			Relation("Projects").
 			Scan(r.Context())
 		if err != nil {
-			slog.Error("failed to scan tags", "err", err)
 			return eris.Wrap(
 				err,
 				"failed to scan tags for tags page",
@@ -496,17 +502,19 @@ func HandlePosts(db *bun.DB) routing.APIFunc {
 			).ServeHTTP(w, r)
 			return nil
 		}
-		err := db.NewSelect().Model(&allPosts).
-			Order("created_at").
-			Relation("Tags").
-			Relation("Posts").
-			Relation("Projects").
-			Scan(r.Context())
-		if err != nil {
-			return eris.Wrap(
-				err,
-				"failed to scan posts for posts page",
-			)
+		if len(allPosts) == 0 {
+			err := db.NewSelect().Model(&allPosts).
+				Order("created_at").
+				Relation("Tags").
+				Relation("Posts").
+				Relation("Projects").
+				Scan(r.Context())
+			if err != nil {
+				return eris.Wrap(
+					err,
+					"failed to scan posts for posts page",
+				)
+			}
 		}
 		var posts = views.List(
 			routing.PostPluralPath,
@@ -526,12 +534,6 @@ func HandlePosts(db *bun.DB) routing.APIFunc {
 	}
 }
 
-func searchHandler(
-	db *bun.DB,
-) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-	}
-}
 // filter returns a paginated slice of items matching the search query, ranked by relevance across multiple fields.
 // The function scores and filters items concurrently, prioritizing matches in the title, description, content, tags, and icon fields depending on the item type.
 // Results are sorted by descending relevance before pagination. If the query is empty, all items are returned paginated.

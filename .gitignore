@@ -15,7 +15,6 @@ test.db
 *.db-journal
 result
 servers
-CLAUDE.md
 tigris.yaml
 cache.sqlite
 *.db-shm

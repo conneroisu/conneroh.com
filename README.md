@@ -87,33 +87,26 @@ update
 run
 ```
 
-### Development without Nix
+#### Development Shell Usage
 
 ```bash
-# Clone the repository
-git clone https://github.com/conneroisu/conneroh.com.git
-cd conneroh.com
-
-# Install dependencies
-go mod download
-
-# Install required tools
-go install github.com/a-h/templ/cmd/templ@latest
-go install github.com/cosmtrek/air@latest
-
-# Generate code
-templ generate
-go generate ./...
-
-# Build CSS and JS
-tailwindcss -i input.css -o cmd/conneroh/_static/dist/style.css
-bun build index.js --minify --outdir cmd/conneroh/_static/dist/
-
-# Initialize the database
-go run ./cmd/update
-
-# Run the application with hot reload
-air
+<!-- BEGIN_MARKER -->
+clean - Clean Project
+dx - Edit flake.nix
+format - Format code files
+generate-all - Generate all files in parallel
+generate-css - Update the generated html and css files.
+generate-db - Update the generated go files from the md docs.
+generate-docs - Update the generated documentation files.
+generate-js - Generate JS files
+generate-reload - Code Generation Steps for specific directory changes.
+gx - Edit go.mod
+interpolate - Interpolate templates; Usage: interpolate input_file start_marker end_marker replacement_text
+lint - Run Nix/Go Linting Steps.
+reset-db - Reset the database
+run - Run the application with air for hot reloading
+tests - Run all go tests
+<!-- END_MARKER -->
 ```
 
 ## Content Management
