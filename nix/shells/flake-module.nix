@@ -207,6 +207,13 @@
         deps = with pkgs; [go git];
         description = "Update go.sum";
       };
+      generate-templates = {
+        exec = ''
+          templ generate
+        '';
+        deps = with pkgs; [templ];
+        description = "Generate templates";
+      };
       run = {
         exec = ''
           export DEBUG=true

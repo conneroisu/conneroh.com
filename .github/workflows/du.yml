@@ -14,8 +14,7 @@ jobs:
       - uses: DeterminateSystems/nix-installer-action@main
       - name: Update go.sum
         run: |
-          nix run .#generate-all
-
+          nix run .#generate-templates
           nix run .#goSumUpdate
       - name: Commit flake.lock
         run: |
