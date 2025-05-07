@@ -85,7 +85,7 @@
           rm "$TEMP_FILE"
         '';
         deps = with pkgs; [templ];
-        description = "Interpolate templates; Usage: interpolate input_file start_marker end_marker replacement_text";
+        description = "Interpolate md/html templates; Usage: interpolate input_file start_marker end_marker replacement_text";
       };
       generate-css = {
         exec = ''
