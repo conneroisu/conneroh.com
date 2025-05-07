@@ -368,7 +368,6 @@
       processes = ["app"];
       version = self'.shortRev or "dirty";
       src = ./../../.;
-      vendorHash = "sha256-BUI6XA3RnQWKrNohX1iC3UxXpc+9WcHxrnX+bxgEpTU=";
       # Create a derivation for the database file
       databaseFiles = pkgs.runCommand "database-files" {} ''
         mkdir -p $out/root
@@ -386,8 +385,11 @@
     in
       {
         conneroh = pkgs.buildGoModule {
-          inherit src vendorHash version preBuild;
+          inherit src version preBuild;
+
+          vendorHash = "sha256-BUI6XA3RnQWKrNohX1iC3UxXpc+9WcHxrnX+bxgEpTU=";
           name = "conneroh.com";
+          goSum = ./../../go.sum;
           nativeBuildInputs = [
             pkgs.templ
             pkgs.tailwindcss
@@ -395,7 +397,9 @@
           subPackages = ["."];
         };
         update = pkgs.buildGoModule {
-          inherit src vendorHash version preBuild;
+          inherit src version preBuild;
+          vendorHash = "sha256-BUI6XA3RnQWKrNohX1iC3UxXpc+9WcHxrnX+bxgEpTU=";
+          goSum = ./../../go.sum;
           name = "update";
           subPackages = ["./cmd/update"];
           doCheck = false;
