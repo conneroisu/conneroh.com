@@ -199,6 +199,14 @@
         deps = with pkgs; [go git golines];
         description = "Format code files";
       };
+      goSumUpdate = {
+        exec = ''
+          echo "Updating go.sum..."
+          go get -u ./...
+        '';
+        deps = with pkgs; [go git];
+        description = "Update go.sum";
+      };
       run = {
         exec = ''
           export DEBUG=true
@@ -316,6 +324,7 @@
           tailwindcss # Web
           tailwindcss-language-server
           bun
+          yaml-language-server
           nodePackages.typescript-language-server
           nodePackages.prettier
           svgcleaner
