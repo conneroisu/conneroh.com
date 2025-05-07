@@ -32,9 +32,9 @@
       };
       reset-db = {
         exec = ''
-          rm ./../../master.db
-          rm ./../../master.db-shm
-          rm ./../../master.db-wal
+          for f in "./master.db" "./master.db-shm" "./master.db-wal"; do
+            rm -f "$f"
+          done
         '';
         description = "Reset the database";
       };
@@ -103,11 +103,7 @@
       generate-docs = {
         exec = ''
           REPO_ROOT="$(git rev-parse --show-toplevel)"
-
-          # Create a temporary file with the content to insert
           TEMP_CONTENT=$(mktemp)
-
-          # Generate all content with a single redirection
           {
             ${builtins.concatStringsSep "\n" (
             pkgs.lib.mapAttrsToList (
