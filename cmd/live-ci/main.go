@@ -85,9 +85,9 @@ func run(
 	if err != nil {
 		return eris.Wrap(err, "error opening database")
 	}
+	defer sqlDB.Close()
 	db := bun.NewDB(sqlDB, sqlitedialect.New())
 	assets.RegisterModels(db)
-
 	if os.Getenv("DEBUG") == "true" {
 		db.AddQueryHook(bundebug.NewQueryHook(bundebug.WithVerbose(true)))
 	}
