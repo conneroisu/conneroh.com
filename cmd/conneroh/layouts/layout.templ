@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
 	"github.com/conneroisu/twerge"
-	"strings"
 	"time"
 )
 
@@ -398,28 +397,6 @@ templ search() {
 	</div>
 }
 
-// Unified template for search results that works for both desktop and mobile
-templ searchResults(
-	query string,
-	results []SearchResult,
-) {
-}
-
-// Helper type for search results
-type SearchResult struct {
-	Title string
-	URL   string
-	Type  string
-}
-
-// Helper function to capitalize first letter of a string
-func capitalize(s string) string {
-	if s == "" {
-		return ""
-	}
-	return strings.ToUpper(s[:1]) + s[1:]
-}
-
 templ footer() {
 	<footer class={ twerge.It("bg-gray-800 border-t border-gray-700 py-12") }>
 		<div class={ twerge.It("container mx-auto px-4") }>
@@ -429,27 +406,65 @@ templ footer() {
 					<p class={ twerge.It("text-gray-400") }>Electrical Engineer & Software Developer</p>
 				</div>
 				<div class={ twerge.It("flex flex-wrap gap-4 justify-center") }>
-					<a href="https://www.linkedin.com/in/conner-ohnesorge-b720a4238" class={ twerge.It("text-gray-400 hover:text-blue-400 transition-colors") }>
+					<a
+						href="https://www.linkedin.com/in/conner-ohnesorge-b720a4238"
+						class={ twerge.It("text-gray-400 hover:text-blue-400 transition-colors") }
+					>
 						LinkedIn
 					</a>
-					<a href="https://github.com/conneroisu" class={ twerge.It("text-gray-400 hover:text-blue-400 transition-colors") }>
+					<a
+						href="https://github.com/conneroisu"
+						class={ twerge.It("text-gray-400 hover:text-blue-400 transition-colors") }
+					>
 						GitHub
 					</a>
-					<a href="https://x.com/ConnerOhnesorge" class={ twerge.It("text-gray-400 hover:text-blue-400 transition-colors") }>
+					<a
+						href="https://x.com/ConnerOhnesorge"
+						class={ twerge.It("text-gray-400 hover:text-blue-400 transition-colors") }
+					>
 						Twitter
 					</a>
-					<a href="mailto:conneroisu@outlook.com" class={ twerge.It("text-gray-400 hover:text-blue-400 transition-colors") }>
+					<a
+						href="mailto:conneroisu@outlook.com"
+						class={ twerge.It("text-gray-400 hover:text-blue-400 transition-colors") }
+					>
 						Email
 					</a>
 				</div>
 			</div>
-			<div class={ twerge.It("mt-8 pt-8 border-t border-gray-700 flex flex-col md:flex-row justify-between items-center") }>
-				<p class={ twerge.It("text-gray-500 text-sm") }>&copy; { currentYear() } Conner Ohnesorge. All rights reserved.</p>
+			<div
+				class={ twerge.It("mt-8 pt-8 border-t border-gray-700 flex flex-col md:flex-row justify-between items-center") }
+			>
+				<p
+					class={ twerge.It("text-gray-500 text-sm") }
+				>
+					&copy; { currentYear() } Conner Ohnesorge. All rights reserved.
+				</p>
 				<div class={ twerge.It("mt-4 md:mt-0") }>
-					<a href="/posts" class={ twerge.It("text-gray-500 hover:text-gray-300 text-sm mx-2 transition-colors") }>Posts</a>
-					<a href="/projects" class={ twerge.It("text-gray-500 hover:text-gray-300 text-sm mx-2 transition-colors") }>Projects</a>
-					<a href="/tags" class={ twerge.It("text-gray-500 hover:text-gray-300 text-sm mx-2 transition-colors") }>Tags</a>
-					<a href="#contact" class={ twerge.It("text-gray-500 hover:text-gray-300 text-sm mx-2 transition-colors") }>Contact</a>
+					<a
+						href="/posts"
+						class={ twerge.It("text-gray-500 hover:text-gray-300 text-sm mx-2 transition-colors") }
+					>
+						Posts
+					</a>
+					<a
+						href="/projects"
+						class={ twerge.It("text-gray-500 hover:text-gray-300 text-sm mx-2 transition-colors") }
+					>
+						Projects
+					</a>
+					<a
+						href="/tags"
+						class={ twerge.It("text-gray-500 hover:text-gray-300 text-sm mx-2 transition-colors") }
+					>
+						Tags
+					</a>
+					<a
+						href="#contact"
+						class={ twerge.It("text-gray-500 hover:text-gray-300 text-sm mx-2 transition-colors") }
+					>
+						Contact
+					</a>
 				</div>
 			</div>
 		</div>
