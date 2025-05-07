@@ -199,12 +199,66 @@
         deps = with pkgs; [go git golines];
         description = "Format code files";
       };
+      goSumUpdate = {
+        exec = ''
+          echo "Updating go.sum..."
+          go get -u ./...
+        '';
+        deps = with pkgs; [go git];
+        description = "Update go.sum";
+      };
       run = {
         exec = ''
           export DEBUG=true
           cd "$(git rev-parse --show-toplevel)" && air
         '';
         deps = with pkgs; [air git];
+        description = "Run the application with air for hot reloading";
+      };
+      live-ci = {
+        exec = ''
+          go run ./cmd/live-ci/main.go
+        '';
+        env = {
+          DEBUG = "true";
+        };
+        deps = with pkgs;
+          [
+            playwright-driver # Browser Archives and Driver Scripts
+            nodejs_20 # Required for Playwright driver
+            pkg-config # Needed for some browser dependencies
+            at-spi2-core # Accessibility support
+            cairo # 2D graphics library
+            cups # Printing system
+            dbus # Message bus system
+            expat # XML parser
+            ffmpeg # Media processing
+            fontconfig # Font configuration and customization
+            freetype # Font rendering engine
+            gdk-pixbuf # Image loading library
+            glib # Low-level core library
+            gtk3 # GUI toolkit
+            go
+          ]
+          ++ (with pkgs;
+            lib.optionals stdenv.isDarwin [
+              libiconv
+            ])
+          ++ (with pkgs;
+            lib.optionals stdenv.isLinux [
+              chromium # Chromium browser
+              xorg.libXcomposite # X11 Composite extension - needed by browsers
+              xorg.libXdamage # X11 Damage extension - needed by browsers
+              xorg.libXfixes # X11 Fixes extension - needed by browsers
+              xorg.libXrandr # X11 RandR extension - needed by browsers
+              xorg.libX11 # X11 client-side library
+              xorg.libxcb # X11 C Bindings library
+              mesa # OpenGL implementation
+              alsa-lib # Audio library
+              nss # Network Security Services
+              nspr # NetScape Portable Runtime
+              pango # Text layout and rendering
+            ]);
         description = "Run the application with air for hot reloading";
       };
     };
@@ -232,6 +286,16 @@
         )}
       '';
 
+      env = {
+        PLAYWRIGHT_BROWSERS_PATH = "${pkgs.playwright-driver.browsers}";
+        PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = "1";
+        PLAYWRIGHT_NODEJS_PATH = "${pkgs.nodejs_20}/bin/node";
+
+        # Browser executable paths
+        PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH = "${ #
+          "${pkgs.playwright-driver.browsers}/chromium-1155"
+        }";
+      };
       packages = with pkgs;
         [
           inputs'.bun2nix.packages.default
@@ -260,6 +324,7 @@
           tailwindcss # Web
           tailwindcss-language-server
           bun
+          yaml-language-server
           nodePackages.typescript-language-server
           nodePackages.prettier
           svgcleaner
@@ -312,7 +377,6 @@
       processes = ["app"];
       version = self'.shortRev or "dirty";
       src = ./../../.;
-      vendorHash = "sha256-BUI6XA3RnQWKrNohX1iC3UxXpc+9WcHxrnX+bxgEpTU=";
       # Create a derivation for the database file
       databaseFiles = pkgs.runCommand "database-files" {} ''
         mkdir -p $out/root
@@ -330,8 +394,11 @@
     in
       {
         conneroh = pkgs.buildGoModule {
-          inherit src vendorHash version preBuild;
+          inherit src version preBuild;
+
+          vendorHash = "sha256-kOGauV5dMTcHvSR7uWvY1dcKR4WqlWccDfnXtycsRVI=";
           name = "conneroh.com";
+          goSum = ./../../go.sum;
           nativeBuildInputs = [
             pkgs.templ
             pkgs.tailwindcss
@@ -339,7 +406,9 @@
           subPackages = ["."];
         };
         update = pkgs.buildGoModule {
-          inherit src vendorHash version preBuild;
+          inherit src version preBuild;
+          vendorHash = "sha256-kOGauV5dMTcHvSR7uWvY1dcKR4WqlWccDfnXtycsRVI=";
+          goSum = ./../../go.sum;
           name = "update";
           subPackages = ["./cmd/update"];
           doCheck = false;

@@ -3,18 +3,27 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"flag"
+	"fmt"
 	"log"
 	"os"
-	"time"
 
+	"github.com/conneroisu/conneroh.com/internal/assets"
 	"github.com/playwright-community/playwright-go"
+	"github.com/rotisserie/eris"
+	"github.com/uptrace/bun"
+	"github.com/uptrace/bun/dialect/sqlitedialect"
+	"github.com/uptrace/bun/extra/bundebug"
 	"golang.org/x/sync/errgroup"
+
+	_ "modernc.org/sqlite"
 )
 
 var (
-	url     = flag.String("url", "http://localhost:8080", "Base URL to visit")
-	workers = flag.Int("workers", 1, "Number of workers to use")
+	url         = flag.String("url", "http://localhost:8080", "Base URL to visit")
+	workers     = flag.Int("workers", 32, "Number of workers to use")
+	lowestBytes = 5000
 )
 
 func main() {
@@ -46,13 +55,6 @@ func run(
 	if err != nil {
 		return err
 	}
-	defer func() {
-		stopErr := pw.Stop()
-		if stopErr != nil {
-			log.Fatalf("could not stop playwright: %v", stopErr)
-		}
-	}()
-
 	// Launch the browser (using Nix-provided browser)
 	option := playwright.BrowserTypeLaunchOptions{
 		ExecutablePath: playwright.String(os.Getenv("PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH") + "/chrome-linux/chrome"),
@@ -74,49 +76,146 @@ func run(
 	if err != nil {
 		return err
 	}
-	defer func() {
-		err = bCtx.Close()
-		if err != nil {
-			log.Fatalf("could not close browser context: %v", err)
-		}
-	}()
 
 	p, err := bCtx.NewPage()
 	if err != nil {
 		return err
 	}
-	defer func() {
-		err = p.Close()
-		if err != nil {
-			log.Fatalf("could not close page: %v", err)
-		}
-	}()
+	sqlDB, err := sql.Open("sqlite", assets.DBName())
+	if err != nil {
+		return eris.Wrap(err, "error opening database")
+	}
+	defer sqlDB.Close()
+	db := bun.NewDB(sqlDB, sqlitedialect.New())
+	assets.RegisterModels(db)
+	if os.Getenv("DEBUG") == "true" {
+		db.AddQueryHook(bundebug.NewQueryHook(bundebug.WithVerbose(true)))
+	}
 
-	time.Sleep(time.Second * 40)
+	var (
+		// Instance Caches
+		allPosts    = []*assets.Post{}
+		allProjects = []*assets.Project{}
+		allTags     = []*assets.Tag{}
+	)
 
-	// for _, url := range routing.ComputeAllURLs(base) {
-	// 	eg.Go(func() error {
-	// 		page, pErr := bCtx.NewPage()
-	// 		if pErr != nil {
-	// 			return pErr
-	// 		}
-	// 		defer func() {
-	// 			err = page.Close()
-	// 			if err != nil {
-	// 				log.Fatalf("could not close page: %v", err)
-	// 			}
-	// 		}()
-	// 		if _, pErr = page.Goto(url, playwright.PageGotoOptions{}); pErr != nil {
-	// 			return pErr
-	// 		}
-	// 		time.Sleep(time.Second)
-	// 		slog.Info("visited post", "url", url)
-	// 		return nil
-	// 	})
-	// }
+	err = db.NewSelect().Model(&allPosts).
+		Order("updated_at").
+		Relation("Tags").
+		Relation("Posts").
+		Relation("Projects").
+		Scan(ctx)
+	if err != nil {
+		return eris.Wrap(
+			err,
+			"failed to scan posts for home page",
+		)
+	}
+	err = db.NewSelect().Model(&allProjects).
+		Order("updated_at").
+		Relation("Tags").
+		Relation("Posts").
+		Relation("Projects").
+		Scan(ctx)
+	if err != nil {
+		return eris.Wrap(
+			err,
+			"failed to scan projects for home page",
+		)
+	}
+	err = db.NewSelect().Model(&allTags).
+		Order("updated_at").
+		Relation("Tags").
+		Relation("Posts").
+		Relation("Projects").
+		Scan(ctx)
+	if err != nil {
+		return eris.Wrap(
+			err,
+			"failed to scan tags for home page",
+		)
+	}
+
+	for _, post := range allPosts {
+		url := base + post.PagePath()
+		eg.Go(func() error {
+			var bdy string
+			page, pErr := bCtx.NewPage()
+			if pErr != nil {
+				return pErr
+			}
+			resp, pErr := page.Goto(url, playwright.PageGotoOptions{})
+			if pErr != nil {
+				return pErr
+			}
+			bdy, pErr = resp.Text()
+			if pErr != nil {
+				return pErr
+			}
+			if len(bdy) < lowestBytes {
+				return fmt.Errorf("body length too small: %d", len(bdy))
+			}
+			return page.Close()
+		})
+	}
+	for _, project := range allProjects {
+		url := base + project.PagePath()
+		eg.Go(func() error {
+			var bdy string
+			page, pErr := bCtx.NewPage()
+			if pErr != nil {
+				return pErr
+			}
+			resp, pErr := page.Goto(url, playwright.PageGotoOptions{})
+			if pErr != nil {
+				return pErr
+			}
+			bdy, pErr = resp.Text()
+			if pErr != nil {
+				return pErr
+			}
+			if len(bdy) < lowestBytes {
+				return fmt.Errorf("body length too small: %d", len(bdy))
+			}
+			return page.Close()
+		})
+	}
+	for _, tag := range allTags {
+		url := base + tag.PagePath()
+		eg.Go(func() error {
+			var bdy string
+			page, pErr := bCtx.NewPage()
+			if pErr != nil {
+				return pErr
+			}
+			resp, pErr := page.Goto(url, playwright.PageGotoOptions{})
+			if pErr != nil {
+				return pErr
+			}
+			bdy, pErr = resp.Text()
+			if pErr != nil {
+				return pErr
+			}
+			if len(bdy) < lowestBytes {
+				return fmt.Errorf("body length too small: %d", len(bdy))
+			}
+			return page.Close()
+		})
+	}
+
 	err = eg.Wait()
 	if err != nil {
 		return err
 	}
-	return nil
+
+	err = p.Close()
+	if err != nil {
+		log.Fatalf("could not close page: %v", err)
+	}
+
+	err = bCtx.Close()
+	if err != nil {
+		log.Fatalf("could not close browser context: %v", err)
+	}
+	return pw.Stop()
 }
