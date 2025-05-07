@@ -534,56 +534,6 @@ func HandlePosts(db *bun.DB) routing.APIFunc {
 	}
 }
 
-func searchHandler(
-	db *bun.DB,
-) routing.APIFunc {
-	return func(w http.ResponseWriter, r *http.Request) error {
-		if len(allPosts) == 0 {
-			err := db.NewSelect().Model(&allPosts).
-				Order("created_at").
-				Relation("Tags").
-				Relation("Posts").
-				Relation("Projects").
-				Scan(r.Context())
-			if err != nil {
-				return eris.Wrap(
-					err,
-					"failed to scan posts for search handler",
-				)
-			}
-		}
-		if len(allProjects) == 0 {
-			err := db.NewSelect().Model(&allProjects).
-				Order("created_at").
-				Relation("Tags").
-				Relation("Posts").
-				Relation("Projects").
-				Scan(r.Context())
-			if err != nil {
-				return eris.Wrap(
-					err,
-					"failed to scan projects for search handler",
-				)
-			}
-		}
-		if len(allTags) == 0 {
-			err := db.NewSelect().Model(&allTags).
-				Order("created_at").
-				Relation("Tags").
-				Relation("Posts").
-				Relation("Projects").
-				Scan(r.Context())
-			if err != nil {
-				return eris.Wrap(
-					err,
-					"failed to scan tags for search handler",
-				)
-			}
-		}
-		return nil
-	}
-}
-
 // filter returns a paginated slice of items matching the search query, ranked by relevance across multiple fields.
 // The function scores and filters items concurrently, prioritizing matches in the title, description, content, tags, and icon fields depending on the item type.
 // Results are sorted by descending relevance before pagination. If the query is empty, all items are returned paginated.

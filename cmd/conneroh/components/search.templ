@@ -1,245 +1,248 @@
-
 package components
 
 import (
-	"fmt"
 	"github.com/conneroisu/conneroh.com/internal/assets"
 	"github.com/conneroisu/twerge"
+	"strconv"
 )
 
-// SearchResult is a component for a single search result item
-// It can handle all types (Post, Project, Tag) and display appropriate information
-templ SearchResult(item any) {
+// SearchResultPost renders a post search result
+templ SearchResultPost(post *assets.Post) {
+	@searchResult(
+		post.Title,
+		post.Description,
+		post.PagePath(),
+		"post",
+		"bg-blue-600",
+	) {
+		<!-- Post icon -->
+		<svg xmlns="http://www.w3.org/2000/svg" class={ twerge.It("h-5 w-5 text-white") } fill="none" viewBox="0 0 24 24" stroke="currentColor">
+			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1M19 20a2 2 0 002-2V8a2 2 0 00-2-2h-1M19 20H9a2 2 0 01-2-2v-5a2 2 0 012-2h10a2 2 0 012 2v5a2 2 0 01-2 2z"></path>
+		</svg>
+		<!-- Post metadata -->
+		<div class={ twerge.It("flex items-center gap-2 text-xs text-gray-400") }>
+			<!-- Created date -->
+			<span class={ twerge.It("flex items-center gap-1") }>
+				<svg xmlns="http://www.w3.org/2000/svg" class={ twerge.It("h-3.5 w-3.5") } fill="none" viewBox="0 0 24 24" stroke="currentColor">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+				</svg>
+				{ post.CreatedAt.Format("Jan 2, 2006") }
+			</span>
+			<!-- Tag count -->
+			if len(post.Tags) > 0 {
+				<span class={ twerge.It("flex items-center gap-1") }>
+					<svg xmlns="http://www.w3.org/2000/svg" class={ twerge.It("h-3.5 w-3.5") } fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+					</svg>
+					{ strconv.Itoa(len(post.Tags)) } tags
+				</span>
+			}
+		</div>
+	}
+}
+
+// SearchResultProject renders a project search result
+templ SearchResultProject(project *assets.Project) {
+	@searchResult(
+		project.Title,
+		project.Description,
+		project.PagePath(),
+		"project",
+		"bg-green-600",
+	) {
+		<!-- Project icon -->
+		<svg xmlns="http://www.w3.org/2000/svg" class={ twerge.It("h-5 w-5 text-white") } fill="none" viewBox="0 0 24 24" stroke="currentColor">
+			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
+		</svg>
+		<!-- Project metadata -->
+		<div class={ twerge.It("flex items-center gap-2 text-xs text-gray-400") }>
+			<!-- Tag count -->
+			if len(project.Tags) > 0 {
+				<span class={ twerge.It("flex items-center gap-1") }>
+					<svg xmlns="http://www.w3.org/2000/svg" class={ twerge.It("h-3.5 w-3.5") } fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+					</svg>
+					{ strconv.Itoa(len(project.Tags)) } tags
+				</span>
+			}
+			<!-- Post count -->
+			if len(project.Posts) > 0 {
+				<span class={ twerge.It("flex items-center gap-1") }>
+					<svg xmlns="http://www.w3.org/2000/svg" class={ twerge.It("h-3.5 w-3.5") } fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1M19 20a2 2 0 002-2V8a2 2 0 00-2-2h-1M19 20H9a2 2 0 01-2-2v-5a2 2 0 012-2h10a2 2 0 012 2v5a2 2 0 01-2 2z"></path>
+					</svg>
+					{ strconv.Itoa(len(project.Posts)) } posts
+				</span>
+			}
+		</div>
+	}
+}
+
+// SearchResultTag renders a tag search result
+templ SearchResultTag(tag *assets.Tag) {
+	@searchResult(
+		tag.Title,
+		tag.Description,
+		tag.PagePath(),
+		"tag",
+		"bg-purple-600",
+	) {
+		<!-- Show the tag's icon if it exists, otherwise show a default tag icon -->
+		if tag.Icon != "" {
+			@Icon(tag.Icon, templ.Attributes{
+				"class": twerge.It("h-5 w-5 text-white"),
+			})
+		} else {
+			<svg xmlns="http://www.w3.org/2000/svg" class={ twerge.It("h-5 w-5 text-white") } fill="none" viewBox="0 0 24 24" stroke="currentColor">
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+			</svg>
+		}
+		<!-- Tag metadata -->
+		<div class={ twerge.It("flex items-center gap-2 text-xs text-gray-400") }>
+			<!-- Project count -->
+			if len(tag.Projects) > 0 {
+				<span class={ twerge.It("flex items-center gap-1") }>
+					<svg xmlns="http://www.w3.org/2000/svg" class={ twerge.It("h-3.5 w-3.5") } fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>
+					</svg>
+					{ strconv.Itoa(len(tag.Projects)) } projects
+				</span>
+			}
+			<!-- Post count -->
+			if len(tag.Posts) > 0 {
+				<span class={ twerge.It("flex items-center gap-1") }>
+					<svg xmlns="http://www.w3.org/2000/svg" class={ twerge.It("h-3.5 w-3.5") } fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1M19 20a2 2 0 002-2V8a2 2 0 00-2-2h-1M19 20H9a2 2 0 01-2-2v-5a2 2 0 012-2h10a2 2 0 012 2v5a2 2 0 01-2 2z"></path>
+					</svg>
+					{ strconv.Itoa(len(tag.Posts)) } posts
+				</span>
+			}
+		</div>
+	}
+}
+
+// Base shared search result layout component (unexported)
+templ searchResult(
+	title string,
+	description string,
+	path string,
+	typeName string,
+	typeColor string,
+) {
 	<div
-		class={ twerge.It("group bg-gray-800 hover:bg-gray-700 border border-gray-700 hover:border-gray-600 rounded-lg overflow-hidden transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-1 cursor-pointer") }
-		hx-get={ getPagePath(item) }
-		hx-target="#bodiody"
+		class={ twerge.It("p-4 hover:bg-gray-700 transition-colors duration-200 cursor-pointer rounded-md") }
+		hx-get={ path }
 		hx-push-url="true"
+		hx-target="#bodiody"
 		preload="mouseover"
 	>
-		<div class={ twerge.It("flex") }>
-			<!-- Left side - thumbnail/icon -->
-			<div class={ twerge.It("w-24 h-24 sm:w-32 sm:h-32 flex-shrink-0 overflow-hidden bg-gray-900") }>
-				@getThumbnail(item)
+		<div class={ twerge.It("flex gap-3") }>
+			<!-- Type indicator icon container -->
+			<div class={ twerge.It("flex-shrink-0 rounded-full p-2 h-10 w-10 flex items-center justify-center ") + typeColor }>
+				{ children... }
 			</div>
-			<!-- Right side - content -->
-			<div class={ twerge.It("flex-grow p-4 flex flex-col justify-between") }>
-				<!-- Header with type indicator and title -->
-				<div>
-					<div class={ twerge.It("flex items-center justify-between mb-2") }>
-						<span class={ getTypeIndicatorClass(item) }>
-							{ getTypeLabel(item) }
-						</span>
-						@getDateElement(item)
-					</div>
-					<h3 class={ twerge.It("text-white font-semibold text-lg group-hover:text-blue-400 transition-colors line-clamp-1") }>
-						{ getTitle(item) }
-					</h3>
-					<p class={ twerge.It("text-gray-400 text-sm mt-1 line-clamp-2") }>
-						{ getDescription(item) }
+			<!-- Content -->
+			<div class={ twerge.It("flex-grow min-w-0") }>
+				<!-- Title with type badge -->
+				<div class={ twerge.It("flex items-center gap-2 mb-1") }>
+					<h3 class={ twerge.It("font-medium text-white truncate") }>{ title }</h3>
+					<span class={ twerge.It("text-xs px-2 py-0.5 rounded-full ") + typeColor }>
+						{ typeName }
+					</span>
+				</div>
+				<!-- Description -->
+				if description != "" {
+					<p class={ twerge.It("text-sm text-gray-400 line-clamp-2 mb-2") }>
+						{ description }
 					</p>
-				</div>
-				<!-- Footer with tags and metadata -->
-				<div class={ twerge.It("mt-3 flex flex-wrap gap-2") }>
-					@renderTags(item)
-				</div>
+				}
+				<!-- Metadata (passed in from specific components) -->
+				{ children... }
 			</div>
 		</div>
 	</div>
 }
 
-func getPagePath(item any) string {
-	switch v := item.(type) {
-	case *assets.Post:
-		return v.PagePath()
-	case *assets.Project:
-		return v.PagePath()
-	case *assets.Tag:
-		return v.PagePath()
-	default:
-		return "#"
-	}
-}
-
-func getTitle(item any) string {
-	switch v := item.(type) {
-	case *assets.Post:
-		return v.Title
-	case *assets.Project:
-		return v.Title
-	case *assets.Tag:
-		return v.Title
-	default:
-		return ""
-	}
-}
-
-func getDescription(item any) string {
-	switch v := item.(type) {
-	case *assets.Post:
-		return v.Description
-	case *assets.Project:
-		return v.Description
-	case *assets.Tag:
-		return v.Description
-	default:
-		return ""
-	}
-}
-
-// getThumbnail returns the appropriate thumbnail for each item type
-templ getThumbnail(item any) {
-	switch v := item.(type) {
-		case *assets.Post:
-			if v.BannerPath != "" {
-				@Image(v.BannerPath, v.Title, twerge.It("object-cover w-full h-full"))
-			} else {
-				<div class={ twerge.It("flex items-center justify-center h-full w-full bg-blue-900") }>
-					@Icon("document", templ.Attributes{
-						"class": twerge.It("w-8 h-8 text-blue-300"),
-					})
-				</div>
-			}
-		case *assets.Project:
-			if v.BannerPath != "" {
-				@Image(v.BannerPath, v.Title, twerge.It("object-cover w-full h-full"))
-			} else {
-				<div class={ twerge.It("flex items-center justify-center h-full w-full bg-purple-900") }>
-					@Icon("code", templ.Attributes{
-						"class": twerge.It("w-8 h-8 text-purple-300"),
-					})
-				</div>
-			}
-		case *assets.Tag:
-			<div class={ twerge.It("flex items-center justify-center h-full w-full bg-gray-900") }>
-				@Icon(v.Icon, templ.Attributes{
-					"class": twerge.It("w-12 h-12"),
-				})
+// SearchResultsContainer wraps multiple search results with section headers
+templ SearchResultsContainer(
+	posts []*assets.Post,
+	projects []*assets.Project,
+	tags []*assets.Tag,
+	query string,
+) {
+	<div class={ twerge.It("space-y-2") }>
+		<!-- Search header -->
+		<div class={ twerge.It("flex items-center justify-between px-3 pt-2") }>
+			<div class={ twerge.It("text-sm font-medium text-gray-400") }>
+				Search Results
 			</div>
-		default:
-			<div class={ twerge.It("flex items-center justify-center h-full w-full bg-gray-900") }>
-				@Icon("search", templ.Attributes{
-					"class": twerge.It("w-8 h-8 text-gray-500"),
-				})
+			<div class={ twerge.It("text-xs text-gray-500") }>
+				{ strconv.Itoa(len(posts) + len(projects) + len(tags)) } results
 			</div>
-	}
-}
-
-// getTypeIndicatorClass returns the appropriate class for the type indicator
-func getTypeIndicatorClass(item any) string {
-	base := "text-xs font-medium px-2 py-1 rounded-full"
-
-	switch item.(type) {
-	case *assets.Post:
-		return twerge.It(base + " bg-blue-900 text-blue-200")
-	case *assets.Project:
-		return twerge.It(base + " bg-purple-900 text-purple-200")
-	case *assets.Tag:
-		return twerge.It(base + " bg-green-900 text-green-200")
-	default:
-		return twerge.It(base + " bg-gray-700 text-gray-300")
-	}
-}
-
-// getTypeLabel returns the appropriate label based on the item type
-func getTypeLabel(item any) string {
-	switch item.(type) {
-	case *assets.Post:
-		return "Post"
-	case *assets.Project:
-		return "Project"
-	case *assets.Tag:
-		return "Tag"
-	default:
-		return "Item"
-	}
-}
-
-// getDateElement returns the date element for posts and projects
-templ getDateElement(item any) {
-	switch v := item.(type) {
-		case *assets.Post:
-			<span class={ twerge.It("text-xs text-gray-500") }>
-				{ v.CreatedAt.Format("Jan 02, 2006") }
-			</span>
-		case *assets.Project:
-			<span class={ twerge.It("text-xs text-gray-500") }>
-				{ v.CreatedAt.Format("Jan 02, 2006") }
-			</span>
-		default:
-			<!-- No date for tags or unknown types -->
-	}
-}
-
-// renderTags displays the first few tags associated with the item
-templ renderTags(item any) {
-	switch v := item.(type) {
-		case *assets.Post:
-			for i, tag := range v.Tags {
-				if i < 2 && tag != nil {
-					<span class={ twerge.It("text-xs bg-blue-900 text-blue-200 px-2 py-0.5 rounded-full") }>
-						{ tag.Title }
-					</span>
-				}
-			}
-			if len(v.Tags) > 2 {
-				<span class={ twerge.It("text-xs text-gray-500") }>
-					+{ fmt.Sprintf("%d", len(v.Tags)-2) } more
-				</span>
-			}
-		case *assets.Project:
-			for i, tag := range v.Tags {
-				if i < 2 && tag != nil {
-					<span class={ twerge.It("text-xs bg-blue-900 text-blue-200 px-2 py-0.5 rounded-full") }>
-						{ tag.Title }
-					</span>
-				}
-			}
-			if len(v.Tags) > 2 {
-				<span class={ twerge.It("text-xs text-gray-500") }>
-					+{ fmt.Sprintf("%d", len(v.Tags)-2) } more
-				</span>
-			}
-		case *assets.Tag:
-			<div class={ twerge.It("flex items-center") }>
-				<span class={ twerge.It("text-xs text-gray-500 mr-1") }>
-					{ fmt.Sprintf("%d", len(v.Posts)) } posts
-				</span>
-				<span class={ twerge.It("text-xs text-gray-500 mx-1") }>•</span>
-				<span class={ twerge.It("text-xs text-gray-500 ml-1") }>
-					{ fmt.Sprintf("%d", len(v.Projects)) } projects
-				</span>
-			</div>
-	}
-}
-
-// SearchResultList renders a list of search results with a header
-templ SearchResultList(results []any, query string) {
-	<div class={ twerge.It("py-2 space-y-4") }>
-		if len(results) == 0 {
-			<div class={ twerge.It("p-4 text-center text-gray-400") }>
-				<p>No results found for "{ query }"</p>
+		</div>
+		<!-- No results state -->
+		if len(posts) + len(projects) + len(tags) == 0 {
+			<div class={ twerge.It("py-8 px-4 text-center") }>
+				<svg xmlns="http://www.w3.org/2000/svg" class={ twerge.It("mx-auto h-12 w-12 text-gray-500 mb-4") } fill="none" viewBox="0 0 24 24" stroke="currentColor">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+				</svg>
+				<p class={ twerge.It("text-gray-400 text-sm") }>No results found for "{ query }"</p>
+				<p class={ twerge.It("text-gray-500 text-xs mt-2") }>Try different keywords or check spelling</p>
 			</div>
 		} else {
-			<div class={ twerge.It("px-3 py-2 text-gray-400 text-sm border-b border-gray-700") }>
-				Found { fmt.Sprintf("%d", len(results)) } results for "{ query }"
+			<div class={ twerge.It("max-h-80 overflow-y-auto divide-y divide-gray-700") }>
+				<!-- Posts Section -->
+				if len(posts) > 0 {
+					<div>
+						<div class={ twerge.It("px-3 py-1 text-xs font-medium text-gray-500 bg-gray-800 sticky top-0") }>
+							Posts ({ strconv.Itoa(len(posts)) })
+						</div>
+						<div class={ twerge.It("space-y-1 p-2") }>
+							for _, post := range posts {
+								@SearchResultPost(post)
+							}
+						</div>
+					</div>
+				}
+				<!-- Projects Section -->
+				if len(projects) > 0 {
+					<div>
+						<div class={ twerge.It("px-3 py-1 text-xs font-medium text-gray-500 bg-gray-800 sticky top-0") }>
+							Projects ({ strconv.Itoa(len(projects)) })
+						</div>
+						<div class={ twerge.It("space-y-1 p-2") }>
+							for _, project := range projects {
+								@SearchResultProject(project)
+							}
+						</div>
+					</div>
+				}
+				<!-- Tags Section -->
+				if len(tags) > 0 {
+					<div>
+						<div class={ twerge.It("px-3 py-1 text-xs font-medium text-gray-500 bg-gray-800 sticky top-0") }>
+							Tags ({ strconv.Itoa(len(tags)) })
+						</div>
+						<div class={ twerge.It("space-y-1 p-2") }>
+							for _, tag := range tags {
+								@SearchResultTag(tag)
+							}
+						</div>
+					</div>
+				}
 			</div>
-			for _, result := range results {
-				@SearchResult(result)
-			}
-			if len(results) > 5 {
-				<div class={ twerge.It("text-center") }>
-					<a
-						href={ templ.SafeURL("/search?q=" + query) }
-						class={ twerge.It("text-blue-400 hover:text-blue-300 text-sm hover:underline inline-block py-2") }
-						hx-get={ "/search?q=" + query }
-						hx-target="#bodiody"
-						hx-push-url="true"
-					>
-						See all { fmt.Sprintf("%d", len(results)) } results
-					</a>
-				</div>
-			}
+			<!-- Full search link -->
+			<div class={ twerge.It("p-3 border-t border-gray-700") }>
+				<a
+					href={ templ.SafeURL("/search?q=" + query) }
+					hx-get={ "/search?q=" + query }
+					hx-push-url="true"
+					hx-target="#bodiody"
+					class={ twerge.It("block text-center py-2 text-sm font-medium text-blue-400 hover:text-blue-300 hover:bg-gray-700 rounded-md transition-colors") }
+				>
+					View all results →
+				</a>
+			</div>
 		}
 	</div>
 }

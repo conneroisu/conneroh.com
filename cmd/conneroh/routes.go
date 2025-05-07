@@ -36,9 +36,6 @@ func AddRoutes(
 		"POST /contact",
 		routing.Make(handleContactForm()))
 	h.HandleFunc(
-		"GET /search/all",
-		routing.Make(searchHandler(db)))
-	h.HandleFunc(
 		"GET /posts",
 		routing.Make(HandlePosts(db)))
 	h.Handle(
