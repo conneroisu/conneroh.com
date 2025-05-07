@@ -1,18 +1,18 @@
 
 package components
+
 import (
 	"fmt"
 	"github.com/conneroisu/conneroh.com/internal/assets"
 	"github.com/conneroisu/twerge"
-	"time"
 )
 
 // SearchResult is a component for a single search result item
 // It can handle all types (Post, Project, Tag) and display appropriate information
-templ SearchResult(item assets.Embeddable) {
+templ SearchResult(item any) {
 	<div
 		class={ twerge.It("group bg-gray-800 hover:bg-gray-700 border border-gray-700 hover:border-gray-600 rounded-lg overflow-hidden transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-1 cursor-pointer") }
-		hx-get={ item.PagePath() }
+		hx-get={ getPagePath(item) }
 		hx-target="#bodiody"
 		hx-push-url="true"
 		preload="mouseover"
@@ -22,7 +22,6 @@ templ SearchResult(item assets.Embeddable) {
 			<div class={ twerge.It("w-24 h-24 sm:w-32 sm:h-32 flex-shrink-0 overflow-hidden bg-gray-900") }>
 				@getThumbnail(item)
 			</div>
-			
 			<!-- Right side - content -->
 			<div class={ twerge.It("flex-grow p-4 flex flex-col justify-between") }>
 				<!-- Header with type indicator and title -->
@@ -34,13 +33,12 @@ templ SearchResult(item assets.Embeddable) {
 						@getDateElement(item)
 					</div>
 					<h3 class={ twerge.It("text-white font-semibold text-lg group-hover:text-blue-400 transition-colors line-clamp-1") }>
-						{ item.Title }
+						{ getTitle(item) }
 					</h3>
 					<p class={ twerge.It("text-gray-400 text-sm mt-1 line-clamp-2") }>
-						{ item.GetDescription() }
+						{ getDescription(item) }
 					</p>
 				</div>
-				
 				<!-- Footer with tags and metadata -->
 				<div class={ twerge.It("mt-3 flex flex-wrap gap-2") }>
 					@renderTags(item)
@@ -50,50 +48,87 @@ templ SearchResult(item assets.Embeddable) {
 	</div>
 }
 
-// Helper functions to handle different content types
-
-// getThumbnail returns the appropriate thumbnail for each item type
-templ getThumbnail(item assets.Embeddable) {
+func getPagePath(item any) string {
 	switch v := item.(type) {
 	case *assets.Post:
-		if v.BannerPath != "" {
-			@Image(v.BannerPath, v.Title, twerge.It("object-cover w-full h-full"))
-		} else {
-			<div class={ twerge.It("flex items-center justify-center h-full w-full bg-blue-900") }>
-				@Icon("document", templ.Attributes{
-					"class": twerge.It("w-8 h-8 text-blue-300"),
-				})
-			</div>
-		}
+		return v.PagePath()
 	case *assets.Project:
-		if v.BannerPath != "" {
-			@Image(v.BannerPath, v.Title, twerge.It("object-cover w-full h-full"))
-		} else {
-			<div class={ twerge.It("flex items-center justify-center h-full w-full bg-purple-900") }>
-				@Icon("code", templ.Attributes{
-					"class": twerge.It("w-8 h-8 text-purple-300"),
+		return v.PagePath()
+	case *assets.Tag:
+		return v.PagePath()
+	default:
+		return "#"
+	}
+}
+
+func getTitle(item any) string {
+	switch v := item.(type) {
+	case *assets.Post:
+		return v.Title
+	case *assets.Project:
+		return v.Title
+	case *assets.Tag:
+		return v.Title
+	default:
+		return ""
+	}
+}
+
+func getDescription(item any) string {
+	switch v := item.(type) {
+	case *assets.Post:
+		return v.Description
+	case *assets.Project:
+		return v.Description
+	case *assets.Tag:
+		return v.Description
+	default:
+		return ""
+	}
+}
+
+// getThumbnail returns the appropriate thumbnail for each item type
+templ getThumbnail(item any) {
+	switch v := item.(type) {
+		case *assets.Post:
+			if v.BannerPath != "" {
+				@Image(v.BannerPath, v.Title, twerge.It("object-cover w-full h-full"))
+			} else {
+				<div class={ twerge.It("flex items-center justify-center h-full w-full bg-blue-900") }>
+					@Icon("document", templ.Attributes{
+						"class": twerge.It("w-8 h-8 text-blue-300"),
+					})
+				</div>
+			}
+		case *assets.Project:
+			if v.BannerPath != "" {
+				@Image(v.BannerPath, v.Title, twerge.It("object-cover w-full h-full"))
+			} else {
+				<div class={ twerge.It("flex items-center justify-center h-full w-full bg-purple-900") }>
+					@Icon("code", templ.Attributes{
+						"class": twerge.It("w-8 h-8 text-purple-300"),
+					})
+				</div>
+			}
+		case *assets.Tag:
+			<div class={ twerge.It("flex items-center justify-center h-full w-full bg-gray-900") }>
+				@Icon(v.Icon, templ.Attributes{
+					"class": twerge.It("w-12 h-12"),
 				})
 			</div>
-		}
-	case *assets.Tag:
-		<div class={ twerge.It("flex items-center justify-center h-full w-full bg-gray-900") }>
-			@Icon(v.Icon, templ.Attributes{
-				"class": twerge.It("w-12 h-12"),
-			})
-		</div>
-	default:
-		<div class={ twerge.It("flex items-center justify-center h-full w-full bg-gray-900") }>
-			@Icon("search", templ.Attributes{
-				"class": twerge.It("w-8 h-8 text-gray-500"),
-			})
-		</div>
+		default:
+			<div class={ twerge.It("flex items-center justify-center h-full w-full bg-gray-900") }>
+				@Icon("search", templ.Attributes{
+					"class": twerge.It("w-8 h-8 text-gray-500"),
+				})
+			</div>
 	}
 }
 
 // getTypeIndicatorClass returns the appropriate class for the type indicator
-func getTypeIndicatorClass(item assets.Embeddable) string {
+func getTypeIndicatorClass(item any) string {
 	base := "text-xs font-medium px-2 py-1 rounded-full"
-	
+
 	switch item.(type) {
 	case *assets.Post:
 		return twerge.It(base + " bg-blue-900 text-blue-200")
@@ -107,7 +142,7 @@ func getTypeIndicatorClass(item assets.Embeddable) string {
 }
 
 // getTypeLabel returns the appropriate label based on the item type
-func getTypeLabel(item assets.Embeddable) string {
+func getTypeLabel(item any) string {
 	switch item.(type) {
 	case *assets.Post:
 		return "Post"
@@ -121,65 +156,65 @@ func getTypeLabel(item assets.Embeddable) string {
 }
 
 // getDateElement returns the date element for posts and projects
-templ getDateElement(item assets.Embeddable) {
+templ getDateElement(item any) {
 	switch v := item.(type) {
-	case *assets.Post:
-		<span class={ twerge.It("text-xs text-gray-500") }>
-			{ v.CreatedAt.Format("Jan 02, 2006") }
-		</span>
-	case *assets.Project:
-		<span class={ twerge.It("text-xs text-gray-500") }>
-			{ v.CreatedAt.Format("Jan 02, 2006") }
-		</span>
-	default:
-		<!-- No date for tags or unknown types -->
+		case *assets.Post:
+			<span class={ twerge.It("text-xs text-gray-500") }>
+				{ v.CreatedAt.Format("Jan 02, 2006") }
+			</span>
+		case *assets.Project:
+			<span class={ twerge.It("text-xs text-gray-500") }>
+				{ v.CreatedAt.Format("Jan 02, 2006") }
+			</span>
+		default:
+			<!-- No date for tags or unknown types -->
 	}
 }
 
 // renderTags displays the first few tags associated with the item
-templ renderTags(item assets.Embeddable) {
+templ renderTags(item any) {
 	switch v := item.(type) {
-	case *assets.Post:
-		for i, tag := range v.Tags {
-			if i < 2 && tag != nil {
-				<span class={ twerge.It("text-xs bg-blue-900 text-blue-200 px-2 py-0.5 rounded-full") }>
-					{ tag.Title }
+		case *assets.Post:
+			for i, tag := range v.Tags {
+				if i < 2 && tag != nil {
+					<span class={ twerge.It("text-xs bg-blue-900 text-blue-200 px-2 py-0.5 rounded-full") }>
+						{ tag.Title }
+					</span>
+				}
+			}
+			if len(v.Tags) > 2 {
+				<span class={ twerge.It("text-xs text-gray-500") }>
+					+{ fmt.Sprintf("%d", len(v.Tags)-2) } more
 				</span>
 			}
-		}
-		if len(v.Tags) > 2 {
-			<span class={ twerge.It("text-xs text-gray-500") }>
-				+{ fmt.Sprintf("%d", len(v.Tags)-2) } more
-			</span>
-		}
-	case *assets.Project:
-		for i, tag := range v.Tags {
-			if i < 2 && tag != nil {
-				<span class={ twerge.It("text-xs bg-blue-900 text-blue-200 px-2 py-0.5 rounded-full") }>
-					{ tag.Title }
+		case *assets.Project:
+			for i, tag := range v.Tags {
+				if i < 2 && tag != nil {
+					<span class={ twerge.It("text-xs bg-blue-900 text-blue-200 px-2 py-0.5 rounded-full") }>
+						{ tag.Title }
+					</span>
+				}
+			}
+			if len(v.Tags) > 2 {
+				<span class={ twerge.It("text-xs text-gray-500") }>
+					+{ fmt.Sprintf("%d", len(v.Tags)-2) } more
 				</span>
 			}
-		}
-		if len(v.Tags) > 2 {
-			<span class={ twerge.It("text-xs text-gray-500") }>
-				+{ fmt.Sprintf("%d", len(v.Tags)-2) } more
-			</span>
-		}
-	case *assets.Tag:
-		<div class={ twerge.It("flex items-center") }>
-			<span class={ twerge.It("text-xs text-gray-500 mr-1") }>
-				{ fmt.Sprintf("%d", len(v.Posts)) } posts
-			</span>
-			<span class={ twerge.It("text-xs text-gray-500 mx-1") }>•</span>
-			<span class={ twerge.It("text-xs text-gray-500 ml-1") }>
-				{ fmt.Sprintf("%d", len(v.Projects)) } projects
-			</span>
-		</div>
+		case *assets.Tag:
+			<div class={ twerge.It("flex items-center") }>
+				<span class={ twerge.It("text-xs text-gray-500 mr-1") }>
+					{ fmt.Sprintf("%d", len(v.Posts)) } posts
+				</span>
+				<span class={ twerge.It("text-xs text-gray-500 mx-1") }>•</span>
+				<span class={ twerge.It("text-xs text-gray-500 ml-1") }>
+					{ fmt.Sprintf("%d", len(v.Projects)) } projects
+				</span>
+			</div>
 	}
 }
 
 // SearchResultList renders a list of search results with a header
-templ SearchResultList(results []assets.Embeddable, query string) {
+templ SearchResultList(results []any, query string) {
 	<div class={ twerge.It("py-2 space-y-4") }>
 		if len(results) == 0 {
 			<div class={ twerge.It("p-4 text-center text-gray-400") }>
@@ -194,7 +229,7 @@ templ SearchResultList(results []assets.Embeddable, query string) {
 			}
 			if len(results) > 5 {
 				<div class={ twerge.It("text-center") }>
-					<a 
+					<a
 						href={ templ.SafeURL("/search?q=" + query) }
 						class={ twerge.It("text-blue-400 hover:text-blue-300 text-sm hover:underline inline-block py-2") }
 						hx-get={ "/search?q=" + query }

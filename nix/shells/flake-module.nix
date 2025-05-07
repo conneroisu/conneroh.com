@@ -414,10 +414,7 @@
               flyctl
               cacert
             ];
-            bashOptions = [
-              "errexit"
-              "pipefail"
-            ];
+            bashOptions = ["errexit" "pipefail"];
             text = ''
               set -e
               arg=$1
