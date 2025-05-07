@@ -450,13 +450,13 @@
                 export CONFIG_FILE=${flyProdToml}
               fi
 
-              REGISTY="registry.fly.io/$FLY_NAME"
-              echo "Copying image to Fly.io... to $REGISTY"
+              REGISTRY="registry.fly.io/$FLY_NAME"
+              echo "Copying image to Fly.io... to $REGISTRY"
 
               skopeo copy \
                 --insecure-policy \
                 docker-archive:"${self'.packages.C-conneroh}" \
-                "docker://$REGISTY:latest" \
+                "docker://$REGISTRY:latest" \
                 --dest-creds x:"$TOKEN" \
                 --format v2s2
 
@@ -464,7 +464,7 @@
               fly deploy \
                 --remote-only \
                 -c "$CONFIG_FILE" \
-                -i "$REGISTY:latest" \
+                -i "$REGISTRY:latest" \
                 -t "$TOKEN"
             '';
           };
