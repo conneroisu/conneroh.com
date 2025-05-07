@@ -32,9 +32,9 @@
       };
       reset-db = {
         exec = ''
-          rm ./master.db
-          rm ./master.db-shm
-          rm ./master.db-wal
+          rm ./../../master.db
+          rm ./../../master.db-shm
+          rm ./../../master.db-wal
         '';
         description = "Reset the database";
       };
@@ -128,9 +128,16 @@
       };
       generate-db = {
         exec = ''
-          doppler run -- update
+          # Run update from PATH if available, or build it if needed
+          if command -v update >/dev/null 2>&1; then
+            doppler run -- update
+          else
+            echo "update command not found, building it first..."
+            nix build .#update --no-link
+            nix run .#update
+          fi
         '';
-        deps = with pkgs; [doppler self'.packages.update];
+        deps = with pkgs; [doppler]; # Remove self'.packages.update dependency
         description = "Update the generated go files from the md docs.";
       };
       generate-reload = {
@@ -275,7 +282,6 @@
           flyctl # Infra
           openssl.dev
           skopeo
-          consul
 
           (
             pkgs.buildGoModule rec {
@@ -321,7 +327,7 @@
       # Create a derivation for the database file
       databaseFiles = pkgs.runCommand "database-files" {} ''
         mkdir -p $out/root
-        cp ${./master.db} $out/root/master.db
+        cp ${./../../master.db} $out/root/master.db
       '';
 
       preBuild = ''
