@@ -1,0 +1,210 @@
+
+package components
+import (
+	"fmt"
+	"github.com/conneroisu/conneroh.com/internal/assets"
+	"github.com/conneroisu/twerge"
+	"time"
+)
+
+// SearchResult is a component for a single search result item
+// It can handle all types (Post, Project, Tag) and display appropriate information
+templ SearchResult(item assets.Embeddable) {
+	<div
+		class={ twerge.It("group bg-gray-800 hover:bg-gray-700 border border-gray-700 hover:border-gray-600 rounded-lg overflow-hidden transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-1 cursor-pointer") }
+		hx-get={ item.PagePath() }
+		hx-target="#bodiody"
+		hx-push-url="true"
+		preload="mouseover"
+	>
+		<div class={ twerge.It("flex") }>
+			<!-- Left side - thumbnail/icon -->
+			<div class={ twerge.It("w-24 h-24 sm:w-32 sm:h-32 flex-shrink-0 overflow-hidden bg-gray-900") }>
+				@getThumbnail(item)
+			</div>
+			
+			<!-- Right side - content -->
+			<div class={ twerge.It("flex-grow p-4 flex flex-col justify-between") }>
+				<!-- Header with type indicator and title -->
+				<div>
+					<div class={ twerge.It("flex items-center justify-between mb-2") }>
+						<span class={ getTypeIndicatorClass(item) }>
+							{ getTypeLabel(item) }
+						</span>
+						@getDateElement(item)
+					</div>
+					<h3 class={ twerge.It("text-white font-semibold text-lg group-hover:text-blue-400 transition-colors line-clamp-1") }>
+						{ item.Title }
+					</h3>
+					<p class={ twerge.It("text-gray-400 text-sm mt-1 line-clamp-2") }>
+						{ item.GetDescription() }
+					</p>
+				</div>
+				
+				<!-- Footer with tags and metadata -->
+				<div class={ twerge.It("mt-3 flex flex-wrap gap-2") }>
+					@renderTags(item)
+				</div>
+			</div>
+		</div>
+	</div>
+}
+
+// Helper functions to handle different content types
+
+// getThumbnail returns the appropriate thumbnail for each item type
+templ getThumbnail(item assets.Embeddable) {
+	switch v := item.(type) {
+	case *assets.Post:
+		if v.BannerPath != "" {
+			@Image(v.BannerPath, v.Title, twerge.It("object-cover w-full h-full"))
+		} else {
+			<div class={ twerge.It("flex items-center justify-center h-full w-full bg-blue-900") }>
+				@Icon("document", templ.Attributes{
+					"class": twerge.It("w-8 h-8 text-blue-300"),
+				})
+			</div>
+		}
+	case *assets.Project:
+		if v.BannerPath != "" {
+			@Image(v.BannerPath, v.Title, twerge.It("object-cover w-full h-full"))
+		} else {
+			<div class={ twerge.It("flex items-center justify-center h-full w-full bg-purple-900") }>
+				@Icon("code", templ.Attributes{
+					"class": twerge.It("w-8 h-8 text-purple-300"),
+				})
+			</div>
+		}
+	case *assets.Tag:
+		<div class={ twerge.It("flex items-center justify-center h-full w-full bg-gray-900") }>
+			@Icon(v.Icon, templ.Attributes{
+				"class": twerge.It("w-12 h-12"),
+			})
+		</div>
+	default:
+		<div class={ twerge.It("flex items-center justify-center h-full w-full bg-gray-900") }>
+			@Icon("search", templ.Attributes{
+				"class": twerge.It("w-8 h-8 text-gray-500"),
+			})
+		</div>
+	}
+}
+
+// getTypeIndicatorClass returns the appropriate class for the type indicator
+func getTypeIndicatorClass(item assets.Embeddable) string {
+	base := "text-xs font-medium px-2 py-1 rounded-full"
+	
+	switch item.(type) {
+	case *assets.Post:
+		return twerge.It(base + " bg-blue-900 text-blue-200")
+	case *assets.Project:
+		return twerge.It(base + " bg-purple-900 text-purple-200")
+	case *assets.Tag:
+		return twerge.It(base + " bg-green-900 text-green-200")
+	default:
+		return twerge.It(base + " bg-gray-700 text-gray-300")
+	}
+}
+
+// getTypeLabel returns the appropriate label based on the item type
+func getTypeLabel(item assets.Embeddable) string {
+	switch item.(type) {
+	case *assets.Post:
+		return "Post"
+	case *assets.Project:
+		return "Project"
+	case *assets.Tag:
+		return "Tag"
+	default:
+		return "Item"
+	}
+}
+
+// getDateElement returns the date element for posts and projects
+templ getDateElement(item assets.Embeddable) {
+	switch v := item.(type) {
+	case *assets.Post:
+		<span class={ twerge.It("text-xs text-gray-500") }>
+			{ v.CreatedAt.Format("Jan 02, 2006") }
+		</span>
+	case *assets.Project:
+		<span class={ twerge.It("text-xs text-gray-500") }>
+			{ v.CreatedAt.Format("Jan 02, 2006") }
+		</span>
+	default:
+		<!-- No date for tags or unknown types -->
+	}
+}
+
+// renderTags displays the first few tags associated with the item
+templ renderTags(item assets.Embeddable) {
+	switch v := item.(type) {
+	case *assets.Post:
+		for i, tag := range v.Tags {
+			if i < 2 && tag != nil {
+				<span class={ twerge.It("text-xs bg-blue-900 text-blue-200 px-2 py-0.5 rounded-full") }>
+					{ tag.Title }
+				</span>
+			}
+		}
+		if len(v.Tags) > 2 {
+			<span class={ twerge.It("text-xs text-gray-500") }>
+				+{ fmt.Sprintf("%d", len(v.Tags)-2) } more
+			</span>
+		}
+	case *assets.Project:
+		for i, tag := range v.Tags {
+			if i < 2 && tag != nil {
+				<span class={ twerge.It("text-xs bg-blue-900 text-blue-200 px-2 py-0.5 rounded-full") }>
+					{ tag.Title }
+				</span>
+			}
+		}
+		if len(v.Tags) > 2 {
+			<span class={ twerge.It("text-xs text-gray-500") }>
+				+{ fmt.Sprintf("%d", len(v.Tags)-2) } more
+			</span>
+		}
+	case *assets.Tag:
+		<div class={ twerge.It("flex items-center") }>
+			<span class={ twerge.It("text-xs text-gray-500 mr-1") }>
+				{ fmt.Sprintf("%d", len(v.Posts)) } posts
+			</span>
+			<span class={ twerge.It("text-xs text-gray-500 mx-1") }>•</span>
+			<span class={ twerge.It("text-xs text-gray-500 ml-1") }>
+				{ fmt.Sprintf("%d", len(v.Projects)) } projects
+			</span>
+		</div>
+	}
+}
+
+// SearchResultList renders a list of search results with a header
+templ SearchResultList(results []assets.Embeddable, query string) {
+	<div class={ twerge.It("py-2 space-y-4") }>
+		if len(results) == 0 {
+			<div class={ twerge.It("p-4 text-center text-gray-400") }>
+				<p>No results found for "{ query }"</p>
+			</div>
+		} else {
+			<div class={ twerge.It("px-3 py-2 text-gray-400 text-sm border-b border-gray-700") }>
+				Found { fmt.Sprintf("%d", len(results)) } results for "{ query }"
+			</div>
+			for _, result := range results {
+				@SearchResult(result)
+			}
+			if len(results) > 5 {
+				<div class={ twerge.It("text-center") }>
+					<a 
+						href={ templ.SafeURL("/search?q=" + query) }
+						class={ twerge.It("text-blue-400 hover:text-blue-300 text-sm hover:underline inline-block py-2") }
+						hx-get={ "/search?q=" + query }
+						hx-target="#bodiody"
+						hx-push-url="true"
+					>
+						See all { fmt.Sprintf("%d", len(results)) } results
+					</a>
+				</div>
+			}
+		}
+	</div>
+}

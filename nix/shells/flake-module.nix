@@ -103,23 +103,16 @@
       generate-docs = {
         exec = ''
           REPO_ROOT="$(git rev-parse --show-toplevel)"
-          TEMP_CONTENT=$(mktemp)
-          {
-            ${builtins.concatStringsSep "\n" (
-            pkgs.lib.mapAttrsToList (
-              name: script: ''echo "  ${name} - ${script.description}"''
+          ${pkgs.lib.getExe config.packages.interpolate} "$REPO_ROOT"/README.md "<!-- BEGIN_MARKER -->" "<!-- END_MARKER -->" '${
+            builtins.concatStringsSep "\n" (
+              pkgs.lib.mapAttrsToList (
+                name: script: ''${name} - ${script.description}''
+              )
+              scripts
             )
-            scripts
-          )}
-          } > "$TEMP_CONTENT"
-
-          # Use the interpolate command with the content from the file
-          interpolate "$REPO_ROOT"/README.md "<!-- BEGIN_MARKER -->" "<!-- END_MARKER -->" "$(cat "$TEMP_CONTENT")"
-
-          # Clean up
-          rm "$TEMP_CONTENT"
+          }'
         '';
-        deps = with pkgs; [doppler coreutils config.packages.interpolate];
+        deps = with pkgs; [doppler coreutils];
         description = "Update the generated documentation files.";
       };
       generate-db = {
