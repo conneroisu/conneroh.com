@@ -142,14 +142,9 @@
       {
         conneroh = pkgs.buildGoModule {
           inherit src version preBuild;
-
           vendorHash = "sha256-kOGauV5dMTcHvSR7uWvY1dcKR4WqlWccDfnXtycsRVI=";
           name = "conneroh.com";
           goSum = ./../../go.sum;
-          nativeBuildInputs = [
-            pkgs.templ
-            pkgs.tailwindcss
-          ];
           subPackages = ["."];
         };
         update = pkgs.buildGoModule {
