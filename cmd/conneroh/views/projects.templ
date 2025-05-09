@@ -25,6 +25,11 @@ templ Project(
 			<div
 				class={ twerge.It("pb-4 mb-4 border-b border-gray-700") }
 			>
+				<h1
+					class={ twerge.It("font-bold text-white mb-4 text-4xl") }
+				>
+					{ project.Title }
+				</h1>
 				<h2
 					class={ twerge.It("font-semibold text-white text-2xl") }
 				>
@@ -45,11 +50,6 @@ templ Project(
 				<div
 					class={ twerge.It("mb-8") }
 				>
-					<h1
-						class={ twerge.It("font-bold text-white mb-4 text-4xl") }
-					>
-						{ project.Title }
-					</h1>
 					if len(project.Tags) > 0 {
 						<span class={ twerge.It("text-gray-400 text-sm pr-2") }>
 							Tags:

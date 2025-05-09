@@ -10,120 +10,144 @@ import (
 templ Post(
 	post *assets.Post,
 ) {
-	<article
+	<div
 		class={ twerge.It("px-4 container mx-auto py-8") }
 	>
-		<div
-			class={ twerge.It("mb-8") }
-		>
-			<h1
-				class={ twerge.It("font-bold text-white mb-4 text-4xl") }
-			>
-				{ post.Title }
-			</h1>
-			if len(post.Tags) > 0 {
-				<span class={ twerge.It("text-gray-400 text-sm pr-2") }>
-					Tags:
-				</span>
-				for _, tag := range post.Tags {
-					<a
-						href={ templ.SafeURL(tag.PagePath()) }
-						hx-get={ templ.SafeURL(tag.PagePath()) }
-						hx-trigger="click"
-						hx-swap="outerHTML"
-						preload="mouseover"
-						hx-target="#bodiody"
-						class={ twerge.It("text-gray-400 text-sm hover:underline hover:text-blue-400 transition-colors duration-200 pr-2") }
-					>
-						#{ tag.Slug }
-					</a>
-				}
-			}
-			<div
-				class={ twerge.It("mb-6 flex items-center text-gray-400") }
-			>
-				<span class="mr-2">
-					🗓
-				</span>
-				<time>
-					{ post.CreatedAt.Format("Jan 2, 2006") }
-				</time>
-				<span
-					class={ twerge.It("mx-2") }
-				>
-					•
-				</span>
-				<span>{ readTime(post.Content) } min read</span>
-			</div>
-			if post.BannerPath != "" {
-				@components.Image(
-					post.BannerPath,
-					post.Title,
-					twerge.It("w-full md:h-96 object-center rounded-lg object-cover shadow-md mb-8 h-64"),
-				)
-			}
-		</div>
+		if post.BannerPath != "" {
+			@components.Image(
+				post.BannerPath,
+				post.Title,
+				twerge.It("w-full md:h-96 object-center rounded-lg object-cover shadow-md mb-8 h-64"),
+			)
+		}
 		<div
 			class={ twerge.It("bg-gray-800 rounded-lg mb-8 overflow-hidden p-6 shadow-lg") }
 		>
 			<div
-				class={ twerge.It("max-w-none my-6 text-gray-300 leading-relaxed") }
+				class={ twerge.It("pb-4 mb-4 border-b border-gray-700") }
 			>
-				@templ.Raw(post.Content)
+				<h1
+					class={ twerge.It("font-bold text-white mb-4 text-4xl") }
+				>
+					{ post.Title }
+				</h1>
+				<h2
+					class={ twerge.It("font-semibold text-white text-2xl") }
+				>
+					About this post
+				</h2>
+				<div
+					class={ twerge.It("h-1 bg-blue-500 mt-2 w-16") }
+				></div>
+			</div>
+			<div
+				class={ twerge.It("max-w-none") }
+			>
+				<p
+					class={ twerge.It("leading-relaxed whitespace-pre-line text-gray-300") }
+				>
+					{ post.Description }
+				</p>
+				<div
+					class={ twerge.It("mb-8") }
+				>
+					if len(post.Tags) > 0 {
+						<span class={ twerge.It("text-gray-400 text-sm pr-2") }>
+							Tags:
+						</span>
+						for _, tag := range post.Tags {
+							<a
+								href={ templ.SafeURL(tag.PagePath()) }
+								hx-get={ templ.SafeURL(tag.PagePath()) }
+								hx-trigger="click"
+								hx-swap="outerHTML"
+								preload="mouseover"
+								hx-target="#bodiody"
+								class={ twerge.It("text-gray-400 text-sm hover:underline hover:text-blue-400 transition-colors duration-200 pr-2") }
+							>
+								#{ tag.Slug }
+							</a>
+						}
+					}
+				</div>
+				<div
+					class={ twerge.It("items-center text-sm text-gray-400 mt-6 flex") }
+				>
+					@components.Icon("calendar", templ.Attributes{})
+					<span>Created: { post.CreatedAt.Format("Jan 2, 2006") }</span>
+				</div>
+				<span
+					class={ twerge.It("items-center text-sm text-gray-400 mt-6 flex") }
+				>
+					• { readTime(post.Content) } min read
+				</span>
 			</div>
 		</div>
-		if len(post.Projects) > 0 {
+		<article
+			class={ twerge.It("px-4 container mx-auto py-8") }
+		>
 			<div
-				class={ twerge.It("pt-8 mt-12 border-t border-gray-700") }
+				class={ twerge.It("bg-gray-800 rounded-lg mb-8 overflow-hidden p-6 shadow-lg") }
 			>
-				<h2
-					class={ twerge.It("text-2xl font-bold text-white mb-4") }
-				>
-					Related Projects
-				</h2>
 				<div
-					class={ twerge.It("grid grid-cols-1 md:grid-cols-2 gap-4") }
+					class={ twerge.It("max-w-none my-6 text-gray-300 leading-relaxed") }
 				>
-					for _, project := range post.Projects {
-						@components.ProjectItem(
-							project,
-							templ.Attributes{
-								"class":       twerge.It("bg-gray-800 transition-all flex transform hover:-translate-y-3 flex-col shadow-md rounded-lg hover:shadow-lg duration-300 overflow-hidden h-full"),
+					@templ.Raw(post.Content)
+				</div>
+			</div>
+			if len(post.Projects) > 0 {
+				<div
+					class={ twerge.It("pt-8 mt-12 border-t border-gray-700") }
+				>
+					<h2
+						class={ twerge.It("text-2xl font-bold text-white mb-4") }
+					>
+						Related Projects
+					</h2>
+					<div
+						class={ twerge.It("grid grid-cols-1 md:grid-cols-2 gap-4") }
+					>
+						for _, project := range post.Projects {
+							@components.ProjectItem(
+								project,
+								templ.Attributes{
+									"class":       twerge.It("bg-gray-800 transition-all flex transform hover:-translate-y-3 flex-col shadow-md rounded-lg hover:shadow-lg duration-300 overflow-hidden h-full"),
+									"hx-target":   "#bodiody",
+									"hx-get":      project.PagePath(),
+									"hx-push-url": "true",
+									"preload":     "mouseover",
+								},
+							)
+						}
+					</div>
+				</div>
+			}
+			if len(post.Posts) > 0 {
+				<div
+					class={ twerge.It("pt-8 mt-12 border-t border-gray-700") }
+				>
+					<h2
+						class={ twerge.It("text-2xl font-bold text-white mb-4") }
+					>
+						Related Posts
+					</h2>
+					<div
+						class={ twerge.It("gap-6 grid grid-cols-1 md:grid-cols-2") }
+					>
+						for _, post := range post.Posts {
+							@components.PostItem(post, templ.Attributes{
+								"class":       twerge.It("bg-gray-800 rounded-lg shadow-md overflow-hidden p-6"),
 								"hx-target":   "#bodiody",
-								"hx-get":      project.PagePath(),
-								"hx-push-url": "true",
+								"hx-get":      post.PagePath(),
+								"hx-push-url": post.PagePath(),
 								"preload":     "mouseover",
-							},
-						)
-					}
+							})
+						}
+					</div>
 				</div>
-			</div>
-		}
-		if len(post.Posts) > 0 {
-			<div
-				class={ twerge.It("pt-8 mt-12 border-t border-gray-700") }
-			>
-				<h2
-					class={ twerge.It("text-2xl font-bold text-white mb-4") }
-				>
-					Related Posts
-				</h2>
-				<div
-					class={ twerge.It("gap-6 grid grid-cols-1 md:grid-cols-2") }
-				>
-					for _, post := range post.Posts {
-						@components.PostItem(post, templ.Attributes{
-							"class":       twerge.It("bg-gray-800 rounded-lg shadow-md overflow-hidden p-6"),
-							"hx-target":   "#bodiody",
-							"hx-get":      post.PagePath(),
-							"hx-push-url": post.PagePath(),
-							"preload":     "mouseover",
-						})
-					}
-				</div>
-			</div>
-		}
-	</article>
-	<script src="https://utteranc.es/client.js" repo="conneroisu/conneroh.com" issue-term="pathname" label="post" theme="github-dark" crossorigin="anonymous" async>
+			}
+		</article>
+		<script src="https://utteranc.es/client.js" repo="conneroisu/conneroh.com" issue-term="pathname" label="post" theme="github-dark" crossorigin="anonymous" async>
 </script>
+	</div>
 }
