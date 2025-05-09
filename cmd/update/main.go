@@ -23,6 +23,7 @@ import (
 	"github.com/spf13/afero"
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/sqlitedialect"
+	"github.com/uptrace/bun/extra/bundebug"
 	_ "modernc.org/sqlite"
 )
 
@@ -66,7 +67,9 @@ func Run(ctx context.Context, getenv func(string) string, numWorkers, bufferSize
 	// Initialize BUN DB
 	db := bun.NewDB(sqldb, sqlitedialect.New())
 
-	// db.AddQueryHook(bundebug.NewQueryHook(bundebug.WithVerbose(true)))
+	if os.Getenv("DEBUG") == "true" {
+		db.AddQueryHook(bundebug.NewQueryHook(bundebug.WithVerbose(true)))
+	}
 
 	// Initialize database tables
 	err = assets.InitDB(ctx, db)

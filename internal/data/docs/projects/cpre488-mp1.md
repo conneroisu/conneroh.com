@@ -12,7 +12,7 @@ banner_path: projects/mp1.webp
 created_at: 2025-03-27T14:13:10.000-06:00
 description: The second Project from CPRE488 at Iowa State University
 title: CPRE488 MP1
-updated_at: 2025-04-12T12:18:29.000-06:00
+updated_at: 2025-05-09T07:01:31.000-06:00
 ---
 
 # CPRE488 MP1
@@ -62,17 +62,25 @@ It should be noted that subsection B deviated in this design by instantiating th
 
 ## 6. Address decoding
 
-The design uses address bits [ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB] to select which register to access:
+The design uses address bits `[ADDR_LSB+OPT_MEM_ADDR_BITS:ADDR_LSB]` to select which register to access:
 
-- ADDR_LSB is set to ( C_S_AXI_DATA_WIDTH /32) + 1, which is typically 2 for 32-bit buses (addressing by words)
+- ADDR_LSB is set to `(C_S_AXI_DATA_WIDTH/32) + 1`, which is typically 2 for 32-bit buses (addressing by words)
 - OPT_MEM_ADDR_BITS is set to 3 , allowing for 16 registers $\left(2^{4}=16\right)$
 
-The AMBAAXI IP is connected to the Zynq processor on the main design through an AXI interconnect. This connection allows for a base address to be mapped for the IP which enables software access to the 16 slave registers (slv_reg) instantiated in the slave AXI. In order to access the individual slave registers, we had to introduce an appropriate offset to the address. In our case, it was $+0 \times 4$ per register. We believed this to be the case as the slave register sizes were set to 32 bits, or 4 bytes. So, for our design, since the base address for the AXI IP was $0 \times 43 \mathrm{C} 00000$, our subsequent registers were mapped as such;
+The AMBAAXI IP is connected to the Zynq processor on the main design through an AXI interconnect.
+
+This connection allows for a base address to be mapped for the IP which enables software access to the 16 slave registers (slv_reg) instantiated in the slave AXI.
+
+In order to access the individual slave registers, we had to introduce an appropriate offset to the address. In our case, it was $+0 \times 4$ per register. We believed this to be the case as the slave register sizes were set to 32 bits, or 4 bytes. So, for our design, since the base address for the AXI IP was `0x43C00000`, our subsequent registers were mapped as such;
+
+```vhdl
 slv_reg0 = 0x43C00000
 slv_reg1 = 0x43C00004
-slv_reg2 $=0 \times 43 C 00008$
-slv_regX $=0 \times 43 \mathrm{C} 00000+(4$ \* X$)$
-For example, with a 32-bit data bus, the design decodes address bits [5:2] to select among the 16 registers. The decoded value creates a 4-bit index (b"0000" to b"1111") that selects registers slv_reg0 through slv_reg15.
+slv_reg2 = 0x43C00008
+slv_reg3 = 0x43C00000 + (4 * X)
+```
+
+For example, with a 32-bit data bus, the design decodes address bits `[5:2]` to select among the 16 registers. The decoded value creates a 4-bit index (b"0000" to b"1111") that selects registers slv_reg0 through slv_reg15.
 
 ## 7. How does the PPM state machine get access to the IP core's Memory Mapped registers:
 
@@ -87,15 +95,17 @@ In AXI, a write transaction requires both address and data channels to be valid.
 
 This is implemented in the code with:
 
-1 slv_reg_wren <= axi_wready AND S_AXI_WVALID AND axi_awready AND S_AXI_AWVALID;
+```vhdl
+slv_reg_wren <= axi_wready AND S_AXI_WVALID AND axi_awready AND S_AXI_AWVALID;
+```
 
 When this signal is asserted, the design decodes the address to determine which register to write to:
 
 1. The address comes from axi_awaddr, which latches the AXI address S_AXI_AWADDR when a valid address is presented
 2. The address is decoded by extracting the relevant bits:
 
-```
-1 loc_addr := axi_awaddr(ADDR_LSB + OPT_MEM_ADDR_BITS DOWNTO ADDR_LSB);
+```vhdl
+loc_addr := axi_awaddr(ADDR_LSB + OPT_MEM_ADDR_BITS DOWNTO ADDR_LSB);
 ```
 
 3. A CASE statement selects the appropriate register based on the decoded address
@@ -103,26 +113,30 @@ When this signal is asserted, the design decodes the address to determine which 
 
 ## 9. Read Enable Process
 
-The read enable signal ( slv_reg_rden ) is generated when:
+The read enable signal (`slv_reg_rden`) is generated when:
 
-1. The slave is ready to accept a read address (axi_arready = '1')
-2. The master is presenting a valid read address ( S_AXI_ARVALID = '1')
+1. The slave is ready to accept a read address (`axi_arready = '1'`)
+2. The master is presenting a valid read address (`S_AXI_ARVALID = '1'`)
 3. The read data channel is not already valid (NOT axi_rvalid)
 
 This is implemented with:
 
-1 slv_reg_rden <= axi_arready AND S_AXI_ARVALID AND (NOT axi_rvalid);
+```vhdl
+slv_reg_rden <= axi_arready AND S_AXI_ARVALID AND (NOT axi_rvalid);
+```
 
-When a read is enabled:
+> [!note]+ When a read is enabled:
+> The address comes from axi_araddr, which latches `S_AXI_ARADDR` when presented.
 
-1. The address comes from axi_araddr, which latches S_AXI_ARADDR when presented
-2. The address is decoded similar to writes:
+The address is decoded similar to writes:
 
-1 loc_addr := axi_araddr(ADDR_LSB + OPT_MEM_ADDR_BITS DOWNTO ADDR_LSB);
+```vhdl
+loc_addr := axi_araddr(ADDR_LSB + OPT_MEM_ADDR_BITS DOWNTO ADDR_LSB);
+```
 
 1. A CASE statement selects the appropriate register to output based on the decoded address
 2. The selected register value is placed in reg_data_out
-3. When slv_reg_rden is asserted, reg_data_out is loaded into axi_rdata to be sent to the master
+3. When `slv_reg_rden` is asserted, `reg_data_out` is loaded into `axi_rdata` to be sent to the master
 
 ## 10. Starting from the generic FSMs in your HW-1 write-up, update the User Logic module such that the design can appropriately capture and generate PPM values for the Hobby King 6ch transmitter as described above.
 
@@ -134,7 +148,7 @@ Since both subsections worked individually on this lab, our approaches to finite
 
 The PPM detect state machine ( Capture_PPM_simp.vhd ) is instantiated in the AXI interface model and relayed into the AXI slave and the respective registers.
 
-```
+```vhdl
 Capture_PPM_simp_inst : Capture_PPM_simp
     port map (
         PPM_Input => PPM_Input,
@@ -158,11 +172,11 @@ For further technical details, this FSM is built with three processes. Two clock
 
 ## 13. IDLE_DETECT
 
-This is the anti-mid-frame logic which counts to 5 ms during a consecutive high input before moving to the next state, IDLE.
+This is the anti-mid-frame logic which counts to 5 ms during a consecutive high input before moving to the next state, `IDLE`.
 
 ## 14. IDLE
 
-The IDLE state indicates the that the current PPM signal is sitting at the idle segment where no channels are being communicated. This state looks for a stable low before continuing to the first interchannel.
+The `IDLE` state indicates the that the current PPM signal is sitting at the idle segment where no channels are being communicated. This state looks for a stable low before continuing to the first interchannel.
 
 ## 15. INTERCHANNEL
 
@@ -238,7 +252,7 @@ This state is similar to DONE_IDLE as it indicates that the FSM is done counting
 
 The PPM detector state machine (detect_fsm ) is instantiated in the AXI slave interface module and has its ports connected to signals/ports defined in the slave interface.
 
-```
+```vhdl
 detect_fsm : ENTITY ppm.detect_fsm PORT MAP
 (
     i_clk => S_AXI_ACLK,
@@ -261,7 +275,7 @@ The detector FSM:
 
 The results from the detector are then written to the appropriate registers ( slv_reg2 through slv_reg7 ) in a dedicated process:
 
-```
+```vhdl
 DETECT_PPM_UPDATE : PROCESS (S_AXI_ACLK) IS
 BEGIN
     IF (rising_edge(S_AXI_ACLK)) THEN
@@ -287,14 +301,14 @@ Inside the detect_fsm module exists the FSM itself, the pulse counter, the chann
 
 The VHDL for the pulse width counter and the channel counter is shown below:
 
-```
-2 PULSE_WIDTH_COUNTER : process(s_pulse_counter_rst_n, i_clk) is
-3 begin
-4 -- Async reset
-5 if(s_pulse_counter_rst_n = '0') then
-6 s_count <= (others => '0');
-7 elsif(rising_edge(i_clk)) then
-8
+```vhdl
+PULSE_WIDTH_COUNTER : process(s_pulse_counter_rst_n, i_clk) is
+begin
+-- Async reset
+if(s_pulse_counter_rst_n = '0') then
+s_count <= (others => '0');
+elsif(rising_edge(i_clk)) then
+
 -- Channel counter
     CHANNEL_COUNTER : process(i_rst_n, i_clk) is
     begin
@@ -318,7 +332,7 @@ The rest of the VHDL can be found in our submission. Many sections were left out
 
 The PPM generator state machine is similarly instantiated and connected:
 
-```
+```vhdl
 generate_fsm : ENTITY ppm.generate_fsm
     GENERIC MAP(
     N => C_S_AXI_DATA_WIDTH
@@ -327,7 +341,7 @@ generate_fsm : ENTITY ppm.generate_fsm
     i_clk => S_AXI_ACLK,
 ```
 
-```
+```vhdl
     i_rst => S_AXI_ARESETN,
     i_slv_reg20 => s_gen_reg20,
     i_slv_reg21 => s_gen_reg21,
@@ -337,12 +351,12 @@ generate_fsm : ENTITY ppm.generate_fsm
     );
 ```
 
-The generator FSM receives its configuration values through intermediate signals ( s_gen_reg20 through s_gen_reg25). These signals are updated in a separate process that determines whether to source the values from:
+The generator FSM receives its configuration values through intermediate signals (`s_gen_reg20` through `s_gen_reg25`). These signals are updated in a separate process that determines whether to source the values from:
 
 1. Software mode (slv_reg8 through slv_reg13) when slv_reg0(0) = '1'
 2. Hardware relay mode (slv_reg2 through slv_reg7) when slv_reg0(0) = '0'
 
-```
+```vhdl
 GENERATE_PPM_UPDATE : PROCESS (S_AXI_ACLK) IS
 BEGIN
     IF rising_edge(S_AXI_ACLK) THEN
@@ -362,6 +376,6 @@ END PROCESS GENERATE_PPM_UPDATE;
 ## 31. Key Architecture Points
 
 1. No Direct Register Access: The FSMs don't directly read from or write to the AXI interface. Instead, they interface through signals and dedicated processes.
-2. Intermediary Signals: All communication between the AXI interface and the state machines occurs through intermediary signals (e.g., s_ppm_count, s_detect_reg_sel, etc.)
+2. Intermediary Signals: All communication between the AXI interface and the state machines occurs through intermediary signals (e.g., `s_ppm_count`, `s_detect_reg_sel`, etc.)
 3. Dedicated Update Processes: Separate processes handle the transfer of data between the state machines and registers, acting as a bridge between the AXI domain and the functional logic.
 4. Synchronous Updates: All updates happen synchronously with the AXI clock, ensuring consistent timing between the bus interface and the internal state machines.

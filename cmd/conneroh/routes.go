@@ -24,8 +24,8 @@ func AddRoutes(
 	h *http.ServeMux,
 	db *bun.DB,
 ) error {
-	slog.Info("adding routes")
-	defer slog.Info("added routes")
+	slog.Debug("adding routes")
+	defer slog.Debug("added routes")
 
 	h.Handle("GET /dist/", http.FileServer(http.FS(static.Dist)))
 

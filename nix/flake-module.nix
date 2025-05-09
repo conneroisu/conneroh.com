@@ -1,11 +1,5 @@
 {
-  perSystem = {
-    self',
-    config,
-    inputs',
-    pkgs,
-    system,
-    ...
-  }: {
-  };
+  imports = [
+    ./shells/flake-module.nix
+  ];
 }

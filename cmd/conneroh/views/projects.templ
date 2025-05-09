@@ -12,24 +12,6 @@ templ Project(
 	<div
 		class={ twerge.It("px-4 container mx-auto py-8") }
 	>
-		<div
-			class={ twerge.It("mb-8") }
-		>
-			<h1
-				class={ twerge.It("font-bold text-white mb-4 text-4xl") }
-			>
-				{ project.Title }
-			</h1>
-			if len(project.Tags) > 0 {
-				<div
-					class={ twerge.It("mb-6 flex-row flex gap-2") }
-				>
-					for _, tag := range project.Tags {
-						@components.TagControl(tag)
-					}
-				</div>
-			}
-		</div>
 		if project.BannerPath != "" {
 			@components.Image(
 				project.BannerPath,
@@ -43,6 +25,11 @@ templ Project(
 			<div
 				class={ twerge.It("pb-4 mb-4 border-b border-gray-700") }
 			>
+				<h1
+					class={ twerge.It("font-bold text-white mb-4 text-4xl") }
+				>
+					{ project.Title }
+				</h1>
 				<h2
 					class={ twerge.It("font-semibold text-white text-2xl") }
 				>
@@ -60,6 +47,28 @@ templ Project(
 				>
 					{ project.Description }
 				</p>
+				<div
+					class={ twerge.It("mb-8") }
+				>
+					if len(project.Tags) > 0 {
+						<span class={ twerge.It("text-gray-400 text-sm pr-2") }>
+							Tags:
+						</span>
+						for _, tag := range project.Tags {
+							<a
+								href={ templ.SafeURL(tag.PagePath()) }
+								hx-get={ templ.SafeURL(tag.PagePath()) }
+								hx-trigger="click"
+								hx-swap="outerHTML"
+								preload="mouseover"
+								hx-target="#bodiody"
+								class={ twerge.It("text-gray-400 text-sm hover:underline hover:text-blue-400 transition-colors duration-200 pr-2") }
+							>
+								#{ tag.Slug }
+							</a>
+						}
+					}
+				</div>
 				<div
 					class={ twerge.It("items-center text-sm text-gray-400 mt-6 flex") }
 				>

@@ -1,7 +1,6 @@
 package views
 
 import (
-	"fmt"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
 	"github.com/conneroisu/conneroh.com/internal/assets"
 	"github.com/conneroisu/twerge"
@@ -11,60 +10,93 @@ import (
 templ Post(
 	post *assets.Post,
 ) {
-	<article
+	<div
 		class={ twerge.It("px-4 container mx-auto py-8") }
 	>
-		<div
-			class={ twerge.It("mb-8") }
-		>
-			<h1
-				class={ twerge.It("font-bold text-white mb-4 text-4xl") }
-			>
-				{ post.Title }
-			</h1>
-			<div
-				class={ twerge.It("mb-6 flex items-center text-gray-400") }
-			>
-				<span class="mr-2">
-					🗓
-				</span>
-				<time>
-					{ post.CreatedAt.Format("Jan 2, 2006") }
-				</time>
-				<span
-					class={ twerge.It("mx-2") }
-				>
-					•
-				</span>
-				<span>{ readTime(post.Content) } min read</span>
-			</div>
-			<div
-				class={ twerge.It("flex flex-wrap gap-2 mb-8") }
-			>
-				for _, tag := range post.Tags {
-					<a
-						href={ templ.SafeURL(fmt.Sprintf("/tag/%s", tag.Slug)) }
-						class={ twerge.It("px-3 font-medium text-sm py-1 inline-block hover:bg-blue-800 text-blue-200 bg-blue-900 rounded-full transition-colors") }
-					>
-						{ tag.Slug }
-					</a>
-				}
-			</div>
-			if post.BannerPath != "" {
-				@components.Image(
-					post.BannerPath,
-					post.Title,
-					twerge.It("w-full md:h-96 object-center rounded-lg object-cover shadow-md mb-8 h-64"),
-				)
-			}
-		</div>
+		if post.BannerPath != "" {
+			@components.Image(
+				post.BannerPath,
+				post.Title,
+				twerge.It("w-full md:h-96 object-center rounded-lg object-cover shadow-md mb-8 h-64"),
+			)
+		}
 		<div
 			class={ twerge.It("bg-gray-800 rounded-lg mb-8 overflow-hidden p-6 shadow-lg") }
 		>
 			<div
+				class={ twerge.It("pb-4 mb-4 border-b border-gray-700") }
+			>
+				<h1
+					class={ twerge.It("font-bold text-white mb-4 text-4xl") }
+				>
+					{ post.Title }
+				</h1>
+				<h2
+					class={ twerge.It("font-semibold text-white text-2xl") }
+				>
+					About this post
+				</h2>
+				<div
+					class={ twerge.It("h-1 bg-blue-500 mt-2 w-16") }
+				></div>
+			</div>
+			<div
+				class={ twerge.It("max-w-none") }
+			>
+				<p
+					class={ twerge.It("leading-relaxed whitespace-pre-line text-gray-300") }
+				>
+					{ post.Description }
+				</p>
+				<div
+					class={ twerge.It("mb-8") }
+				>
+					if len(post.Tags) > 0 {
+						<span class={ twerge.It("text-gray-400 text-sm pr-2") }>
+							Tags:
+						</span>
+						for _, tag := range post.Tags {
+							<a
+								href={ templ.SafeURL(tag.PagePath()) }
+								hx-get={ templ.SafeURL(tag.PagePath()) }
+								hx-trigger="click"
+								hx-swap="outerHTML"
+								preload="mouseover"
+								hx-target="#bodiody"
+								class={ twerge.It("text-gray-400 text-sm hover:underline hover:text-blue-400 transition-colors duration-200 pr-2") }
+							>
+								#{ tag.Slug }
+							</a>
+						}
+					}
+				</div>
+				<div
+					class={ twerge.It("items-center text-sm text-gray-400 mt-6 flex") }
+				>
+					@components.Icon("calendar", templ.Attributes{})
+					<span>Created: { post.CreatedAt.Format("Jan 2, 2006") }</span>
+				</div>
+				<span
+					class={ twerge.It("items-center text-sm text-gray-400 mt-6 flex") }
+				>
+					• { readTime(post.Content) } min read
+				</span>
+			</div>
+		</div>
+		<div
+			class={ twerge.It("bg-gray-800 rounded-lg mb-8 overflow-hidden p-6 shadow-lg") }
+		>
+			<h2
+				class={ twerge.It("text-white mb-4 text-2xl font-semibold") }
+			>
+				Content
+			</h2>
+			<div
 				class={ twerge.It("max-w-none my-6 text-gray-300 leading-relaxed") }
 			>
-				@templ.Raw(post.Content)
+				<article>
+					@templ.Raw(post.Content)
+				</article>
 			</div>
 		</div>
 		if len(post.Projects) > 0 {
@@ -118,7 +150,7 @@ templ Post(
 				</div>
 			</div>
 		}
-	</article>
-	<script src="https://utteranc.es/client.js" repo="conneroisu/conneroh.com" issue-term="pathname" label="post" theme="github-dark" crossorigin="anonymous" async>
+		<script src="https://utteranc.es/client.js" repo="conneroisu/conneroh.com" issue-term="pathname" label="post" theme="github-dark" crossorigin="anonymous" async>
 </script>
+	</div>
 }

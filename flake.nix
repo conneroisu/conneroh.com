@@ -18,7 +18,7 @@
       {self, ...}: {
         systems = import inputs.systems;
         imports = [
-          ./nix/shells/flake-module.nix
+          ./nix/flake-module.nix
         ];
 
         perSystem = {
