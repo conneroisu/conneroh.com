@@ -1,7 +1,6 @@
 package views
 
 import (
-	"fmt"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
 	"github.com/conneroisu/conneroh.com/internal/assets"
 	"github.com/conneroisu/twerge"
@@ -22,6 +21,24 @@ templ Post(
 			>
 				{ post.Title }
 			</h1>
+			if len(post.Tags) > 0 {
+				<span class={ twerge.It("text-gray-400 text-sm pr-2") }>
+					Tags:
+				</span>
+				for _, tag := range post.Tags {
+					<a
+						href={ templ.SafeURL(tag.PagePath()) }
+						hx-get={ templ.SafeURL(tag.PagePath()) }
+						hx-trigger="click"
+						hx-swap="outerHTML"
+						preload="mouseover"
+						hx-target="#bodiody"
+						class={ twerge.It("text-gray-400 text-sm hover:underline hover:text-blue-400 transition-colors duration-200 pr-2") }
+					>
+						#{ tag.Slug }
+					</a>
+				}
+			}
 			<div
 				class={ twerge.It("mb-6 flex items-center text-gray-400") }
 			>
@@ -37,18 +54,6 @@ templ Post(
 					•
 				</span>
 				<span>{ readTime(post.Content) } min read</span>
-			</div>
-			<div
-				class={ twerge.It("flex flex-wrap gap-2 mb-8") }
-			>
-				for _, tag := range post.Tags {
-					<a
-						href={ templ.SafeURL(fmt.Sprintf("/tag/%s", tag.Slug)) }
-						class={ twerge.It("px-3 font-medium text-sm py-1 inline-block hover:bg-blue-800 text-blue-200 bg-blue-900 rounded-full transition-colors") }
-					>
-						{ tag.Slug }
-					</a>
-				}
 			</div>
 			if post.BannerPath != "" {
 				@components.Image(
