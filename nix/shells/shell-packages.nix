@@ -9,7 +9,7 @@
   processes = ["app"];
   version = self'.shortRev or "dirty";
   src = ./../../.;
-  # Create a derivation for the database file
+
   databaseFiles = pkgs.runCommand "database-files" {} ''
     mkdir -p $out/root
     cp ${./../../master.db} $out/root/master.db
