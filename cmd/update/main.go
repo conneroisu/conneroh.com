@@ -62,6 +62,18 @@ func Run(ctx context.Context, getenv func(string) string, numWorkers, bufferSize
 	if err != nil {
 		return eris.Wrap(err, "failed to open database")
 	}
+	defer func() {
+		_, Verr := sqldb.Exec("PRAGMA journal_mode = OFF;")
+		if Verr != nil {
+			slog.Error("failed to vacuum database", "err", Verr)
+			return
+		}
+		_, Verr = sqldb.Exec("VACUUM;")
+		if Verr != nil {
+			slog.Error("failed to vacuum database", "err", Verr)
+			return
+		}
+	}()
 	defer sqldb.Close()
 
 	// Initialize BUN DB
