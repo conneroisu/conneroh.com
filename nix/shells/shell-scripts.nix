@@ -68,16 +68,9 @@
     };
     generate-db = {
       exec = ''
-        # Run update from PATH if available, or build it if needed
-        if command -v update >/dev/null 2>&1; then
-          doppler run -- update
-        else
-          echo "update command not found, building it first..."
-          nix build .#update --no-link
-          nix run .#update
-        fi
+        doppler run -- update
       '';
-      deps = with pkgs; [doppler];
+      deps = with pkgs; [doppler self'.packages.update];
       description = "Update the generated go files from the md docs.";
     };
     generate-reload = {

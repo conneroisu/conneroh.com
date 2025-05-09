@@ -10,23 +10,23 @@ func SetCache() {
 var ClassMapStr = map[string]twerge.CacheValue{
 	"-right-4 h-24 -bottom-4 rounded-full w-24 z-0 absolute bg-purple-600": twerge.CacheValue{
 		Generated: "tw-25",
-		Merged:    "-bottom-4 rounded-full z-0 bg-purple-600 w-24 absolute h-24 -right-4",
+		Merged:    "w-24 h-24 z-0 absolute bg-purple-600 -right-4 -bottom-4 rounded-full",
 	},
 	"absolute z-10 grid sm:grid-cols-2 md:grid-cols-3": twerge.CacheValue{
-		Generated: "tw-44",
-		Merged:    "md:grid-cols-3 absolute z-10 grid sm:grid-cols-2",
+		Generated: "tw-49",
+		Merged:    "absolute z-10 grid sm:grid-cols-2 md:grid-cols-3",
 	},
 	"animate-spin h-5 w-5": twerge.CacheValue{
 		Generated: "tw-85",
-		Merged:    "w-5 animate-spin h-5",
+		Merged:    "animate-spin h-5 w-5",
 	},
 	"bg-blue-500 p-8 rounded-lg shadow-md text-center": twerge.CacheValue{
-		Generated: "tw-130",
-		Merged:    "rounded-lg shadow-md bg-blue-500 text-center p-8",
+		Generated: "tw-124",
+		Merged:    "shadow-md text-center rounded-lg bg-blue-500 p-8",
 	},
 	"bg-blue-600 font-medium px-3 py-2 text-white rounded-md": twerge.CacheValue{
 		Generated: "tw-93",
-		Merged:    "py-2 rounded-md bg-blue-600 px-3 font-medium text-white",
+		Merged:    "bg-blue-600 rounded-md font-medium px-3 text-white py-2",
 	},
 	"bg-gradient-to-b from-gray-900 to-gray-800 py-20": twerge.CacheValue{
 		Generated: "tw-11",
@@ -34,55 +34,51 @@ var ClassMapStr = map[string]twerge.CacheValue{
 	},
 	"bg-gray-700 w-12 text-gray-300 justify-center hover:bg-gray-800 transition-colors rounded-full h-12 items-center flex": twerge.CacheValue{
 		Generated: "tw-59",
-		Merged:    "hover:bg-gray-800 transition-colors h-12 items-center flex text-gray-300 justify-center rounded-full bg-gray-700 w-12",
+		Merged:    "items-center w-12 transition-colors hover:bg-gray-800 h-12 flex bg-gray-700 text-gray-300 justify-center rounded-full",
 	},
 	"bg-gray-800 border-t border-gray-700 py-12": twerge.CacheValue{
 		Generated: "tw-66",
-		Merged:    "py-12 border-t bg-gray-800 border-gray-700",
+		Merged:    "border-gray-700 bg-gray-800 py-12 border-t",
 	},
 	"bg-gray-800 p-8 rounded-lg space-y-6 shadow-md": twerge.CacheValue{
 		Generated: "tw-61",
-		Merged:    "space-y-6 rounded-lg shadow-md p-8 bg-gray-800",
+		Merged:    "space-y-6 shadow-md p-8 rounded-lg bg-gray-800",
 	},
 	"bg-gray-800 py-16": twerge.CacheValue{
 		Generated: "tw-27",
 		Merged:    "bg-gray-800 py-16",
 	},
 	"bg-gray-800 rounded-lg mb-8 overflow-hidden p-6 shadow-lg": twerge.CacheValue{
-		Generated: "tw-107",
-		Merged:    "bg-gray-800 rounded-lg mb-8 p-6 overflow-hidden shadow-lg",
+		Generated: "tw-106",
+		Merged:    "rounded-lg overflow-hidden p-6 bg-gray-800 mb-8 shadow-lg",
 	},
 	"bg-gray-800 transition-all flex transform hover:-translate-y-3 flex-col shadow-md rounded-lg hover:shadow-lg duration-300 overflow-hidden h-full cursor-pointer": twerge.CacheValue{
 		Generated: "tw-99",
-		Merged:    "transform h-full bg-gray-800 flex-col hover:shadow-lg cursor-pointer transition-all shadow-md overflow-hidden flex hover:-translate-y-3 rounded-lg duration-300",
-	},
-	"bg-gray-800 transition-all flex transform hover:-translate-y-3 flex-col shadow-md rounded-lg hover:shadow-lg duration-300 overflow-hidden h-full": twerge.CacheValue{
-		Generated: "tw-112",
-		Merged:    "rounded-lg transform hover:-translate-y-3 hover:shadow-lg transition-all flex-col shadow-md flex duration-300 overflow-hidden h-full bg-gray-800",
+		Merged:    "cursor-pointer duration-300 h-full bg-gray-800 transition-all flex hover:-translate-y-3 flex-col shadow-md overflow-hidden hover:shadow-lg transform rounded-lg",
 	},
 	"bg-gray-900 py-16": twerge.CacheValue{
-		Generated: "tw-45",
+		Generated: "tw-43",
 		Merged:    "bg-gray-900 py-16",
 	},
 	"bg-gray-900 transition-all flex transform hover:-translate-y-3 flex-col shadow-md rounded-lg hover:shadow-lg duration-300 overflow-hidden h-full cursor-pointer": twerge.CacheValue{
 		Generated: "tw-32",
-		Merged:    "shadow-md cursor-pointer rounded-lg overflow-hidden transform h-full bg-gray-900 flex hover:-translate-y-3 flex-col hover:shadow-lg duration-300 transition-all",
+		Merged:    "hover:shadow-lg flex transform hover:-translate-y-3 cursor-pointer shadow-md rounded-lg h-full duration-300 overflow-hidden transition-all bg-gray-900 flex-col",
 	},
 	"bg-gray-900": twerge.CacheValue{
 		Generated: "tw-0",
 		Merged:    "bg-gray-900",
 	},
 	"bg-green-600 rounded-full p-4 w-16 h-16 flex items-center justify-center": twerge.CacheValue{
-		Generated: "tw-132",
-		Merged:    "bg-green-600 rounded-full w-16 flex justify-center h-16 items-center p-4",
+		Generated: "tw-126",
+		Merged:    "flex justify-center bg-green-600 rounded-full w-16 p-4 items-center h-16",
 	},
 	"border-b border-gray-700 mb-6": twerge.CacheValue{
-		Generated: "tw-125",
+		Generated: "tw-119",
 		Merged:    "mb-6 border-b border-gray-700",
 	},
 	"border-gray-700 border-b p-3": twerge.CacheValue{
 		Generated: "tw-80",
-		Merged:    "border-b p-3 border-gray-700",
+		Merged:    "p-3 border-b border-gray-700",
 	},
 	"border-gray-800 border-b": twerge.CacheValue{
 		Generated: "tw-1",
@@ -90,7 +86,7 @@ var ClassMapStr = map[string]twerge.CacheValue{
 	},
 	"container mx-auto lg:px-8 sm:px-6 px-4": twerge.CacheValue{
 		Generated: "tw-2",
-		Merged:    "container mx-auto lg:px-8 sm:px-6 px-4",
+		Merged:    "px-4 lg:px-8 sm:px-6 container mx-auto",
 	},
 	"container mx-auto px-4": twerge.CacheValue{
 		Generated: "tw-67",
@@ -102,35 +98,35 @@ var ClassMapStr = map[string]twerge.CacheValue{
 	},
 	"flex flex-col md:flex-row justify-between items-center": twerge.CacheValue{
 		Generated: "tw-68",
-		Merged:    "md:flex-row justify-between items-center flex flex-col",
+		Merged:    "items-center flex flex-col md:flex-row justify-between",
 	},
 	"flex flex-wrap gap-2 mb-8": twerge.CacheValue{
 		Generated: "tw-105",
-		Merged:    "mb-8 flex flex-wrap gap-2",
+		Merged:    "flex flex-wrap gap-2 mb-8",
 	},
 	"flex flex-wrap gap-4 justify-center": twerge.CacheValue{
 		Generated: "tw-72",
-		Merged:    "justify-center flex flex-wrap gap-4",
+		Merged:    "flex flex-wrap gap-4 justify-center",
 	},
 	"flex justify-center items-center mt-8 space-x-2": twerge.CacheValue{
 		Generated: "tw-90",
-		Merged:    "items-center mt-8 space-x-2 flex justify-center",
+		Merged:    "flex justify-center items-center mt-8 space-x-2",
 	},
 	"flex md:hidden space-x-2": twerge.CacheValue{
 		Generated: "tw-96",
-		Merged:    "space-x-2 flex md:hidden",
+		Merged:    "flex md:hidden space-x-2",
 	},
 	"flex text-white justify-center inset-0 font-bold items-center absolute text-xl": twerge.CacheValue{
 		Generated: "tw-23",
-		Merged:    "font-bold text-white justify-center items-center absolute text-xl flex inset-0",
+		Merged:    "justify-center flex inset-0 items-center absolute text-xl text-white font-bold",
 	},
 	"flex-col lg:flex-row items-center justify-between flex": twerge.CacheValue{
 		Generated: "tw-13",
-		Merged:    "flex-col lg:flex-row items-center justify-between flex",
+		Merged:    "items-center justify-between flex flex-col lg:flex-row",
 	},
 	"flex-grow flex p-6 flex-col": twerge.CacheValue{
 		Generated: "tw-35",
-		Merged:    "flex-grow p-6 flex-col flex",
+		Merged:    "flex-grow flex-col flex p-6",
 	},
 	"flex-wrap gap-4 flex": twerge.CacheValue{
 		Generated: "tw-18",
@@ -138,18 +134,18 @@ var ClassMapStr = map[string]twerge.CacheValue{
 	},
 	"font-bold text-white mb-4 text-4xl": twerge.CacheValue{
 		Generated: "tw-102",
-		Merged:    "font-bold text-white mb-4 text-4xl",
+		Merged:    "text-4xl font-bold text-white mb-4",
 	},
 	"font-medium border-gray-600 py-3 rounded-md px-6 text-gray-300 transition-colors hover:bg-gray-800 border": twerge.CacheValue{
 		Generated: "tw-20",
-		Merged:    "text-gray-300 hover:bg-gray-800 py-3 font-medium rounded-md px-6 transition-colors border border-gray-600",
+		Merged:    "text-gray-300 hover:bg-gray-800 rounded-md py-3 transition-colors font-medium border-gray-600 px-6 border",
 	},
 	"font-medium flex items-center text-blue-400 hover:underline text-lg": twerge.CacheValue{
 		Generated: "tw-30",
-		Merged:    "text-lg font-medium flex items-center text-blue-400 hover:underline",
+		Merged:    "font-medium flex items-center text-blue-400 hover:underline text-lg",
 	},
 	"font-semibold text-white text-2xl": twerge.CacheValue{
-		Generated: "tw-116",
+		Generated: "tw-110",
 		Merged:    "font-semibold text-white text-2xl",
 	},
 	"font-semibold text-white text-xl": twerge.CacheValue{
@@ -158,19 +154,15 @@ var ClassMapStr = map[string]twerge.CacheValue{
 	},
 	"gap-6 grid grid-cols-1 md:grid-cols-2": twerge.CacheValue{
 		Generated: "tw-62",
-		Merged:    "grid-cols-1 md:grid-cols-2 gap-6 grid",
+		Merged:    "grid grid-cols-1 md:grid-cols-2 gap-6",
 	},
 	"grid grid-cols-1 lg:grid-cols-2 gap-8": twerge.CacheValue{
-		Generated: "tw-46",
-		Merged:    "gap-8 grid grid-cols-1 lg:grid-cols-2",
-	},
-	"grid grid-cols-1 md:grid-cols-2 gap-4": twerge.CacheValue{
-		Generated: "tw-111",
-		Merged:    "grid grid-cols-1 md:grid-cols-2 gap-4",
+		Generated: "tw-44",
+		Merged:    "grid-cols-1 lg:grid-cols-2 gap-8 grid",
 	},
 	"grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8": twerge.CacheValue{
 		Generated: "tw-50",
-		Merged:    "gap-8 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4",
+		Merged:    "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8",
 	},
 	"grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 grid": twerge.CacheValue{
 		Generated: "tw-98",
@@ -178,35 +170,35 @@ var ClassMapStr = map[string]twerge.CacheValue{
 	},
 	"grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 grid": twerge.CacheValue{
 		Generated: "tw-31",
-		Merged:    "md:grid-cols-2 lg:grid-cols-3 gap-8 grid grid-cols-1",
+		Merged:    "lg:grid-cols-3 gap-8 grid grid-cols-1 md:grid-cols-2",
 	},
 	"h-1 bg-blue-500 mt-2 w-16": twerge.CacheValue{
-		Generated: "tw-117",
-		Merged:    "w-16 h-1 bg-blue-500 mt-2",
+		Generated: "tw-111",
+		Merged:    "h-1 bg-blue-500 mt-2 w-16",
 	},
 	"h-12 transition-colors justify-center rounded-full text-gray-300 bg-gray-700 flex w-12 items-center hover:bg-red-500": twerge.CacheValue{
 		Generated: "tw-60",
-		Merged:    "flex text-gray-300 w-12 items-center hover:bg-red-500 justify-center rounded-full bg-gray-700 h-12 transition-colors",
+		Merged:    "text-gray-300 w-12 items-center transition-colors hover:bg-red-500 rounded-full h-12 bg-gray-700 flex justify-center",
 	},
 	"h-8 w-8 text-white": twerge.CacheValue{
-		Generated: "tw-133",
+		Generated: "tw-127",
 		Merged:    "h-8 w-8 text-white",
 	},
 	"hidden md:flex space-x-2": twerge.CacheValue{
 		Generated: "tw-92",
-		Merged:    "hidden md:flex space-x-2",
+		Merged:    "md:flex space-x-2 hidden",
 	},
 	"hover:bg-blue-400 w-12 rounded-full bg-gray-700 transition-colors flex text-gray-300 h-12 items-center justify-center": twerge.CacheValue{
 		Generated: "tw-58",
-		Merged:    "w-12 bg-gray-700 transition-colors h-12 hover:bg-blue-400 justify-center rounded-full flex items-center text-gray-300",
+		Merged:    "hover:bg-blue-400 w-12 items-center bg-gray-700 justify-center rounded-full flex text-gray-300 h-12 transition-colors",
 	},
 	"hover:bg-blue-800 flex font-medium text-blue-200 px-3 py-1 flex-row text-sm hover:underline rounded-full h-8 items-center transition-colors justify-between bg-blue-900": twerge.CacheValue{
-		Generated: "tw-39",
-		Merged:    "py-1 hover:underline rounded-full h-8 transition-colors items-center justify-between px-3 text-sm bg-blue-900 flex flex-row text-blue-200 hover:bg-blue-800 font-medium",
+		Generated: "tw-41",
+		Merged:    "h-8 justify-between hover:underline items-center bg-blue-900 flex-row text-sm rounded-full transition-colors flex py-1 hover:bg-blue-800 font-medium text-blue-200 px-3",
 	},
 	"hover:text-white cursor-pointer text-gray-300": twerge.CacheValue{
 		Generated: "tw-8",
-		Merged:    "cursor-pointer text-gray-300 hover:text-white",
+		Merged:    "hover:text-white cursor-pointer text-gray-300",
 	},
 	"hover:underline": twerge.CacheValue{
 		Generated: "tw-17",
@@ -217,7 +209,7 @@ var ClassMapStr = map[string]twerge.CacheValue{
 		Merged:    "htmx-indicator top-2.5 text-blue-500 absolute right-3",
 	},
 	"items-center flex pr-3": twerge.CacheValue{
-		Generated: "tw-40",
+		Generated: "tw-42",
 		Merged:    "items-center flex pr-3",
 	},
 	"items-center flex": twerge.CacheValue{
@@ -226,11 +218,11 @@ var ClassMapStr = map[string]twerge.CacheValue{
 	},
 	"items-center justify-between mb-3 flex p-6": twerge.CacheValue{
 		Generated: "tw-52",
-		Merged:    "justify-between mb-3 flex items-center p-6",
+		Merged:    "items-center mb-3 justify-between flex p-6",
 	},
 	"items-center text-sm text-gray-400 mt-6 flex": twerge.CacheValue{
-		Generated: "tw-120",
-		Merged:    "items-center text-sm text-gray-400 mt-6 flex",
+		Generated: "tw-114",
+		Merged:    "flex items-center text-sm text-gray-400 mt-6",
 	},
 	"justify-between h-16 flex items-center": twerge.CacheValue{
 		Generated: "tw-3",
@@ -238,43 +230,43 @@ var ClassMapStr = map[string]twerge.CacheValue{
 	},
 	"justify-between items-center mb-12 pr-4 flex flex-col md:flex-row": twerge.CacheValue{
 		Generated: "tw-28",
-		Merged:    "pr-4 flex flex-col md:flex-row justify-between items-center mb-12",
+		Merged:    "md:flex-row justify-between items-center mb-12 pr-4 flex flex-col",
 	},
 	"justify-center gap-4 mb-8 flex flex-wrap": twerge.CacheValue{
 		Generated: "tw-57",
-		Merged:    "justify-center gap-4 mb-8 flex flex-wrap",
+		Merged:    "flex flex-wrap justify-center gap-4 mb-8",
 	},
 	"leading-relaxed whitespace-pre-line text-gray-300": twerge.CacheValue{
-		Generated: "tw-119",
-		Merged:    "leading-relaxed whitespace-pre-line text-gray-300",
+		Generated: "tw-113",
+		Merged:    "text-gray-300 leading-relaxed whitespace-pre-line",
 	},
 	"lg:w-1/2 mb-10 lg:mb-0": twerge.CacheValue{
 		Generated: "tw-14",
-		Merged:    "lg:mb-0 lg:w-1/2 mb-10",
+		Merged:    "lg:w-1/2 mb-10 lg:mb-0",
 	},
 	"lg:w-1/2 relative": twerge.CacheValue{
 		Generated: "tw-21",
 		Merged:    "lg:w-1/2 relative",
 	},
 	"max-w-none my-6 text-gray-300 leading-relaxed": twerge.CacheValue{
-		Generated: "tw-108",
-		Merged:    "max-w-none my-6 text-gray-300 leading-relaxed",
+		Generated: "tw-107",
+		Merged:    "text-gray-300 leading-relaxed max-w-none my-6",
 	},
 	"max-w-none": twerge.CacheValue{
-		Generated: "tw-118",
+		Generated: "tw-112",
 		Merged:    "max-w-none",
 	},
 	"mb-1 block text-sm font-medium text-gray-300": twerge.CacheValue{
 		Generated: "tw-63",
-		Merged:    "text-gray-300 mb-1 block text-sm font-medium",
+		Merged:    "mb-1 block text-sm font-medium text-gray-300",
 	},
 	"mb-12 text-center": twerge.CacheValue{
-		Generated: "tw-122",
-		Merged:    "text-center mb-12",
+		Generated: "tw-116",
+		Merged:    "mb-12 text-center",
 	},
 	"mb-3 text-xl hover:underline font-semibold text-white line-clamp-2": twerge.CacheValue{
 		Generated: "tw-36",
-		Merged:    "hover:underline font-semibold text-white line-clamp-2 mb-3 text-xl",
+		Merged:    "hover:underline font-semibold text-white mb-3 text-xl line-clamp-2",
 	},
 	"mb-4 grid-cols-2 grid flex-wrap gap-2": twerge.CacheValue{
 		Generated: "tw-38",
@@ -282,27 +274,23 @@ var ClassMapStr = map[string]twerge.CacheValue{
 	},
 	"mb-4 md:text-5xl text-4xl leading-tight font-bold lg:text-6xl text-white": twerge.CacheValue{
 		Generated: "tw-15",
-		Merged:    "mb-4 text-4xl lg:text-6xl text-white md:text-5xl leading-tight font-bold",
+		Merged:    "md:text-5xl text-4xl leading-tight font-bold mb-4 lg:text-6xl text-white",
 	},
 	"mb-4 text-3xl font-bold text-white": twerge.CacheValue{
 		Generated: "tw-29",
-		Merged:    "font-bold text-white mb-4 text-3xl",
+		Merged:    "mb-4 text-3xl font-bold text-white",
 	},
 	"mb-6 flex items-center text-gray-400": twerge.CacheValue{
 		Generated: "tw-103",
-		Merged:    "mb-6 flex items-center text-gray-400",
+		Merged:    "flex items-center text-gray-400 mb-6",
 	},
 	"mb-6 flex justify-center": twerge.CacheValue{
-		Generated: "tw-131",
+		Generated: "tw-125",
 		Merged:    "mb-6 flex justify-center",
-	},
-	"mb-6 flex-row flex gap-2": twerge.CacheValue{
-		Generated: "tw-113",
-		Merged:    "mb-6 flex-row flex gap-2",
 	},
 	"mb-6 md:mb-0": twerge.CacheValue{
 		Generated: "tw-69",
-		Merged:    "md:mb-0 mb-6",
+		Merged:    "mb-6 md:mb-0",
 	},
 	"mb-8": twerge.CacheValue{
 		Generated: "tw-101",
@@ -318,7 +306,7 @@ var ClassMapStr = map[string]twerge.CacheValue{
 	},
 	"mt-8 pt-8 border-t border-gray-700 flex flex-col md:flex-row justify-between items-center": twerge.CacheValue{
 		Generated: "tw-74",
-		Merged:    "border-t border-gray-700 flex flex-col md:flex-row justify-between items-center mt-8 pt-8",
+		Merged:    "pt-8 border-gray-700 flex-col border-t flex md:flex-row justify-between items-center mt-8",
 	},
 	"mx-2": twerge.CacheValue{
 		Generated: "tw-104",
@@ -326,7 +314,7 @@ var ClassMapStr = map[string]twerge.CacheValue{
 	},
 	"mx-auto rounded-full h-64 bg-blue-600 relative md:w-80 md:h-80 w-64 shadow-lg": twerge.CacheValue{
 		Generated: "tw-22",
-		Merged:    "rounded-full h-64 relative md:w-80 w-64 mx-auto shadow-lg bg-blue-600 md:h-80",
+		Merged:    "w-64 shadow-lg relative md:w-80 mx-auto rounded-full h-64 bg-blue-600 md:h-80",
 	},
 	"opacity-25": twerge.CacheValue{
 		Generated: "tw-86",
@@ -337,84 +325,76 @@ var ClassMapStr = map[string]twerge.CacheValue{
 		Merged:    "opacity-75",
 	},
 	"overflow-hidden bg-gray-800 transform rounded-lg transition-all hover:shadow-lg duration-300 shadow-md hover:-translate-y-1 cursor-pointer": twerge.CacheValue{
-		Generated: "tw-47",
-		Merged:    "hover:shadow-lg rounded-lg shadow-md hover:-translate-y-1 bg-gray-800 transform duration-300 cursor-pointer transition-all overflow-hidden",
+		Generated: "tw-45",
+		Merged:    "duration-300 bg-gray-800 rounded-lg overflow-hidden transform transition-all shadow-md hover:-translate-y-1 cursor-pointer hover:shadow-lg",
 	},
 	"p-2 focus:outline-none sm:hidden hover:text-white hover:bg-gray-700 rounded-md text-gray-300 mr-2": twerge.CacheValue{
 		Generated: "tw-5",
-		Merged:    "focus:outline-none mr-2 rounded-md sm:hidden p-2 hover:text-white hover:bg-gray-700 text-gray-300",
+		Merged:    "hover:bg-gray-700 mr-2 sm:hidden text-gray-300 p-2 focus:outline-none hover:text-white rounded-md",
 	},
 	"p-4 inline-block": twerge.CacheValue{
-		Generated: "tw-123",
+		Generated: "tw-117",
 		Merged:    "p-4 inline-block",
 	},
 	"p-6 rounded-lg overflow-hidden bg-gray-800 shadow-md hover:shadow-lg duration-300 transform transition-all hover:-translate-y-1 cursor-pointer": twerge.CacheValue{
 		Generated: "tw-100",
-		Merged:    "rounded-lg transform p-6 duration-300 bg-gray-800 hover:shadow-lg transition-all overflow-hidden shadow-md hover:-translate-y-1 cursor-pointer",
+		Merged:    "transform cursor-pointer shadow-md duration-300 transition-all hover:-translate-y-1 overflow-hidden rounded-lg hover:shadow-lg bg-gray-800 p-6",
 	},
 	"p-6 rounded-lg overflow-hidden bg-gray-900 shadow-md hover:shadow-lg duration-300 transform transition-all hover:-translate-y-1": twerge.CacheValue{
 		Generated: "tw-51",
-		Merged:    "overflow-hidden transition-all rounded-lg duration-300 hover:-translate-y-1 p-6 bg-gray-900 transform shadow-md hover:shadow-lg",
+		Merged:    "duration-300 p-6 overflow-hidden shadow-md rounded-lg bg-gray-900 hover:-translate-y-1 hover:shadow-lg transform transition-all",
 	},
 	"p-6": twerge.CacheValue{
-		Generated: "tw-48",
+		Generated: "tw-46",
 		Merged:    "p-6",
 	},
 	"pb-4 mb-4 border-b border-gray-700": twerge.CacheValue{
-		Generated: "tw-115",
+		Generated: "tw-109",
 		Merged:    "pb-4 mb-4 border-b border-gray-700",
 	},
 	"pb-4 space-y-1 sm:hidden pt-2": twerge.CacheValue{
 		Generated: "tw-9",
 		Merged:    "sm:hidden pt-2 pb-4 space-y-1",
 	},
-	"pt-8 mt-12 border-t border-gray-700": twerge.CacheValue{
-		Generated: "tw-109",
-		Merged:    "pt-8 mt-12 border-t border-gray-700",
-	},
 	"px-1 sm:text-base text-sm font-medium py-4 border-b-2": twerge.CacheValue{
-		Generated: "tw-127",
-		Merged:    "font-medium text-sm py-4 border-b-2 px-1 sm:text-base",
+		Generated: "tw-121",
+		Merged:    "font-medium py-4 px-1 text-sm border-b-2 sm:text-base",
 	},
 	"px-2 text-gray-200 bottom-0 py-1 right-0 text-xs rounded-tl-md bg-blue-500 absolute": twerge.CacheValue{
-		Generated: "tw-42",
-		Merged:    "bottom-0 py-1 rounded-tl-md bg-blue-500 px-2 text-gray-200 right-0 text-xs absolute",
+		Generated: "tw-40",
+		Merged:    "right-0 text-xs bg-blue-500 py-1 rounded-tl-md absolute px-2 text-gray-200 bottom-0",
 	},
 	"px-3 bg-gray-800 transition-colors rounded-md border py-2 border-gray-700 text-gray-300 hover:bg-gray-700 flex items-center": twerge.CacheValue{
 		Generated: "tw-97",
-		Merged:    "bg-gray-800 rounded-md border-gray-700 text-gray-300 px-3 border transition-colors hover:bg-gray-700 py-2 flex items-center",
+		Merged:    "bg-gray-800 border flex items-center rounded-md text-gray-300 hover:bg-gray-700 py-2 border-gray-700 px-3 transition-colors",
 	},
 	"px-3 bg-gray-800 transition-colors rounded-md border py-2 border-gray-700 text-gray-300 hover:bg-gray-700 opacity-50 flex items-center": twerge.CacheValue{
 		Generated: "tw-91",
-		Merged:    "items-center py-2 flex bg-gray-800 px-3 hover:bg-gray-700 border text-gray-300 opacity-50 border-gray-700 transition-colors rounded-md",
+		Merged:    "text-gray-300 opacity-50 py-2 rounded-md border border-gray-700 px-3 transition-colors hover:bg-gray-700 flex bg-gray-800 items-center",
 	},
 	"px-3 bg-gray-800 transition-colors rounded-md border py-2 border-gray-700 text-gray-300 hover:bg-gray-700": twerge.CacheValue{
 		Generated: "tw-94",
-		Merged:    "rounded-md py-2 px-3 bg-gray-800 transition-colors border border-gray-700 text-gray-300 hover:bg-gray-700",
-	},
-	"px-3 font-medium text-sm py-1 inline-block hover:bg-blue-800 text-blue-200 bg-blue-900 rounded-full transition-colors": twerge.CacheValue{
-		Generated: "tw-106",
-		Merged:    "px-3 font-medium text-sm transition-colors py-1 hover:bg-blue-800 text-blue-200 inline-block rounded-full bg-blue-900",
+		Merged:    "py-2 px-3 text-gray-300 bg-gray-800 border hover:bg-gray-700 rounded-md transition-colors border-gray-700",
 	},
 	"px-4 container mx-auto py-2": twerge.CacheValue{
 		Generated: "tw-89",
-		Merged:    "px-4 mx-auto py-2 container",
+		Merged:    "container py-2 px-4 mx-auto",
 	},
 	"px-4 container mx-auto py-8": twerge.CacheValue{
 		Generated: "tw-78",
-		Merged:    "container px-4 mx-auto py-8",
+		Merged:    "px-4 container py-8 mx-auto",
 	},
 	"py-1 absolute right-0 bg-blue-500 rounded-tl-md px-2 text-xs text-white bottom-0": twerge.CacheValue{
-		Generated: "tw-49",
-		Merged:    "bottom-0 right-0 bg-blue-500 px-2 text-white py-1 absolute rounded-tl-md text-xs",
+		Generated: "tw-47",
+		Merged:    "py-1 text-xs text-white absolute right-0 bg-blue-500 rounded-tl-md px-2 bottom-0",
 	},
 	"py-2 bg-gray-700 focus:outline-none border-gray-600 w-full focus:ring-blue-500 border px-4 text-white rounded-md focus:ring-2": twerge.CacheValue{
 		Generated: "tw-64",
-		Merged:    "bg-gray-700 rounded-md px-4 border focus:ring-2 focus:outline-none w-full text-white py-2 border-gray-600 focus:ring-blue-500",
+		Merged:    "bg-gray-700 focus:ring-blue-500 px-4 focus:ring-2 focus:outline-none rounded-md border-gray-600 border w-full text-white py-2",
 	},
 	"py-3 text-gray-900 rounded-md hover:opacity-90 font-medium transition-opacity bg-white px-6": twerge.CacheValue{
 		Generated: "tw-19",
-		Merged:    "rounded-md font-medium py-3 text-gray-900 px-6 hover:opacity-90 bg-white transition-opacity",
+		Merged:    "bg-white rounded-md transition-opacity py-3 text-gray-900 hover:opacity-90 font-medium px-6",
 	},
 	"relative w-full": twerge.CacheValue{
 		Generated: "tw-33",
@@ -426,26 +406,26 @@ var ClassMapStr = map[string]twerge.CacheValue{
 	},
 	"rounded-full bg-blue-600 relative mx-auto shadow-lg": twerge.CacheValue{
 		Generated: "tw-24",
-		Merged:    "bg-blue-600 mx-auto rounded-full shadow-lg relative",
+		Merged:    "bg-blue-600 relative mx-auto rounded-full shadow-lg",
 	},
 	"rounded-full h-8 justify-center items-center flex w-8 bg-gray-700": twerge.CacheValue{
 		Generated: "tw-54",
-		Merged:    "justify-center w-8 rounded-full h-8 items-center flex bg-gray-700",
+		Merged:    "w-8 flex h-8 items-center bg-gray-700 justify-center rounded-full",
 	},
 	"rounded-md font-medium text-white transition-colors focus:ring-offset-2 focus:ring-2 focus:ring-blue-500 w-full hover:bg-blue-700 bg-blue-600 py-3 focus:outline-none px-6": twerge.CacheValue{
 		Generated: "tw-65",
-		Merged:    "focus:ring-blue-500 focus:outline-none bg-blue-600 rounded-md text-white px-6 hover:bg-blue-700 font-medium focus:ring-2 w-full transition-colors py-3 focus:ring-offset-2",
+		Merged:    "focus:ring-2 hover:bg-blue-700 w-full px-6 py-3 focus:outline-none text-white focus:ring-offset-2 bg-blue-600 rounded-md font-medium transition-colors focus:ring-blue-500",
 	},
 	"space-x-8 flex": twerge.CacheValue{
-		Generated: "tw-126",
+		Generated: "tw-120",
 		Merged:    "space-x-8 flex",
 	},
 	"space-x-8 hidden sm:flex items-center ml-8": twerge.CacheValue{
 		Generated: "tw-7",
-		Merged:    "sm:flex items-center ml-8 space-x-8 hidden",
+		Merged:    "space-x-8 hidden sm:flex items-center ml-8",
 	},
 	"text-2xl font-bold text-white mb-4": twerge.CacheValue{
-		Generated: "tw-110",
+		Generated: "tw-128",
 		Merged:    "text-2xl font-bold text-white mb-4",
 	},
 	"text-3xl font-bold mb-6 text-white": twerge.CacheValue{
@@ -454,19 +434,19 @@ var ClassMapStr = map[string]twerge.CacheValue{
 	},
 	"text-base text-gray-300 hover:bg-gray-700 hover:text-white pl-3 pr-4 block py-2 font-medium": twerge.CacheValue{
 		Generated: "tw-10",
-		Merged:    "text-base hover:text-white pl-3 pr-4 block text-gray-300 hover:bg-gray-700 py-2 font-medium",
+		Merged:    "text-gray-300 hover:bg-gray-700 hover:text-white pr-4 py-2 text-base pl-3 block font-medium",
 	},
 	"text-blue-500 border-blue-500": twerge.CacheValue{
-		Generated: "tw-128",
+		Generated: "tw-122",
 		Merged:    "text-blue-500 border-blue-500",
 	},
 	"text-center max-w-2xl mx-auto": twerge.CacheValue{
 		Generated: "tw-55",
-		Merged:    "max-w-2xl mx-auto text-center",
+		Merged:    "text-center max-w-2xl mx-auto",
 	},
 	"text-gray-300 mb-4 line-clamp-2": twerge.CacheValue{
 		Generated: "tw-37",
-		Merged:    "text-gray-300 mb-4 line-clamp-2",
+		Merged:    "mb-4 line-clamp-2 text-gray-300",
 	},
 	"text-gray-300 mb-8": twerge.CacheValue{
 		Generated: "tw-56",
@@ -474,10 +454,10 @@ var ClassMapStr = map[string]twerge.CacheValue{
 	},
 	"text-gray-400 hover:text-blue-400 transition-colors": twerge.CacheValue{
 		Generated: "tw-73",
-		Merged:    "text-gray-400 hover:text-blue-400 transition-colors",
+		Merged:    "hover:text-blue-400 transition-colors text-gray-400",
 	},
 	"text-gray-400 hover:text-gray-300 border-transparent": twerge.CacheValue{
-		Generated: "tw-129",
+		Generated: "tw-123",
 		Merged:    "text-gray-400 hover:text-gray-300 border-transparent",
 	},
 	"text-gray-400 px-2 py-1": twerge.CacheValue{
@@ -490,7 +470,7 @@ var ClassMapStr = map[string]twerge.CacheValue{
 	},
 	"text-gray-500 absolute left-3 top-2.5": twerge.CacheValue{
 		Generated: "tw-83",
-		Merged:    "left-3 top-2.5 text-gray-500 absolute",
+		Merged:    "absolute left-3 top-2.5 text-gray-500",
 	},
 	"text-gray-500 hover:text-gray-300 text-sm mx-2 transition-colors": twerge.CacheValue{
 		Generated: "tw-77",
@@ -501,51 +481,51 @@ var ClassMapStr = map[string]twerge.CacheValue{
 		Merged:    "text-gray-500 text-sm",
 	},
 	"text-sm px-3 items-center hover:underline bg-blue-900 w-full transition-colors py-1 hover:bg-blue-800 h-8 flex-row rounded-full text-blue-200 justify-between font-medium": twerge.CacheValue{
-		Generated: "tw-43",
-		Merged:    "text-sm px-3 rounded-full font-medium transition-colors justify-between py-1 hover:underline bg-blue-900 w-full hover:bg-blue-800 h-8 text-blue-200 items-center flex-row",
+		Generated: "tw-48",
+		Merged:    "px-3 items-center hover:underline w-full transition-colors hover:bg-blue-800 h-8 text-blue-200 bg-blue-900 py-1 justify-between text-sm flex-row rounded-full font-medium",
 	},
 	"text-white cursor-pointer pr-4 text-xl font-bold": twerge.CacheValue{
 		Generated: "tw-6",
 		Merged:    "text-white cursor-pointer pr-4 text-xl font-bold",
 	},
 	"text-white mb-4 text-2xl font-semibold": twerge.CacheValue{
-		Generated: "tw-121",
-		Merged:    "font-semibold text-white mb-4 text-2xl",
+		Generated: "tw-115",
+		Merged:    "text-2xl font-semibold text-white mb-4",
 	},
 	"text-white mb-6": twerge.CacheValue{
-		Generated: "tw-134",
+		Generated: "tw-129",
 		Merged:    "text-white mb-6",
 	},
 	"text-white text-xl font-bold mb-2": twerge.CacheValue{
 		Generated: "tw-70",
-		Merged:    "font-bold mb-2 text-white text-xl",
+		Merged:    "text-white text-xl font-bold mb-2",
 	},
 	"text-xl text-gray-300 max-w-2xl mx-auto": twerge.CacheValue{
-		Generated: "tw-124",
-		Merged:    "mx-auto text-xl text-gray-300 max-w-2xl",
+		Generated: "tw-118",
+		Merged:    "text-xl text-gray-300 max-w-2xl mx-auto",
 	},
 	"text-xl text-gray-300 mb-8 max-w-md": twerge.CacheValue{
 		Generated: "tw-16",
-		Merged:    "mb-8 max-w-md text-xl text-gray-300",
+		Merged:    "text-xl text-gray-300 mb-8 max-w-md",
 	},
 	"text-xs bg-red-500 py-1 bottom-0 px-2 rounded-tr-md text-gray-200 left-0 absolute": twerge.CacheValue{
-		Generated: "tw-41",
-		Merged:    "py-1 bottom-0 rounded-tr-md absolute text-xs bg-red-500 px-2 text-gray-200 left-0",
+		Generated: "tw-39",
+		Merged:    "text-gray-200 left-0 absolute text-xs bg-red-500 bottom-0 rounded-tr-md py-1 px-2",
 	},
 	"w-full focus:outline-none border rounded-md pr-4 py-2 pl-10 bg-gray-700 text-white focus:ring-2 border-gray-600 focus:ring-blue-500": twerge.CacheValue{
 		Generated: "tw-82",
-		Merged:    "focus:ring-2 pl-10 bg-gray-700 text-white border-gray-600 pr-4 w-full rounded-md focus:outline-none border focus:ring-blue-500 py-2",
+		Merged:    "bg-gray-700 focus:ring-2 border-gray-600 focus:ring-blue-500 pr-4 py-2 rounded-md pl-10 text-white focus:outline-none w-full border",
 	},
 	"w-full h-48 object-cover": twerge.CacheValue{
 		Generated: "tw-34",
 		Merged:    "w-full h-48 object-cover",
 	},
 	"w-full md:h-96 object-center rounded-lg object-cover shadow-md mb-8 h-64": twerge.CacheValue{
-		Generated: "tw-114",
-		Merged:    "shadow-md h-64 object-center rounded-lg object-cover mb-8 w-full md:h-96",
+		Generated: "tw-108",
+		Merged:    "object-cover shadow-md mb-8 object-center rounded-lg md:h-96 h-64 w-full",
 	},
 	"z-0 absolute h-16 bg-pink-600 -top-4 rounded-full -left-4 w-16": twerge.CacheValue{
 		Generated: "tw-26",
-		Merged:    "-left-4 absolute -top-4 rounded-full bg-pink-600 h-16 w-16 z-0",
+		Merged:    "z-0 absolute h-16 bg-pink-600 rounded-full -left-4 -top-4 w-16",
 	},
 }

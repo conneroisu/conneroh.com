@@ -12,24 +12,6 @@ templ Project(
 	<div
 		class={ twerge.It("px-4 container mx-auto py-8") }
 	>
-		<div
-			class={ twerge.It("mb-8") }
-		>
-			<h1
-				class={ twerge.It("font-bold text-white mb-4 text-4xl") }
-			>
-				{ project.Title }
-			</h1>
-			if len(project.Tags) > 0 {
-				<div
-					class={ twerge.It("mb-6 flex-row flex gap-2") }
-				>
-					for _, tag := range project.Tags {
-						@components.TagControl(tag)
-					}
-				</div>
-			}
-		</div>
 		if project.BannerPath != "" {
 			@components.Image(
 				project.BannerPath,
@@ -60,6 +42,20 @@ templ Project(
 				>
 					{ project.Description }
 				</p>
+				<div
+					class={ twerge.It("mb-8") }
+				>
+					<h1
+						class={ twerge.It("font-bold text-white mb-4 text-4xl") }
+					>
+						{ project.Title }
+					</h1>
+					if len(project.Tags) > 0 {
+						for _, tag := range project.Tags {
+							@components.TagControl(tag)
+						}
+					}
+				</div>
 				<div
 					class={ twerge.It("items-center text-sm text-gray-400 mt-6 flex") }
 				>
