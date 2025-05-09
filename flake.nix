@@ -9,26 +9,15 @@
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
   };
 
-  outputs = inputs @ {
-    self,
-    flake-parts,
-    ...
-  }:
+  outputs = inputs @ {flake-parts, ...}:
     flake-parts.lib.mkFlake {inherit inputs;} (
-      {self, ...}: {
+      {...}: {
         systems = import inputs.systems;
         imports = [
           ./nix/flake-module.nix
         ];
 
-        perSystem = {
-          self',
-          config,
-          inputs',
-          pkgs,
-          system,
-          ...
-        }: {
+        perSystem = {system, ...}: {
           _module.args.pkgs = import inputs.nixpkgs {
             inherit system;
             config.allowUnfree = true;
