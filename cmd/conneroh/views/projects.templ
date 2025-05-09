@@ -51,8 +51,21 @@ templ Project(
 						{ project.Title }
 					</h1>
 					if len(project.Tags) > 0 {
+						<span class={ twerge.It("text-gray-400 text-sm pr-2") }>
+							Tags:
+						</span>
 						for _, tag := range project.Tags {
-							@components.TagControl(tag)
+							<a
+								href={ templ.SafeURL(tag.PagePath()) }
+								hx-get={ templ.SafeURL(tag.PagePath()) }
+								hx-trigger="click"
+								hx-swap="outerHTML"
+								preload="mouseover"
+								hx-target="#bodiody"
+								class={ twerge.It("text-gray-400 text-sm hover:underline hover:text-blue-400 transition-colors duration-200 pr-2") }
+							>
+								#{ tag.Slug }
+							</a>
 						}
 					}
 				</div>

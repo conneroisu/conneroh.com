@@ -1,3 +1,4 @@
+// Package markdown provides a markdown parser.
 package markdown
 
 import (
@@ -5,6 +6,7 @@ import (
 	"strings"
 
 	callout "github.com/VojtaStruhar/goldmark-obsidian-callout"
+	chromahtml "github.com/alecthomas/chroma/v2/formatters/html"
 	mathjax "github.com/litao91/goldmark-mathjax"
 	enclave "github.com/quail-ink/goldmark-enclave"
 	"github.com/quail-ink/goldmark-enclave/core"
@@ -72,7 +74,13 @@ func NewMD(
 			&hashtag.Extender{
 				Variant: hashtag.ObsidianVariant,
 			},
-			highlighting.NewHighlighting(highlighting.WithStyle("monokai")),
+			highlighting.NewHighlighting(
+				highlighting.WithStyle("monokai"),
+				highlighting.WithFormatOptions(
+					chromahtml.WithClasses(true),
+					chromahtml.WithLinkableLineNumbers(true, "l"),
+				),
+			),
 		))
 }
 
