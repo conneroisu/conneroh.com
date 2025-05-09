@@ -77,8 +77,10 @@ func NewMD(
 			highlighting.NewHighlighting(
 				highlighting.WithStyle("monokai"),
 				highlighting.WithFormatOptions(
-					chromahtml.WithClasses(true),
+					// chromahtml.WithClasses(true),
 					chromahtml.WithLinkableLineNumbers(true, "l"),
+					chromahtml.WithLineNumbers(true),
+					chromahtml.LineNumbersInTable(true),
 				),
 			),
 		))

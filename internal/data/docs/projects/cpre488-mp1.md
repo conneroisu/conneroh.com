@@ -12,7 +12,7 @@ banner_path: projects/mp1.webp
 created_at: 2025-03-27T14:13:10.000-06:00
 description: The second Project from CPRE488 at Iowa State University
 title: CPRE488 MP1
-updated_at: 2025-05-09T05:27:11.000-06:00
+updated_at: 2025-05-09T07:01:31.000-06:00
 ---
 
 # CPRE488 MP1
@@ -72,14 +72,15 @@ The AMBAAXI IP is connected to the Zynq processor on the main design through an 
 This connection allows for a base address to be mapped for the IP which enables software access to the 16 slave registers (slv_reg) instantiated in the slave AXI.
 
 In order to access the individual slave registers, we had to introduce an appropriate offset to the address. In our case, it was $+0 \times 4$ per register. We believed this to be the case as the slave register sizes were set to 32 bits, or 4 bytes. So, for our design, since the base address for the AXI IP was `0x43C00000`, our subsequent registers were mapped as such;
-```c
+
+```vhdl
 slv_reg0 = 0x43C00000
 slv_reg1 = 0x43C00004
 slv_reg2 = 0x43C00008
 slv_reg3 = 0x43C00000 + (4 * X)
 ```
 
-For example, with a 32-bit data bus, the design decodes address bits [5:2] to select among the 16 registers. The decoded value creates a 4-bit index (b"0000" to b"1111") that selects registers slv_reg0 through slv_reg15.
+For example, with a 32-bit data bus, the design decodes address bits `[5:2]` to select among the 16 registers. The decoded value creates a 4-bit index (b"0000" to b"1111") that selects registers slv_reg0 through slv_reg15.
 
 ## 7. How does the PPM state machine get access to the IP core's Memory Mapped registers:
 
@@ -94,7 +95,9 @@ In AXI, a write transaction requires both address and data channels to be valid.
 
 This is implemented in the code with:
 
-1 slv_reg_wren <= axi_wready AND S_AXI_WVALID AND axi_awready AND S_AXI_AWVALID;
+```vhdl
+slv_reg_wren <= axi_wready AND S_AXI_WVALID AND axi_awready AND S_AXI_AWVALID;
+```
 
 When this signal is asserted, the design decodes the address to determine which register to write to:
 
