@@ -105,6 +105,7 @@ func run(ctx context.Context) error {
 			1,
 			10,
 		)),
+		layouts.Page(views.Code500()),
 		layouts.Page(views.List(
 			routing.ProjectPluralPath,
 			&allPosts,
