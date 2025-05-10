@@ -136,50 +136,38 @@ func Run(
 	case <-innerCtx.Done():
 		// Signal received, initiate graceful shutdown
 		slog.Info("shutdown signal received, shutting down server...")
-
-		// Create shutdown context with timeout
-		shutdownCtx, cancel := context.WithTimeout(
-			context.Background(), // Use a fresh context for shutdown
-			shutdownTimeout,
-		)
-		defer cancel()
-
-		// Attempt graceful shutdown
-		err := httpServer.Shutdown(shutdownCtx)
-		if err != nil {
-			slog.Error("error during server shutdown",
-				slog.String("error", err.Error()),
-				slog.Duration("timeout", shutdownTimeout),
-			)
-		}
-
-		// Wait for all go-routines to finish
-		slog.Info("waiting for server shutdown to complete")
-		wg.Wait()
-		slog.Info("server shutdown completed")
-		return nil
+		return gracefulShutdown(httpServer, &wg)
 	case <-ctx.Done():
 		// Parent context cancelled
 		slog.Info("parent context cancelled, shutting down...")
-
-		// Create shutdown context with timeout
-		shutdownCtx, cancel := context.WithTimeout(
-			context.Background(), // Use a fresh context for shutdown
-			shutdownTimeout,
-		)
-		defer cancel()
-
-		// Attempt graceful shutdown
-		err := httpServer.Shutdown(shutdownCtx)
-		if err != nil {
-			slog.Error("error during server shutdown",
-				slog.String("error", err.Error()),
-				slog.Duration("timeout", shutdownTimeout),
-			)
-		}
-
-		// Wait for all goroutines to finish
-		wg.Wait()
-		return nil
+		return gracefulShutdown(httpServer, &wg)
 	}
+}
+
+func gracefulShutdown(
+	httpServer *http.Server,
+	wg *sync.WaitGroup,
+) error {
+	// Create shutdown context with timeout
+	shutdownCtx, cancel := context.WithTimeout(
+		context.Background(), // Use a fresh context for shutdown
+		shutdownTimeout,
+	)
+	defer cancel()
+
+	// Attempt graceful shutdown
+	err := httpServer.Shutdown(shutdownCtx)
+	if err != nil {
+		slog.Error("error during server shutdown",
+			slog.String("error", err.Error()),
+			slog.Duration("timeout", shutdownTimeout),
+		)
+		return err
+	}
+
+	// Wait for all go-routines to finish
+	slog.Info("waiting for server shutdown to complete")
+	wg.Wait()
+	slog.Info("server shutdown completed")
+	return nil
 }
