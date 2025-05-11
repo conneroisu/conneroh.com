@@ -8,7 +8,10 @@
   force_https = true;
   processes = ["app"];
   version = self'.shortRev or "dirty";
-  src = ./../../.;
+  src = builtins.path {
+    path = ./.;
+    name = "source";
+  };
 
   databaseFiles = pkgs.runCommand "database-files" {} ''
     mkdir -p $out/root
