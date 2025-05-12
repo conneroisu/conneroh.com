@@ -50,24 +50,7 @@ templ ProjectItem(
 						}
 					}
 					if len(project.Tags) > maxShownTags {
-						<button
-							class={ twerge.It("text-sm px-3 items-center hover:underline bg-blue-900 w-full transition-colors py-1 hover:bg-blue-800 h-8 flex-row rounded-full text-blue-200 justify-between font-medium") }
-							x-on:click.stop="allTags = !allTags"
-							x-ref="moreTags"
-						>
-							<div
-								x-show="!allTags"
-								class="flex flex-row items-center"
-							>
-								({ strconv.Itoa(len(project.Tags[maxShownTags-1:])) }) More
-							</div>
-							<div
-								x-show="allTags"
-								class="flex flex-row items-center"
-							>
-								Show less
-							</div>
-						</button>
+						@moreTagsButton(strconv.Itoa(len(project.Tags[maxShownTags-1:])))
 					}
 				</div>
 			</div>
@@ -129,24 +112,7 @@ templ PostItem(post *assets.Post, attrs templ.Attributes) {
 						@TagControl(tag)
 					}
 					if len(post.Tags) > maxShownTags {
-						<button
-							class={ twerge.It("text-sm px-3 items-center hover:underline bg-blue-900 w-full transition-colors py-1 hover:bg-blue-800 h-8 flex-row rounded-full text-blue-200 justify-between font-medium") }
-							x-on:click.stop="allTags = !allTags"
-							x-ref="moreTags"
-						>
-							<div
-								x-show="!allTags"
-								class="flex flex-row items-center"
-							>
-								({ strconv.Itoa(len(post.Tags[maxShownTags-1:])) }) More
-							</div>
-							<div
-								x-show="allTags"
-								class="flex flex-row items-center"
-							>
-								Show less
-							</div>
-						</button>
+						@moreTagsButton(strconv.Itoa(len(post.Tags[maxShownTags-1:])))
 					}
 				</div>
 			</div>
@@ -189,7 +155,7 @@ templ TagItem(tag *assets.Tag, attrs templ.Attributes) {
 				{ tag.Title }
 			</h2>
 			<div
-				class={ twerge.It("rounded-full h-8 justify-center items-center flex w-8 bg-gray-700") }
+				class={ twerge.It("rounded-sm h-8 justify-center items-center flex w-8 bg-gray-700") }
 			>
 				@Icon(tag.Icon, templ.Attributes{
 					"class": "stoke-white",
@@ -213,4 +179,25 @@ templ TagItem(tag *assets.Tag, attrs templ.Attributes) {
 			{ strconv.Itoa(len(tag.Projects)) } projects
 		</span>
 	</a>
+}
+
+templ moreTagsButton(tagCount string) {
+	<button
+		class={ twerge.It("text-sm px-3 items-center hover:underline bg-emerald-800 w-full transition-colors py-1 hover:bg-emerald-600 h-8 rounded-sm justify-between font-medium text-emerald-300 hover:text-white flex flex-row") }
+		x-on:click.stop="allTags = !allTags"
+		x-ref="moreTags"
+	>
+		<div
+			x-show="!allTags"
+			class="flex flex-row items-center"
+		>
+			({ tagCount }) More
+		</div>
+		<div
+			x-show="allTags"
+			class="flex flex-row items-center"
+		>
+			Show less
+		</div>
+	</button>
 }

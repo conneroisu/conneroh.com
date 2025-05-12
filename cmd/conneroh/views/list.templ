@@ -56,7 +56,7 @@ templ search(
 		>
 			<input
 				id="search"
-				class={ twerge.It("w-full focus:outline-none border rounded-md pr-4 py-2 pl-10 bg-gray-700 text-white focus:ring-2 border-gray-600 focus:ring-blue-500") }
+				class={ twerge.It("w-full focus:outline-none border rounded-md pr-4 py-2 pl-10 bg-gray-700 text-white focus:ring-2 border-gray-600 focus:ring-green-500") }
 				placeholder={ fmt.Sprintf("Search %s...", target) }
 				hx-get={ fmt.Sprintf("/search/%s", target) }
 				hx-target="#listi"
@@ -75,7 +75,7 @@ templ search(
 			</div>
 			<div
 				id="search-indicator"
-				class={ twerge.It("htmx-indicator top-2.5 text-blue-500 absolute right-3") }
+				class={ twerge.It("htmx-indicator top-2.5 text-green-500 absolute right-3") }
 			>
 				<svg
 					class={ twerge.It("animate-spin h-5 w-5") }

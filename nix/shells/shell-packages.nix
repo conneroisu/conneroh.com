@@ -9,7 +9,7 @@
   processes = ["app"];
   version = self'.shortRev or "dirty";
   src = builtins.path {
-    path = ./.;
+    path = ./../../.;
     name = "source";
   };
 

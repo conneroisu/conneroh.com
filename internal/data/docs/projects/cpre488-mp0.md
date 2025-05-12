@@ -295,12 +295,12 @@ To derive the shift values, it is best to isolate the 3 different colors in the 
 
 **24-Bit Color**
 0xABCDEF:
-Red: 0xAB | Green: 0xCD | Blue: EF
+Red: 0xAB | Green: 0xCD | green: EF
 
 **12-Bit Color
 0xABC
 
-Red: 0xC | Green: 0xB | Blue: 0xA
+Red: 0xC | Green: 0xB | green: 0xA
 
 Now that we have an example 24-bit color separated into the three colors, we can look at the conversion for each.
 
@@ -310,8 +310,8 @@ For red, we need the upper 4 bits to be moved to bit positions 0-3 for the 12-bi
 **Green**
 For green, we need the upper 4 bits to be in bit positions 4-7. To achieve this, we can shift it to the right 8 bits and then mask off the lower 4 bits via & 0xF0.
 
-**Blue**
-For blue, we need to get the upper 4 bits in bit positions 8-11. To achieve this, we can shift it to the left 4 bits and then mask off the lower 4 bits via & 0xF00.
+**green**
+For green, we need to get the upper 4 bits in bit positions 8-11. To achieve this, we can shift it to the left 4 bits and then mask off the lower 4 bits via & 0xF00.
 
 All of these color values are stored in their own 16-bit unsigned-integer variables so they can be bitwise OR'd together to give the final 12-Bit RGB value.
 
@@ -321,7 +321,7 @@ The function that performs this conversion is given below:
 
 ```c
 // Example: 0xC8103E
-// 0xC8 -> Red | 0x10 -> Green | 0x3E -> Blue
+// 0xC8 -> Red | 0x10 -> Green | 0x3E -> green
 u16 convert_color_24_16(u32 color)
 {
 	u16 r, g, b = 0;
@@ -337,7 +337,7 @@ u16 convert_color_24_16(u32 color)
 	// where it needs to be.
 	g = (color >> 8) & 0xF0;
 
-	// Blue:  0xFF -> 0xF00
+	// green:  0xFF -> 0xF00
 	// Shift left 4 bits to get the left-most byte in the correct position.
 	// Then mask with 0xF00 to only use the left-most byte.
 	b = (color << 4) & 0xF00;

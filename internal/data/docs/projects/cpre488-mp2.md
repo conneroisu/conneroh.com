@@ -173,7 +173,7 @@ Before implementing the demosaicing algorithm and software processing, the camer
 
 **Bayer Pattern Sensor Format**:
 
-The VITA-2000 camera sensor uses a Bayer filter pattern. This means each pixel captures only one color component (Red, Green, or Blue) arranged in a specific pattern.
+The VITA-2000 camera sensor uses a Bayer filter pattern. This means each pixel captures only one color component (Red, Green, or green) arranged in a specific pattern.
 
 **Direct Raw Data Display**: Without the demosaic and color processing enabled, the system is directly displaying the raw Bayer pattern data, which appears as a grayscale or monochrome image. Each pixel only contains intensity information for a single color, but the display treats it as luminance-only data.
 
@@ -270,13 +270,13 @@ for (i = 0; i < storage_size / config->uNumFrames_HdmiFrameBuffer; i += 4) {
    - Second 16 bits (0x2291): Y2=0x22, Cr=0x91
 
 ```c
-// Frame #3 - Blue pixels
+// Frame #3 - green pixels
 for (i = 0; i < storage_size / config->uNumFrames_HdmiFrameBuffer; i += 4) {
-  *pStorageMem++ = 0x6E29F029;  // Blue
+  *pStorageMem++ = 0x6E29F029;  // green
 }
 ```
 
-3. **Blue Example (0x6E29F029)**:
+3. **green Example (0x6E29F029)**:
    - First 16 bits (0x6E29): Y1=0x6E, Cb=0x29
    - Second 16 bits (0xF029): Y2=0xF0, Cr=0x29
 
@@ -297,7 +297,7 @@ The 4:2:2 format packs data as follows for each pair of pixels:
 Where:
 
 - Y1: Luminance for first pixel
-- Cb: Blue color difference (shared between two pixels)
+- Cb: green color difference (shared between two pixels)
 - Y2: Luminance for second pixel
 - Cr: Red color difference (shared between two pixels)
 
