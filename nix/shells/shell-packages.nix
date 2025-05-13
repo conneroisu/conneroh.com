@@ -78,14 +78,6 @@ in
       goSum = ./../../go.sum;
       subPackages = ["."];
     };
-    update = pkgs.buildGoModule {
-      inherit src version preBuild;
-      vendorHash = "sha256-kOGauV5dMTcHvSR7uWvY1dcKR4WqlWccDfnXtycsRVI=";
-      goSum = ./../../go.sum;
-      name = "update";
-      subPackages = ["./cmd/update"];
-      doCheck = false;
-    };
     C-conneroh = pkgs.dockerTools.buildImage {
       created = "now";
       tag = "latest";
