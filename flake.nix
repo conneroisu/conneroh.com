@@ -1,12 +1,17 @@
 {
   description = "Personal Website for Conner Ohnesorge";
 
+  # TODO: Might be adventageous to introduce flake-utils to reduce copy-pasta of nix paths
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     systems.url = "github:nix-systems/default";
     bun2nix.url = "github:baileyluTCD/bun2nix";
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
+    nix2container.url = "github:nlewo/nix2container";
+    nix2container.inputs = {
+      nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = inputs @ {flake-parts, ...}:
