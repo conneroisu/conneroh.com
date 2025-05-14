@@ -27,8 +27,7 @@ func Make(fn APIFunc) http.HandlerFunc {
 			)
 			target := r.Header.Get(hx.HdrTarget)
 			if target != "" {
--				http.Redirect(w, r, "/500", http.StatusContinue)
-+				http.Redirect(w, r, "/500", http.StatusFound) // 302 Found or http.StatusTemporaryRedirect (307)
+				http.Redirect(w, r, "/500", http.StatusFound) // 302 Found or http.StatusTemporaryRedirect (307)
 			}
 		}
 	}
