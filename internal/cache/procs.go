@@ -26,19 +26,19 @@ import (
 	"go.abhg.dev/goldmark/frontmatter"
 )
 
-// TaskType represents different types of tasks
+// TaskType represents different types of tasks.
 type TaskType string
 
 const (
-	// TypeAsset is a task for processing an asset file
+	// TypeAsset is a task for processing an asset file.
 	TypeAsset TaskType = "asset"
-	// TypeDoc is a task for processing a document file
+	// TypeDoc is a task for processing a document file.
 	TypeDoc TaskType = "doc"
-	// TypeRelationship is a task for updating relationships
+	// TypeRelationship is a task for updating relationships.
 	TypeRelationship TaskType = "relationship"
 )
 
-// Task represents a unit of work to be processed
+// Task represents a unit of work to be processed.
 type Task struct {
 	Type    TaskType
 	Path    string
@@ -49,7 +49,7 @@ type Task struct {
 	RetryCount     int
 }
 
-// Stats tracks statistics about task processing
+// Stats tracks statistics about task processing.
 type Stats struct {
 	TotalSubmitted     atomic.Int64
 	TotalCompleted     atomic.Int64
@@ -59,25 +59,25 @@ type Stats struct {
 	shutdownInitiated  atomic.Bool
 }
 
-// RecordTaskSubmitted records that a task was submitted
+// RecordTaskSubmitted records that a task was submitted.
 func (s *Stats) RecordTaskSubmitted() {
 	s.TotalSubmitted.Add(1)
 	s.lastActivityNs.Store(time.Now().UnixNano())
 }
 
-// RecordTaskCompleted records that a task was completed
+// RecordTaskCompleted records that a task was completed.
 func (s *Stats) RecordTaskCompleted() {
 	s.TotalCompleted.Add(1)
 	s.lastActivityNs.Store(time.Now().UnixNano())
 }
 
-// RecordRelationshipTask records that a relationship task was submitted
+// RecordRelationshipTask records that a relationship task was submitted.
 func (s *Stats) RecordRelationshipTask() {
 	s.TotalRelationships.Add(1)
 	s.lastActivityNs.Store(time.Now().UnixNano())
 }
 
-// SetScanComplete marks that filesystem scanning is complete
+// SetScanComplete marks that filesystem scanning is complete.
 func (s *Stats) SetScanComplete() {
 	s.scanComplete.Store(true)
 	slog.Debug("filesystem scan complete",
@@ -86,25 +86,26 @@ func (s *Stats) SetScanComplete() {
 		"relationships", s.TotalRelationships.Load())
 }
 
-// IsComplete checks if all tasks are complete
+// IsComplete checks if all tasks are complete.
 func (s *Stats) IsComplete() bool {
 	return s.scanComplete.Load() &&
 		(s.TotalCompleted.Load() >= s.TotalSubmitted.Load()) &&
 		!s.shutdownInitiated.Load()
 }
 
-// TimeSinceActivity returns the time since the last activity
+// TimeSinceActivity returns the time since the last activity.
 func (s *Stats) TimeSinceActivity() time.Duration {
 	lastNs := s.lastActivityNs.Load()
+
 	return time.Since(time.Unix(0, lastNs))
 }
 
-// SetShutdownInitiated marks that shutdown has been initiated
+// SetShutdownInitiated marks that shutdown has been initiated.
 func (s *Stats) SetShutdownInitiated() {
 	s.shutdownInitiated.Store(true)
 }
 
-// LogStatus logs the current status
+// LogStatus logs the current status.
 func (s *Stats) LogStatus() {
 	lastNs := s.lastActivityNs.Load()
 	slog.Debug("processor status",
@@ -115,11 +116,12 @@ func (s *Stats) LogStatus() {
 		"idleTime", time.Since(time.Unix(0, lastNs)).String())
 }
 
-// Processor handles processing of assets and documents
+// Processor handles processing of assets and documents.
 type Processor struct {
 	fs          afero.Fs
 	db          *bun.DB
 	s3Client    s3Client
+	s3Bucket    string
 	embedder    embedder
 	md          goldmark.Markdown
 	taskCh      chan Task
@@ -133,7 +135,7 @@ type Processor struct {
 	doneCh      chan struct{} // Channel to signal completion
 }
 
-// Interface for S3 operations
+// Interface for S3 operations.
 type s3Client interface {
 	PutObject(
 		ctx context.Context,
@@ -142,7 +144,7 @@ type s3Client interface {
 	) (*s3.PutObjectOutput, error)
 }
 
-// Interface for embedding operations
+// Interface for embedding operations.
 type embedder interface {
 	Embeddings(
 		ctx context.Context,
@@ -151,7 +153,7 @@ type embedder interface {
 	) error
 }
 
-// batchOperations handles batched database operations
+// batchOperations handles batched database operations.
 type batchOperations struct {
 	mu             sync.Mutex
 	cacheUpdates   []*assets.Cache
@@ -161,7 +163,7 @@ type batchOperations struct {
 	shutdownCh     chan struct{}
 }
 
-// newBatchOperations creates a new batch operations manager
+// newBatchOperations creates a new batch operations manager.
 func newBatchOperations(db *bun.DB, batchSize int) *batchOperations {
 	b := &batchOperations{
 		cacheUpdates:   make([]*assets.Cache, 0, batchSize),
@@ -183,6 +185,7 @@ func newBatchOperations(db *bun.DB, batchSize int) *batchOperations {
 			case <-b.shutdownCh:
 				// Final flush on shutdown
 				b.flush(context.Background())
+
 				return
 			}
 		}
@@ -191,7 +194,7 @@ func newBatchOperations(db *bun.DB, batchSize int) *batchOperations {
 	return b
 }
 
-// scheduleCacheUpdate adds a cache update to the batch
+// scheduleCacheUpdate adds a cache update to the batch.
 func (b *batchOperations) scheduleCacheUpdate(ctx context.Context, cache *assets.Cache) {
 	b.mu.Lock()
 	defer b.mu.Unlock()
@@ -209,13 +212,14 @@ func (b *batchOperations) scheduleCacheUpdate(ctx context.Context, cache *assets
 	}
 }
 
-// flush immediately processes any pending updates regardless of batch size
+// flush immediately processes any pending updates regardless of batch size.
 func (b *batchOperations) flush(ctx context.Context) {
 	b.mu.Lock()
 
 	// Nothing to do
 	if len(b.cacheUpdates) == 0 {
 		b.mu.Unlock()
+
 		return
 	}
 
@@ -250,50 +254,52 @@ func (b *batchOperations) flush(ctx context.Context) {
 	}
 }
 
-// shutdown stops the background flush timer and performs a final flush
+// shutdown stops the background flush timer and performs a final flush.
 func (b *batchOperations) shutdown() {
 	close(b.shutdownCh)
 }
 
-// memCache provides an in-memory cache to reduce database queries
+// memCache provides an in-memory cache to reduce database queries.
 type memCache struct {
 	once  sync.Once
 	mu    sync.RWMutex
 	paths map[string]string // path -> hash
 }
 
-// newMemCache creates a new memory cache
+// newMemCache creates a new memory cache.
 func newMemCache() *memCache {
 	return &memCache{
 		paths: make(map[string]string),
 	}
 }
 
-// Get gets a hash from the cache
+// Get gets a hash from the cache.
 func (m *memCache) Get(path string) (string, bool) {
 	m.mu.RLock()
 	hash, ok := m.paths[path]
 	m.mu.RUnlock()
+
 	return hash, ok
 }
 
-// Set sets a hash in the cache
+// Set sets a hash in the cache.
 func (m *memCache) Set(path, hash string) {
 	m.mu.Lock()
 	m.paths[path] = hash
 	m.mu.Unlock()
 }
 
-// ensureLoaded ensures the cache is loaded from the database once
+// ensureLoaded ensures the cache is loaded from the database once.
 func (m *memCache) ensureLoaded(ctx context.Context, db *bun.DB) error {
 	var loadErr error
 	m.once.Do(func() {
 		loadErr = m.loadFromDB(ctx, db)
 	})
+
 	return loadErr
 }
 
-// loadFromDB loads ALL cache entries from the database in a single query
+// loadFromDB loads ALL cache entries from the database in a single query.
 func (m *memCache) loadFromDB(ctx context.Context, db *bun.DB) error {
 	slog.Debug("loading all cache entries from database")
 
@@ -318,10 +324,11 @@ func (m *memCache) loadFromDB(ctx context.Context, db *bun.DB) error {
 	}
 
 	slog.Debug("loaded all cache entries into memory", "count", len(caches))
+
 	return nil
 }
 
-// entityCache provides a cache for entities to reduce database lookups
+// entityCache provides a cache for entities to reduce database lookups.
 type entityCache struct {
 	mu       sync.RWMutex
 	tags     map[string]*assets.Tag
@@ -329,7 +336,7 @@ type entityCache struct {
 	projects map[string]*assets.Project
 }
 
-// newEntityCache creates a new entity cache
+// newEntityCache creates a new entity cache.
 func newEntityCache() *entityCache {
 	return &entityCache{
 		tags:     make(map[string]*assets.Tag),
@@ -338,15 +345,16 @@ func newEntityCache() *entityCache {
 	}
 }
 
-// GetTag gets a tag from the cache
+// GetTag gets a tag from the cache.
 func (e *entityCache) GetTag(slug string) (*assets.Tag, bool) {
 	e.mu.RLock()
 	tag, ok := e.tags[slug]
 	e.mu.RUnlock()
+
 	return tag, ok
 }
 
-// SetTag sets a tag in the cache
+// SetTag sets a tag in the cache.
 func (e *entityCache) SetTag(tag *assets.Tag) {
 	e.mu.Lock()
 	tagCopy := *tag // Make a copy to avoid race conditions
@@ -354,15 +362,16 @@ func (e *entityCache) SetTag(tag *assets.Tag) {
 	e.mu.Unlock()
 }
 
-// GetPost gets a post from the cache
+// GetPost gets a post from the cache.
 func (e *entityCache) GetPost(slug string) (*assets.Post, bool) {
 	e.mu.RLock()
 	post, ok := e.posts[slug]
 	e.mu.RUnlock()
+
 	return post, ok
 }
 
-// SetPost sets a post in the cache
+// SetPost sets a post in the cache.
 func (e *entityCache) SetPost(post *assets.Post) {
 	e.mu.Lock()
 	postCopy := *post // Make a copy to avoid race conditions
@@ -370,15 +379,16 @@ func (e *entityCache) SetPost(post *assets.Post) {
 	e.mu.Unlock()
 }
 
-// GetProject gets a project from the cache
+// GetProject gets a project from the cache.
 func (e *entityCache) GetProject(slug string) (*assets.Project, bool) {
 	e.mu.RLock()
 	project, ok := e.projects[slug]
 	e.mu.RUnlock()
+
 	return project, ok
 }
 
-// SetProject sets a project in the cache
+// SetProject sets a project in the cache.
 func (e *entityCache) SetProject(project *assets.Project) {
 	e.mu.Lock()
 	projectCopy := *project // Make a copy to avoid race conditions
@@ -386,14 +396,14 @@ func (e *entityCache) SetProject(project *assets.Project) {
 	e.mu.Unlock()
 }
 
-// Buffer pool for reusing buffers in markdown parsing
+// Buffer pool for reusing buffers in markdown parsing.
 var bufferPool = sync.Pool{
 	New: func() any {
 		return new(bytes.Buffer)
 	},
 }
 
-// Static mapping of file extensions to content types to avoid reflection
+// Static mapping of file extensions to content types to avoid reflection.
 var contentTypes = map[string]string{
 	".jpg":   "image/jpeg",
 	".jpeg":  "image/jpeg",
@@ -418,7 +428,7 @@ var contentTypes = map[string]string{
 	".otf":   "font/otf",
 }
 
-// getContentType returns the content type for a file extension
+// getContentType returns the content type for a file extension.
 func getContentType(path string) string {
 	ext := filepath.Ext(path)
 	if contentType, ok := contentTypes[ext]; ok {
@@ -428,7 +438,7 @@ func getContentType(path string) string {
 	return "application/octet-stream"
 }
 
-// NewProcessor creates a new asset processor
+// NewProcessor creates a new asset processor.
 func NewProcessor(
 	fs afero.Fs,
 	db *bun.DB,
@@ -440,6 +450,10 @@ func NewProcessor(
 	memCache := newMemCache()
 	entityCache := newEntityCache()
 
+	bucketName := os.Getenv("BUCKET_NAME")
+	if bucketName == "" {
+		panic("BUCKET_NAME environment variable is not set")
+	}
 	// Initialize SQLite for better concurrency
 	initDB(db)
 
@@ -447,6 +461,7 @@ func NewProcessor(
 		fs:          fs,
 		db:          db,
 		s3Client:    s3Client,
+		s3Bucket:    bucketName,
 		embedder:    embedder,
 		md:          md,
 		taskCh:      make(chan Task, bufferSize),
@@ -461,7 +476,7 @@ func NewProcessor(
 	}
 }
 
-// initDB configures SQLite for better concurrency handling
+// initDB configures SQLite for better concurrency handling.
 func initDB(db *bun.DB) {
 	// Set pragmas for better concurrent performance
 	pragmas := []string{
@@ -480,7 +495,7 @@ func initDB(db *bun.DB) {
 	}
 }
 
-// Start starts the processor workers
+// Start starts the processor workers.
 func (p *Processor) Start(ctx context.Context, numWorkers int) {
 	// Initialize the last activity timestamp
 	p.stats.lastActivityNs.Store(time.Now().UnixNano())
@@ -499,7 +514,7 @@ func (p *Processor) Start(ctx context.Context, numWorkers int) {
 	slog.Debug("processor started", "workers", numWorkers)
 }
 
-// monitorCompletion monitors for task completion
+// monitorCompletion monitors for task completion.
 func (p *Processor) monitorCompletion(ctx context.Context) {
 	ticker := time.NewTicker(1 * time.Second)
 	defer ticker.Stop()
@@ -508,6 +523,7 @@ func (p *Processor) monitorCompletion(ctx context.Context) {
 		select {
 		case <-ctx.Done():
 			slog.Debug("completion monitor shutdown due to context cancellation")
+
 			return
 
 		case <-ticker.C:
@@ -533,7 +549,7 @@ func (p *Processor) monitorCompletion(ctx context.Context) {
 	}
 }
 
-// logStatus logs the processor status periodically
+// logStatus logs the processor status periodically.
 func (p *Processor) logStatus(ctx context.Context) {
 	ticker := time.NewTicker(5 * time.Second)
 	defer ticker.Stop()
@@ -553,7 +569,7 @@ func (p *Processor) logStatus(ctx context.Context) {
 	}
 }
 
-// worker processes tasks from the task channel
+// worker processes tasks from the task channel.
 func (p *Processor) worker(ctx context.Context, id int) {
 	slog.Debug("starting worker", "id", id)
 	defer slog.Debug("worker stopped", "id", id)
@@ -593,7 +609,7 @@ func (p *Processor) worker(ctx context.Context, id int) {
 	}
 }
 
-// SubmitTask adds a task to the task channel
+// SubmitTask adds a task to the task channel.
 func (p *Processor) SubmitTask(task Task) {
 	select {
 	case p.taskCh <- task:
@@ -608,7 +624,7 @@ func (p *Processor) SubmitTask(task Task) {
 	}
 }
 
-// ScanFS scans the filesystem and submits tasks
+// ScanFS scans the filesystem and submits tasks.
 func (p *Processor) ScanFS() error {
 	slog.Debug("scanning filesystem")
 
@@ -664,7 +680,7 @@ func (p *Processor) ScanFS() error {
 	return err
 }
 
-// WaitForCompletion waits for all tasks to complete
+// WaitForCompletion waits for all tasks to complete.
 func (p *Processor) WaitForCompletion(timeout time.Duration) bool {
 	slog.Debug("waiting for task completion", "timeout", timeout.String())
 
@@ -677,6 +693,7 @@ func (p *Processor) WaitForCompletion(timeout time.Duration) bool {
 	case <-p.doneCh:
 		// All tasks completed
 		slog.Info("received completion signal - all tasks completed")
+
 		return true
 	case <-timer.C:
 		// Timeout occurred
@@ -690,18 +707,19 @@ func (p *Processor) WaitForCompletion(timeout time.Duration) bool {
 			"pendingTasks",
 			p.stats.TotalSubmitted.Load()-p.stats.TotalCompleted.Load(),
 		)
+
 		return false
 	}
 }
 
 // WaitForAllTasks waits for the wait group to finish
 // This is different from WaitForCompletion as it waits for the actual
-// wait group to be empty, not just for the done signal
+// wait group to be empty, not just for the done signal.
 func (p *Processor) WaitForAllTasks() {
 	p.wg.Wait()
 }
 
-// Close properly cleans up all resources
+// Close properly cleans up all resources.
 func (p *Processor) Close() {
 	// Shutdown the batch operations background goroutine
 	p.batchOps.shutdown()
@@ -714,17 +732,17 @@ func (p *Processor) Close() {
 	slog.Debug("processor resources cleaned up")
 }
 
-// Errors returns the error channel
+// Errors returns the error channel.
 func (p *Processor) Errors() <-chan error {
 	return p.errCh
 }
 
-// Done returns the done channel
+// Done returns the done channel.
 func (p *Processor) Done() <-chan struct{} {
 	return p.doneCh
 }
 
-// processTask handles processing of a single task
+// processTask handles processing of a single task.
 func (p *Processor) processTask(ctx context.Context, task Task) error {
 	switch task.Type {
 	case TypeAsset:
@@ -750,15 +768,17 @@ func (p *Processor) processTask(ctx context.Context, task Task) error {
 					p.SubmitTask(task)
 				}
 			}()
+
 			return nil // Don't propagate error as we're retrying
 		}
+
 		return nil
 	default:
 		return eris.Errorf("unknown task type: %s", task.Type)
 	}
 }
 
-// processAsset processes an asset file
+// processAsset processes an asset file.
 func (p *Processor) processAsset(ctx context.Context, task Task) error {
 	var err error
 
@@ -780,11 +800,13 @@ func (p *Processor) processAsset(ctx context.Context, task Task) error {
 	}
 	if isCached {
 		slog.Debug("asset cached", "path", task.Path)
+
 		return nil // Skip if already cached and unchanged
 	}
 
 	// Upload to S3
-	if err := p.uploadToS3(ctx, task.Path, task.Content); err != nil {
+	err = p.uploadToS3(ctx, task.Path, task.Content)
+	if err != nil {
 		return err
 	}
 
@@ -792,7 +814,7 @@ func (p *Processor) processAsset(ctx context.Context, task Task) error {
 	return p.updateCache(ctx, task.Path, hash)
 }
 
-// processDocument processes a document file
+// processDocument processes a document file.
 func (p *Processor) processDocument(ctx context.Context, task Task) error {
 	// Read file if content wasn't provided
 	var content []byte
@@ -811,9 +833,11 @@ func (p *Processor) processDocument(ctx context.Context, task Task) error {
 	hash := assets.Hash(content)
 
 	// Check if document is already cached and unchanged
-	if isCached, err := p.checkCache(ctx, task.Path, hash); err != nil {
+	isCached, err := p.checkCache(ctx, task.Path, hash)
+	if err != nil {
 		return err
-	} else if isCached {
+	}
+	if isCached {
 		return nil // Skip if already cached and unchanged
 	}
 
@@ -824,12 +848,14 @@ func (p *Processor) processDocument(ctx context.Context, task Task) error {
 	}
 
 	// Set default values
-	if err := assets.Defaults(doc); err != nil {
+	err = assets.Defaults(doc)
+	if err != nil {
 		return eris.Wrapf(err, "failed to set defaults for document: %s", task.Path)
 	}
 
 	// Parse markdown and frontmatter
-	if err := p.parseMarkdown(content, doc); err != nil {
+	err = p.parseMarkdown(content, doc)
+	if err != nil {
 		return err
 	}
 
@@ -837,12 +863,14 @@ func (p *Processor) processDocument(ctx context.Context, task Task) error {
 	doc.Slug = assets.Slugify(task.Path)
 
 	// Validate document
-	if err := assets.Validate(task.Path, doc); err != nil {
+	err = assets.Validate(task.Path, doc)
+	if err != nil {
 		return eris.Wrapf(err, "document validation failed: %s", task.Path)
 	}
 
 	// Save document to database
-	if err := p.saveDocument(ctx, doc); err != nil {
+	err = p.saveDocument(ctx, doc)
+	if err != nil {
 		return err
 	}
 
@@ -851,7 +879,7 @@ func (p *Processor) processDocument(ctx context.Context, task Task) error {
 }
 
 // checkCache checks if a file is already cached and unchanged
-// This version uses the memory cache with sync.Once initialization
+// This version uses the memory cache with sync.Once initialization.
 func (p *Processor) checkCache(ctx context.Context, path, hash string) (bool, error) {
 	// Make sure cache is loaded (only once)
 	if err := p.memCache.ensureLoaded(ctx, p.db); err != nil {
@@ -864,6 +892,7 @@ func (p *Processor) checkCache(ctx context.Context, path, hash string) (bool, er
 			return true, nil
 		}
 		slog.Debug("file has changed", "path", path)
+
 		return false, nil
 	}
 
@@ -871,7 +900,7 @@ func (p *Processor) checkCache(ctx context.Context, path, hash string) (bool, er
 	return false, nil
 }
 
-// updateCache updates the cache record for a file
+// updateCache updates the cache record for a file.
 func (p *Processor) updateCache(ctx context.Context, path, hash string) error {
 	cache := &assets.Cache{
 		Path: path,
@@ -887,17 +916,18 @@ func (p *Processor) updateCache(ctx context.Context, path, hash string) error {
 	return nil
 }
 
-// uploadToS3 uploads a file to S3
+// uploadToS3 uploads a file to S3.
 func (p *Processor) uploadToS3(ctx context.Context, path string, data []byte) error {
 	// Use custom content type function instead of mime.TypeByExtension
 	contentType := getContentType(path)
 
 	// Use a timeout context to prevent hanging on S3 operations
-	uploadCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	uploadCtx, cancel := context.WithTimeout(ctx, 15*time.Second)
 	defer cancel()
 
+	slog.Info("Uploading to S3", "path", path)
 	_, err := p.s3Client.PutObject(uploadCtx, &s3.PutObjectInput{
-		Bucket:      aws.String("conneroh"),
+		Bucket:      &p.s3Bucket,
 		Key:         aws.String(path),
 		Body:        bytes.NewReader(data),
 		ContentType: aws.String(contentType),
@@ -907,14 +937,16 @@ func (p *Processor) uploadToS3(ctx context.Context, path string, data []byte) er
 		if errors.Is(err, context.DeadlineExceeded) {
 			return eris.New("S3 upload timed out")
 		}
+
 		return eris.Wrapf(err, "failed to upload to S3: %s", path)
 	}
 
 	slog.Debug("uploaded to S3", "path", path)
+
 	return nil
 }
 
-// parseMarkdown parses markdown content and extracts frontmatter
+// parseMarkdown parses markdown content and extracts frontmatter.
 func (p *Processor) parseMarkdown(content []byte, doc *assets.Doc) error {
 	// Get a buffer from the pool
 	buf := bufferPool.Get().(*bytes.Buffer)
@@ -941,10 +973,11 @@ func (p *Processor) parseMarkdown(content []byte, doc *assets.Doc) error {
 	}
 
 	doc.Content = buf.String()
+
 	return nil
 }
 
-// saveDocument saves a document to the database
+// saveDocument saves a document to the database.
 func (p *Processor) saveDocument(ctx context.Context, doc *assets.Doc) error {
 	switch {
 	case strings.HasPrefix(doc.Path, assets.PostsLoc) && strings.HasSuffix(doc.Path, ".md"):
@@ -958,7 +991,7 @@ func (p *Processor) saveDocument(ctx context.Context, doc *assets.Doc) error {
 	}
 }
 
-// savePost saves a post to the database
+// savePost saves a post to the database.
 func (p *Processor) savePost(ctx context.Context, doc *assets.Doc) error {
 	// Convert Doc to Post
 	post := &assets.Post{}
@@ -985,11 +1018,17 @@ func (p *Processor) savePost(ctx context.Context, doc *assets.Doc) error {
 		Set("y = EXCLUDED.y").
 		Set("z = EXCLUDED.z").
 		Exec(insertCtx)
+	slog.Info(
+		"saved post",
+		slog.String("slug", doc.Slug),
+		slog.String("banner_path", doc.BannerPath),
+	)
 
 	if err != nil {
 		if errors.Is(err, context.DeadlineExceeded) {
 			return eris.New("database operation timed out")
 		}
+
 		return eris.Wrapf(err, "failed to save post: %s", doc.Path)
 	}
 
@@ -1007,7 +1046,7 @@ func (p *Processor) savePost(ctx context.Context, doc *assets.Doc) error {
 	return nil
 }
 
-// saveProject saves a project to the database
+// saveProject saves a project to the database.
 func (p *Processor) saveProject(ctx context.Context, doc *assets.Doc) error {
 	// Convert Doc to Project
 	project := &assets.Project{}
@@ -1039,6 +1078,7 @@ func (p *Processor) saveProject(ctx context.Context, doc *assets.Doc) error {
 		if errors.Is(err, context.DeadlineExceeded) {
 			return eris.New("database operation timed out")
 		}
+
 		return eris.Wrapf(err, "failed to save project: %s", doc.Path)
 	}
 
@@ -1056,7 +1096,7 @@ func (p *Processor) saveProject(ctx context.Context, doc *assets.Doc) error {
 	return nil
 }
 
-// saveTag saves a tag to the database
+// saveTag saves a tag to the database.
 func (p *Processor) saveTag(ctx context.Context, doc *assets.Doc) error {
 	// Convert Doc to Tag
 	tag := &assets.Tag{}
@@ -1088,6 +1128,7 @@ func (p *Processor) saveTag(ctx context.Context, doc *assets.Doc) error {
 		if errors.Is(err, context.DeadlineExceeded) {
 			return eris.New("database operation timed out")
 		}
+
 		return eris.Wrapf(err, "failed to save tag: %s", doc.Path)
 	}
 
@@ -1105,7 +1146,7 @@ func (p *Processor) saveTag(ctx context.Context, doc *assets.Doc) error {
 	return nil
 }
 
-// findTagBySlug finds a tag by its slug
+// findTagBySlug finds a tag by its slug.
 func (p *Processor) findTagBySlug(
 	ctx context.Context,
 	slug, origin string,
@@ -1141,6 +1182,7 @@ func (p *Processor) findTagBySlug(
 				origin,
 			)
 		}
+
 		return nil, eris.Wrapf(err, "failed to find tag: %s", slug)
 	}
 
@@ -1150,7 +1192,7 @@ func (p *Processor) findTagBySlug(
 	return &tag, nil
 }
 
-// findPostBySlug finds a post by its slug
+// findPostBySlug finds a post by its slug.
 func (p *Processor) findPostBySlug(ctx context.Context, slug, origin string) (*assets.Post, error) {
 	// First check in-memory cache
 	if post, ok := p.entityCache.GetPost(slug); ok {
@@ -1182,6 +1224,7 @@ func (p *Processor) findPostBySlug(ctx context.Context, slug, origin string) (*a
 				origin,
 			)
 		}
+
 		return nil, eris.Wrapf(err, "failed to find post: %s", slug)
 	}
 
@@ -1191,7 +1234,7 @@ func (p *Processor) findPostBySlug(ctx context.Context, slug, origin string) (*a
 	return &post, nil
 }
 
-// findProjectBySlug finds a project by its slug
+// findProjectBySlug finds a project by its slug.
 func (p *Processor) findProjectBySlug(ctx context.Context, slug, origin string) (*assets.Project, error) {
 	// First check in-memory cache
 	if project, ok := p.entityCache.GetProject(slug); ok {
@@ -1224,6 +1267,7 @@ func (p *Processor) findProjectBySlug(ctx context.Context, slug, origin string) 
 				origin,
 			)
 		}
+
 		return nil, eris.Wrapf(err, "failed to find project: %s", slug)
 	}
 
@@ -1233,7 +1277,7 @@ func (p *Processor) findProjectBySlug(ctx context.Context, slug, origin string) 
 	return &project, nil
 }
 
-// updatePostRelationships updates relationships for a post
+// updatePostRelationships updates relationships for a post.
 func (p *Processor) updatePostRelationships(
 	ctx context.Context,
 	post *assets.Post,
@@ -1312,7 +1356,7 @@ func (p *Processor) updatePostRelationships(
 	return nil
 }
 
-// updateProjectRelationships updates relationships for a project
+// updateProjectRelationships updates relationships for a project.
 func (p *Processor) updateProjectRelationships(
 	ctx context.Context,
 	project *assets.Project,
@@ -1386,7 +1430,7 @@ func (p *Processor) updateProjectRelationships(
 	return nil
 }
 
-// updateTagRelationships updates relationships for a tag
+// updateTagRelationships updates relationships for a tag.
 func (p *Processor) updateTagRelationships(
 	ctx context.Context,
 	tag *assets.Tag,

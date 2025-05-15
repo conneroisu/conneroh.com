@@ -4,10 +4,11 @@ aliases:
   - My Ethics
 tags:
   - edu/iastate/ee394
+banner_path: posts/ethics.webp
 created_at: 2025-05-02T13:36:53.000-06:00
 description: This essay discusses the importance of having a personal code of ethics and using a thoughtful decision-making process to promote ethical behavior in organizations and professions.
 title: My Ethics
-updated_at: 2025-05-02T13:37:42.000-06:00
+updated_at: 2025-05-15T12:36:49.000-06:00
 ---
 
 # My Ethics

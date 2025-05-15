@@ -68,6 +68,10 @@
           harper
           htmx-lsp
           vscode-langservers-extracted
+          sqlite
+
+          rust-bin.stable.latest.default # Rust
+          rust-analyzer
 
           flyctl # Infra
           openssl.dev

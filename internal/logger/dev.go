@@ -30,6 +30,7 @@ var DefaultLogger = slog.New(
 					)
 				}
 			}
+
 			return a
 		}}),
 )

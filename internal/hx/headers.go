@@ -1,7 +1,7 @@
 package hx
 
 const (
-	// Request Headers
+	// Request Headers.
 
 	// HdrBoosted indicates that the request was sent via an element using [hx-boost](https://htmx.org/docs/#boost).
 	HdrBoosted = "HX-Boosted"
@@ -11,7 +11,7 @@ const (
 	HdrHistoryRestoreRequest = "HX-History-Restore-Request"
 	// HdrPrompt indicates that the request was sent via an element using [hx-prompt](https://htmx.org/docs/#prompt).
 	HdrPrompt = "HX-Prompt"
-	// HdrRequest is always set to "true"
+	// HdrRequest is always set to "true".
 	HdrRequest = "HX-Request"
 	// HdrTarget is the id of the target element if it exists.
 	HdrTarget = "HX-Target"
@@ -20,7 +20,7 @@ const (
 	// HdrTrigger is the id of the triggered element if it exists.
 	HdrTrigger = "HX-Trigger"
 
-	// Response Headers
+	// Response Headers.
 
 	// HdrLocation is the URL to redirect to without doing a full page reload.
 	HdrLocation = "HX-Location"

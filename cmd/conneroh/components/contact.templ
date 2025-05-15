@@ -4,7 +4,7 @@ import "github.com/conneroisu/twerge"
 
 // CThanks is the component for the thanks response after submitting a contact forum
 templ ThankYou() {
-	<div class={ twerge.It("bg-blue-500 p-8 rounded-lg shadow-md text-center") }>
+	<div class={ twerge.It("bg-green-500 p-8 rounded-lg shadow-md text-center") }>
 		<div class={ twerge.It("mb-6 flex justify-center") }>
 			<div class={ twerge.It("bg-green-600 rounded-full p-4 w-16 h-16 flex items-center justify-center") }>
 				<svg xmlns="http://www.w3.org/2000/svg" class={ twerge.It("h-8 w-8 text-white") } fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -38,7 +38,7 @@ templ Form() {
 					type="text"
 					id="name"
 					name="name"
-					class={ twerge.It("py-2 bg-gray-700 focus:outline-none border-gray-600 w-full focus:ring-blue-500 border px-4 text-white rounded-md focus:ring-2") }
+					class={ twerge.It("py-2 bg-gray-700 focus:outline-none border-gray-600 w-full focus:ring-green-500 border px-4 text-white rounded-md focus:ring-2") }
 					required
 				/>
 			</div>
@@ -53,7 +53,7 @@ templ Form() {
 					type="email"
 					id="email"
 					name="email"
-					class={ twerge.It("py-2 bg-gray-700 focus:outline-none border-gray-600 w-full focus:ring-blue-500 border px-4 text-white rounded-md focus:ring-2") }
+					class={ twerge.It("py-2 bg-gray-700 focus:outline-none border-gray-600 w-full focus:ring-green-500 border px-4 text-white rounded-md focus:ring-2") }
 					required
 				/>
 			</div>
@@ -69,7 +69,7 @@ templ Form() {
 				type="text"
 				id="subject"
 				name="subject"
-				class={ twerge.It("py-2 bg-gray-700 focus:outline-none border-gray-600 w-full focus:ring-blue-500 border px-4 text-white rounded-md focus:ring-2") }
+				class={ twerge.It("py-2 bg-gray-700 focus:outline-none border-gray-600 w-full focus:ring-green-500 border px-4 text-white rounded-md focus:ring-2") }
 				required
 			/>
 		</div>
@@ -84,13 +84,13 @@ templ Form() {
 				id="message"
 				name="message"
 				rows="4"
-				class={ twerge.It("py-2 bg-gray-700 focus:outline-none border-gray-600 w-full focus:ring-blue-500 border px-4 text-white rounded-md focus:ring-2") }
+				class={ twerge.It("py-2 bg-gray-700 focus:outline-none border-gray-600 w-full focus:ring-green-500 border px-4 text-white rounded-md focus:ring-2") }
 				required
 			></textarea>
 		</div>
 		<button
 			type="submit"
-			class={ twerge.It("rounded-md font-medium text-white transition-colors focus:ring-offset-2 focus:ring-2 focus:ring-blue-500 w-full hover:bg-blue-700 bg-blue-600 py-3 focus:outline-none px-6") }
+			class={ twerge.It("rounded-md font-medium text-white transition-colors focus:ring-offset-2 focus:ring-2 focus:ring-green-500 w-full hover:bg-green-700 bg-green-600 py-3 focus:outline-none px-6") }
 		>
 			Send Message
 		</button>

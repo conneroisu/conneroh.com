@@ -12,7 +12,7 @@ banner_path: projects/mp0-menu.gif
 created_at: 2025-03-27T14:13:10.000-06:00
 description: The first Project from CPRE488 at Iowa State University
 title: CPRE488 MP0
-updated_at: 2025-04-14T19:16:20.000-06:00
+updated_at: 2025-05-15T14:11:20.000-06:00
 ---
 
 # CPRE488 MP0
@@ -97,7 +97,7 @@ Depends on the `xilinx-sdk` implementation.
 3. **Display**:
    - VDMA **should** stream the framebuffer to the display.
 
-![[projects/high_level_diagram.png]]
+<!-- ![[projects/high_level_diagram.png]] -->
 
 ## How does NESCore_Callback_OutputFrame() get called?
 
@@ -187,7 +187,7 @@ This is used in the Hello World example to print the "Hello World" string to the
 
 The LED outputs were connected to an Axi interconnect at slot_0. Because the LED is sending data, we can read the respective GPIO responses in the W Channel. The image below illustrates that the first and seventh switches were toggled in succession per the signals in WDATA. 
 
-![[projects/cpre488-mp0-led-flash-capture.png]] 
+<!-- ![[projects/cpre488-mp0-led-flash-capture.png]]  -->
 
 A pulse duration of 25 ns is shown in the image above.
 
@@ -244,13 +244,13 @@ int main()
 ## In VIVADO, add these peripherals to your project , connect and then configure them to generate a 640x480 output signal.
 
 The Video Timing Control IP was set to the given timing values for 640x480 video. However, we had to change the active polarity of the Hsync and Vsync as the VTC defualt values did not align with the standard VGA protocol.
-![[projects/VTC_setup.png]]
+<!-- ![[projects/VTC_setup.png]] -->
 
 The Video Direct Memory Access IP was set such that it had a data width of 16 bits to correspond to our Video Output IP.
-![[projects/VDMA_setup.png]]
+<!-- ![[projects/VDMA_setup.png]] -->
 
 The AXI4-Stream to Video Out IP was setup such that it could read 16 bits and output 16 bits. Because the VGA protocol did need any additional signals from this IP, we could use the Mono/Sensor video format to ensure our data stream widths were the desired sizes (12-bits also works for the output as long as it is properly mapped to the VGA pins). 
-![[projects/Vidout_setup.png]]
+<!-- ![[projects/Vidout_setup.png]] -->
 
 Some other important considerations were that the input clock had to be as close to 25.125 MHz, the VTC enable on the AXI4-Stream to Video Out IP had to be connected to the generation clock enable output on the Video Timing, and ensuring the AXI4-Stream to Video Out IP had an independent clock for video if we had a faster clock for the AXI stream. 
 
@@ -364,11 +364,11 @@ We implemented the following extra credit items:
 
 To implement a reader for the SNES controller, we first did some research on the protocol that the controller used. The website https://gamesx.com/controldata/snesdat.htm provided a sufficient writeup of the protocol. However, to verify that we understood the protocol, we took the SNES controller and went out to one of the circuit labs. In the lab, we hooked up the function generator to generate the `clock` and `latch` signals. We then were able to read the response from the SNES controller using an oscilloscope. Am image of such a reading is shown below:
 
-![[projects/oscope.png]]
+<!-- ![[projects/oscope.png]] -->
 
 After we verified we understood the protocol, we devised a block diagram of an implementation. This block diagram is shown below:
 
-![[projects/snes_controller_reader_bd.png]]
+<!-- ![[projects/snes_controller_reader_bd.png]] -->
 
 This block diagram is made up of three major components: the pulse generator, a 4-bit counter, and a 16-bit shift register. The pulse generator creates the `latch` signal for the SNES controller upon receiving the `start` signal. After the pulse is sent, the pulse generator will not sent another pulse until it is reset and `start` is sent again. Then once the pulse has finished, the `counter_enable` signal is sent out to the 4-bit counter. The 4-bit counter will count 16 clock cycles, which will be aligned to the 16 data bits that the SNES controller sends. Once 16 clock cycles have been read, the `done` signal is sent out and the 16-bit shift register is disabled so we don't shift the read data off. Like the pulse generator, the 4-bit counter cannot be activated again until it is reset. This is to avoid restarting the 4-bit counter by accidently holding the enable signal high for too long.
 
@@ -378,11 +378,11 @@ Once all of this was implemented, we ran many tests, fixed many issues and got a
 
 There was another attempt to interface with a SNES controller through a Verilog defined IP. This particular method sought to follow the SNES protocol as defined in this website (https://gamesx.com/controldata/snesdat.htm). A state machine was implemented such that the RTL would act like the SNES CPU; The latch and clock would hold high for 12 us to signal for the SNES controller to begin latching data, the latch would then go low for 6 us to signal for the SNES controller to begin sending data, and then the clock would then propagate on a 12 us period for 15 cycles such that the SNES data was completely transmitted. In order to implement a delay of 6 us and 12 us clock, a delay timer was created by using a counter. This counter counts to a parameter set to the quotient of the input clock and the desired period. Since the input clock to this RTL IP was 25 MHz 6 us achieved by counting up to 150 cycles. This RTL IP was successfully imported into the Vivado project, but there was issue when attempting to connect its output data to the processing system block. There was an attempt to create a custom AXI4-lite peripherial IP which wrapped the user project, but there wasn't enough time to trouble shoot the issues. 
 
-![[projects/ager.png]]
+<!-- ![[projects/ager.png]] -->
 
 Below is an example of the SNES controller correctly communicating with the FPGA.
 
-![[projects/verilog_snes_ex.png]]
+<!-- ![[projects/verilog_snes_ex.png]] -->
 
 ### Graphical Menu
 

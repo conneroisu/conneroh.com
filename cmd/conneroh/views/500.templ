@@ -1,0 +1,50 @@
+package views
+
+import (
+	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
+	"github.com/conneroisu/twerge"
+)
+
+templ Code500() {
+	<div class={ twerge.It("min-h-screen flex items-center justify-center bg-gray-900 px-4 py-12") }>
+		<div class={ twerge.It("max-w-md w-full bg-gray-800 rounded-lg shadow-lg overflow-hidden") }>
+			<div class={ twerge.It("p-6") }>
+				<div class={ twerge.It("flex items-center justify-center mb-8") }>
+					<div class={ twerge.It("h-24 w-24 rounded-full bg-red-500 flex items-center justify-center") }>
+						@components.Icon("circle-alert", templ.Attributes{
+							"class": twerge.It("text-white"),
+							"style": "width: 3em; height: 3em;",
+						})
+					</div>
+				</div>
+				<h1 class={ twerge.It("text-3xl font-bold text-center text-white mb-4") }>
+					500 - Server Error
+				</h1>
+				<div class={ twerge.It("h-1 w-16 bg-red-500 mx-auto mb-6") }></div>
+				<p class={ twerge.It("text-gray-300 mb-8 text-center") }>
+					Something went wrong on my end. I'll work to fix the issue. Please try again later or contact us if the problem persists.
+				</p>
+				<div class={ twerge.It("flex flex-col md:flex-row gap-4 justify-center") }>
+					<a
+						href="/"
+						hx-get="/"
+						hx-push-url="true"
+						hx-target="#bodiody"
+						class={ twerge.It("inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-green-600 hover:bg-green-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500") }
+					>
+						Return Home
+					</a>
+					<a
+						href="#contact"
+						class={ twerge.It("inline-flex items-center justify-center px-6 py-3 border border-gray-700 rounded-md shadow-sm text-base font-medium text-gray-300 bg-gray-900 hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500") }
+					>
+						Contact Support
+					</a>
+				</div>
+				<div class={ twerge.It("mt-8 text-sm text-gray-500 text-center") }>
+					Error Code: 500 - Internal Server Error
+				</div>
+			</div>
+		</div>
+	</div>
+}

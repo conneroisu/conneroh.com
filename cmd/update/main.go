@@ -34,7 +34,7 @@ var (
 
 func main() {
 	flag.Parse()
-	slog.SetDefault(logger.DefaultLogger)
+	slog.SetDefault(logger.DefaultProdLogger)
 
 	// Create context that will be canceled on interrupt signals
 	ctx, stop := signal.NotifyContext(context.Background(),
@@ -51,7 +51,7 @@ func main() {
 	}
 }
 
-// Run executes the main application logic
+// Run executes the main application logic.
 func Run(ctx context.Context, getenv func(string) string, numWorkers, bufferSize int) error {
 	// Initialize error collection
 	var errs []error
@@ -66,11 +66,13 @@ func Run(ctx context.Context, getenv func(string) string, numWorkers, bufferSize
 		_, Verr := sqldb.Exec("PRAGMA journal_mode = OFF;")
 		if Verr != nil {
 			slog.Error("failed to vacuum database", "err", Verr)
+
 			return
 		}
 		_, Verr = sqldb.Exec("VACUUM;")
 		if Verr != nil {
 			slog.Error("failed to vacuum database", "err", Verr)
+
 			return
 		}
 	}()
@@ -144,6 +146,7 @@ func Run(ctx context.Context, getenv func(string) string, numWorkers, bufferSize
 		errs = append(errs, eris.Wrap(err, "failed to scan filesystem"))
 		errMutex.Unlock()
 		cancelProcessing() // Cancel processing on scan error
+
 		return combineErrors(errs)
 	}
 
@@ -201,10 +204,11 @@ func Run(ctx context.Context, getenv func(string) string, numWorkers, bufferSize
 	}
 
 	slog.Info("processing completed successfully")
+
 	return nil
 }
 
-// combineErrors combines multiple errors into one
+// combineErrors combines multiple errors into one.
 func combineErrors(errs []error) error {
 	if len(errs) == 0 {
 		return nil

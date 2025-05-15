@@ -116,7 +116,7 @@ templ Home(
 					hx-push-url="true"
 					hx-target="#bodiody"
 					preload="mouseover"
-					class={ twerge.It("font-medium flex items-center text-blue-400 hover:underline text-lg") }
+					class={ twerge.It("font-medium flex items-center text-green-400 hover:underline text-lg cursor-pointer") }
 				>
 					View All Projects &rarr;
 				</a>
@@ -129,7 +129,7 @@ templ Home(
 						@components.ProjectItem(
 							project,
 							templ.Attributes{
-								"class":       twerge.It("bg-gray-900 transition-all flex transform hover:-translate-y-3 flex-col shadow-md rounded-lg hover:shadow-lg duration-300 overflow-hidden h-full cursor-pointer"),
+								"class":       twerge.It("bg-gray-900 transition-all flex transform hover:-translate-y-3 flex-col shadow-md rounded-lg hover:shadow-lg duration-300 overflow-hidden cursor-pointer h-full"),
 								"aria-label":  project.Title,
 								"hx-target":   "#bodiody",
 								"hx-get":      project.PagePath(),
@@ -161,7 +161,7 @@ templ Home(
 					hx-get="/posts"
 					hx-push-url="true"
 					hx-target="#bodiody"
-					class={ twerge.It("font-medium flex items-center text-blue-400 hover:underline text-lg") }
+					class={ twerge.It("font-medium flex items-center text-green-400 hover:underline text-lg cursor-pointer") }
 					preload="mouseover"
 				>
 					View All Posts &rarr;
@@ -173,7 +173,7 @@ templ Home(
 				for i, post := range *fullPosts {
 					if i < 4 {
 						@components.PostItem(post, templ.Attributes{
-							"class":       twerge.It("overflow-hidden bg-gray-800 transform rounded-lg transition-all hover:shadow-lg duration-300 shadow-md hover:-translate-y-1 cursor-pointer"),
+							"class":       twerge.It("overflow-hidden bg-gray-800 transform rounded-lg transition-all hover:shadow-lg duration-300 shadow-md hover:-translate-y-1 cursor-pointer h-full"),
 							"hx-target":   "#bodiody",
 							"hx-get":      post.PagePath(),
 							"hx-push-url": post.PagePath(),
@@ -204,7 +204,7 @@ templ Home(
 					hx-get="/tags"
 					hx-push-url="/tags"
 					preload="mouseover"
-					class={ twerge.It("font-medium flex items-center text-blue-400 hover:underline text-lg") }
+					class={ twerge.It("font-medium flex items-center text-green-400 hover:underline text-lg") }
 				>
 					See All Skills/Technologies &rarr;
 				</a>
@@ -257,7 +257,7 @@ templ Home(
 					// Social links
 					<a
 						href="https://www.linkedin.com/in/conner-ohnesorge-b720a4238"
-						class={ twerge.It("hover:bg-blue-400 w-12 rounded-full bg-gray-700 transition-colors flex text-gray-300 h-12 items-center justify-center") }
+						class={ twerge.It("hover:bg-green-400 w-12 rounded-full bg-gray-700 transition-colors flex text-gray-300 h-12 items-center justify-center") }
 					>
 						@components.Icon("linkedin", templ.Attributes{})
 					</a>
@@ -269,7 +269,7 @@ templ Home(
 					</a>
 					<a
 						href="https://x.com/ConnerOhnesorge"
-						class={ twerge.It("hover:bg-blue-400 w-12 rounded-full bg-gray-700 transition-colors flex text-gray-300 h-12 items-center justify-center") }
+						class={ twerge.It("hover:bg-green-400 w-12 rounded-full bg-gray-700 transition-colors flex text-gray-300 h-12 items-center justify-center") }
 					>
 						@components.Icon("twitter", templ.Attributes{})
 					</a>

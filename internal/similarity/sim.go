@@ -1,7 +1,7 @@
 package similarity
 
 import (
-	"fmt"
+	"errors"
 	"math"
 
 	"gonum.org/v1/gonum/floats"
@@ -40,6 +40,7 @@ func normalizeScores(sim []float64) []float64 {
 			normalized[i] = (sim[i] - minimum) / (maximum - minimum)
 		}
 	}
+
 	return normalized
 }
 
@@ -79,6 +80,7 @@ func similarityDotMatrix(xq, index *mat.VecDense) (float64, error) {
 func euclideanDistance(xq, index *mat.VecDense) (float64, error) {
 	diff := mat.NewVecDense(xq.Len(), nil)
 	diff.SubVec(xq, index)
+
 	return mat.Norm(diff, 2), nil
 }
 
@@ -97,6 +99,7 @@ func manhattanDistance(xq, index *mat.VecDense) (float64, error) {
 	for i := range diff.Len() {
 		sum += math.Abs(diff.AtVec(i))
 	}
+
 	return mat.Norm(diff, 1), nil
 }
 
@@ -114,6 +117,7 @@ func jaccardSimilarity(xq, index *mat.VecDense) (float64, error) {
 		minSum += math.Min(xq.AtVec(i), index.AtVec(i))
 		maxSum += math.Max(xq.AtVec(i), index.AtVec(i))
 	}
+
 	return minSum / maxSum, nil
 }
 
@@ -144,6 +148,7 @@ func pearsonCorrelation(xq, index *mat.VecDense) (float64, error) {
 		varSumXq += diffXq * diffXq
 		varSumIndex += diffIndex * diffIndex
 	}
+
 	return numerator / (math.Sqrt(varSumXq) * math.Sqrt(varSumIndex)), nil
 }
 
@@ -157,7 +162,7 @@ func pearsonCorrelation(xq, index *mat.VecDense) (float64, error) {
 // The function takes two vectors as input and returns the Hamming distance between them.
 func hammingDistance(xq, index *mat.VecDense) (float64, error) {
 	if xq.Len() != index.Len() {
-		return 0, fmt.Errorf("vectors must be the same length (are you mix mashing encoding models?)")
+		return 0, errors.New("vectors must be the same length (are you mix mashing encoding models?)")
 	}
 
 	count := 0.0
@@ -166,6 +171,7 @@ func hammingDistance(xq, index *mat.VecDense) (float64, error) {
 			count++
 		}
 	}
+
 	return count, nil
 }
 
@@ -188,5 +194,6 @@ func minkowskiDistance(xq, index *mat.VecDense, p float64) (float64, error) {
 	for i := range diff.Len() {
 		sum += math.Pow(math.Abs(diff.AtVec(i)), p)
 	}
+
 	return math.Pow(sum, 1/p), nil
 }
