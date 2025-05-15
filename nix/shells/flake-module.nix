@@ -70,6 +70,7 @@
           harper
           htmx-lsp
           vscode-langservers-extracted
+          sqlite
 
           flyctl # Infra
           openssl.dev
