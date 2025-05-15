@@ -126,7 +126,7 @@ templ ListResults(
 				for i, post := range *posts {
 					if i < routing.MaxListLargeItems {
 						@components.PostItem(post, templ.Attributes{
-							"class":       twerge.It("overflow-hidden bg-gray-800 transform rounded-lg transition-all hover:shadow-lg duration-300 shadow-md hover:-translate-y-1 cursor-pointer"),
+							"class":       twerge.It("overflow-hidden bg-gray-800 transform rounded-lg transition-all hover:shadow-lg duration-300 shadow-md hover:-translate-y-1 cursor-pointer h-full"),
 							"hx-target":   "#bodiody",
 							"hx-get":      post.PagePath(),
 							"hx-push-url": post.PagePath(),
@@ -153,7 +153,7 @@ templ ListResults(
 				for i, tag := range *tags {
 					if i < routing.MaxListSmallItems {
 						@components.TagItem(tag, templ.Attributes{
-							"class":       twerge.It("p-6 rounded-lg overflow-hidden bg-gray-800 shadow-md hover:shadow-lg duration-300 transform transition-all hover:-translate-y-1 cursor-pointer"),
+							"class":       twerge.It("p-6 rounded-lg overflow-hidden bg-gray-800 shadow-md hover:shadow-lg duration-300 transform transition-all hover:-translate-y-1 cursor-pointer h-full"),
 							"hx-target":   "#bodiody",
 							"hx-get":      tag.PagePath(),
 							"hx-push-url": "true",

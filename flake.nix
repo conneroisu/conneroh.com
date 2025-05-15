@@ -8,6 +8,8 @@
     bun2nix.url = "github:baileyluTCD/bun2nix";
     flake-parts.url = "github:hercules-ci/flake-parts";
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
+    rust-overlay.url = "github:oxalica/rust-overlay";
+    rust-overlay.inputs.nixpkgs.follows = "nixpkgs";
     nix2container.url = "github:nlewo/nix2container";
     nix2container.inputs = {
       nixpkgs.follows = "nixpkgs";
@@ -30,6 +32,7 @@
               (final: prev: {
                 go = prev.go_1_24;
               })
+              inputs.rust-overlay.overlays.default
             ];
           };
         };

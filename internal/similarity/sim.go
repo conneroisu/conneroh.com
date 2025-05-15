@@ -1,7 +1,7 @@
 package similarity
 
 import (
-	"fmt"
+	"errors"
 	"math"
 
 	"gonum.org/v1/gonum/floats"

@@ -4,16 +4,17 @@ aliases:
   - "Miracle Rice in Bali: Computational Investigations into the Origins of Efficiency"
 tags:
   - edu/iastate/ageds461
+banner_path: posts/miracle-rice-in-bali.webp
 created_at: 2021-12-01T19:42:03.000-06:00
 description: "Miracle Rice in Bali: Computational Investigations into the Origins of Efficiency"
 title: Miracle Rice in Bali
-updated_at: 2025-04-18T19:58:39.000-06:00
+updated_at: 2025-05-15T12:36:46.000-06:00
 ---
 
 # Miracle Rice in Bali: Computational Investigations into the Origins of Efficiency  
 
-<!-- ![[ISU-Extension.png|300]] -->
 
+<!-- ![[ISU-Extension.png|300]] -->
 
 ## Abstract
 > Bali is an Indonesian island whose population has long depended on rice cultivation. Its geography—shaped by volcanoes, some still active—creates steep northern slopes and an “inclined alluvial plane” to the south[^UN1979]. Instead of centralized, state‑run irrigation, Bali relies on a network of water temples—religious establishments that regulate water flow and collectively manage irrigation.

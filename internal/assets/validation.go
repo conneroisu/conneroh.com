@@ -57,6 +57,14 @@ func Validate(
 		))
 	}
 
+	if emb.BannerPath == "" {
+		errs = append(errs, eris.Wrapf(
+			ErrValueMissing,
+			"%s is missing banner path",
+			path,
+		))
+	}
+
 	// TODO: Validate that the banner path is a valid image and is not null/zero
 
 	for _, er := range errs {

@@ -121,6 +121,7 @@ type Processor struct {
 	fs          afero.Fs
 	db          *bun.DB
 	s3Client    s3Client
+	s3Bucket    string
 	embedder    embedder
 	md          goldmark.Markdown
 	taskCh      chan Task
@@ -449,6 +450,10 @@ func NewProcessor(
 	memCache := newMemCache()
 	entityCache := newEntityCache()
 
+	bucketName := os.Getenv("BUCKET_NAME")
+	if bucketName == "" {
+		panic("BUCKET_NAME environment variable is not set")
+	}
 	// Initialize SQLite for better concurrency
 	initDB(db)
 
@@ -456,6 +461,7 @@ func NewProcessor(
 		fs:          fs,
 		db:          db,
 		s3Client:    s3Client,
+		s3Bucket:    bucketName,
 		embedder:    embedder,
 		md:          md,
 		taskCh:      make(chan Task, bufferSize),
@@ -799,7 +805,8 @@ func (p *Processor) processAsset(ctx context.Context, task Task) error {
 	}
 
 	// Upload to S3
-	if err := p.uploadToS3(ctx, task.Path, task.Content); err != nil {
+	err = p.uploadToS3(ctx, task.Path, task.Content)
+	if err != nil {
 		return err
 	}
 
@@ -826,9 +833,11 @@ func (p *Processor) processDocument(ctx context.Context, task Task) error {
 	hash := assets.Hash(content)
 
 	// Check if document is already cached and unchanged
-	if isCached, err := p.checkCache(ctx, task.Path, hash); err != nil {
+	isCached, err := p.checkCache(ctx, task.Path, hash)
+	if err != nil {
 		return err
-	} else if isCached {
+	}
+	if isCached {
 		return nil // Skip if already cached and unchanged
 	}
 
@@ -839,12 +848,14 @@ func (p *Processor) processDocument(ctx context.Context, task Task) error {
 	}
 
 	// Set default values
-	if err := assets.Defaults(doc); err != nil {
+	err = assets.Defaults(doc)
+	if err != nil {
 		return eris.Wrapf(err, "failed to set defaults for document: %s", task.Path)
 	}
 
 	// Parse markdown and frontmatter
-	if err := p.parseMarkdown(content, doc); err != nil {
+	err = p.parseMarkdown(content, doc)
+	if err != nil {
 		return err
 	}
 
@@ -852,12 +863,14 @@ func (p *Processor) processDocument(ctx context.Context, task Task) error {
 	doc.Slug = assets.Slugify(task.Path)
 
 	// Validate document
-	if err := assets.Validate(task.Path, doc); err != nil {
+	err = assets.Validate(task.Path, doc)
+	if err != nil {
 		return eris.Wrapf(err, "document validation failed: %s", task.Path)
 	}
 
 	// Save document to database
-	if err := p.saveDocument(ctx, doc); err != nil {
+	err = p.saveDocument(ctx, doc)
+	if err != nil {
 		return err
 	}
 
@@ -909,11 +922,12 @@ func (p *Processor) uploadToS3(ctx context.Context, path string, data []byte) er
 	contentType := getContentType(path)
 
 	// Use a timeout context to prevent hanging on S3 operations
-	uploadCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	uploadCtx, cancel := context.WithTimeout(ctx, 15*time.Second)
 	defer cancel()
 
+	slog.Info("Uploading to S3", "path", path)
 	_, err := p.s3Client.PutObject(uploadCtx, &s3.PutObjectInput{
-		Bucket:      aws.String("conneroh"),
+		Bucket:      &p.s3Bucket,
 		Key:         aws.String(path),
 		Body:        bytes.NewReader(data),
 		ContentType: aws.String(contentType),
@@ -1004,6 +1018,11 @@ func (p *Processor) savePost(ctx context.Context, doc *assets.Doc) error {
 		Set("y = EXCLUDED.y").
 		Set("z = EXCLUDED.z").
 		Exec(insertCtx)
+	slog.Info(
+		"saved post",
+		slog.String("slug", doc.Slug),
+		slog.String("banner_path", doc.BannerPath),
+	)
 
 	if err != nil {
 		if errors.Is(err, context.DeadlineExceeded) {

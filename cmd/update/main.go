@@ -34,7 +34,7 @@ var (
 
 func main() {
 	flag.Parse()
-	slog.SetDefault(logger.DefaultLogger)
+	slog.SetDefault(logger.DefaultProdLogger)
 
 	// Create context that will be canceled on interrupt signals
 	ctx, stop := signal.NotifyContext(context.Background(),

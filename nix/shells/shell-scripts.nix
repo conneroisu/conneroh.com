@@ -5,18 +5,12 @@
 }: rec {
   scripts = {
     dx = {
-      exec = ''
-        REPO_ROOT="$(git rev-parse --show-toplevel)"
-        $EDITOR "$REPO_ROOT"/flake.nix
-      '';
+      exec = ''$EDITOR "$(git rev-parse --show-toplevel)"/flake.nix'';
       deps = [pkgs.git];
       description = "Edit flake.nix";
     };
     gx = {
-      exec = ''
-        REPO_ROOT="$(git rev-parse --show-toplevel)"
-        $EDITOR "$REPO_ROOT"/go.mod
-      '';
+      exec = ''$EDITOR "$(git rev-parse --show-toplevel)"/go.mod'';
       deps = [pkgs.git];
       description = "Edit go.mod";
     };
