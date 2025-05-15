@@ -76,11 +76,24 @@
           "-SA1019",
           "all"
         ]
+      },
+      "gocyclo": {
+        "min-complexity": 20
+      },
+      "dupl": {
+        "exclude-patterns": [
+          "^internal/data/|^vendor/|^cmd/conneroh/_static/dist/"
+        ]
+      },
+      "gocognit": {
+        "exclude-patterns": [
+          "^internal/data/|^vendor/|^cmd/conneroh/_static/dist/"
+        ]
       }
     }
   },
   "severity": {
-    "default": "error",
+    "default": "warning",
     "rules": [
       {
         "linters": [
