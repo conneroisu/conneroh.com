@@ -23,12 +23,13 @@ const (
 // CustomTime allows us to customize the YAML time parsing.
 type CustomTime struct{ time.Time }
 
-// UnmarshalYAML implements the yaml.Unmarshaler interface
+// UnmarshalYAML implements the yaml.Unmarshaler interface.
 func (ct *CustomTime) UnmarshalYAML(value *yaml.Node) error {
 	// Try parsing as date-only format first
 	t, err := time.Parse("2006-01-02", value.Value)
 	if err == nil {
 		ct.Time = t
+
 		return nil
 	}
 
@@ -39,6 +40,7 @@ func (ct *CustomTime) UnmarshalYAML(value *yaml.Node) error {
 	}
 
 	ct.Time = t
+
 	return nil
 }
 
@@ -165,7 +167,7 @@ type (
 )
 
 type (
-	// PostToTag represents a many-to-many relationship between posts and tags
+	// PostToTag represents a many-to-many relationship between posts and tags.
 	PostToTag struct {
 		bun.BaseModel `bun:"post_to_tags"`
 
@@ -175,7 +177,7 @@ type (
 		Tag    *Tag  `bun:"rel:belongs-to,join:tag_id=id"`
 	}
 
-	// PostToProject represents a many-to-many relationship between posts and projects
+	// PostToProject represents a many-to-many relationship between posts and projects.
 	PostToProject struct {
 		bun.BaseModel `bun:"post_to_projects"`
 
@@ -185,7 +187,7 @@ type (
 		Project   *Project `bun:"rel:belongs-to,join:project_id=id"`
 	}
 
-	// ProjectToTag represents a many-to-many relationship between projects and tags
+	// ProjectToTag represents a many-to-many relationship between projects and tags.
 	ProjectToTag struct {
 		bun.BaseModel `bun:"project_to_tags"`
 
@@ -195,7 +197,7 @@ type (
 		Tag       *Tag     `bun:"rel:belongs-to,join:tag_id=id"`
 	}
 
-	// PostToPost represents a many-to-many relationship between posts and other posts
+	// PostToPost represents a many-to-many relationship between posts and other posts.
 	PostToPost struct {
 		bun.BaseModel `bun:"post_to_posts"`
 
@@ -205,7 +207,7 @@ type (
 		TargetPost   *Post `bun:"rel:belongs-to,join:target_post_id=id"`
 	}
 
-	// ProjectToProject represents a many-to-many relationship between projects and other projects
+	// ProjectToProject represents a many-to-many relationship between projects and other projects.
 	ProjectToProject struct {
 		bun.BaseModel `bun:"project_to_projects"`
 
@@ -215,7 +217,7 @@ type (
 		TargetProject   *Project `bun:"rel:belongs-to,join:target_project_id=id"`
 	}
 
-	// TagToTag represents a many-to-many relationship between tags and other tags
+	// TagToTag represents a many-to-many relationship between tags and other tags.
 	TagToTag struct {
 		bun.BaseModel `bun:"tag_to_tags"`
 
@@ -261,5 +263,6 @@ func (emb *Tag) String() string {
 // Hash calculates the hash of a file's content.
 func Hash(content []byte) string {
 	sum := md5.Sum(content)
+
 	return hex.EncodeToString(sum[:])
 }

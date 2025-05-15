@@ -68,9 +68,9 @@
     };
     generate-db = {
       exec = ''
-        doppler run -- update
+        doppler run -- go run ./cmd/update
       '';
-      deps = with pkgs; [doppler self'.packages.update];
+      deps = with pkgs; [doppler];
       description = "Update the generated go files from the md docs.";
     };
     generate-reload = {

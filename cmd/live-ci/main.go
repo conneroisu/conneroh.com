@@ -155,6 +155,7 @@ func run(
 			if len(bdy) < lowestBytes {
 				return fmt.Errorf("body length too small: %d", len(bdy))
 			}
+
 			return page.Close()
 		})
 	}
@@ -177,6 +178,7 @@ func run(
 			if len(bdy) < lowestBytes {
 				return fmt.Errorf("body length too small: %d", len(bdy))
 			}
+
 			return page.Close()
 		})
 	}
@@ -199,6 +201,7 @@ func run(
 			if len(bdy) < lowestBytes {
 				return fmt.Errorf("body length too small: %d", len(bdy))
 			}
+
 			return page.Close()
 		})
 	}
@@ -217,5 +220,6 @@ func run(
 	if err != nil {
 		log.Fatalf("could not close browser context: %v", err)
 	}
+
 	return pw.Stop()
 }

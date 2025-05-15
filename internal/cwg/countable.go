@@ -7,7 +7,7 @@ import (
 	"sync"
 )
 
-// DebugEntry represents a single Add operation on the WaitGroup
+// DebugEntry represents a single Add operation on the WaitGroup.
 type DebugEntry struct {
 	location string
 	delta    int
@@ -15,7 +15,7 @@ type DebugEntry struct {
 	id       int  // Unique ID for tracking
 }
 
-// DebugWaitGroup wraps sync.WaitGroup to add debugging capabilities
+// DebugWaitGroup wraps sync.WaitGroup to add debugging capabilities.
 type DebugWaitGroup struct {
 	wg        sync.WaitGroup
 	mutex     sync.Mutex
@@ -24,7 +24,7 @@ type DebugWaitGroup struct {
 	activeMap map[int]int // Maps ID to index in entries
 }
 
-// Add adds delta to the WaitGroup counter and records the caller
+// Add adds delta to the WaitGroup counter and records the caller.
 func (dwg *DebugWaitGroup) Add(delta int) {
 	dwg.mutex.Lock()
 	defer dwg.mutex.Unlock()
@@ -64,7 +64,7 @@ func (dwg *DebugWaitGroup) Add(delta int) {
 	dwg.wg.Add(delta)
 }
 
-// Done decrements the WaitGroup counter by one and marks one entry as done
+// Done decrements the WaitGroup counter by one and marks one entry as done.
 func (dwg *DebugWaitGroup) Done() {
 	dwg.mutex.Lock()
 	defer dwg.mutex.Unlock()
@@ -73,6 +73,7 @@ func (dwg *DebugWaitGroup) Done() {
 	var keyToRemove int
 	for k := range dwg.activeMap {
 		keyToRemove = k
+
 		break
 	}
 
@@ -85,12 +86,12 @@ func (dwg *DebugWaitGroup) Done() {
 	dwg.wg.Done()
 }
 
-// Wait blocks until the WaitGroup counter is zero
+// Wait blocks until the WaitGroup counter is zero.
 func (dwg *DebugWaitGroup) Wait() {
 	dwg.wg.Wait()
 }
 
-// PrintActiveDebugInfo prints only the active (not Done) entries
+// PrintActiveDebugInfo prints only the active (not Done) entries.
 func (dwg *DebugWaitGroup) PrintActiveDebugInfo() {
 	dwg.mutex.Lock()
 	defer dwg.mutex.Unlock()
@@ -112,7 +113,7 @@ func (dwg *DebugWaitGroup) PrintActiveDebugInfo() {
 	}
 }
 
-// Count returns the number of active entries
+// Count returns the number of active entries.
 func (dwg *DebugWaitGroup) Count() int {
 	return len(dwg.entries)
 }

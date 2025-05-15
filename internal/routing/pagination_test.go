@@ -170,7 +170,7 @@ func TestPaginate(t *testing.T) {
 	}
 }
 
-// Helper function to compare slices
+// Helper function to compare slices.
 func slicesEqual[T comparable](a, b []T) bool {
 	if len(a) != len(b) {
 		return false
@@ -180,5 +180,6 @@ func slicesEqual[T comparable](a, b []T) bool {
 			return false
 		}
 	}
+
 	return true
 }

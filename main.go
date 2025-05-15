@@ -19,6 +19,7 @@ func main() {
 		os.Getenv,
 	); err != nil {
 		fmt.Println(err)
+
 		return
 	}
 }

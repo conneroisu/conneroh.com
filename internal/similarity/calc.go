@@ -12,7 +12,7 @@ type Calculator struct {
 	workers int
 }
 
-// Option is a function that can be used to configure a Calculator
+// Option is a function that can be used to configure a Calculator.
 type Option func(c *Calculator)
 
 type handler func(queryVec *mat.VecDense, indexVec *mat.VecDense) (float64, error)
@@ -28,6 +28,7 @@ func NewCalculator(opts ...Option) *Calculator {
 	for _, opt := range opts {
 		opt(c)
 	}
+
 	return c
 }
 
@@ -46,6 +47,7 @@ func (c *Calculator) Similarity(qVec, iVec []float64) (sim float64, err error) {
 			}
 			sim += biFunc.coefficient * val
 		}
+
 		return sim, nil
 	}
 
@@ -72,6 +74,7 @@ func (c *Calculator) Similarity(qVec, iVec []float64) (sim float64, err error) {
 				val, err := biFunc.handler(qVecMat, iVecMat)
 				if err != nil {
 					errCh <- err
+
 					return
 				}
 				results <- biFunc.coefficient * val
@@ -129,7 +132,7 @@ func WithSimilarityDotMatrix(coefficient float64) Option {
 
 // WithEuclideanDistance sets the EuclideanDistance function with a coefficient.
 //
-// $$d(x, y) = \sqrt{\sum_{i=1}^{n}(x_i - y_i)^2}$$
+// $$d(x, y) = \sqrt{\sum_{i=1}^{n}(x_i - y_i)^2}$$.
 func WithEuclideanDistance(coefficient float64) Option {
 	return func(c *Calculator) {
 		c.biFuncs = append(c.biFuncs, biFuncCoefficient{

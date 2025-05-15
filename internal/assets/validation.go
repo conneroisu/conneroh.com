@@ -67,5 +67,6 @@ func Validate(
 	if err != nil {
 		return err
 	}
+
 	return nil
 }

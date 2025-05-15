@@ -12,8 +12,21 @@
   "linters": {
     "enable": [
       "asasalint",
+      "exhaustive",
+      "godox",
+      "nlreturn",
       "bidichk",
       "bodyclose",
+      "dupl",
+      "gocritic",
+      "godot",
+      "errname",
+      "copyloopvar",
+      "errname",
+      "goconst",
+      "intrange",
+      "perfsprint",
+      "usestdlibvars",
       "gocheckcompilerdirectives",
       "staticcheck",
       "intrange",
@@ -40,6 +53,10 @@
         "common-false-positives",
         "legacy",
         "std-error-handling"
+      ],
+      "linters": [
+        "gocognit",
+        "nestif"
       ]
     },
     "settings": {

@@ -6,13 +6,15 @@ import (
 	"net/http"
 
 	static "github.com/conneroisu/conneroh.com/cmd/conneroh/_static"
+	"github.com/conneroisu/conneroh.com/cmd/conneroh/layouts"
+	"github.com/conneroisu/conneroh.com/cmd/conneroh/views"
 	"github.com/conneroisu/conneroh.com/internal/assets"
 	"github.com/conneroisu/conneroh.com/internal/routing"
 	"github.com/uptrace/bun"
 )
 
 var (
-	// Instance Caches
+	// Instance Caches.
 	allPosts    = []*assets.Post{}
 	allProjects = []*assets.Project{}
 	allTags     = []*assets.Tag{}
@@ -62,6 +64,10 @@ func AddRoutes(
 	h.HandleFunc(
 		"GET /tag/{slug...}",
 		routing.Make(HandleTag(db)))
+
+	h.HandleFunc(
+		"GET /500",
+		routing.MorphableHandler(layouts.Page, views.Code500()))
 
 	return nil
 }
