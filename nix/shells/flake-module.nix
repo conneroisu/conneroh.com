@@ -41,8 +41,6 @@
           statix
           deadnix
 
-          litellm
-
           go_1_24 # Go Tools
           air
           templ
