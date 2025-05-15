@@ -20,3 +20,4 @@ cache.sqlite
 *.db-shm
 *.db-wal
 *_templ.go
+target

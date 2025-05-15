@@ -4,10 +4,11 @@ aliases: []
 tags:
   - programming-language/lua
   - ide/neovim
+banner_path: projects/doppler.nvim.webp
 created_at: 2025-03-28T19:17:42.000-06:00
 description: A Neovim plugin that seamlessly integrates Doppler's secret management
 title: doppler.nvim
-updated_at: 2025-04-25T06:01:13.000-06:00
+updated_at: 2025-05-15T14:07:05.000-06:00
 ---
 
 ## Understanding doppler.nvim

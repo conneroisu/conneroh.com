@@ -68,7 +68,7 @@ templ ProjectItem(
 		</div>
 		if len(project.Tags) > maxShownTags {
 			<div
-				class={ twerge.It("absolute z-10 grid sm:grid-cols-2 md:grid-cols-3") }
+				class={ twerge.It("absolute z-10 grid sm:grid-cols-2 md:grid-cols-3 gap-1") }
 				x-show="allTags"
 				x-anchor.bottom.offset="$refs.moreTags"
 			>
@@ -130,7 +130,7 @@ templ PostItem(post *assets.Post, attrs templ.Attributes) {
 		</div>
 		if len(post.Tags) > maxShownTags {
 			<div
-				class={ twerge.It("absolute z-10 grid sm:grid-cols-2 md:grid-cols-3") }
+				class={ twerge.It("absolute z-10 grid sm:grid-cols-2 md:grid-cols-3 gap-1") }
 				x-show="allTags"
 				x-anchor.bottom.offset="$refs.moreTags"
 			>
