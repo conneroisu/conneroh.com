@@ -55,6 +55,7 @@ func handleContactForm() routing.APIFunc {
 		// TODO: Send email
 
 		templ.Handler(components.ThankYou()).ServeHTTP(w, r)
+
 		return nil
 	}
 }
@@ -211,13 +212,15 @@ func listHandler(
 				)).ServeHTTP(w, r)
 			}
 		}
+
 		return nil
 	}
 }
 
-// HandleHome handles the home page. aka /{$}
+// HandleHome handles the home page. aka /{$}.
 func HandleHome(db *bun.DB) func(w http.ResponseWriter, r *http.Request) error {
 	var homePage *templ.Component
+
 	return func(w http.ResponseWriter, r *http.Request) error {
 		var err error
 		if homePage != nil {
@@ -225,6 +228,7 @@ func HandleHome(db *bun.DB) func(w http.ResponseWriter, r *http.Request) error {
 				layouts.Page,
 				*homePage,
 			).ServeHTTP(w, r)
+
 			return nil
 		}
 		if len(allPosts) == 0 {
@@ -279,20 +283,23 @@ func HandleHome(db *bun.DB) func(w http.ResponseWriter, r *http.Request) error {
 			layouts.Page,
 			home,
 		).ServeHTTP(w, r)
+
 		return nil
 	}
 }
 
-// HandleProjects handles the projects page. aka /projects
+// HandleProjects handles the projects page. aka /projects.
 func HandleProjects(db *bun.DB) routing.APIFunc {
 	// Handler Component Cache
 	var projectList *templ.Component
+
 	return func(w http.ResponseWriter, r *http.Request) error {
 		if projectList != nil {
 			routing.MorphableHandler(
 				layouts.Page,
 				*projectList,
 			).ServeHTTP(w, r)
+
 			return nil
 		}
 		if len(allProjects) == 0 {
@@ -323,14 +330,16 @@ func HandleProjects(db *bun.DB) routing.APIFunc {
 			layouts.Page,
 			projects,
 		).ServeHTTP(w, r)
+
 		return nil
 	}
 }
 
-// HandlePost handles the post page. aka /post/{slug...}
+// HandlePost handles the post page. aka /post/{slug...}.
 func HandlePost(db *bun.DB) routing.APIFunc {
 	// Handler Component Slug-Mapped Cache
 	var postMap = map[string]templ.Component{}
+
 	return func(w http.ResponseWriter, r *http.Request) error {
 		var (
 			p    assets.Post
@@ -343,6 +352,7 @@ func HandlePost(db *bun.DB) routing.APIFunc {
 				layouts.Page,
 				comp,
 			).ServeHTTP(w, r)
+
 			return nil
 		}
 		err := db.NewSelect().Model(&p).
@@ -353,6 +363,7 @@ func HandlePost(db *bun.DB) routing.APIFunc {
 			Limit(1).Scan(r.Context())
 		if err != nil {
 			slog.Error("failed to scan post", "err", err)
+
 			return eris.Wrap(
 				err,
 				"failed to scan post",
@@ -364,14 +375,16 @@ func HandlePost(db *bun.DB) routing.APIFunc {
 			layouts.Page,
 			comp,
 		).ServeHTTP(w, r)
+
 		return nil
 	}
 }
 
-// HandleProject handles the project page. aka /project/{slug...}
+// HandleProject handles the project page. aka /project/{slug...}.
 func HandleProject(db *bun.DB) routing.APIFunc {
 	// Handler Component Slug-Mapped Cache
 	var projectMap = map[string]templ.Component{}
+
 	return func(w http.ResponseWriter, r *http.Request) error {
 		var (
 			p    assets.Project
@@ -384,6 +397,7 @@ func HandleProject(db *bun.DB) routing.APIFunc {
 				layouts.Page,
 				c,
 			).ServeHTTP(w, r)
+
 			return nil
 		}
 		err := db.NewSelect().Model(&p).
@@ -404,20 +418,23 @@ func HandleProject(db *bun.DB) routing.APIFunc {
 			layouts.Page,
 			c,
 		).ServeHTTP(w, r)
+
 		return nil
 	}
 }
 
-// HandleTags handles the tags page. aka /tags
+// HandleTags handles the tags page. aka /tags.
 func HandleTags(db *bun.DB) routing.APIFunc {
 	// Handler Component Cache
 	var tagList *templ.Component
+
 	return func(w http.ResponseWriter, r *http.Request) error {
 		if tagList != nil {
 			routing.MorphableHandler(
 				layouts.Page,
 				*tagList,
 			).ServeHTTP(w, r)
+
 			return nil
 		}
 		err := db.NewSelect().Model(&allTags).
@@ -446,14 +463,16 @@ func HandleTags(db *bun.DB) routing.APIFunc {
 			layouts.Page,
 			tags,
 		).ServeHTTP(w, r)
+
 		return nil
 	}
 }
 
-// HandleTag handles the tag page. aka /tag/{slug...}
+// HandleTag handles the tag page. aka /tag/{slug...}.
 func HandleTag(db *bun.DB) routing.APIFunc {
 	// Handler Component Slug-Mapped Cache
 	var tagMap = map[string]templ.Component{}
+
 	return func(w http.ResponseWriter, r *http.Request) error {
 		var (
 			tag  assets.Tag
@@ -466,6 +485,7 @@ func HandleTag(db *bun.DB) routing.APIFunc {
 				layouts.Page,
 				comp,
 			).ServeHTTP(w, r)
+
 			return nil
 		}
 		err := db.NewSelect().Model(&tag).
@@ -486,20 +506,23 @@ func HandleTag(db *bun.DB) routing.APIFunc {
 			layouts.Page,
 			comp,
 		).ServeHTTP(w, r)
+
 		return nil
 	}
 }
 
-// HandlePosts handles the posts page. aka /posts
+// HandlePosts handles the posts page. aka /posts.
 func HandlePosts(db *bun.DB) routing.APIFunc {
 	// Handler Component Cache
 	var postList *templ.Component
+
 	return func(w http.ResponseWriter, r *http.Request) error {
 		if postList != nil {
 			routing.MorphableHandler(
 				layouts.Page,
 				*postList,
 			).ServeHTTP(w, r)
+
 			return nil
 		}
 		if len(allPosts) == 0 {
@@ -530,6 +553,7 @@ func HandlePosts(db *bun.DB) routing.APIFunc {
 			layouts.Page,
 			posts,
 		).ServeHTTP(w, r)
+
 		return nil
 	}
 }
@@ -550,6 +574,7 @@ func filter[T any](
 			return strings.ToLower(titleGetter(items[i])) <
 				strings.ToLower(titleGetter(items[j]))
 		})
+
 		return routing.Paginate(items, page, pageSize)
 	}
 

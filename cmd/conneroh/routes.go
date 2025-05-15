@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	// Instance Caches
+	// Instance Caches.
 	allPosts    = []*assets.Post{}
 	allProjects = []*assets.Project{}
 	allTags     = []*assets.Tag{}

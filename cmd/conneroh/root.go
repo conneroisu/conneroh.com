@@ -22,7 +22,7 @@ import (
 	"github.com/uptrace/bun/dialect/sqlitedialect"
 	"github.com/uptrace/bun/extra/bundebug"
 
-	// SQLite driver
+	// SQLite driver.
 	_ "modernc.org/sqlite"
 )
 
@@ -71,6 +71,7 @@ func NewServer(
 		mux.ServeHTTP(w, r)
 	})
 	var handler http.Handler = slogLogHandler
+
 	return handler, nil
 }
 
@@ -136,10 +137,12 @@ func Run(
 	case <-innerCtx.Done():
 		// Signal received, initiate graceful shutdown
 		slog.Info("shutdown signal received, shutting down server...")
+
 		return gracefulShutdown(httpServer, &wg)
 	case <-ctx.Done():
 		// Parent context cancelled
 		slog.Info("parent context cancelled, shutting down...")
+
 		return gracefulShutdown(httpServer, &wg)
 	}
 }
@@ -162,6 +165,7 @@ func gracefulShutdown(
 			slog.String("error", err.Error()),
 			slog.Duration("timeout", shutdownTimeout),
 		)
+
 		return err
 	}
 
@@ -169,5 +173,6 @@ func gracefulShutdown(
 	slog.Info("waiting for server shutdown to complete")
 	wg.Wait()
 	slog.Info("server shutdown completed")
+
 	return nil
 }

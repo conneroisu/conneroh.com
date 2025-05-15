@@ -86,6 +86,7 @@ func run(ctx context.Context) error {
 	if err != nil {
 		return eris.Wrapf(err, "(update-css) failed to get tags")
 	}
+
 	return twerge.CodeGen(
 		twerge.Default(),
 		"internal/data/css/classes.go",

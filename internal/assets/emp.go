@@ -41,6 +41,7 @@ func InitDB(
 		return err
 	}
 	RegisterModels(db)
+
 	return nil
 }
 
@@ -83,6 +84,7 @@ func CreateTables(ctx context.Context, db *bun.DB) error {
 			return err
 		}
 	}
+
 	return nil
 }
 

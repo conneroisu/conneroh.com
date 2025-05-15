@@ -87,7 +87,7 @@ func (c *HashCache) Close() error {
 }
 
 // SplitGlobPath splits a glob path into a base directory and pattern.
-// For example: "./src/*.go" -> "./src", "*.go"
+// For example: "./src/*.go" -> "./src", "*.go".
 func SplitGlobPath(globPath string) (string, string) {
 	// Check if the path contains glob metacharacters
 	if !strings.ContainsAny(globPath, "*?[{") {
@@ -142,6 +142,7 @@ func hashFile(fs afero.Fs, path string) (string, error) {
 // hashGlobPath computes a hash for a path that may contain a glob pattern.
 func hashGlobPath(fs afero.Fs, globPath string) (string, error) {
 	dir, pattern := SplitGlobPath(globPath)
+
 	return hashDir(fs, dir, pattern)
 }
 
@@ -166,6 +167,7 @@ func hashDir(fs afero.Fs, path string, globPattern string) (string, error) {
 			if !info.IsDir() {
 				files = append(files, p)
 			}
+
 			return nil
 		})
 		if err != nil {
@@ -204,7 +206,7 @@ func hashDir(fs afero.Fs, path string, globPattern string) (string, error) {
 	return hex.EncodeToString(h.Sum(nil)), nil
 }
 
-// aferoGlob implements a simple glob for afero filesystems
+// aferoGlob implements a simple glob for afero filesystems.
 func aferoGlob(fs afero.Fs, pattern string) ([]string, error) {
 	dir, filePattern := filepath.Split(pattern)
 	if dir == "" {
@@ -289,6 +291,7 @@ func (c *HashCache) HasGlobChanges(globPaths []string) (bool, error) {
 			c.lastComputedHashes = currentHashes
 			c.mu.Unlock()
 			c.mu.RLock()
+
 			return true, nil
 		}
 	}
@@ -309,6 +312,7 @@ func (c *HashCache) UpdateGlobHashes(globPaths []string, useLastComputed bool) e
 		for _, path := range globPaths {
 			if _, exists := c.lastComputedHashes[path]; !exists {
 				allPathsFound = false
+
 				break
 			}
 		}
@@ -374,6 +378,7 @@ func OnGlobPathChanges(fs afero.Fs, workCache WorkCache, globPaths []string, fn 
 		cachedHash, exists := workCache[path]
 		if !exists || cachedHash != hash {
 			changed = true
+
 			break
 		}
 	}

@@ -51,6 +51,7 @@ func GeneratePagination(currentPage, totalPages, maxDisplay int) []string {
 		for i := 1; i <= totalPages; i++ {
 			result = append(result, strconv.Itoa(i))
 		}
+
 		return result
 	}
 
@@ -60,6 +61,7 @@ func GeneratePagination(currentPage, totalPages, maxDisplay int) []string {
 			result = append(result, strconv.Itoa(i))
 		}
 		result = append(result, "...")
+
 		return result
 	}
 
@@ -69,6 +71,7 @@ func GeneratePagination(currentPage, totalPages, maxDisplay int) []string {
 		for i := totalPages - maxDisplay + 2; i <= totalPages; i++ {
 			result = append(result, strconv.Itoa(i))
 		}
+
 		return result
 	}
 

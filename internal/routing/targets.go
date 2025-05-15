@@ -7,7 +7,7 @@ import (
 )
 
 // PluralPath is the target of a plural view.
-// string
+// string.
 type PluralPath = string
 
 const (

@@ -56,12 +56,12 @@ templ ProjectItem(
 				</div>
 			</div>
 			<span
-				class={ twerge.It("text-xs bg-red-500 py-1 bottom-0 px-2 rounded-tr-md text-gray-200 left-0 absolute") }
+				class={ twerge.It("text-py-1 bottom-0 px-2 rounded-tr-md text-white left-0 absolute border-emerald-800 border-2 border-l-0 border-b-0") }
 			>
 				{ strconv.Itoa(len(project.Posts)) } posts
 			</span>
 			<span
-				class={ twerge.It("px-2 text-gray-200 bottom-0 py-1 right-0 text-xs rounded-tl-md bg-blue-500 absolute") }
+				class={ twerge.It("px-2 bottom-0 py-1 right-0 text-xs rounded-tl-md text-white absolute border-emerald-800 border-2 border-r-0 border-b-0") }
 			>
 				{ strconv.Itoa(len(project.Tags)) } tags
 			</span>
@@ -118,12 +118,12 @@ templ PostItem(post *assets.Post, attrs templ.Attributes) {
 				</div>
 			</div>
 			<span
-				class={ twerge.It("text-xs bg-red-500 py-1 bottom-0 px-2 rounded-tr-md text-gray-200 left-0 absolute") }
+				class={ twerge.It("text-py-1 bottom-0 px-2 rounded-tr-md text-white left-0 absolute border-emerald-800 border-2 border-l-0 border-b-0") }
 			>
 				{ strconv.Itoa(len(post.Tags)) } tags | { strconv.Itoa(len(post.Projects)) } projects
 			</span>
 			<div
-				class={ twerge.It("py-1 absolute right-0 bg-blue-500 rounded-tl-md px-2 text-xs text-white bottom-0") }
+				class={ twerge.It("px-2 bottom-0 py-1 right-0 text-xs rounded-tl-md text-white absolute border-emerald-800 border-2 border-r-0 border-b-0") }
 			>
 				{ post.CreatedAt.Format("Jan 02, 2006") }
 			</div>

@@ -30,6 +30,7 @@ var (
 func IsAllowedMediaType(path string) bool {
 	ext := filepath.Ext(path)
 	contentType := mime.TypeByExtension(ext)
+
 	return slices.Contains(AllowedAssetTypes, contentType)
 }
 

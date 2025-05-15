@@ -71,6 +71,7 @@ func Hello() {
 	functionRun := false
 	err = hashCache.OnGlobChanges(globPaths, func() error {
 		functionRun = true
+
 		return nil
 	})
 	require.NoError(t, err)
@@ -93,6 +94,7 @@ func Hello() {
 	functionRun = false
 	err = hashCache.OnGlobChanges(globPaths, func() error {
 		functionRun = true
+
 		return nil
 	})
 	require.NoError(t, err)
@@ -103,6 +105,7 @@ func Hello() {
 	functionRun = false
 	workCache, err = cache.OnGlobPathChanges(memFs, workCache, globPaths, func() error {
 		functionRun = true
+
 		return nil
 	})
 	require.NoError(t, err)
@@ -120,6 +123,7 @@ func Hello() {
 	functionRun = false
 	_, err = cache.OnGlobPathChanges(memFs, workCache, globPaths, func() error {
 		functionRun = true
+
 		return nil
 	})
 	require.NoError(t, err)

@@ -28,6 +28,7 @@ func Slugify(s string) string {
 	if ok {
 		return path
 	}
+
 	return strings.TrimSuffix(Pathify(s), filepath.Ext(s))
 }
 

@@ -38,6 +38,7 @@ func NewOllamaClient(getenv func(string) string) (*OllamaClient, error) {
 	if err != nil {
 		return nil, eris.Wrapf(ErrInvalidCreds, "invalid %s", ollamaURLVar)
 	}
+
 	return &OllamaClient{
 		client: api.NewClient(urlVal, http.DefaultClient),
 	}, nil
@@ -70,7 +71,7 @@ func (c *OllamaClient) Embeddings(
 	return
 }
 
-// Generate a deterministic projection matrix for dimensionality reduction
+// Generate a deterministic projection matrix for dimensionality reduction.
 func projectionMatrixCreate(inputDim, outputDim int) *mat.Dense {
 	// Create a matrix with dimensions [outputDim x inputDim]
 	// This will multiply directly with the input vector without transposition
@@ -106,7 +107,7 @@ func projectionMatrixCreate(inputDim, outputDim int) *mat.Dense {
 	return matrix
 }
 
-// Project a single embedding to 3D using a projection matrix
+// Project a single embedding to 3D using a projection matrix.
 func projectTo3D(embedding []float64, projectionMatrix *mat.Dense) (x, y, z float64) {
 	// Create a vector from the embedding
 	embedVec := mat.NewVecDense(len(embedding), embedding)

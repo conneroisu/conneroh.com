@@ -42,6 +42,7 @@ func New(getenv func(string) string) (Client, error) {
 			awsBaseURLVar,
 		)
 	}
+
 	return &DefaultAWSClient{
 		Client: s3.NewFromConfig(aws.Config{
 			Region:       "auto",
@@ -59,7 +60,7 @@ func New(getenv func(string) string) (Client, error) {
 }
 
 // credHandler is the bucket for the api security.
-// It implements the aws.Authenitcator
+// It implements the aws.Authenitcator.
 type credHandler struct {
 	id  string
 	key string
@@ -83,6 +84,7 @@ func newCredHandler(getEnv func(string) string) (*credHandler, error) {
 			awsSecretKeyVar,
 		)
 	}
+
 	return &credHandler{
 		id:  id,
 		key: key,

@@ -1,11 +1,9 @@
 // Package views contains the HTML templates for the website.
 package views
 
-//go:generate gomarkdoc -o README.md -e .
+import "strconv"
 
-import (
-	"fmt"
-)
+//go:generate gomarkdoc -o README.md -e .
 
 func readTime(content string) string {
 	// Rough estimate - 200 words per minute reading speed
@@ -15,5 +13,6 @@ func readTime(content string) string {
 	if minutes < 1 {
 		return "1"
 	}
-	return fmt.Sprintf("%d", minutes)
+
+	return strconv.Itoa(minutes)
 }
