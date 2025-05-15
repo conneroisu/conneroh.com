@@ -23,6 +23,8 @@
       "errname",
       "copyloopvar",
       "errname",
+      "mnd",
+      "gosec",
       "goconst",
       "intrange",
       "perfsprint",
