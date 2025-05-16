@@ -9,7 +9,7 @@ in {
     pkgs = import inputs.nixpkgs {
       inherit system;
     };
-    tag = "v3";
+    tag = "v4";
   in {
     packages.x86_64-linux = rec {
       devcontainer = pkgs.dockerTools.buildNixShellImage {
