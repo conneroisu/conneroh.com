@@ -3,7 +3,7 @@
   "overrideCommand": false,
   "updateRemoteUserUID": false,
   "onCreateCommand": "nix-shell --command 'echo done building nix dev environment'",
-  "entrypoint": "./entrypoint.sh",
+  "entrypoint": "./.devcontainer/entrypoint.sh",
   "waitFor": "onCreateCommand",
   "customizations": {
     "vscode": {
