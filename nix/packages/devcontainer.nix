@@ -16,13 +16,6 @@ in {
         inherit tag;
         name = "conneroh/devcontainer";
         drv = self.devShells.${system}.devcontainer;
-        Env = [
-          "PATH=${pkgs.lib.makeBinPath [
-            pkgs.coreutils-full
-            pkgs.bashInteractive
-            pkgs.toybox
-          ]}:/bin:/usr/bin"
-        ];
       };
 
       deployDevcontainer = pkgs.writeShellApplication {
