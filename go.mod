@@ -5,14 +5,15 @@ go 1.24.1
 require (
 	github.com/VojtaStruhar/goldmark-obsidian-callout v0.1.0
 	github.com/a-h/templ v0.3.865
+	github.com/alecthomas/chroma/v2 v2.17.2
 	github.com/aws/aws-sdk-go-v2 v1.36.3
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.79.3
 	github.com/conneroisu/twerge v0.4.5
 	github.com/gorilla/schema v1.4.1
 	github.com/litao91/goldmark-mathjax v0.0.0-20210217064022-a43cf739a50f
-	github.com/ollama/ollama v0.6.8
+	github.com/ollama/ollama v0.7.0
 	github.com/playwright-community/playwright-go v0.5200.0
-	github.com/quail-ink/goldmark-enclave v0.1.5
+	github.com/quailyquaily/goldmark-enclave v0.1.9
 	github.com/rotisserie/eris v0.5.4
 	github.com/sourcegraph/conc v0.3.0
 	github.com/spf13/afero v1.14.0
@@ -35,7 +36,6 @@ require (
 
 require (
 	github.com/BurntSushi/toml v1.5.0 // indirect
-	github.com/alecthomas/chroma/v2 v2.17.2 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.6.10 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.3.34 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.6.34 // indirect
@@ -66,12 +66,11 @@ require (
 	github.com/tmthrgd/go-hex v0.0.0-20190904060850-447a3041c3bc // indirect
 	github.com/vmihailenco/msgpack/v5 v5.4.1 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
-	go.uber.org/atomic v1.11.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/exp v0.0.0-20250506013437-ce4c2cf36ca6 // indirect
 	golang.org/x/sys v0.33.0 // indirect
 	golang.org/x/text v0.25.0 // indirect
-	modernc.org/libc v1.65.2 // indirect
+	modernc.org/libc v1.65.6 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.10.0 // indirect
 )

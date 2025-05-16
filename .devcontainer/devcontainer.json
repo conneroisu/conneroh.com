@@ -1,5 +1,5 @@
 {
-  "image": "ghcr.io/xtruder/nix-devcontainer:v1",
+  "image": "ghcr.io/conneroisu/conneroh.com:latest:latest",
   "postCreateCommand": "direnv allow",
   "features": {
     "ghcr.io/forwardsoftware/devcontainer-features/go-mod-cache:1": {
@@ -7,15 +7,15 @@
     }
   },
   "customizations": {
-		"vscode": {
+    "vscode": {
       "settings": {
-       "editor.formatOnSave": true,
-       "editor.lineNumbers": "relative"
+        "editor.formatOnSave": true,
+        "editor.lineNumbers": "relative"
       },
-			"extensions": [
-				"nicolasdschmidt.lunar-pink",
-				"github.copilot",
-				"github.copilot-chat",
+      "extensions": [
+        "nicolasdschmidt.lunar-pink",
+        "github.copilot",
+        "github.copilot-chat",
         "vscodevim.vim",
         "JasonMcGhee.claude-debugs-for-you",
         "golang.Go",
@@ -27,7 +27,7 @@
         "qwtel.sqlite-viewer",
         "danprince.vsnetrw",
         "eamodio.gitlens"
-			]
-		}
-	}
+      ]
+    }
+  }
 }

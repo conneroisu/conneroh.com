@@ -12,7 +12,7 @@ in {
     };
   in {
     packages.x86_64-linux = rec {
-      devcontainer = pkgs.dockerTools.streamNixShellImage {
+      devcontainer = pkgs.dockerTools.buildNixShellImage {
         name = "conneroh/devcontainer";
         tag = "latest";
         drv = self.devShells.${system}.default;
@@ -30,6 +30,7 @@ in {
 
           [ -z "$GHCR_TOKEN" ] && GHCR_TOKEN="$(doppler secrets get --plain GHCR_TOKEN)"
           TOKEN="$GHCR_TOKEN"
+          REGISTRY="ghcr.io/conneroisu/conneroh.com"
 
           skopeo copy \
             --insecure-policy \
