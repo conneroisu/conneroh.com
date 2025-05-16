@@ -9,13 +9,20 @@ in {
     pkgs = import inputs.nixpkgs {
       inherit system;
     };
-    tag = "v4";
+    tag = "v5";
   in {
     packages.x86_64-linux = rec {
       devcontainer = pkgs.dockerTools.buildNixShellImage {
         inherit tag;
         name = "conneroh/devcontainer";
         drv = self.devShells.${system}.devcontainer;
+        Env = [
+          "PATH=${pkgs.lib.makeBinPath [
+            pkgs.coreutils-full
+            pkgs.bashInteractive
+            pkgs.toybox
+          ]}:/bin:/usr/bin"
+        ];
       };
 
       deployDevcontainer = pkgs.writeShellApplication {
