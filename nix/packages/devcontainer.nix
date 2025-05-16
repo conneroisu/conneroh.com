@@ -26,7 +26,6 @@ in {
         bashOptions = ["errexit" "pipefail"];
         text = ''
           set -e
-          arg=$1
           TOKEN=""
 
           [ -z "$GHCR_TOKEN" ] && GHCR_TOKEN="$(doppler secrets get --plain GHCR_TOKEN)"
