@@ -1,5 +1,5 @@
 {
-  "image": "ghcr.io/conneroisu/conneroh.com:latest:latest",
+  "image": "ghcr.io/conneroisu/conneroh.com:latest",
   "postCreateCommand": "direnv allow",
   "features": {
     "ghcr.io/forwardsoftware/devcontainer-features/go-mod-cache:1": {
