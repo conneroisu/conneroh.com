@@ -5,8 +5,9 @@ aliases:
 tags: []
 created_at: 2025-04-11T08:07:35.000-06:00
 description: React is a JavaScript library for building user interfaces.
+icon: react
 title: React
-updated_at: 2025-04-11T08:08:43.000-06:00
+updated_at: 2025-05-16T09:18:47.000-06:00
 ---
 
 # React
