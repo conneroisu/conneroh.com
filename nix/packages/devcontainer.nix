@@ -9,31 +9,13 @@ in {
     pkgs = import inputs.nixpkgs {
       inherit system;
     };
-    tag = "v2";
+    tag = "v3";
   in {
     packages.x86_64-linux = rec {
       devcontainer = pkgs.dockerTools.buildNixShellImage {
         inherit tag;
         name = "conneroh/devcontainer";
-        drv =
-          self.devShells.${system}.default
-          // {
-            packages = with pkgs; [
-              # Contaier Deps
-              coreutils-full
-              toybox
-              curl
-              wget
-              docker
-              git
-              gnugrep
-              gnused
-              jq
-              nix
-              skopeo
-              util-linux
-            ];
-          };
+        drv = self.devShells.${system}.devcontainer;
       };
 
       deployDevcontainer = pkgs.writeShellApplication {

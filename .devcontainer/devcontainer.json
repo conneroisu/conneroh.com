@@ -1,5 +1,5 @@
 {
-  "image": "ghcr.io/conneroisu/conneroh.com:v2",
+  "image": "ghcr.io/conneroisu/conneroh.com:v3",
   "postCreateCommand": "direnv allow",
   "customizations": {
     "vscode": {
