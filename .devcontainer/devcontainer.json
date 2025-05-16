@@ -1,6 +1,5 @@
 {
   "image": "ghcr.io/conneroisu/conneroh.com:v5",
-  "userEnvProbe": "loginShell",
   "overrideCommand": false,
   "updateRemoteUserUID": false,
   "onCreateCommand": "nix-shell --command 'echo done building nix dev environment'",
