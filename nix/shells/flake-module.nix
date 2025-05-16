@@ -72,6 +72,7 @@
 
           rust-bin.stable.latest.default # Rust
           rust-analyzer
+          pkg-config
 
           flyctl # Infra
           openssl.dev
