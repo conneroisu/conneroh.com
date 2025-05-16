@@ -392,7 +392,6 @@
 
           databaseFiles = pkgs.runCommand "database-files" {} ''
             mkdir -p $out/root
-            # ${pkgs.sqlite}/bin/sqlite3 ${./master.db} "VACUUM;PRAGMA journal_mode=OFF"
             cp ${./master.db} $out/root/master.db
           '';
 
