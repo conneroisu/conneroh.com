@@ -29,7 +29,10 @@ func AddRoutes(
 	slog.Debug("adding routes")
 	defer slog.Debug("added routes")
 
-	h.Handle("GET /dist/", http.FileServer(http.FS(static.Dist)))
+	h.Handle(
+		"GET /dist/",
+		http.FileServer(http.FS(static.Dist)),
+	)
 
 	h.HandleFunc(
 		"GET /{$}",
