@@ -9,7 +9,7 @@ in {
     pkgs = import inputs.nixpkgs {
       inherit system;
     };
-    tag = "v1";
+    tag = "v2";
   in {
     packages.x86_64-linux = rec {
       devcontainer = pkgs.dockerTools.buildNixShellImage {
@@ -21,7 +21,9 @@ in {
             packages = with pkgs; [
               # Contaier Deps
               coreutils-full
+              toybox
               curl
+              wget
               docker
               git
               gnugrep
