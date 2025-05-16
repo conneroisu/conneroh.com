@@ -6,8 +6,9 @@ tags:
   - hdl
 created_at: 2025-03-27T14:13:15.000-06:00
 description: VHDL (VHSIC Hardware Description Language) is a hardware description language used to model and simulate digital circuits and systems.
+icon: vhdl
 title: VHDL
-updated_at: 2025-04-02T06:54:41.000-06:00
+updated_at: 2025-05-16T09:05:05.000-06:00
 ---
 
 # VHDL
