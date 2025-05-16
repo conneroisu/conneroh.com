@@ -1,10 +1,6 @@
 {
   "image": "ghcr.io/conneroisu/conneroh.com:v5",
-  "overrideCommand": false,
-  "updateRemoteUserUID": false,
-  "onCreateCommand": "nix-shell --command 'echo done building nix dev environment'",
   "entrypoint": "./.devcontainer/entrypoint.sh",
-  "waitFor": "onCreateCommand",
   "customizations": {
     "vscode": {
       "settings": {
