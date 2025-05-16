@@ -1,6 +1,9 @@
 {
   "image": "ghcr.io/conneroisu/conneroh.com:v4",
-  "postCreateCommand": "direnv allow",
+  "userEnvProbe": "loginShell",
+  "updateRemoteUserUID": false,
+  "onCreateCommand": "nix-shell --command 'echo done building nix dev environment'",
+  "waitFor": "onCreateCommand",
   "customizations": {
     "vscode": {
       "settings": {
