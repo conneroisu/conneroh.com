@@ -1,11 +1,6 @@
 {
-  "image": "ghcr.io/conneroisu/conneroh.com:latest",
+  "image": "ghcr.io/conneroisu/conneroh.com:v1",
   "postCreateCommand": "direnv allow",
-  "features": {
-    "ghcr.io/forwardsoftware/devcontainer-features/go-mod-cache:1": {
-      "go-version": "1.24"
-    }
-  },
   "customizations": {
     "vscode": {
       "settings": {

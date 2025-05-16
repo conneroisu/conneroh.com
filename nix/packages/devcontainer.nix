@@ -6,16 +6,32 @@
   system = "x86_64-linux";
 in {
   flake = let
-    inherit (inputs.nix2container.packages.x86_64-linux) nix2container;
     pkgs = import inputs.nixpkgs {
       inherit system;
     };
+    tag = "v1";
   in {
     packages.x86_64-linux = rec {
       devcontainer = pkgs.dockerTools.buildNixShellImage {
+        inherit tag;
         name = "conneroh/devcontainer";
-        tag = "latest";
-        drv = self.devShells.${system}.default;
+        drv =
+          self.devShells.${system}.default
+          // {
+            packages = with pkgs; [
+              # Contaier Deps
+              coreutils-full
+              curl
+              docker
+              git
+              gnugrep
+              gnused
+              jq
+              nix
+              skopeo
+              util-linux
+            ];
+          };
       };
 
       deployDevcontainer = pkgs.writeShellApplication {
@@ -35,7 +51,7 @@ in {
           skopeo copy \
             --insecure-policy \
             docker-archive:"${devcontainer}" \
-            "docker://$REGISTRY:latest" \
+            "docker://$REGISTRY:${tag}" \
             --dest-creds x:"$TOKEN" \
             --format v2s2
         '';
