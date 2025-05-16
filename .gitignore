@@ -21,3 +21,4 @@ cache.sqlite
 *.db-wal
 *_templ.go
 target
+*.qcow2
