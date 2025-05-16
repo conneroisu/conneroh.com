@@ -5,13 +5,14 @@ tags:
   - edu/iastate/ageds461
 affiliation: Iowa State University
 author: Conner D. Ohnesorge
+banner_path: posts/sustainabilty-solution.webp
 course: AGEDS 461
 created_at: 2021-12-17T19:42:03.000-06:00
 description: An AI Solution to Evaluating the Adoption of Innovations I presented at AGEDS 461 at Iowa State University.
 professor: connero@iastate.edu
 subtitle: An AI Solution to Evaluating the Adoption of Innovations
 title: Sustainability and Extension as a Solution to World Hunger
-updated_at: 2025-04-18T20:13:05.000-06:00
+updated_at: 2025-05-16T10:29:48.000-06:00
 ---
 
 ## Quotes of Preface

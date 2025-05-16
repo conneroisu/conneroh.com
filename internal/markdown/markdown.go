@@ -113,7 +113,7 @@ func (r *resolver) ResolveWikilink(n *wikilink.Node) ([]byte, error) {
 	}
 
 	return fmt.Appendf(nil,
-		"https://conneroh.fly.storage.tigris.dev/%s",
+		"https://conneroisu.fly.storage.tigris.dev/assets/%s",
 		targetStr,
 	), nil
 }
