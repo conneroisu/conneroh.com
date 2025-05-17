@@ -7,16 +7,13 @@
 node_modules
 .env
 tmp
-test.db
 *.wlf
 *.log
 .DS_Store
 .vscode
-*.db-journal
 result
-servers
 tigris.yaml
-cache.sqlite
+*.db-journal
 *.db-shm
 *.db-wal
 *_templ.go
