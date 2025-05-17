@@ -185,5 +185,11 @@
           ]);
       description = "Run the application with air for hot reloading";
     };
+    pr-review = {
+      exec = ''
+'';
+      deps = with pkgs; [];
+      description = "Create a PR Review Deployment";
+    };
   };
 }
