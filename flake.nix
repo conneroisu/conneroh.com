@@ -7,9 +7,7 @@
     bun2nix.url = "github:baileyluTCD/bun2nix";
     flake-utils.url = "github:numtide/flake-utils";
     nix2container.url = "github:nlewo/nix2container";
-    nix2container.inputs = {
-      nixpkgs.follows = "nixpkgs";
-    };
+    nix2container.inputs.nixpkgs.follows = "nixpkgs";
     rust-overlay.url = "github:oxalica/rust-overlay";
     rust-overlay.inputs.nixpkgs.follows = "nixpkgs";
   };
@@ -197,7 +195,7 @@
             mkdir -p $out/root
             # Joint Shm and Wal
             ${pkgs.sqlite}/bin/sqlite3 ${./master.db} "PRAGMA wal_checkpoint(FULL);"
-            cp ${./master.db} $out/root/master.db
+            cp ${./master.db} $out/master.db
           '';
 
           preBuild = ''
