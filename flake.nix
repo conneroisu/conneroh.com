@@ -385,10 +385,9 @@
           force_https = true;
           processes = ["app"];
           version = self.shortRev or "dirty";
-          src = builtins.path {
-            path = ./.;
-            name = "source";
-          };
+          src = builtins.filterSource
+            (path: type: !(type == "directory" && baseNameOf path == "node_modules") && !(type == "directory" && baseNameOf path == "internal/data/docs"))
+            ./source-dir;
 
           databaseFiles = pkgs.runCommand "database-files" {} ''
             mkdir -p $out/root
