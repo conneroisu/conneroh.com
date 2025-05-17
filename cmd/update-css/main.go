@@ -89,9 +89,9 @@ func run(ctx context.Context) error {
 
 	return twerge.CodeGen(
 		twerge.Default(),
-		"internal/data/css/classes.go",
+		"cmd/conneroh/classes/classes.go",
 		"input.css",
-		"internal/data/css/classes.html",
+		"cmd/conneroh/classes/classes.html",
 		layouts.Page(views.Home(
 			&allPosts,
 			&allProjects,
