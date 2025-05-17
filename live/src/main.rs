@@ -5,6 +5,9 @@ use std::pin::Pin;
 use tokio::fs;
 use tokio::io;
 
+/// Recursively visits a directory and counts the number of files.
+///
+/// * `path`: The path to the directory to visit.
 fn visit(path: PathBuf) -> Pin<Box<dyn Future<Output = io::Result<i32>> + Send>> {
     Box::pin(async move {
         let mut entries = fs::read_dir(path).await?;
