@@ -13,8 +13,9 @@
   };
 
   outputs = inputs @ {
-    flake-utils,
     self,
+    flake-utils,
+    nix2container,
     ...
   }:
     flake-utils.lib.eachSystem ["x86_64-linux" "aarch64-linux" "aarch64-darwin"] (
@@ -43,6 +44,12 @@
               }
           )
           flake-scripts.scripts;
+        alpine = nix2container.pullImage {
+          imageName = "alpine";
+          imageDigest = "sha256:115731bab0862031b44766733890091c17924f9b7781b79997f5f163be262178";
+          arch = "amd64";
+          sha256 = "sha256-o4GvFCq6pvzASvlI5BLnk+Y4UN6qKL2dowuT0cp8q7Q=";
+        };
       in {
         devShells = let
           shell-shellHook = ''
@@ -249,7 +256,8 @@
 
           flyDevToml = settingsFormat.generate "fly.dev.toml" flyDevConfig;
           flyProdToml = settingsFormat.generate "fly.toml" flyProdConfig;
-        in
+          tag = "v6";
+        in rec
           {
             conneroh = pkgs.buildGoModule {
               inherit src version preBuild;
@@ -322,6 +330,31 @@
                   -c "$CONFIG_FILE" \
                   -i "$REGISTRY:latest" \
                   -t "$TOKEN"
+              '';
+            };
+            devcontainer = nix2container.buildImage {
+              fromImage = alpine;
+            };
+            deployDevcontainer = pkgs.writeShellApplication {
+              name = "deploy-devcontainer";
+              runtimeInputs = [
+                pkgs.skopeo
+              ];
+              bashOptions = ["errexit" "pipefail"];
+              text = ''
+                set -e
+                TOKEN=""
+
+                [ -z "$GHCR_TOKEN" ] && GHCR_TOKEN="$(doppler secrets get --plain GHCR_TOKEN)"
+                TOKEN="$GHCR_TOKEN"
+                REGISTRY="ghcr.io/conneroisu/conneroh.com"
+
+                skopeo copy \
+                  --insecure-policy \
+                  docker-archive:"${devcontainer}" \
+                  "docker://$REGISTRY:${tag}" \
+                  --dest-creds x:"$TOKEN" \
+                  --format v2s2
               '';
             };
           }
