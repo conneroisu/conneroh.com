@@ -27,9 +27,14 @@ import (
 	_ "modernc.org/sqlite"
 )
 
+const (
+	numWorkers    = 20
+	taskBufferInt = 1000
+)
+
 var (
-	workers    = flag.Int("workers", 20, "number of parallel workers")
-	taskBuffer = flag.Int("buffer", 1000, "size of task buffer")
+	workers    = flag.Int("workers", numWorkers, "number of parallel workers")
+	taskBuffer = flag.Int("buffer", taskBufferInt, "size of task buffer")
 )
 
 func main() {
@@ -47,7 +52,7 @@ func main() {
 	if err := Run(ctx, os.Getenv, *workers, *taskBuffer); err != nil {
 		formattedStr := eris.ToString(err, true)
 		fmt.Println(formattedStr)
-		os.Exit(1)
+		panic(err)
 	}
 }
 
@@ -62,20 +67,6 @@ func Run(ctx context.Context, getenv func(string) string, numWorkers, bufferSize
 	if err != nil {
 		return eris.Wrap(err, "failed to open database")
 	}
-	defer func() {
-		_, Verr := sqldb.Exec("PRAGMA journal_mode = OFF;")
-		if Verr != nil {
-			slog.Error("failed to vacuum database", "err", Verr)
-
-			return
-		}
-		_, Verr = sqldb.Exec("VACUUM;")
-		if Verr != nil {
-			slog.Error("failed to vacuum database", "err", Verr)
-
-			return
-		}
-	}()
 	defer sqldb.Close()
 
 	// Initialize BUN DB

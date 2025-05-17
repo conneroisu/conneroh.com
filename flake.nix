@@ -195,6 +195,8 @@
 
           databaseFiles = pkgs.runCommand "database-files" {} ''
             mkdir -p $out/root
+            # Joint Shm and Wal
+            ${pkgs.sqlite}/bin/sqlite3 ${./master.db} "PRAGMA wal_checkpoint(FULL);"
             cp ${./master.db} $out/root/master.db
           '';
 
