@@ -1,7 +1,6 @@
 {
   description = "Personal Website for Conner Ohnesorge";
 
-  # TODO: Might be adventageous to introduce flake-utils to reduce copy-pasta of nix paths
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     systems.url = "github:nix-systems/default";
@@ -20,7 +19,7 @@
     self,
     ...
   }:
-    flake-utils.lib.eachSystem ["x86_64-linux" "aarch64-linux"] (
+    flake-utils.lib.eachSystem ["x86_64-linux" "aarch64-linux" "aarch64-darwin"] (
       system: let
         pkgs = import inputs.nixpkgs {
           inherit system;
@@ -125,14 +124,13 @@
           };
           generate-js = {
             exec = ''
-              REPO_ROOT="$(git rev-parse --show-toplevel)"
               bun build \
                     "$REPO_ROOT"/index.js \
                     --minify \
                     --minify-syntax \
                     --minify-whitespace  \
                     --minify-identifiers \
-                    --outdir "$REPO_ROOT"/cmd/conneroh/_static/dist/
+                    --outdir "$(git rev-parse --show-toplevel)"/cmd/conneroh/_static/dist/
             '';
             deps = with pkgs; [bun git];
             description = "Generate JS files";
@@ -169,17 +167,12 @@
             description = "Format code files";
           };
           goSumUpdate = {
-            exec = ''
-              echo "Updating go.sum..."
-              go get -u ./...
-            '';
+            exec = ''go get -u "$(git rev-parse --show-toplevel)"/...'';
             deps = with pkgs; [go git];
             description = "Update go.sum";
           };
           generate-templates = {
-            exec = ''
-              templ generate
-            '';
+            exec = ''templ generate "$(git rev-parse --show-toplevel)"'';
             deps = with pkgs; [templ];
             description = "Generate templates";
           };
@@ -255,7 +248,6 @@
         devShells = let
           shell-shellHook = ''
             export REPO_ROOT=$(git rev-parse --show-toplevel)
-            # Print available commands
             echo "Available commands:"
             ${pkgs.lib.concatStringsSep "\n" (
               pkgs.lib.mapAttrsToList (name: script: ''echo "  ${name} - ${script.description}"'') scripts
@@ -386,7 +378,17 @@
           processes = ["app"];
           version = self.shortRev or "dirty";
           src = builtins.path {
-            path = ./.;
+            path = pkgs.lib.cleanSourceWith {
+              src = ./.;
+              filter = path: type: let
+                baseName = baseNameOf path;
+              in
+                !(
+                  (type == "directory" && baseName == ".direnv")
+                  || (type == "symlink" && baseName == ".git")
+                  || (type == "directory" && baseName == "data")
+                );
+            };
             name = "source";
           };
 
