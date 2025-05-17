@@ -388,6 +388,7 @@
           src = builtins.path {
             path = ./.;
             name = "source";
+            filter = path: type: !builtins.match "internal/docs" path;
           };
 
           databaseFiles = pkgs.runCommand "database-files" {} ''
