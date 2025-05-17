@@ -67,6 +67,13 @@ func Run(ctx context.Context, getenv func(string) string, numWorkers, bufferSize
 	if err != nil {
 		return eris.Wrap(err, "failed to open database")
 	}
+	defer func() {
+		_, Eerr := sqldb.Exec("PRAGMA wal_checkpoint(FULL);")
+		if Eerr != nil {
+			errs = append(errs, eris.Wrap(Eerr, "failed to checkpoint database"))
+		}
+	}()
+
 	defer sqldb.Close()
 
 	// Initialize BUN DB
