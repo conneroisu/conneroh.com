@@ -83,6 +83,11 @@ After adding or modifying content, update the database with:
 generate-db
 ```
 
+Alternatively, you can run the script directly:
+```bash
+./generate-db.sh
+```
+
 ## Build and Deploy
 
 ### Local Build

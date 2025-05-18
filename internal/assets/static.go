@@ -1,18 +1,17 @@
 package assets
 
 import (
-	"crypto/md5"
-	"encoding/hex"
 	"fmt"
 	"time"
 
+	"github.com/conneroisu/conneroh.com/internal/hashutil"
 	"github.com/uptrace/bun"
 	"gopkg.in/yaml.v3"
 )
 
 // DBName returns the name/file of the database.
 func DBName() string {
-	return "file:master.db?_pragma=busy_timeout=5000&_pragma=journal_mode=WAL&_pragma=mmap_size=30000000000&_pragma=page_size=32768"
+	return "file:master.db"
 }
 
 const (
@@ -257,9 +256,7 @@ func (emb *Tag) String() string {
 	return fmt.Sprintf("%s %s %s %d", emb.Title, emb.Slug, emb.Description, emb.ID)
 }
 
-// Hash calculates the hash of a file's content.
+// Hash calculates the hash of a file's content using SHA-256.
 func Hash(content []byte) string {
-	sum := md5.Sum(content)
-
-	return hex.EncodeToString(sum[:])
+	return hashutil.ComputeHash(content)
 }

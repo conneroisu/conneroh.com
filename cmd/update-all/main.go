@@ -1,4 +1,4 @@
-// Package main is the entry point for the application
+// Package main combines the functionality of update-db and update
 package main
 
 import (
@@ -63,7 +63,33 @@ func Run(ctx context.Context, getenv func(string) string, numWorkers, bufferSize
 	var errs []error
 	errMutex := &sync.Mutex{}
 
-	// Create database connection
+	// Step 1: Remove existing database if it exists
+	dbPath := assets.DBName()
+	slog.Info("removing existing database", "path", dbPath)
+	
+	// Extract actual file path from SQLite connection string
+	dbFilePath := dbPath
+	if len(dbPath) > 5 && dbPath[0:5] == "file:" {
+		// Extract file path from "file:path?options"
+		for i := 5; i < len(dbPath); i++ {
+			if dbPath[i] == '?' {
+				dbFilePath = dbPath[5:i]
+				break
+			}
+		}
+		if dbFilePath == dbPath[5:] {
+			dbFilePath = dbPath[5:]
+		}
+	}
+	
+	// Remove database files with all possible extensions
+	for _, suffix := range []string{"", "-shm", "-wal"} {
+		if err := os.Remove(dbFilePath + suffix); err != nil && !os.IsNotExist(err) {
+			slog.Warn("error removing database file", "path", dbFilePath+suffix, "error", err)
+		}
+	}
+
+	// Step 2: Create database connection
 	sqldb, err := sql.Open("sqlite", assets.DBName())
 	if err != nil {
 		return eris.Wrap(err, "failed to open database")
@@ -77,10 +103,114 @@ func Run(ctx context.Context, getenv func(string) string, numWorkers, bufferSize
 		db.AddQueryHook(bundebug.NewQueryHook(bundebug.WithVerbose(true)))
 	}
 
-	err = assets.InitDB(ctx, db)
+	// Enable foreign keys in SQLite
+	_, err = db.ExecContext(ctx, "PRAGMA foreign_keys = ON;")
 	if err != nil {
-		return eris.Wrap(err, "failed to initialize database")
+		return eris.Wrap(err, "failed to enable foreign keys")
 	}
+
+	// Step 3: Create database tables
+	slog.Info("creating database tables")
+	
+	// First, register all models
+	db.RegisterModel(
+		(*assets.Post)(nil),
+		(*assets.Tag)(nil),
+		(*assets.Project)(nil),
+		(*assets.Cache)(nil),
+		(*assets.PostToTag)(nil),
+		(*assets.PostToPost)(nil),
+		(*assets.PostToProject)(nil),
+		(*assets.ProjectToTag)(nil),
+		(*assets.ProjectToProject)(nil),
+		(*assets.TagToTag)(nil),
+	)
+	
+	// Create entity tables
+	models := []interface{}{
+		(*assets.Post)(nil),
+		(*assets.Tag)(nil),
+		(*assets.Project)(nil),
+		(*assets.Cache)(nil),
+	}
+
+	for _, model := range models {
+		_, err = db.NewCreateTable().
+			Model(model).
+			IfNotExists().
+			Exec(ctx)
+		if err != nil {
+			return eris.Wrap(err, fmt.Sprintf("failed to create table for %T", model))
+		}
+	}
+
+	// Create relationship tables with foreign keys
+	relationships := []struct {
+		model interface{}
+		fks   []string
+	}{
+		{
+			model: (*assets.PostToTag)(nil),
+			fks: []string{
+				"(post_id) REFERENCES posts(id) ON DELETE CASCADE",
+				"(tag_id) REFERENCES tags(id) ON DELETE CASCADE",
+			},
+		},
+		{
+			model: (*assets.PostToPost)(nil),
+			fks: []string{
+				"(source_post_id) REFERENCES posts(id) ON DELETE CASCADE",
+				"(target_post_id) REFERENCES posts(id) ON DELETE CASCADE",
+			},
+		},
+		{
+			model: (*assets.PostToProject)(nil),
+			fks: []string{
+				"(post_id) REFERENCES posts(id) ON DELETE CASCADE",
+				"(project_id) REFERENCES projects(id) ON DELETE CASCADE",
+			},
+		},
+		{
+			model: (*assets.ProjectToTag)(nil),
+			fks: []string{
+				"(project_id) REFERENCES projects(id) ON DELETE CASCADE",
+				"(tag_id) REFERENCES tags(id) ON DELETE CASCADE",
+			},
+		},
+		{
+			model: (*assets.ProjectToProject)(nil),
+			fks: []string{
+				"(source_project_id) REFERENCES projects(id) ON DELETE CASCADE",
+				"(target_project_id) REFERENCES projects(id) ON DELETE CASCADE",
+			},
+		},
+		{
+			model: (*assets.TagToTag)(nil),
+			fks: []string{
+				"(source_tag_id) REFERENCES tags(id) ON DELETE CASCADE",
+				"(target_tag_id) REFERENCES tags(id) ON DELETE CASCADE",
+			},
+		},
+	}
+
+	for _, rel := range relationships {
+		query := db.NewCreateTable().
+			Model(rel.model).
+			IfNotExists()
+		
+		for _, fk := range rel.fks {
+			query = query.ForeignKey(fk)
+		}
+		
+		_, err = query.Exec(ctx)
+		if err != nil {
+			return eris.Wrap(err, fmt.Sprintf("failed to create relationship table for %T", rel.model))
+		}
+	}
+
+	slog.Info("database tables created successfully")
+
+	// Step 4: Initialize the data processing
 	// Initialize filesystem
 	fs := afero.NewBasePathFs(afero.NewOsFs(), assets.VaultLoc)
 

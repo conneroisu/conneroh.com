@@ -1,11 +1,8 @@
 package cache
 
 import (
-	"crypto/md5"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"io"
 	"maps"
 	"os"
 	"path/filepath"
@@ -13,6 +10,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/conneroisu/conneroh.com/internal/hashutil"
 	"github.com/spf13/afero"
 )
 
@@ -123,7 +121,7 @@ func SplitGlobPath(globPath string) (string, string) {
 	return ".", globPath
 }
 
-// hashFile computes the MD5 hash of a file.
+// hashFile computes the SHA-256 hash of a file.
 func hashFile(fs afero.Fs, path string) (string, error) {
 	file, err := fs.Open(path)
 	if err != nil {
@@ -131,12 +129,7 @@ func hashFile(fs afero.Fs, path string) (string, error) {
 	}
 	defer file.Close()
 
-	hash := md5.New()
-	if _, err := io.Copy(hash, file); err != nil {
-		return "", err
-	}
-
-	return hex.EncodeToString(hash.Sum(nil)), nil
+	return hashutil.ComputeHashFromReader(file)
 }
 
 // hashGlobPath computes a hash for a path that may contain a glob pattern.
@@ -178,8 +171,9 @@ func hashDir(fs afero.Fs, path string, globPattern string) (string, error) {
 	// Sort files for consistent ordering
 	sort.Strings(files)
 
-	// Hash each file and combine
-	h := md5.New()
+	// Create a concatenated string of paths and hashes, then hash that
+	var hashInputBuilder strings.Builder
+	
 	for _, file := range files {
 		relPath, err := filepath.Rel(path, file)
 		if err != nil {
@@ -187,7 +181,7 @@ func hashDir(fs afero.Fs, path string, globPattern string) (string, error) {
 		}
 
 		// Include the relative path in the hash
-		_, err = io.WriteString(h, relPath)
+		_, err = hashInputBuilder.WriteString(relPath)
 		if err != nil {
 			return "", err
 		}
@@ -197,13 +191,14 @@ func hashDir(fs afero.Fs, path string, globPattern string) (string, error) {
 			return "", err
 		}
 
-		_, err = io.WriteString(h, fileHash)
+		_, err = hashInputBuilder.WriteString(fileHash)
 		if err != nil {
 			return "", err
 		}
 	}
-
-	return hex.EncodeToString(h.Sum(nil)), nil
+	
+	// Compute a single hash for all files
+	return hashutil.ComputeHash([]byte(hashInputBuilder.String())), nil
 }
 
 // aferoGlob implements a simple glob for afero filesystems.

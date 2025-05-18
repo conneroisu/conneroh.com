@@ -4,7 +4,6 @@ package cache
 import (
 	"bytes"
 	"context"
-	"database/sql"
 	"errors"
 	"log/slog"
 	"os"
@@ -49,11 +48,45 @@ type Task struct {
 	RetryCount     int
 }
 
+// DBTaskType represents different types of database tasks.
+type DBTaskType string
+
+const (
+	// DBSavePost is for saving a post.
+	DBSavePost DBTaskType = "save_post"
+	// DBSaveProject is for saving a project.
+	DBSaveProject DBTaskType = "save_project"
+	// DBSaveTag is for saving a tag.
+	DBSaveTag DBTaskType = "save_tag"
+	// DBFindTag is for finding a tag.
+	DBFindTag DBTaskType = "find_tag"
+	// DBFindPost is for finding a post.
+	DBFindPost DBTaskType = "find_post"
+	// DBFindProject is for finding a project.
+	DBFindProject DBTaskType = "find_project"
+	// DBUpdateCache is for updating the cache.
+	DBUpdateCache DBTaskType = "update_cache"
+	// DBLoadCache is for loading the cache.
+	DBLoadCache DBTaskType = "load_cache"
+	// DBUpdateRelationship is for updating relationships.
+	DBUpdateRelationship DBTaskType = "update_relationship"
+)
+
+// DBTask represents a database operation to be processed by the dedicated DB goroutine.
+type DBTask struct {
+	Type         DBTaskType
+	Data         interface{}
+	ResponseChan chan interface{}
+	ErrorChan    chan error
+}
+
 // Stats tracks statistics about task processing.
 type Stats struct {
 	TotalSubmitted     atomic.Int64
 	TotalCompleted     atomic.Int64
 	TotalRelationships atomic.Int64
+	DBTasksSubmitted   atomic.Int64
+	DBTasksCompleted   atomic.Int64
 	lastActivityNs     atomic.Int64 // unixNano
 	scanComplete       atomic.Bool
 	shutdownInitiated  atomic.Bool
@@ -71,6 +104,18 @@ func (s *Stats) RecordTaskCompleted() {
 	s.lastActivityNs.Store(time.Now().UnixNano())
 }
 
+// RecordDBTaskSubmitted records that a DB task was submitted.
+func (s *Stats) RecordDBTaskSubmitted() {
+	s.DBTasksSubmitted.Add(1)
+	s.lastActivityNs.Store(time.Now().UnixNano())
+}
+
+// RecordDBTaskCompleted records that a DB task was completed.
+func (s *Stats) RecordDBTaskCompleted() {
+	s.DBTasksCompleted.Add(1)
+	s.lastActivityNs.Store(time.Now().UnixNano())
+}
+
 // RecordRelationshipTask records that a relationship task was submitted.
 func (s *Stats) RecordRelationshipTask() {
 	s.TotalRelationships.Add(1)
@@ -83,13 +128,16 @@ func (s *Stats) SetScanComplete() {
 	slog.Debug("filesystem scan complete",
 		"submitted", s.TotalSubmitted.Load(),
 		"completed", s.TotalCompleted.Load(),
-		"relationships", s.TotalRelationships.Load())
+		"relationships", s.TotalRelationships.Load(),
+		"dbTasksSubmitted", s.DBTasksSubmitted.Load(),
+		"dbTasksCompleted", s.DBTasksCompleted.Load())
 }
 
 // IsComplete checks if all tasks are complete.
 func (s *Stats) IsComplete() bool {
 	return s.scanComplete.Load() &&
 		(s.TotalCompleted.Load() >= s.TotalSubmitted.Load()) &&
+		(s.DBTasksCompleted.Load() >= s.DBTasksSubmitted.Load()) &&
 		!s.shutdownInitiated.Load()
 }
 
@@ -112,27 +160,29 @@ func (s *Stats) LogStatus() {
 		"submitted", s.TotalSubmitted.Load(),
 		"completed", s.TotalCompleted.Load(),
 		"relationships", s.TotalRelationships.Load(),
+		"dbTasksSubmitted", s.DBTasksSubmitted.Load(),
+		"dbTasksCompleted", s.DBTasksCompleted.Load(),
 		"scanComplete", s.scanComplete.Load(),
 		"idleTime", time.Since(time.Unix(0, lastNs)).String())
 }
 
 // Processor handles processing of assets and documents.
 type Processor struct {
-	fs          afero.Fs
-	db          *bun.DB
-	s3Client    s3Client
-	s3Bucket    string
-	embedder    embedder
-	md          goldmark.Markdown
-	taskCh      chan Task
-	errCh       chan error
-	wg          *sync.WaitGroup
-	memCache    *memCache
-	entityCache *entityCache
-	dbMutex     *sync.Mutex // Mutex for database operations
-	batchOps    *batchOperations
-	stats       *Stats
-	doneCh      chan struct{} // Channel to signal completion
+	fs           afero.Fs
+	db           *bun.DB
+	s3Client     s3Client
+	s3Bucket     string
+	embedder     embedder
+	md           goldmark.Markdown
+	taskCh       chan Task
+	dbTaskCh     chan DBTask
+	errCh        chan error
+	wg           *sync.WaitGroup
+	memCache     *memCache
+	entityCache  *entityCache
+	stats        *Stats
+	doneCh       chan struct{} // Channel to signal completion
+	dbShutdownCh chan struct{} // Channel to signal DB goroutine shutdown
 }
 
 // Interface for S3 operations.
@@ -153,115 +203,8 @@ type embedder interface {
 	) error
 }
 
-// batchOperations handles batched database operations.
-type batchOperations struct {
-	mu             sync.Mutex
-	cacheUpdates   []*assets.Cache
-	batchSize      int
-	db             *bun.DB
-	updateInterval time.Duration
-	shutdownCh     chan struct{}
-}
-
-// newBatchOperations creates a new batch operations manager.
-func newBatchOperations(db *bun.DB, batchSize int) *batchOperations {
-	b := &batchOperations{
-		cacheUpdates:   make([]*assets.Cache, 0, batchSize),
-		batchSize:      batchSize,
-		db:             db,
-		updateInterval: 500 * time.Millisecond,
-		shutdownCh:     make(chan struct{}),
-	}
-
-	// Start a single background goroutine for regular flushing
-	go func() {
-		ticker := time.NewTicker(b.updateInterval)
-		defer ticker.Stop()
-
-		for {
-			select {
-			case <-ticker.C:
-				b.flush(context.Background())
-			case <-b.shutdownCh:
-				// Final flush on shutdown
-				b.flush(context.Background())
-
-				return
-			}
-		}
-	}()
-
-	return b
-}
-
-// scheduleCacheUpdate adds a cache update to the batch.
-func (b *batchOperations) scheduleCacheUpdate(ctx context.Context, cache *assets.Cache) {
-	b.mu.Lock()
-	defer b.mu.Unlock()
-
-	// Add to queue (create a copy to avoid race conditions)
-	cacheCopy := *cache
-	b.cacheUpdates = append(b.cacheUpdates, &cacheCopy)
-
-	// If we've reached batch size, flush immediately
-	if len(b.cacheUpdates) >= b.batchSize {
-		// Unlock while executing to avoid deadlock
-		b.mu.Unlock()
-		b.flush(ctx)
-		b.mu.Lock()
-	}
-}
-
-// flush immediately processes any pending updates regardless of batch size.
-func (b *batchOperations) flush(ctx context.Context) {
-	b.mu.Lock()
-
-	// Nothing to do
-	if len(b.cacheUpdates) == 0 {
-		b.mu.Unlock()
-
-		return
-	}
-
-	// Take the current batch and reset
-	updates := b.cacheUpdates
-	b.cacheUpdates = make([]*assets.Cache, 0, b.batchSize)
-
-	// Unlock while executing the batch
-	b.mu.Unlock()
-
-	slog.Debug("executing batch cache update", "count", len(updates))
-
-	// Use a timeout context to prevent hanging
-	execCtx, cancel := context.WithTimeout(ctx, 2*time.Second)
-	defer cancel()
-
-	_, err := b.db.NewInsert().
-		Model(&updates).
-		On("CONFLICT (path) DO UPDATE").
-		Set("hashed = EXCLUDED.hashed").
-		Set("x = EXCLUDED.x").
-		Set("y = EXCLUDED.y").
-		Set("z = EXCLUDED.z").
-		Exec(execCtx)
-
-	if err != nil {
-		if errors.Is(err, context.DeadlineExceeded) {
-			slog.Error("batch update timed out", "count", len(updates))
-		} else {
-			slog.Error("failed to batch update cache", "err", err, "count", len(updates))
-		}
-	}
-}
-
-// shutdown stops the background flush timer and performs a final flush.
-func (b *batchOperations) shutdown() {
-	close(b.shutdownCh)
-}
-
 // memCache provides an in-memory cache to reduce database queries.
 type memCache struct {
-	once  sync.Once
 	mu    sync.RWMutex
 	paths map[string]string // path -> hash
 }
@@ -287,16 +230,6 @@ func (m *memCache) Set(path, hash string) {
 	m.mu.Lock()
 	m.paths[path] = hash
 	m.mu.Unlock()
-}
-
-// ensureLoaded ensures the cache is loaded from the database once.
-func (m *memCache) ensureLoaded(ctx context.Context, db *bun.DB) error {
-	var loadErr error
-	m.once.Do(func() {
-		loadErr = m.loadFromDB(ctx, db)
-	})
-
-	return loadErr
 }
 
 // loadFromDB loads ALL cache entries from the database in a single query.
@@ -458,21 +391,21 @@ func NewProcessor(
 	initDB(db)
 
 	return &Processor{
-		fs:          fs,
-		db:          db,
-		s3Client:    s3Client,
-		s3Bucket:    bucketName,
-		embedder:    embedder,
-		md:          md,
-		taskCh:      make(chan Task, bufferSize),
-		errCh:       make(chan error, bufferSize),
-		wg:          &sync.WaitGroup{},
-		memCache:    memCache,
-		entityCache: entityCache,
-		dbMutex:     &sync.Mutex{},
-		batchOps:    newBatchOperations(db, 50), // Batch size of 50
-		stats:       &Stats{lastActivityNs: atomic.Int64{}},
-		doneCh:      make(chan struct{}),
+		fs:           fs,
+		db:           db,
+		s3Client:     s3Client,
+		s3Bucket:     bucketName,
+		embedder:     embedder,
+		md:           md,
+		taskCh:       make(chan Task, bufferSize),
+		dbTaskCh:     make(chan DBTask, bufferSize), // DB task channel with buffer
+		errCh:        make(chan error, bufferSize),
+		wg:           &sync.WaitGroup{},
+		memCache:     memCache,
+		entityCache:  entityCache,
+		stats:        &Stats{lastActivityNs: atomic.Int64{}},
+		doneCh:       make(chan struct{}),
+		dbShutdownCh: make(chan struct{}),
 	}
 }
 
@@ -506,6 +439,9 @@ func (p *Processor) Start(ctx context.Context, numWorkers int) {
 	// Start status logger
 	go p.logStatus(ctx)
 
+	// Start the dedicated database worker
+	go p.dbWorker(ctx)
+
 	// Start worker goroutines
 	for i := range numWorkers {
 		go p.worker(ctx, i)
@@ -531,10 +467,12 @@ func (p *Processor) monitorCompletion(ctx context.Context) {
 			if p.stats.IsComplete() {
 				slog.Debug("all tasks complete - EXITING PROGRAM",
 					"total", p.stats.TotalCompleted.Load(),
+					"dbTasks", p.stats.DBTasksCompleted.Load(),
 					"relationships", p.stats.TotalRelationships.Load())
 
-				// Use direct exit since channel signaling may be unreliable
-				os.Exit(0)
+				// Signal completion instead of direct exit
+				p.stats.SetShutdownInitiated()
+				close(p.doneCh)
 			}
 
 			// Check for inactivity timeout (15 seconds - reduced from 30)
@@ -542,8 +480,9 @@ func (p *Processor) monitorCompletion(ctx context.Context) {
 				slog.Warn("inactivity timeout detected - EXITING PROGRAM",
 					"idleTime", p.stats.TimeSinceActivity().String())
 
-				// Use direct exit since channel signaling may be unreliable
-				os.Exit(0)
+				// Signal completion instead of direct exit
+				p.stats.SetShutdownInitiated()
+				close(p.doneCh)
 			}
 		}
 	}
@@ -560,13 +499,46 @@ func (p *Processor) logStatus(ctx context.Context) {
 			return
 		case <-ticker.C:
 			p.stats.LogStatus()
-
-			// Add extra diagnostics
 			slog.Debug("task channel status",
-				"channelCapacity", cap(p.taskCh),
-				"currentQueueSize", len(p.taskCh))
+				"taskChannelCapacity", cap(p.taskCh),
+				"currentTaskQueueSize", len(p.taskCh),
+				"dbChannelCapacity", cap(p.dbTaskCh),
+				"currentDBQueueSize", len(p.dbTaskCh))
 		}
 	}
+}
+
+// flushCacheBatch flushes the batch of cache updates to the database.
+func (p *Processor) flushCacheBatch(ctx context.Context, batch []*assets.Cache) []*assets.Cache {
+	if len(batch) == 0 {
+		return batch
+	}
+
+	slog.Debug("executing batch cache update", "count", len(batch))
+
+	// Use a timeout context to prevent hanging
+	execCtx, cancel := context.WithTimeout(ctx, 2*time.Second)
+	defer cancel()
+
+	_, err := p.db.NewInsert().
+		Model(&batch).
+		On("CONFLICT (path) DO UPDATE").
+		Set("hashed = EXCLUDED.hashed").
+		Set("x = EXCLUDED.x").
+		Set("y = EXCLUDED.y").
+		Set("z = EXCLUDED.z").
+		Exec(execCtx)
+
+	if err != nil {
+		if errors.Is(err, context.DeadlineExceeded) {
+			slog.Error("batch update timed out", "count", len(batch))
+		} else {
+			slog.Error("failed to batch update cache", "err", err, "count", len(batch))
+		}
+	}
+
+	// Return a fresh slice with the same capacity
+	return make([]*assets.Cache, 0, cap(batch))
 }
 
 // worker processes tasks from the task channel.
@@ -621,6 +593,31 @@ func (p *Processor) SubmitTask(task Task) {
 	case <-time.After(5 * time.Second):
 		// This shouldn't happen with a properly sized buffer
 		p.errCh <- eris.Errorf("timeout submitting task: %s", task.Path)
+	}
+}
+
+// submitDBTask submits a database task to the dedicated DB worker.
+func (p *Processor) submitDBTask(task DBTask) (interface{}, error) {
+	responseChan := make(chan interface{}, 1)
+	errorChan := make(chan error, 1)
+
+	task.ResponseChan = responseChan
+	task.ErrorChan = errorChan
+
+	// Submit the task
+	select {
+	case p.dbTaskCh <- task:
+		// Wait for response or error
+		select {
+		case response := <-responseChan:
+			return response, nil
+		case err := <-errorChan:
+			return nil, err
+		case <-time.After(10 * time.Second):
+			return nil, eris.Errorf("timeout waiting for DB task response: %s", task.Type)
+		}
+	case <-time.After(5 * time.Second):
+		return nil, eris.Errorf("timeout submitting DB task: %s", task.Type)
 	}
 }
 
@@ -696,16 +693,19 @@ func (p *Processor) WaitForCompletion(timeout time.Duration) bool {
 
 		return true
 	case <-timer.C:
-		// Timeout occurred
 		p.stats.LogStatus()
 		slog.Warn(
 			"timeout waiting for completion",
 			"timeout",
 			timeout.String(),
-			"queueSize",
+			"taskQueueSize",
 			len(p.taskCh),
+			"dbQueueSize",
+			len(p.dbTaskCh),
 			"pendingTasks",
 			p.stats.TotalSubmitted.Load()-p.stats.TotalCompleted.Load(),
+			"pendingDBTasks",
+			p.stats.DBTasksSubmitted.Load()-p.stats.DBTasksCompleted.Load(),
 		)
 
 		return false
@@ -721,11 +721,12 @@ func (p *Processor) WaitForAllTasks() {
 
 // Close properly cleans up all resources.
 func (p *Processor) Close() {
-	// Shutdown the batch operations background goroutine
-	p.batchOps.shutdown()
+	// Signal DB worker to shutdown and flush any pending batches
+	close(p.dbShutdownCh)
 
 	// Close all channels
 	close(p.taskCh)
+	close(p.dbTaskCh)
 	close(p.errCh)
 	close(p.doneCh)
 
@@ -810,8 +811,16 @@ func (p *Processor) processAsset(ctx context.Context, task Task) error {
 		return err
 	}
 
-	// Update cache
-	return p.updateCache(ctx, task.Path, hash)
+	// Update cache using the DB worker
+	_, err = p.submitDBTask(DBTask{
+		Type: DBUpdateCache,
+		Data: &assets.Cache{
+			Path: task.Path,
+			Hash: hash,
+		},
+	})
+
+	return err
 }
 
 // processDocument processes a document file.
@@ -868,25 +877,27 @@ func (p *Processor) processDocument(ctx context.Context, task Task) error {
 		return eris.Wrapf(err, "document validation failed: %s", task.Path)
 	}
 
-	// Save document to database
+	// Save document to database through the DB worker
 	err = p.saveDocument(ctx, doc)
 	if err != nil {
 		return err
 	}
 
-	// Update cache
-	return p.updateCache(ctx, task.Path, hash)
+	// Update cache through the DB worker
+	_, err = p.submitDBTask(DBTask{
+		Type: DBUpdateCache,
+		Data: &assets.Cache{
+			Path: task.Path,
+			Hash: hash,
+		},
+	})
+
+	return err
 }
 
-// checkCache checks if a file is already cached and unchanged
-// This version uses the memory cache with sync.Once initialization.
+// checkCache checks if a file is already cached and unchanged.
 func (p *Processor) checkCache(ctx context.Context, path, hash string) (bool, error) {
-	// Make sure cache is loaded (only once)
-	if err := p.memCache.ensureLoaded(ctx, p.db); err != nil {
-		return false, err
-	}
-
-	// Check in memory cache
+	// Check in memory cache first
 	if cachedHash, ok := p.memCache.Get(path); ok {
 		if cachedHash == hash {
 			return true, nil
@@ -896,24 +907,23 @@ func (p *Processor) checkCache(ctx context.Context, path, hash string) (bool, er
 		return false, nil
 	}
 
-	// Not in cache
-	return false, nil
-}
-
-// updateCache updates the cache record for a file.
-func (p *Processor) updateCache(ctx context.Context, path, hash string) error {
-	cache := &assets.Cache{
-		Path: path,
-		Hash: hash,
+	// Not in memory cache, load from database if needed
+	_, err := p.submitDBTask(DBTask{
+		Type: DBLoadCache,
+	})
+	if err != nil {
+		return false, err
 	}
 
-	// Update memory cache immediately
-	p.memCache.Set(path, hash)
+	// Check again after loading cache
+	if cachedHash, ok := p.memCache.Get(path); ok {
+		if cachedHash == hash {
+			return true, nil
+		}
+	}
 
-	// Schedule for batch update
-	p.batchOps.scheduleCacheUpdate(ctx, cache)
-
-	return nil
+	// Not in cache
+	return false, nil
 }
 
 // uploadToS3 uploads a file to S3.
@@ -981,526 +991,114 @@ func (p *Processor) parseMarkdown(content []byte, doc *assets.Doc) error {
 func (p *Processor) saveDocument(ctx context.Context, doc *assets.Doc) error {
 	switch {
 	case strings.HasPrefix(doc.Path, assets.PostsLoc) && strings.HasSuffix(doc.Path, ".md"):
-		return p.savePost(ctx, doc)
+		// Convert Doc to Post
+		post := &assets.Post{}
+		copygen.ToPost(post, doc)
+
+		// Submit to DB worker
+		response, err := p.submitDBTask(DBTask{
+			Type: DBSavePost,
+			Data: post,
+		})
+		if err != nil {
+			return err
+		}
+
+		// Schedule relationship update task with a delay to avoid database contention
+		time.AfterFunc(100*time.Millisecond, func() {
+			if savedPost, ok := response.(*assets.Post); ok {
+				p.SubmitTask(Task{
+					Type: TypeRelationship,
+					Path: doc.Path,
+					RelationshipFn: func(ctx context.Context) error {
+						_, err := p.submitDBTask(DBTask{
+							Type: DBUpdateRelationship,
+							Data: struct {
+								Post *assets.Post
+							}{Post: savedPost},
+						})
+
+						return err
+					},
+				})
+			}
+		})
+
+		return nil
+
 	case strings.HasPrefix(doc.Path, assets.ProjectsLoc) && strings.HasSuffix(doc.Path, ".md"):
-		return p.saveProject(ctx, doc)
+		// Convert Doc to Project
+		project := &assets.Project{}
+		copygen.ToProject(project, doc)
+
+		// Submit to DB worker
+		response, err := p.submitDBTask(DBTask{
+			Type: DBSaveProject,
+			Data: project,
+		})
+		if err != nil {
+			return err
+		}
+
+		// Schedule relationship update task with a delay to avoid database contention
+		time.AfterFunc(100*time.Millisecond, func() {
+			if savedProject, ok := response.(*assets.Project); ok {
+				p.SubmitTask(Task{
+					Type: TypeRelationship,
+					Path: doc.Path,
+					RelationshipFn: func(ctx context.Context) error {
+						_, err := p.submitDBTask(DBTask{
+							Type: DBUpdateRelationship,
+							Data: struct {
+								Project *assets.Project
+							}{Project: savedProject},
+						})
+
+						return err
+					},
+				})
+			}
+		})
+
+		return nil
+
 	case strings.HasPrefix(doc.Path, assets.TagsLoc) && strings.HasSuffix(doc.Path, ".md"):
-		return p.saveTag(ctx, doc)
+		// Convert Doc to Tag
+		tag := &assets.Tag{}
+		copygen.ToTag(tag, doc)
+
+		// Submit to DB worker
+		response, err := p.submitDBTask(DBTask{
+			Type: DBSaveTag,
+			Data: tag,
+		})
+		if err != nil {
+			return err
+		}
+
+		// Schedule relationship update task with a delay to avoid database contention
+		time.AfterFunc(100*time.Millisecond, func() {
+			if savedTag, ok := response.(*assets.Tag); ok {
+				p.SubmitTask(Task{
+					Type: TypeRelationship,
+					Path: doc.Path,
+					RelationshipFn: func(ctx context.Context) error {
+						_, err := p.submitDBTask(DBTask{
+							Type: DBUpdateRelationship,
+							Data: struct {
+								Tag *assets.Tag
+							}{Tag: savedTag},
+						})
+
+						return err
+					},
+				})
+			}
+		})
+
+		return nil
+
 	default:
 		return eris.Errorf("unknown document type: %s", doc.Path)
 	}
-}
-
-// savePost saves a post to the database.
-func (p *Processor) savePost(ctx context.Context, doc *assets.Doc) error {
-	// Convert Doc to Post
-	post := &assets.Post{}
-	copygen.ToPost(post, doc)
-
-	// Use database mutex to prevent concurrent writes
-	p.dbMutex.Lock()
-	defer p.dbMutex.Unlock()
-
-	// Save post with a timeout context to prevent hanging
-	insertCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
-	defer cancel()
-
-	// Save post
-	_, err := p.db.NewInsert().
-		Model(post).
-		On("CONFLICT (slug) DO UPDATE").
-		Set("title = EXCLUDED.title").
-		Set("description = EXCLUDED.description").
-		Set("content = EXCLUDED.content").
-		Set("banner_path = EXCLUDED.banner_path").
-		Set("created_at = EXCLUDED.created_at").
-		Set("x = EXCLUDED.x").
-		Set("y = EXCLUDED.y").
-		Set("z = EXCLUDED.z").
-		Exec(insertCtx)
-	slog.Info(
-		"saved post",
-		slog.String("slug", doc.Slug),
-		slog.String("banner_path", doc.BannerPath),
-	)
-
-	if err != nil {
-		if errors.Is(err, context.DeadlineExceeded) {
-			return eris.New("database operation timed out")
-		}
-
-		return eris.Wrapf(err, "failed to save post: %s", doc.Path)
-	}
-
-	// Schedule relationship update task with a delay to avoid database contention
-	time.AfterFunc(100*time.Millisecond, func() {
-		p.SubmitTask(Task{
-			Type: TypeRelationship,
-			Path: doc.Path,
-			RelationshipFn: func(ctx context.Context) error {
-				return p.updatePostRelationships(ctx, post)
-			},
-		})
-	})
-
-	return nil
-}
-
-// saveProject saves a project to the database.
-func (p *Processor) saveProject(ctx context.Context, doc *assets.Doc) error {
-	// Convert Doc to Project
-	project := &assets.Project{}
-	copygen.ToProject(project, doc)
-
-	// Use database mutex to prevent concurrent writes
-	p.dbMutex.Lock()
-	defer p.dbMutex.Unlock()
-
-	// Save project with a timeout context to prevent hanging
-	insertCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
-	defer cancel()
-
-	// Save project
-	_, err := p.db.NewInsert().
-		Model(project).
-		On("CONFLICT (slug) DO UPDATE").
-		Set("title = EXCLUDED.title").
-		Set("description = EXCLUDED.description").
-		Set("content = EXCLUDED.content").
-		Set("banner_path = EXCLUDED.banner_path").
-		Set("created_at = EXCLUDED.created_at").
-		Set("x = EXCLUDED.x").
-		Set("y = EXCLUDED.y").
-		Set("z = EXCLUDED.z").
-		Exec(insertCtx)
-
-	if err != nil {
-		if errors.Is(err, context.DeadlineExceeded) {
-			return eris.New("database operation timed out")
-		}
-
-		return eris.Wrapf(err, "failed to save project: %s", doc.Path)
-	}
-
-	// Schedule relationship update task with a delay to avoid database contention
-	time.AfterFunc(10*time.Millisecond, func() {
-		p.SubmitTask(Task{
-			Type: TypeRelationship,
-			Path: doc.Path,
-			RelationshipFn: func(ctx context.Context) error {
-				return p.updateProjectRelationships(ctx, project)
-			},
-		})
-	})
-
-	return nil
-}
-
-// saveTag saves a tag to the database.
-func (p *Processor) saveTag(ctx context.Context, doc *assets.Doc) error {
-	// Convert Doc to Tag
-	tag := &assets.Tag{}
-	copygen.ToTag(tag, doc)
-
-	// Use database mutex to prevent concurrent writes
-	p.dbMutex.Lock()
-	defer p.dbMutex.Unlock()
-
-	// Save tag with a timeout context to prevent hanging
-	insertCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
-	defer cancel()
-
-	// Save tag
-	_, err := p.db.NewInsert().
-		Model(tag).
-		On("CONFLICT (slug) DO UPDATE").
-		Set("title = EXCLUDED.title").
-		Set("description = EXCLUDED.description").
-		Set("content = EXCLUDED.content").
-		Set("banner_path = EXCLUDED.banner_path").
-		Set("created_at = EXCLUDED.created_at").
-		Set("x = EXCLUDED.x").
-		Set("y = EXCLUDED.y").
-		Set("z = EXCLUDED.z").
-		Exec(insertCtx)
-
-	if err != nil {
-		if errors.Is(err, context.DeadlineExceeded) {
-			return eris.New("database operation timed out")
-		}
-
-		return eris.Wrapf(err, "failed to save tag: %s", doc.Path)
-	}
-
-	// Schedule relationship update task with a delay to avoid database contention
-	time.AfterFunc(10*time.Millisecond, func() {
-		p.SubmitTask(Task{
-			Type: TypeRelationship,
-			Path: doc.Path,
-			RelationshipFn: func(ctx context.Context) error {
-				return p.updateTagRelationships(ctx, tag)
-			},
-		})
-	})
-
-	return nil
-}
-
-// findTagBySlug finds a tag by its slug.
-func (p *Processor) findTagBySlug(
-	ctx context.Context,
-	slug, origin string,
-) (*assets.Tag, error) {
-	// First check in-memory cache
-	if tag, ok := p.entityCache.GetTag(slug); ok {
-		return tag, nil
-	}
-
-	// Use mutex to prevent concurrent database queries
-	p.dbMutex.Lock()
-	defer p.dbMutex.Unlock()
-
-	// Use timeout to prevent hanging
-	queryCtx, cancel := context.WithTimeout(ctx, 3*time.Second)
-	defer cancel()
-
-	var tag assets.Tag
-
-	err := p.db.NewSelect().
-		Model(&tag).
-		Where("slug = ?", slug).
-		Scan(queryCtx)
-
-	if err != nil {
-		if errors.Is(err, context.DeadlineExceeded) {
-			return nil, eris.New("database operation timed out")
-		}
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, eris.Errorf(
-				"tag not found: %s (referenced from %s)",
-				slug,
-				origin,
-			)
-		}
-
-		return nil, eris.Wrapf(err, "failed to find tag: %s", slug)
-	}
-
-	// Update cache
-	p.entityCache.SetTag(&tag)
-
-	return &tag, nil
-}
-
-// findPostBySlug finds a post by its slug.
-func (p *Processor) findPostBySlug(ctx context.Context, slug, origin string) (*assets.Post, error) {
-	// First check in-memory cache
-	if post, ok := p.entityCache.GetPost(slug); ok {
-		return post, nil
-	}
-
-	// Use mutex to prevent concurrent database queries
-	p.dbMutex.Lock()
-	defer p.dbMutex.Unlock()
-
-	// Use timeout to prevent hanging
-	queryCtx, cancel := context.WithTimeout(ctx, 3*time.Second)
-	defer cancel()
-
-	var post assets.Post
-
-	err := p.db.NewSelect().
-		Model(&post).
-		Where("slug = ?", slug).
-		Scan(queryCtx)
-	if err != nil {
-		if errors.Is(err, context.DeadlineExceeded) {
-			return nil, eris.New("database operation timed out")
-		}
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, eris.Errorf(
-				"post not found: %s (referenced from %s)",
-				slug,
-				origin,
-			)
-		}
-
-		return nil, eris.Wrapf(err, "failed to find post: %s", slug)
-	}
-
-	// Update cache
-	p.entityCache.SetPost(&post)
-
-	return &post, nil
-}
-
-// findProjectBySlug finds a project by its slug.
-func (p *Processor) findProjectBySlug(ctx context.Context, slug, origin string) (*assets.Project, error) {
-	// First check in-memory cache
-	if project, ok := p.entityCache.GetProject(slug); ok {
-		return project, nil
-	}
-
-	// Use mutex to prevent concurrent database queries
-	p.dbMutex.Lock()
-	defer p.dbMutex.Unlock()
-
-	// Use timeout to prevent hanging
-	queryCtx, cancel := context.WithTimeout(ctx, 3*time.Second)
-	defer cancel()
-
-	var project assets.Project
-
-	err := p.db.NewSelect().
-		Model(&project).
-		Where("slug = ?", slug).
-		Scan(queryCtx)
-
-	if err != nil {
-		if errors.Is(err, context.DeadlineExceeded) {
-			return nil, eris.New("database operation timed out")
-		}
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, eris.Errorf(
-				"project not found: %s (referenced from %s)",
-				slug,
-				origin,
-			)
-		}
-
-		return nil, eris.Wrapf(err, "failed to find project: %s", slug)
-	}
-
-	// Update cache
-	p.entityCache.SetProject(&project)
-
-	return &project, nil
-}
-
-// updatePostRelationships updates relationships for a post.
-func (p *Processor) updatePostRelationships(
-	ctx context.Context,
-	post *assets.Post,
-) error {
-	for _, tagSlug := range post.TagSlugs { // Create tag relationships
-		tag, err := p.findTagBySlug(ctx, tagSlug, post.Slug)
-		if err != nil {
-			return err
-		}
-
-		_, err = p.db.NewInsert().
-			Model(&assets.PostToTag{
-				PostID: post.ID,
-				TagID:  tag.ID,
-			}).
-			On("CONFLICT (post_id, tag_id) DO NOTHING").
-			Exec(ctx)
-		if err != nil {
-			return eris.Wrapf(
-				err,
-				"failed to create post-tag relationship: %s -> %s",
-				post.Slug,
-				tagSlug,
-			)
-		}
-	}
-
-	for _, postSlug := range post.PostSlugs { // Create post relationships
-		relatedPost, err := p.findPostBySlug(ctx, postSlug, post.Slug)
-		if err != nil {
-			return err
-		}
-
-		_, err = p.db.NewInsert().
-			Model(&assets.PostToPost{
-				SourcePostID: post.ID,
-				TargetPostID: relatedPost.ID,
-			}).
-			On("CONFLICT (source_post_id, target_post_id) DO NOTHING").
-			Exec(ctx)
-
-		if err != nil {
-			return eris.Wrapf(
-				err,
-				"failed to create post-post relationship: %s -> %s",
-				post.Slug,
-				postSlug,
-			)
-		}
-	}
-
-	for _, projectSlug := range post.ProjectSlugs { // Create project relationships
-		project, err := p.findProjectBySlug(ctx, projectSlug, post.Slug)
-		if err != nil {
-			return err
-		}
-
-		_, err = p.db.NewInsert().
-			Model(&assets.PostToProject{
-				PostID:    post.ID,
-				ProjectID: project.ID,
-			}).
-			On("CONFLICT (post_id, project_id) DO NOTHING").
-			Exec(ctx)
-
-		if err != nil {
-			return eris.Wrapf(
-				err,
-				"failed to create post-project relationship: %s -> %s",
-				post.Slug,
-				projectSlug,
-			)
-		}
-	}
-
-	return nil
-}
-
-// updateProjectRelationships updates relationships for a project.
-func (p *Processor) updateProjectRelationships(
-	ctx context.Context,
-	project *assets.Project,
-) error {
-	for _, projectSlug := range project.ProjectSlugs { // Create project relationships
-		relatedProject, err := p.findProjectBySlug(ctx, projectSlug, project.Slug)
-		if err != nil {
-			return err
-		}
-		_, err = p.db.NewInsert().
-			Model(&assets.ProjectToProject{
-				SourceProjectID: project.ID,
-				TargetProjectID: relatedProject.ID,
-			}).
-			On("CONFLICT (source_project_id, target_project_id) DO NOTHING").
-			Exec(ctx)
-		if err != nil {
-			return eris.Wrapf(
-				err,
-				"failed to create project-project relationship: %s -> %s",
-				project.Slug,
-				projectSlug,
-			)
-		}
-	}
-
-	for _, tagSlug := range project.TagSlugs { // Create tag relationships
-		tag, err := p.findTagBySlug(ctx, tagSlug, project.Slug)
-		if err != nil {
-			return err
-		}
-		_, err = p.db.NewInsert().
-			Model(&assets.ProjectToTag{
-				ProjectID: project.ID,
-				TagID:     tag.ID,
-			}).
-			On("CONFLICT (project_id, tag_id) DO NOTHING").
-			Exec(ctx)
-		if err != nil {
-			return eris.Wrapf(
-				err,
-				"failed to create project-tag relationship: %s -> %s",
-				project.Slug,
-				tagSlug,
-			)
-		}
-	}
-
-	for _, postSlug := range project.PostSlugs { // Create post relationships
-		post, err := p.findPostBySlug(ctx, postSlug, project.Slug)
-		if err != nil {
-			return err
-		}
-		_, err = p.db.NewInsert().
-			Model(&assets.PostToProject{
-				ProjectID: project.ID,
-				PostID:    post.ID,
-			}).
-			On("CONFLICT (project_id, post_id) DO NOTHING").
-			Exec(ctx)
-		if err != nil {
-			return eris.Wrapf(
-				err,
-				"failed to create project-post relationship: %s -> %s",
-				project.Slug,
-				postSlug,
-			)
-		}
-	}
-
-	return nil
-}
-
-// updateTagRelationships updates relationships for a tag.
-func (p *Processor) updateTagRelationships(
-	ctx context.Context,
-	tag *assets.Tag,
-) error {
-	for _, tagSlug := range tag.TagSlugs { // Create tag relationships
-		relatedTag, err := p.findTagBySlug(ctx, tagSlug, tag.Slug)
-		if err != nil {
-			return err
-		}
-		_, err = p.db.NewInsert().
-			Model(&assets.TagToTag{
-				SourceTagID: tag.ID,
-				TargetTagID: relatedTag.ID,
-			}).
-			On("CONFLICT (source_tag_id, target_tag_id) DO NOTHING").
-			Exec(ctx)
-		if err != nil {
-			return eris.Wrapf(
-				err,
-				"failed to create tag-tag relationship: %s -> %s",
-				tag.Slug,
-				tagSlug,
-			)
-		}
-	}
-
-	for _, postSlug := range tag.PostSlugs { // Create post relationships
-		post, err := p.findPostBySlug(ctx, postSlug, tag.Slug)
-		if err != nil {
-			return err
-		}
-
-		_, err = p.db.NewInsert().
-			Model(&assets.PostToTag{
-				TagID:  tag.ID,
-				PostID: post.ID,
-			}).
-			On("CONFLICT (tag_id, post_id) DO NOTHING").
-			Exec(ctx)
-		if err != nil {
-			return eris.Wrapf(
-				err,
-				"failed to create tag-post relationship: %s -> %s",
-				tag.Slug,
-				postSlug,
-			)
-		}
-	}
-
-	for _, projectSlug := range tag.ProjectSlugs { // Create project relationships
-		project, err := p.findProjectBySlug(ctx, projectSlug, tag.Slug)
-		if err != nil {
-			return err
-		}
-		_, err = p.db.NewInsert().
-			Model(&assets.ProjectToTag{
-				TagID:     tag.ID,
-				ProjectID: project.ID,
-			}).
-			On("CONFLICT (tag_id, project_id) DO NOTHING").
-			Exec(ctx)
-		if err != nil {
-			return eris.Wrapf(
-				err,
-				"failed to create tag-project relationship: %s -> %s",
-				tag.Slug,
-				projectSlug,
-			)
-		}
-	}
-
-	return nil
 }

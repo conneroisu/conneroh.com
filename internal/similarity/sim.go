@@ -21,14 +21,14 @@ type Utterance struct {
 	Embed embedding
 }
 
-// normalizeScores normalizes the similarity scores to a 0-1 range.
+// NormalizeScores normalizes the similarity scores to a 0-1 range.
 // The function takes a slice of float64 values representing the similarity
 // scores.
 //
 // The function takes a slice of float64 values representing the
 // similarity scores and returns a slice of float64 values representing
 // the normalized similarity scores.
-func normalizeScores(sim []float64) []float64 {
+func NormalizeScores(sim []float64) []float64 {
 	minimum := floats.Min(sim)
 	maximum := floats.Max(sim)
 	normalized := make([]float64, len(sim))
@@ -183,7 +183,7 @@ func hammingDistance(xq, index *mat.VecDense) (float64, error) {
 // $$d(x, y) = \sum_{i=1}^{n} |x_i - y_i|^p$$
 //
 // where n is the length of the vectors.
-func minkowskiDistance(xq, index *mat.VecDense, p float64) (float64, error) {
+func MinkowskiDistance(xq, index *mat.VecDense, p float64) (float64, error) {
 	if p <= 0 {
 		panic("Order p must be greater than 0")
 	}

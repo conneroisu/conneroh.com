@@ -43,9 +43,13 @@
         golangci-lint run
         statix check "$REPO_ROOT"/flake.nix
         deadnix "$REPO_ROOT"/flake.nix
+        
+        # Run Rust clippy
+        echo "Running Rust clippy..."
+        cd "$REPO_ROOT"/live && cargo clippy -- -D warnings
       '';
-      deps = with pkgs; [golangci-lint statix deadnix templ];
-      description = "Run Nix/Go Linting Steps.";
+      deps = with pkgs; [golangci-lint statix deadnix templ rustc cargo];
+      description = "Run Nix/Go/Rust Linting Steps.";
     };
     generate-css = {
       exec = ''
