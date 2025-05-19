@@ -1,0 +1,78 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:base",
+    ":semanticCommits",
+    ":dependencyDashboard"
+  ],
+  "packageRules": [
+    {
+      "matchManagers": ["gomod"],
+      "groupName": "go dependencies",
+      "semanticCommitType": "deps",
+      "semanticCommitScope": "go"
+    },
+    {
+      "matchDepTypes": ["require"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "go minor and patch updates",
+      "automerge": true
+    },
+    {
+      "matchDepTypes": ["require"],
+      "matchUpdateTypes": ["major"],
+      "semanticCommitType": "feat",
+      "semanticCommitScope": "go-deps"
+    },
+    {
+      "matchManagers": ["npm"],
+      "groupName": "js dependencies",
+      "semanticCommitType": "deps",
+      "semanticCommitScope": "js"
+    },
+    {
+      "matchManagers": ["npm"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "js minor and patch updates",
+      "automerge": true
+    },
+    {
+      "matchManagers": ["npm"],
+      "matchUpdateTypes": ["major"],
+      "semanticCommitType": "feat",
+      "semanticCommitScope": "js-deps"
+    },
+    {
+      "matchPackagePatterns": ["^@alpinejs", "^alpinejs"],
+      "groupName": "alpine.js dependencies",
+      "semanticCommitScope": "alpine"
+    },
+    {
+      "matchPackagePatterns": ["^tailwindcss", "^@tailwindcss"],
+      "groupName": "tailwind dependencies",
+      "semanticCommitScope": "tailwind"
+    }
+  ],
+  "labels": ["dependencies"],
+  "timezone": "America/Chicago",
+  "schedule": ["every weekend"],
+  "prHourlyLimit": 9,
+  "prConcurrentLimit": 5,
+  "branchPrefix": "renovate/",
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 5am on monday"]
+  },
+  "vulnerabilityAlerts": {
+    "labels": ["security"],
+    "assignees": ["@conneroisu"]
+  },
+  "commitMessageAction": "Update",
+  "commitMessageTopic": "{{depName}}",
+  "commitMessageExtra": "to {{newVersion}}",
+  "ignorePaths": [
+    "**/node_modules/**",
+    "**/bower_components/**",
+    "**/vendor/**"
+  ]
+}
