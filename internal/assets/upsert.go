@@ -151,6 +151,7 @@ func UpsertPostRelationships(
 						post.Slug,
 					)
 				}
+
 				return eris.Wrapf(
 					err,
 					"failed to find tag: %s",
@@ -195,6 +196,7 @@ func UpsertPostRelationships(
 						post.Slug,
 					)
 				}
+
 				return eris.Wrapf(
 					err,
 					"failed to find post: %s",
@@ -239,6 +241,7 @@ func UpsertPostRelationships(
 						post.Slug,
 					)
 				}
+
 				return eris.Wrapf(
 					err,
 					"failed to find project: %s",
@@ -293,6 +296,7 @@ func UpsertProjectRelationships(
 						project.Slug,
 					)
 				}
+
 				return eris.Wrapf(
 					err,
 					"failed to find tag: %s",
@@ -337,6 +341,7 @@ func UpsertProjectRelationships(
 						project.Slug,
 					)
 				}
+
 				return eris.Wrapf(
 					err,
 					"failed to find post: %s",
@@ -381,6 +386,7 @@ func UpsertProjectRelationships(
 						project.Slug,
 					)
 				}
+
 				return eris.Wrapf(
 					err,
 					"failed to find project: %s",
@@ -435,6 +441,7 @@ func UpsertTagRelationships(
 						tag.Slug,
 					)
 				}
+
 				return eris.Wrapf(
 					err,
 					"failed to find tag: %s",
@@ -479,6 +486,7 @@ func UpsertTagRelationships(
 						tag.Slug,
 					)
 				}
+
 				return eris.Wrapf(
 					err,
 					"failed to find post: %s",
@@ -523,6 +531,7 @@ func UpsertTagRelationships(
 						tag.Slug,
 					)
 				}
+
 				return eris.Wrapf(
 					err,
 					"failed to find project: %s",

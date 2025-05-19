@@ -333,31 +333,6 @@
                   -t "$TOKEN"
               '';
             };
-            devcontainer = nix2container.buildImage {
-              fromImage = alpine;
-            };
-            deployDevcontainer = pkgs.writeShellApplication {
-              name = "deploy-devcontainer";
-              runtimeInputs = [
-                pkgs.skopeo
-              ];
-              bashOptions = ["errexit" "pipefail"];
-              text = ''
-                set -e
-                TOKEN=""
-
-                [ -z "$GHCR_TOKEN" ] && GHCR_TOKEN="$(doppler secrets get --plain GHCR_TOKEN)"
-                TOKEN="$GHCR_TOKEN"
-                REGISTRY="ghcr.io/conneroisu/conneroh.com"
-
-                skopeo copy \
-                  --insecure-policy \
-                  docker-archive:"${devcontainer}" \
-                  "docker://$REGISTRY:${tag}" \
-                  --dest-creds x:"$TOKEN" \
-                  --format v2s2
-              '';
-            };
           }
           // pkgs.lib.genAttrs (builtins.attrNames flake-scripts.scripts) (name: scriptPackages.${name});
       }
