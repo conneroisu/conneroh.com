@@ -112,9 +112,9 @@ tests - Run all go tests
 
 ## Content Management
 
-Content is managed through Markdown files located in `internal/data/docs/`. The format for content files is:
+Content is managed through Markdown files located in `internal/data/`. The format for content files is:
 
-### Blog Post Example (`internal/data/docs/posts/example-post.md`):
+### Blog Post Example (`internal/data/posts/example-post.md`):
 
 ```markdown
 ---

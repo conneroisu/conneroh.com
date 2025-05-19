@@ -41,5 +41,8 @@ func IsAllowedAsset(path string) bool {
 
 // IsAllowedDocumentType returns true if the provided path is an allowed document type.
 func IsAllowedDocumentType(path string) bool {
-	return slices.Contains(AllowedDocumentTypes, mime.TypeByExtension(filepath.Ext(path)))
+	return slices.Contains(
+		AllowedDocumentTypes,
+		mime.TypeByExtension(filepath.Ext(path)),
+	)
 }

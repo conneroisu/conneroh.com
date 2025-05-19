@@ -74,9 +74,9 @@ reset-db
 ### Content Management
 
 Content is stored as Markdown files in `internal/data/docs/` directories:
-- `internal/data/docs/posts/`: Blog posts
-- `internal/data/docs/projects/`: Project descriptions
-- `internal/data/docs/tags/`: Tag descriptions
+- `internal/data/posts/`: Blog posts
+- `internal/data/projects/`: Project descriptions
+- `internal/data/tags/`: Tag descriptions
 
 After adding or modifying content, update the database with:
 ```bash
@@ -109,7 +109,7 @@ nix run .#deployPackage
 ## Content Workflow
 
 When working with content, remember:
-1. Content is written in Markdown files in the `internal/data/docs/` directory
+1. Content is written in Markdown files in the `internal/data/` directory
 2. After changes, run `generate-db` to update the database
 3. Run `generate-css` if template changes affect the CSS
 4. Use `run` command to see changes with hot-reloading

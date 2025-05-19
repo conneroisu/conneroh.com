@@ -1,8 +1,7 @@
-// Package markdown provides a markdown parser.
-package markdown
+package assets
 
 import (
-	"fmt"
+	"bytes"
 	"strings"
 
 	callout "github.com/VojtaStruhar/goldmark-obsidian-callout"
@@ -10,12 +9,14 @@ import (
 	mathjax "github.com/litao91/goldmark-mathjax"
 	enclave "github.com/quailyquaily/goldmark-enclave"
 	"github.com/quailyquaily/goldmark-enclave/core"
+	"github.com/rotisserie/eris"
 	"github.com/spf13/afero"
 	"github.com/yuin/goldmark"
 	highlighting "github.com/yuin/goldmark-highlighting/v2"
 	"github.com/yuin/goldmark/extension"
 	"github.com/yuin/goldmark/parser"
 	"github.com/yuin/goldmark/renderer/html"
+
 	"go.abhg.dev/goldmark/anchor"
 	"go.abhg.dev/goldmark/frontmatter"
 	"go.abhg.dev/goldmark/hashtag"
@@ -112,8 +113,50 @@ func (r *resolver) ResolveWikilink(n *wikilink.Node) ([]byte, error) {
 		return nil, err
 	}
 
-	return fmt.Appendf(nil,
-		"https://conneroisu.fly.storage.tigris.dev/assets/%s",
-		targetStr,
-	), nil
+	return []byte(BucketPath(targetStr)), nil
+}
+
+// ParseMarkdown parses a markdown document.
+func ParseMarkdown(md goldmark.Markdown, item DirMatchItem) (*Doc, error) {
+	// Parse document
+	doc := &Doc{
+		Path:    item.Path,
+		Content: item.Content,
+		Slug:    Slugify(item.Path),
+	}
+
+	var buf bytes.Buffer
+	// Set default values
+	err := Defaults(doc)
+	if err != nil {
+		return nil, eris.Wrapf(err, "failed to set defaults for document: %s", item.Path)
+	}
+
+	// Parse markdown
+	err = md.Convert([]byte(doc.Content), &buf)
+	if err != nil {
+		return nil, eris.Wrapf(err, "failed to parse markdown: %s", doc.Path)
+	}
+	// Create a new parser context
+	pCtx := parser.NewContext()
+
+	// Convert markdown
+	err = md.Convert([]byte(item.Content), &buf, parser.WithContext(pCtx))
+	if err != nil {
+		return nil, eris.Wrapf(err, "failed to convert markdown: %s", doc.Path)
+	}
+
+	// Extract frontmatter
+	metadata := frontmatter.Get(pCtx)
+	if metadata == nil {
+		return nil, eris.Errorf("frontmatter is nil for %s", doc.Path)
+	}
+
+	if err := metadata.Decode(doc); err != nil {
+		return nil, eris.Wrapf(err, "failed to decode frontmatter: %s", doc.Path)
+	}
+
+	doc.Content = buf.String()
+
+	return doc, nil
 }

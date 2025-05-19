@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/conneroisu/conneroh.com/internal/hashutil"
 	"github.com/uptrace/bun"
 	"gopkg.in/yaml.v3"
 )
@@ -66,9 +65,6 @@ type (
 		Tags         []*Tag     `yaml:"-"`
 		Projects     []*Project `yaml:"-"`
 	}
-)
-
-type (
 	// Cache is a any asset.
 	Cache struct {
 		bun.BaseModel `bun:"caches"`
@@ -76,10 +72,6 @@ type (
 		ID   int64  `bun:"id,pk,autoincrement"`
 		Path string `bun:"path,unique"`
 		Hash string `bun:"hashed,unique"`
-
-		X float64
-		Y float64
-		Z float64
 	}
 	// Post is a post with all its projects and tags.
 	Post struct {
@@ -160,9 +152,6 @@ type (
 		Posts    []*Post    `bun:"m2m:post_to_tags,join:Tag=Post"`
 		Projects []*Project `bun:"m2m:project_to_tags,join:Tag=Project"`
 	}
-)
-
-type (
 	// PostToTag represents a many-to-many relationship between posts and tags.
 	PostToTag struct {
 		bun.BaseModel `bun:"post_to_tags"`
@@ -245,18 +234,13 @@ func (emb *Tag) PagePath() string {
 }
 
 func (emb *Post) String() string {
-	return fmt.Sprintf("%s %s %s %d", emb.Title, emb.Slug, emb.Description, emb.ID)
+	return fmt.Sprintf("Post: %s %s %s %d", emb.Title, emb.Slug, emb.Description, emb.ID)
 }
 
 func (emb *Project) String() string {
-	return fmt.Sprintf("%s %s %s %d", emb.Title, emb.Slug, emb.Description, emb.ID)
+	return fmt.Sprintf("Project: %s %s %s %d", emb.Title, emb.Slug, emb.Description, emb.ID)
 }
 
 func (emb *Tag) String() string {
-	return fmt.Sprintf("%s %s %s %d", emb.Title, emb.Slug, emb.Description, emb.ID)
-}
-
-// Hash calculates the hash of a file's content using SHA-256.
-func Hash(content []byte) string {
-	return hashutil.ComputeHash(content)
+	return fmt.Sprintf("Tag: %s %s %s %d", emb.Title, emb.Slug, emb.Description, emb.ID)
 }

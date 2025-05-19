@@ -89,7 +89,7 @@ func (p *Processor) dbWorker(ctx context.Context) {
 
 					break
 				}
-				err = p.dbSavePost(ctx, post)
+				err = assets.UpsertPost(ctx, p.db, post)
 				response = post
 
 			case DBSaveProject:
@@ -99,7 +99,7 @@ func (p *Processor) dbWorker(ctx context.Context) {
 
 					break
 				}
-				err = p.dbSaveProject(ctx, project)
+				err = assets.UpsertProject(ctx, p.db, project)
 				response = project
 
 			case DBSaveTag:
@@ -109,7 +109,7 @@ func (p *Processor) dbWorker(ctx context.Context) {
 
 					break
 				}
-				err = p.dbSaveTag(ctx, tag)
+				err = assets.UpsertTag(ctx, p.db, tag)
 				response = tag
 
 			case DBFindTag:
@@ -159,7 +159,7 @@ func (p *Processor) dbWorker(ctx context.Context) {
 				case struct {
 					Post *assets.Post
 				}:
-					err = p.dbUpdatePostRelationships(ctx, relationData.Post)
+					err = p.UpsertPostRelationShips(ctx, relationData.Post)
 				case struct {
 					Project *assets.Project
 				}:

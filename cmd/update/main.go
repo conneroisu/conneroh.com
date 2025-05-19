@@ -5,20 +5,14 @@ import (
 	"context"
 	"database/sql"
 	"flag"
-	"fmt"
 	"log/slog"
 	"os"
 	"os/signal"
-	"sync"
 	"syscall"
-	"time"
 
 	"github.com/conneroisu/conneroh.com/internal/assets"
-	"github.com/conneroisu/conneroh.com/internal/cache"
-	"github.com/conneroisu/conneroh.com/internal/cwg"
-	"github.com/conneroisu/conneroh.com/internal/llama"
+	"github.com/conneroisu/conneroh.com/internal/copygen"
 	"github.com/conneroisu/conneroh.com/internal/logger"
-	"github.com/conneroisu/conneroh.com/internal/markdown"
 	"github.com/conneroisu/conneroh.com/internal/tigris"
 	"github.com/rotisserie/eris"
 	"github.com/spf13/afero"
@@ -29,8 +23,12 @@ import (
 )
 
 const (
-	numWorkers    = 20
-	taskBufferInt = 1000
+	numWorkers     = 20
+	taskBufferInt  = 1000
+	fullAssetLoc   = assets.AssetsLoc
+	fullPostLoc    = assets.PostsLoc
+	fullProjectLoc = assets.ProjectsLoc
+	fullTagLoc     = assets.TagsLoc
 )
 
 var (
@@ -40,7 +38,7 @@ var (
 
 func main() {
 	flag.Parse()
-	slog.SetDefault(logger.DefaultProdLogger)
+	slog.SetDefault(logger.DefaultLogger)
 
 	// Create context that will be canceled on interrupt signals
 	ctx, stop := signal.NotifyContext(context.Background(),
@@ -50,167 +48,141 @@ func main() {
 		syscall.SIGHUP)
 	defer stop()
 
-	if err := Run(ctx, os.Getenv, *workers, *taskBuffer); err != nil {
-		formattedStr := eris.ToString(err, true)
-		fmt.Println(formattedStr)
+	err := Run(ctx, os.Getenv, *workers, *taskBuffer)
+	if err != nil {
 		panic(err)
 	}
 }
 
 // Run executes the main application logic.
-func Run(ctx context.Context, getenv func(string) string, numWorkers, bufferSize int) error {
-	// Initialize error collection
-	var errs []error
-	errMutex := &sync.Mutex{}
-
-	// Create database connection
+func Run(
+	ctx context.Context,
+	getenv func(string) string,
+	_, _ int,
+) error {
+	var relFns []assets.RelationshipFn
 	sqldb, err := sql.Open("sqlite", assets.DBName())
 	if err != nil {
 		return eris.Wrap(err, "failed to open database")
 	}
 	defer sqldb.Close()
-
-	// Initialize BUN DB
 	db := bun.NewDB(sqldb, sqlitedialect.New())
-
 	if os.Getenv("DEBUG") == "true" {
 		db.AddQueryHook(bundebug.NewQueryHook(bundebug.WithVerbose(true)))
 	}
-
 	err = assets.InitDB(ctx, db)
 	if err != nil {
 		return eris.Wrap(err, "failed to initialize database")
 	}
-	// Initialize filesystem
 	fs := afero.NewBasePathFs(afero.NewOsFs(), assets.VaultLoc)
-
-	// Initialize dependencies
-	ol, err := llama.NewOllamaClient(getenv)
-	if err != nil {
-		return eris.Wrap(err, "failed to create Ollama client")
-	}
-
+	// ol, err := llama.NewOllamaClient(getenv)
+	// if err != nil {
+	// 	return eris.Wrap(err, "failed to create Ollama client")
+	// }
 	ti, err := tigris.New(getenv)
 	if err != nil {
 		return eris.Wrap(err, "failed to create Tigris client")
 	}
+	bucketName := getenv("BUCKET_NAME")
+	if bucketName == "" {
+		return eris.New("BUCKET_NAME environment variable is not set")
+	}
+	md := assets.NewMD(fs)
 
-	md := markdown.NewMD(fs)
-
-	// Create processor with specified number of workers
-	processor := cache.NewProcessor(fs, db, ti, ol, md, bufferSize)
-
-	// Create a context with cancellation
-	processingCtx, cancelProcessing := context.WithCancel(ctx)
-	defer cancelProcessing()
-
-	// Start the processor workers
-	processor.Start(processingCtx, numWorkers)
-
-	// Handle errors from the processor
-	errWg := &cwg.DebugWaitGroup{}
-	errWg.Add(1)
-	go func() {
-		defer errWg.Done()
-		for {
-			select {
-			case err, ok := <-processor.Errors():
-				if !ok {
-					return // Channel closed
-				}
-				errMutex.Lock()
-				errs = append(errs, err)
-				fmt.Print("processing error", "err", err)
-				errMutex.Unlock()
-			case <-processingCtx.Done():
-				return
-			}
+	todoAssets, err := assets.HashDirMatch(ctx, fs, fullAssetLoc, db)
+	if err != nil {
+		return err
+	}
+	for _, item := range todoAssets {
+		slog.Info("uploading to S3", "path", item.Path)
+		err = assets.UploadToS3(
+			ctx,
+			ti,
+			bucketName,
+			item.Path,
+			[]byte(item.Content),
+		)
+		if err != nil {
+			return eris.Wrap(err, "failed to upload to S3")
 		}
-	}()
-
-	// Scan the filesystem and submit tasks
-	slog.Info("scanning filesystem", "path", assets.VaultLoc)
-	if err := processor.ScanFS(); err != nil {
-		errMutex.Lock()
-		errs = append(errs, eris.Wrap(err, "failed to scan filesystem"))
-		errMutex.Unlock()
-		cancelProcessing() // Cancel processing on scan error
-
-		return combineErrors(errs)
 	}
 
-	// Set up a forced exit after an absolute timeout (3 minutes)
-	// This is an emergency fallback in case all other mechanisms fail
-	forceExitCh := make(chan struct{})
-	go func() {
-		// Wait for 3 minutes then force exit
-		time.Sleep(3 * time.Minute)
-		slog.Error("EMERGENCY TIMEOUT - forcing exit after 3 minutes")
-		close(forceExitCh)
-	}()
-
-	// Wait for completion with a timeout, or handle Ctrl+C
-	completionTimeout := 2 * time.Minute
-
-	// Create separate channels for completion waiting
-	completionDone := make(chan bool)
-
-	// Wait for completion in a separate goroutine
-	go func() {
-		completed := processor.WaitForCompletion(completionTimeout)
-		completionDone <- completed
-	}()
-
-	// Wait for either completion, context cancellation, or force exit
-	select {
-	case completed := <-completionDone:
-		if completed {
-			slog.Info("tasks completed successfully")
-		} else {
-			slog.Warn("completion timeout reached - forcing shutdown")
-			cancelProcessing()
+	todoPosts, err := assets.HashDirMatch(ctx, fs, fullPostLoc, db)
+	if err != nil {
+		return eris.Wrap(err, "failed to hash posts")
+	}
+	for _, item := range todoPosts {
+		slog.Info("processing post", "path", item.Path)
+		var (
+			post  assets.Post
+			doc   *assets.Doc
+			relFn assets.RelationshipFn
+		)
+		doc, err = assets.ParseMarkdown(md, item)
+		if err != nil {
+			return eris.Wrap(err, "failed to parse markdown")
 		}
-	case <-ctx.Done():
-		slog.Info("received termination signal")
-		cancelProcessing()
-	case <-forceExitCh:
-		slog.Error("emergency exit triggered - shutdown forced")
-		cancelProcessing()
+		copygen.ToPost(&post, doc)
+		relFn, err = assets.UpsertPost(ctx, db, &post)
+		if err != nil {
+			return eris.Wrap(err, "failed to upsert post")
+		}
+		relFns = append(relFns, relFn)
 	}
 
-	// Wait for error handling to finish
-	errWg.Wait()
-
-	// Clean up processor
-	processor.Close()
-
-	// Check if any errors occurred
-	errMutex.Lock()
-	defer errMutex.Unlock()
-
-	if len(errs) > 0 {
-		return combineErrors(errs)
+	todoProjects, err := assets.HashDirMatch(ctx, fs, fullProjectLoc, db)
+	if err != nil {
+		return eris.Wrap(err, "failed to hash projects")
+	}
+	for _, item := range todoProjects {
+		slog.Info("processing project", "path", item.Path)
+		var (
+			project assets.Project
+			doc     *assets.Doc
+			relFn   assets.RelationshipFn
+		)
+		doc, err = assets.ParseMarkdown(md, item)
+		if err != nil {
+			return eris.Wrap(err, "failed to parse markdown")
+		}
+		copygen.ToProject(&project, doc)
+		relFn, err = assets.UpsertProject(ctx, db, &project)
+		if err != nil {
+			return eris.Wrap(err, "failed to upsert project")
+		}
+		relFns = append(relFns, relFn)
 	}
 
-	slog.Info("processing completed successfully")
+	todoTags, err := assets.HashDirMatch(ctx, fs, fullTagLoc, db)
+	if err != nil {
+		return eris.Wrap(err, "failed to hash tags")
+	}
+	for _, item := range todoTags {
+		slog.Info("processing tag", "path", item.Path)
+		var (
+			tag   assets.Tag
+			doc   *assets.Doc
+			relFn assets.RelationshipFn
+		)
+		doc, err = assets.ParseMarkdown(md, item)
+		if err != nil {
+			return eris.Wrap(err, "failed to parse markdown")
+		}
+		copygen.ToTag(&tag, doc)
+		relFn, err = assets.UpsertTag(ctx, db, &tag)
+		if err != nil {
+			return eris.Wrap(err, "failed to upsert tag")
+		}
+		relFns = append(relFns, relFn)
+	}
+
+	slog.Info("upserting relationships")
+	for _, fn := range relFns {
+		err := fn(ctx)
+		if err != nil {
+			return eris.Wrap(err, "failed to run relationship function")
+		}
+	}
 
 	return nil
-}
-
-// combineErrors combines multiple errors into one.
-func combineErrors(errs []error) error {
-	if len(errs) == 0 {
-		return nil
-	}
-
-	var combinedErr error
-	for _, err := range errs {
-		if combinedErr == nil {
-			combinedErr = err
-		} else {
-			combinedErr = eris.Wrap(combinedErr, err.Error())
-		}
-	}
-
-	return eris.Wrap(combinedErr, "processing completed with errors")
 }

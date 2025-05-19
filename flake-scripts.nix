@@ -43,7 +43,7 @@
         golangci-lint run
         statix check "$REPO_ROOT"/flake.nix
         deadnix "$REPO_ROOT"/flake.nix
-        
+
         # Run Rust clippy
         echo "Running Rust clippy..."
         cd "$REPO_ROOT"/live && cargo clippy -- -D warnings
@@ -78,7 +78,7 @@
           generate-css
           echo "$TEMPL_HASH" > ./internal/cache/templ.hash
         fi
-        DOCS_HASH=$(nix-hash --type sha256 --base32 ./internal/data/docs/ | sha256sum | cut -d' ' -f1)
+        DOCS_HASH=$(nix-hash --type sha256 --base32 ./internal/data/**/*.md | sha256sum | cut -d' ' -f1)
         OLD_DOCS_HASH=$(cat "$REPO_ROOT"/internal/cache/docs.hash)
         if [ "$OLD_DOCS_HASH" != "$DOCS_HASH" ]; then
           echo "OLD_DOCS_HASH: $OLD_DOCS_HASH; NEW_DOCS_HASH: $DOCS_HASH"
@@ -191,163 +191,163 @@
     };
     pr-review = {
       exec = ''
-    set -eo pipefail
+        set -eo pipefail
 
-    # Required dependencies check
-    for cmd in jq flyctl cut; do
-      if ! command -v "$cmd" >/dev/null 2>&1; then
-        echo "Error: Required command '$cmd' not found. Ensure it's included in runtimeInputs."
-        exit 1
-      fi
-    done
+        # Required dependencies check
+        for cmd in jq flyctl cut; do
+          if ! command -v "$cmd" >/dev/null 2>&1; then
+            echo "Error: Required command '$cmd' not found. Ensure it's included in runtimeInputs."
+            exit 1
+          fi
+        done
 
-    # Handle working directory change
-    if [ -n "''${INPUT_PATH}" ]; then
-      cd "''${INPUT_PATH}" || exit 1
-    fi
+        # Handle working directory change
+        if [ -n "''${INPUT_PATH}" ]; then
+          cd "''${INPUT_PATH}" || exit 1
+        fi
 
-    if [ -z "''${GITHUB_EVENT_PATH}" ]; then
-      if [ -n "$1" ] && [ -f "$1" ]; then
-        GITHUB_EVENT_PATH="$1"
-      else
-        echo "Error: GITHUB_EVENT_PATH not set and no event file provided as argument"
-        exit 1
-      fi
-    fi
-    PR_NUMBER=$(jq -r '.pull_request.number // .number // empty' "''${GITHUB_EVENT_PATH}")
-    if [ -z "''${PR_NUMBER}" ]; then
-      echo "Error: Could not extract PR number. This action only supports pull_request events."
-      exit 1
-    fi
+        if [ -z "''${GITHUB_EVENT_PATH}" ]; then
+          if [ -n "$1" ] && [ -f "$1" ]; then
+            GITHUB_EVENT_PATH="$1"
+          else
+            echo "Error: GITHUB_EVENT_PATH not set and no event file provided as argument"
+            exit 1
+          fi
+        fi
+        PR_NUMBER=$(jq -r '.pull_request.number // .number // empty' "''${GITHUB_EVENT_PATH}")
+        if [ -z "''${PR_NUMBER}" ]; then
+          echo "Error: Could not extract PR number. This action only supports pull_request events."
+          exit 1
+        fi
 
-    # Ensure repository info is available - use cut instead of parameter expansion
-    if [ -n "''${GITHUB_REPOSITORY}" ]; then
-      # Extract owner and name using cut rather than parameter expansion
-      GITHUB_REPOSITORY_OWNER=$(echo "''${GITHUB_REPOSITORY}" | cut -d '/' -f 1)
-      GITHUB_REPOSITORY_NAME=$(echo "''${GITHUB_REPOSITORY}" | cut -d '/' -f 2)
-    fi
+        # Ensure repository info is available - use cut instead of parameter expansion
+        if [ -n "''${GITHUB_REPOSITORY}" ]; then
+          # Extract owner and name using cut rather than parameter expansion
+          GITHUB_REPOSITORY_OWNER=$(echo "''${GITHUB_REPOSITORY}" | cut -d '/' -f 1)
+          GITHUB_REPOSITORY_NAME=$(echo "''${GITHUB_REPOSITORY}" | cut -d '/' -f 2)
+        fi
 
-    # If we don't have the repository information, we need both parts
-    if [ -z "''${GITHUB_REPOSITORY_OWNER}" ] || [ -z "''${GITHUB_REPOSITORY_NAME}" ]; then
-      echo "Error: Repository owner or name not available. Please set GITHUB_REPOSITORY_OWNER and GITHUB_REPOSITORY_NAME."
-      exit 1
-    fi
+        # If we don't have the repository information, we need both parts
+        if [ -z "''${GITHUB_REPOSITORY_OWNER}" ] || [ -z "''${GITHUB_REPOSITORY_NAME}" ]; then
+          echo "Error: Repository owner or name not available. Please set GITHUB_REPOSITORY_OWNER and GITHUB_REPOSITORY_NAME."
+          exit 1
+        fi
 
-    # Extract event type
-    EVENT_TYPE=$(jq -r '.action // empty' "''${GITHUB_EVENT_PATH}")
+        # Extract event type
+        EVENT_TYPE=$(jq -r '.action // empty' "''${GITHUB_EVENT_PATH}")
 
-    # Prepare app name with PR number, ensuring it follows Fly.io naming conventions
-    app="''${INPUT_NAME:-pr-''${PR_NUMBER}-''${GITHUB_REPOSITORY_OWNER}-''${GITHUB_REPOSITORY_NAME}}"
-    app=$(echo "''${app}" | tr '_' '-')  # Change underscores to hyphens
+        # Prepare app name with PR number, ensuring it follows Fly.io naming conventions
+        app="''${INPUT_NAME:-pr-''${PR_NUMBER}-''${GITHUB_REPOSITORY_OWNER}-''${GITHUB_REPOSITORY_NAME}}"
+        app=$(echo "''${app}" | tr '_' '-')  # Change underscores to hyphens
 
-    # Configuration
-    region="''${INPUT_REGION:-''${FLY_REGION:-iad}}"
-    org="''${INPUT_ORG:-''${FLY_ORG:-personal}}"
-    image="''${INPUT_IMAGE}"
-    config="''${INPUT_CONFIG:-fly.toml}"
-    build_args=""
-    build_secrets=""
-    output_file="''${GITHUB_OUTPUT:-fly-output.env}"
-    
-    # Set default values for optional inputs
-    : "''${INPUT_HA:=false}"
-    : "''${INPUT_VMSIZE:=shared-cpu-1x}"
-    : "''${INPUT_CPUKIND:=shared}"
-    : "''${INPUT_CPU:=1}"
-    : "''${INPUT_MEMORY:=256MB}"
+        # Configuration
+        region="''${INPUT_REGION:-''${FLY_REGION:-iad}}"
+        org="''${INPUT_ORG:-''${FLY_ORG:-personal}}"
+        image="''${INPUT_IMAGE}"
+        config="''${INPUT_CONFIG:-fly.toml}"
+        build_args=""
+        build_secrets=""
+        output_file="''${GITHUB_OUTPUT:-fly-output.env}"
 
-    # Safety check: ensure app name contains PR number
-    if ! echo "''${app}" | grep -q "''${PR_NUMBER}"; then
-      echo "For safety, this action requires the app's name to contain the PR number."
-      exit 1
-    fi
+        # Set default values for optional inputs
+        : "''${INPUT_HA:=false}"
+        : "''${INPUT_VMSIZE:=shared-cpu-1x}"
+        : "''${INPUT_CPUKIND:=shared}"
+        : "''${INPUT_CPU:=1}"
+        : "''${INPUT_MEMORY:=256MB}"
 
-    # Handle PR closure - remove the Fly app if it exists
-    if [ "''${EVENT_TYPE}" = "closed" ]; then
-      echo "PR was closed. Attempting to destroy the Fly app..."
-      flyctl apps destroy "''${app}" -y || true
-      exit 0
-    fi
+        # Safety check: ensure app name contains PR number
+        if ! echo "''${app}" | grep -q "''${PR_NUMBER}"; then
+          echo "For safety, this action requires the app's name to contain the PR number."
+          exit 1
+        fi
 
-    # Process build arguments
-    if [ -n "''${INPUT_BUILD_ARGS}" ]; then
-      for ARG in $(echo "''${INPUT_BUILD_ARGS}" | tr " " "\n"); do
-        build_args="$build_args --build-arg ''${ARG}"
-      done
-    fi
+        # Handle PR closure - remove the Fly app if it exists
+        if [ "''${EVENT_TYPE}" = "closed" ]; then
+          echo "PR was closed. Attempting to destroy the Fly app..."
+          flyctl apps destroy "''${app}" -y || true
+          exit 0
+        fi
 
-    # Process build secrets
-    if [ -n "''${INPUT_BUILD_SECRETS}" ]; then
-      for ARG in $(echo "''${INPUT_BUILD_SECRETS}" | tr " " "\n"); do
-        build_secrets="$build_secrets --build-secret ''${ARG}"
-      done
-    fi
+        # Process build arguments
+        if [ -n "''${INPUT_BUILD_ARGS}" ]; then
+          for ARG in $(echo "''${INPUT_BUILD_ARGS}" | tr " " "\n"); do
+            build_args="$build_args --build-arg ''${ARG}"
+          done
+        fi
 
-    # Deploy the Fly app, creating it first if needed
-    if ! flyctl status --app "''${app}" 2>/dev/null; then
-      echo "App doesn't exist yet. Creating new app: ''${app}"
-      # Backup the original config file since 'flyctl launch' can modify it
-      cp "''${config}" "''${config}.bak"
-      flyctl launch --no-deploy --copy-config --name "''${app}" --image "''${image}" \
-        --region "''${region}" --org "''${org}"
-      # Restore the original config file
-      cp "''${config}.bak" "''${config}"
-    fi
+        # Process build secrets
+        if [ -n "''${INPUT_BUILD_SECRETS}" ]; then
+          for ARG in $(echo "''${INPUT_BUILD_SECRETS}" | tr " " "\n"); do
+            build_secrets="$build_secrets --build-secret ''${ARG}"
+          done
+        fi
 
-    # Set secrets if provided
-    if [ -n "''${INPUT_SECRETS}" ]; then
-      echo "''${INPUT_SECRETS}" | tr " " "\n" | flyctl secrets import --app "''${app}"
-    fi
+        # Deploy the Fly app, creating it first if needed
+        if ! flyctl status --app "''${app}" 2>/dev/null; then
+          echo "App doesn't exist yet. Creating new app: ''${app}"
+          # Backup the original config file since 'flyctl launch' can modify it
+          cp "''${config}" "''${config}.bak"
+          flyctl launch --no-deploy --copy-config --name "''${app}" --image "''${image}" \
+            --region "''${region}" --org "''${org}"
+          # Restore the original config file
+          cp "''${config}.bak" "''${config}"
+        fi
 
-    # Attach postgres cluster if specified
-    if [ -n "''${INPUT_POSTGRES}" ]; then
-      echo "Attaching Postgres cluster: ''${INPUT_POSTGRES}"
-      flyctl postgres attach "''${INPUT_POSTGRES}" --app "''${app}" || true
-    fi
+        # Set secrets if provided
+        if [ -n "''${INPUT_SECRETS}" ]; then
+          echo "''${INPUT_SECRETS}" | tr " " "\n" | flyctl secrets import --app "''${app}"
+        fi
 
-    # Deploy the application
-    echo "Contents of config ''${config} file: " && cat "''${config}"
+        # Attach postgres cluster if specified
+        if [ -n "''${INPUT_POSTGRES}" ]; then
+          echo "Attaching Postgres cluster: ''${INPUT_POSTGRES}"
+          flyctl postgres attach "''${INPUT_POSTGRES}" --app "''${app}" || true
+        fi
 
-    if [ -n "''${INPUT_VM}" ]; then
-      flyctl deploy --config "''${config}" --app "''${app}" --regions "''${region}" \
-        --image "''${image}" --strategy immediate --ha="''${INPUT_HA}" \
-        --vm-size "''${INPUT_VMSIZE}"
-    else
-      flyctl deploy --config "''${config}" --app "''${app}" --regions "''${region}" \
-        --image "''${image}" --strategy immediate --ha="''${INPUT_HA}" \
-        --vm-cpu-kind "''${INPUT_CPUKIND}" --vm-cpus "''${INPUT_CPU}" \
-        --vm-memory "''${INPUT_MEMORY}"
-    fi
+        # Deploy the application
+        echo "Contents of config ''${config} file: " && cat "''${config}"
 
-    # Get status and write output
-    flyctl status --app "''${app}" --json > status.json
-    hostname=$(jq -r '.Hostname // empty' status.json)
-    appid=$(jq -r '.ID // empty' status.json)
+        if [ -n "''${INPUT_VM}" ]; then
+          flyctl deploy --config "''${config}" --app "''${app}" --regions "''${region}" \
+            --image "''${image}" --strategy immediate --ha="''${INPUT_HA}" \
+            --vm-size "''${INPUT_VMSIZE}"
+        else
+          flyctl deploy --config "''${config}" --app "''${app}" --regions "''${region}" \
+            --image "''${image}" --strategy immediate --ha="''${INPUT_HA}" \
+            --vm-cpu-kind "''${INPUT_CPUKIND}" --vm-cpus "''${INPUT_CPU}" \
+            --vm-memory "''${INPUT_MEMORY}"
+        fi
 
-    # Write outputs in a way that works both in GitHub Actions and standalone
-    if [ -n "''${GITHUB_OUTPUT}" ]; then
-      # GitHub Actions environment - use a block instead of individual redirects
-      {
-        echo "hostname=''${hostname}"
-        echo "url=https://''${hostname}"
-        echo "id=''${appid}"
-        echo "name=''${app}"
-      } >> "''${GITHUB_OUTPUT}"
-    else
-      # Standalone environment - write to file and stdout
-      {
-        echo "hostname=''${hostname}"
-        echo "url=https://''${hostname}"
-        echo "id=''${appid}"
-        echo "name=''${app}"
-      } >> "''${output_file}"
-      
-      echo "Deployment completed successfully!"
-      echo "App: ''${app}"
-      echo "URL: https://''${hostname}"
-      echo "App ID: ''${appid}"
-      echo "Output written to: ''${output_file}"
-    fi
+        # Get status and write output
+        flyctl status --app "''${app}" --json > status.json
+        hostname=$(jq -r '.Hostname // empty' status.json)
+        appid=$(jq -r '.ID // empty' status.json)
+
+        # Write outputs in a way that works both in GitHub Actions and standalone
+        if [ -n "''${GITHUB_OUTPUT}" ]; then
+          # GitHub Actions environment - use a block instead of individual redirects
+          {
+            echo "hostname=''${hostname}"
+            echo "url=https://''${hostname}"
+            echo "id=''${appid}"
+            echo "name=''${app}"
+          } >> "''${GITHUB_OUTPUT}"
+        else
+          # Standalone environment - write to file and stdout
+          {
+            echo "hostname=''${hostname}"
+            echo "url=https://''${hostname}"
+            echo "id=''${appid}"
+            echo "name=''${app}"
+          } >> "''${output_file}"
+
+          echo "Deployment completed successfully!"
+          echo "App: ''${app}"
+          echo "URL: https://''${hostname}"
+          echo "App ID: ''${appid}"
+          echo "Output written to: ''${output_file}"
+        fi
       '';
       deps = with pkgs; [];
       description = "Create a PR Review Deployment";

@@ -7,7 +7,6 @@ import (
 	"errors"
 	"log/slog"
 	"os"
-	"path/filepath"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -336,41 +335,6 @@ var bufferPool = sync.Pool{
 	},
 }
 
-// Static mapping of file extensions to content types to avoid reflection.
-var contentTypes = map[string]string{
-	".jpg":   "image/jpeg",
-	".jpeg":  "image/jpeg",
-	".png":   "image/png",
-	".gif":   "image/gif",
-	".svg":   "image/svg+xml",
-	".webp":  "image/webp",
-	".css":   "text/css",
-	".txt":   "text/plain",
-	".md":    "text/markdown",
-	".pdf":   "application/pdf",
-	".xml":   "application/xml",
-	".zip":   "application/zip",
-	".mp3":   "audio/mpeg",
-	".mp4":   "video/mp4",
-	".webm":  "video/webm",
-	".wav":   "audio/wav",
-	".ico":   "image/x-icon",
-	".woff":  "font/woff",
-	".woff2": "font/woff2",
-	".ttf":   "font/ttf",
-	".otf":   "font/otf",
-}
-
-// getContentType returns the content type for a file extension.
-func getContentType(path string) string {
-	ext := filepath.Ext(path)
-	if contentType, ok := contentTypes[ext]; ok {
-		return contentType
-	}
-	// Fallback to standard library for unknown extensions
-	return "application/octet-stream"
-}
-
 // NewProcessor creates a new asset processor.
 func NewProcessor(
 	fs afero.Fs,
@@ -387,8 +351,6 @@ func NewProcessor(
 	if bucketName == "" {
 		panic("BUCKET_NAME environment variable is not set")
 	}
-	// Initialize SQLite for better concurrency
-	initDB(db)
 
 	return &Processor{
 		fs:           fs,
@@ -406,25 +368,6 @@ func NewProcessor(
 		stats:        &Stats{lastActivityNs: atomic.Int64{}},
 		doneCh:       make(chan struct{}),
 		dbShutdownCh: make(chan struct{}),
-	}
-}
-
-// initDB configures SQLite for better concurrency handling.
-func initDB(db *bun.DB) {
-	// Set pragmas for better concurrent performance
-	pragmas := []string{
-		"PRAGMA journal_mode = WAL",
-		"PRAGMA synchronous = NORMAL",
-		"PRAGMA busy_timeout = 5000",
-		"PRAGMA cache_size = 10000",
-		"PRAGMA temp_store = MEMORY",   // Added to use memory for temp storage
-		"PRAGMA mmap_size = 268435456", // Added to use memory mapping (256MB)
-	}
-
-	for _, pragma := range pragmas {
-		if _, err := db.Exec(pragma); err != nil {
-			slog.Error("failed to set pragma", "pragma", pragma, "err", err)
-		}
 	}
 }
 
