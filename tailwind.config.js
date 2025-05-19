@@ -1,7 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   // jit: true,
-  content: ["./internal/data/css/classes.html"],
+  content: ["./cmd/conneroh/classes/classes.html"],
   theme: {
     extend: {},
   },

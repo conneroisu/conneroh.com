@@ -64,10 +64,10 @@ func run(
 	if err != nil {
 		return err
 	}
+	// Don't use defer with log.Fatal as it skips deferred functions
 	defer func() {
-		err = browser.Close()
-		if err != nil {
-			log.Fatalf("could not close browser: %v", err)
+		if closeErr := browser.Close(); closeErr != nil {
+			err = eris.Wrap(closeErr, "could not close browser")
 		}
 	}()
 
@@ -211,14 +211,12 @@ func run(
 		return err
 	}
 
-	err = p.Close()
-	if err != nil {
-		log.Fatalf("could not close page: %v", err)
+	if closeErr := p.Close(); closeErr != nil {
+		return eris.Wrap(closeErr, "could not close page")
 	}
 
-	err = bCtx.Close()
-	if err != nil {
-		log.Fatalf("could not close browser context: %v", err)
+	if closeErr := bCtx.Close(); closeErr != nil {
+		return eris.Wrap(closeErr, "could not close browser context")
 	}
 
 	return pw.Stop()

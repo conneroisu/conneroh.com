@@ -13,10 +13,8 @@ var (
 	EmpTag = new(Tag)
 	// EmpProject is a pointer to a Project.
 	EmpProject = new(Project)
-
 	// EmpCache is a pointer to a Cache.
 	EmpCache = new(Cache)
-
 	// EmpPostToTag is a pointer to a PostToTag.
 	EmpPostToTag = new(PostToTag)
 	// EmpPostToPost is a pointer to a PostToPost.
@@ -31,50 +29,24 @@ var (
 	EmpTagToTag = new(TagToTag)
 )
 
+var models = []any{
+	EmpPostToTag,
+	EmpPostToPost,
+	EmpPostToProject,
+	EmpProjectToTag,
+	EmpProjectToProject,
+	EmpTagToTag,
+	EmpPost,
+	EmpTag,
+	EmpProject,
+	EmpCache,
+}
+
 // InitDB initializes the database.
 func InitDB(
 	ctx context.Context,
 	db *bun.DB,
 ) error {
-	err := CreateTables(ctx, db)
-	if err != nil {
-		return err
-	}
-	RegisterModels(db)
-
-	return nil
-}
-
-// CreateTables creates all the necessary tables for the application.
-func CreateTables(ctx context.Context, db *bun.DB) error {
-	// Create M2M relationship tables
-	relationModels := []any{
-		EmpPostToTag,
-		EmpPostToPost,
-		EmpPostToProject,
-		EmpProjectToTag,
-		EmpProjectToProject,
-		EmpTagToTag,
-	}
-
-	for _, model := range relationModels {
-		_, err := db.NewCreateTable().
-			Model(model).
-			IfNotExists().
-			Exec(ctx)
-		if err != nil {
-			return err
-		}
-	}
-
-	// Create main entity tables
-	models := []any{
-		EmpPost,
-		EmpTag,
-		EmpProject,
-		EmpCache,
-	}
-
 	for _, model := range models {
 		_, err := db.NewCreateTable().
 			Model(model).
@@ -90,12 +62,17 @@ func CreateTables(ctx context.Context, db *bun.DB) error {
 
 // RegisterModels registers all the M2M relationship models with Bun.
 func RegisterModels(db *bun.DB) {
+	// Register all models at once to avoid ordering issues
 	db.RegisterModel(
-		EmpPostToTag,
-		EmpPostToPost,
-		EmpPostToProject,
-		EmpProjectToTag,
-		EmpProjectToProject,
-		EmpTagToTag,
+		(*PostToTag)(nil),
+		(*PostToPost)(nil),
+		(*PostToProject)(nil),
+		(*ProjectToTag)(nil),
+		(*ProjectToProject)(nil),
+		(*TagToTag)(nil),
+		(*Post)(nil),
+		(*Tag)(nil),
+		(*Project)(nil),
+		(*Cache)(nil),
 	)
 }

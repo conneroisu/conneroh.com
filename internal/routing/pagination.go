@@ -17,6 +17,12 @@ const (
 
 	// Ellipsis represents pagination gaps.
 	Ellipsis = "..."
+
+	// PaginationHalfDivisor is used to calculate pagination ranges.
+	PaginationHalfDivisor = 2
+
+	// PaginationEndAdjustment is used to adjust the end range in pagination.
+	PaginationEndAdjustment = 2
 )
 
 // Paginate paginates a list of items.
@@ -56,7 +62,7 @@ func GeneratePagination(currentPage, totalPages, maxDisplay int) []string {
 	}
 
 	// Near the start
-	if currentPage <= maxDisplay/2 {
+	if currentPage <= maxDisplay/PaginationHalfDivisor {
 		for i := 1; i <= maxDisplay-1; i++ {
 			result = append(result, strconv.Itoa(i))
 		}
@@ -66,9 +72,9 @@ func GeneratePagination(currentPage, totalPages, maxDisplay int) []string {
 	}
 
 	// Near the end
-	if currentPage >= totalPages-(maxDisplay/2) {
+	if currentPage >= totalPages-(maxDisplay/PaginationHalfDivisor) {
 		result = append(result, "...")
-		for i := totalPages - maxDisplay + 2; i <= totalPages; i++ {
+		for i := totalPages - maxDisplay + PaginationEndAdjustment; i <= totalPages; i++ {
 			result = append(result, strconv.Itoa(i))
 		}
 
@@ -77,8 +83,8 @@ func GeneratePagination(currentPage, totalPages, maxDisplay int) []string {
 
 	// Middle range
 	result = append(result, "...")
-	midCount := maxDisplay - 2
-	start := currentPage - midCount/2
+	midCount := maxDisplay - PaginationEndAdjustment
+	start := currentPage - midCount/PaginationHalfDivisor
 	end := start + midCount - 1
 	for i := start; i <= end; i++ {
 		result = append(result, strconv.Itoa(i))

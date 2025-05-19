@@ -29,7 +29,7 @@ type Client interface {
 type DefaultAWSClient struct{ *s3.Client }
 
 // New creates a new Tigris client.
-func New(getenv func(string) string) (Client, error) {
+func New(getenv func(string) string) (*DefaultAWSClient, error) {
 	credHandler, err := newCredHandler(getenv)
 	if err != nil {
 		return nil, err

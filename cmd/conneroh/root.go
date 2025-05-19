@@ -14,8 +14,8 @@ import (
 	"syscall"
 	"time"
 
+	classes "github.com/conneroisu/conneroh.com/cmd/conneroh/classes"
 	"github.com/conneroisu/conneroh.com/internal/assets"
-	classes "github.com/conneroisu/conneroh.com/internal/data/css"
 	"github.com/conneroisu/conneroh.com/internal/logger"
 	"github.com/rotisserie/eris"
 	"github.com/uptrace/bun"

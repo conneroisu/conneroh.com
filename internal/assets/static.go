@@ -1,8 +1,6 @@
 package assets
 
 import (
-	"crypto/md5"
-	"encoding/hex"
 	"fmt"
 	"time"
 
@@ -12,7 +10,7 @@ import (
 
 // DBName returns the name/file of the database.
 func DBName() string {
-	return "file:master.db?_pragma=busy_timeout=5000&_pragma=journal_mode=WAL&_pragma=mmap_size=30000000000&_pragma=page_size=32768&_pragma=synchronous=FULL"
+	return "file:master.db"
 }
 
 const (
@@ -67,9 +65,6 @@ type (
 		Tags         []*Tag     `yaml:"-"`
 		Projects     []*Project `yaml:"-"`
 	}
-)
-
-type (
 	// Cache is a any asset.
 	Cache struct {
 		bun.BaseModel `bun:"caches"`
@@ -77,10 +72,6 @@ type (
 		ID   int64  `bun:"id,pk,autoincrement"`
 		Path string `bun:"path,unique"`
 		Hash string `bun:"hashed,unique"`
-
-		X float64
-		Y float64
-		Z float64
 	}
 	// Post is a post with all its projects and tags.
 	Post struct {
@@ -161,9 +152,6 @@ type (
 		Posts    []*Post    `bun:"m2m:post_to_tags,join:Tag=Post"`
 		Projects []*Project `bun:"m2m:project_to_tags,join:Tag=Project"`
 	}
-)
-
-type (
 	// PostToTag represents a many-to-many relationship between posts and tags.
 	PostToTag struct {
 		bun.BaseModel `bun:"post_to_tags"`
@@ -246,20 +234,13 @@ func (emb *Tag) PagePath() string {
 }
 
 func (emb *Post) String() string {
-	return fmt.Sprintf("%s %s %s %d", emb.Title, emb.Slug, emb.Description, emb.ID)
+	return fmt.Sprintf("Post: %s %s %s %d", emb.Title, emb.Slug, emb.Description, emb.ID)
 }
 
 func (emb *Project) String() string {
-	return fmt.Sprintf("%s %s %s %d", emb.Title, emb.Slug, emb.Description, emb.ID)
+	return fmt.Sprintf("Project: %s %s %s %d", emb.Title, emb.Slug, emb.Description, emb.ID)
 }
 
 func (emb *Tag) String() string {
-	return fmt.Sprintf("%s %s %s %d", emb.Title, emb.Slug, emb.Description, emb.ID)
-}
-
-// Hash calculates the hash of a file's content.
-func Hash(content []byte) string {
-	sum := md5.Sum(content)
-
-	return hex.EncodeToString(sum[:])
+	return fmt.Sprintf("Tag: %s %s %s %d", emb.Title, emb.Slug, emb.Description, emb.ID)
 }
