@@ -81,7 +81,8 @@
     }
   },
   "severity": {
-    "default": "error",
+    "default": "warning",
+    "default-severity": "warning",
     "rules": [
       {
         "linters": [
