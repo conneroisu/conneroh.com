@@ -202,7 +202,7 @@
             mkdir -p $out/root
             # Joint Shm and Wal
             ${pkgs.sqlite}/bin/sqlite3 ${./master.db} "PRAGMA wal_checkpoint(FULL);"
-            cp ${./master.db} $out/master.db
+            cp ${./master.db} $out/root/master.db
           '';
 
           preBuild = ''
@@ -257,11 +257,12 @@
           flyDevToml = settingsFormat.generate "fly.dev.toml" flyDevConfig;
           flyProdToml = settingsFormat.generate "fly.toml" flyProdConfig;
           tag = "v6";
-        in rec
+        in
+          rec
           {
             conneroh = pkgs.buildGoModule {
               inherit src version preBuild;
-              vendorHash = "sha256-bPcOM7B+17SBqrEfAdJdUDEqkYWzlvys8YD1gh1mbX8=";
+              vendorHash = "sha256-DYqIBhMpuNc62m9fCU7T6Sl17tmpTztD70qG1OGUEN8=";
               name = "conneroh.com";
               goSum = ./go.sum;
               subPackages = ["."];
