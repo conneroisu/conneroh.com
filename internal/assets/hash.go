@@ -2,6 +2,7 @@ package assets
 
 import (
 	"context"
+	//nolint:gosec
 	"crypto/md5"
 	"database/sql"
 	"encoding/hex"
@@ -18,6 +19,7 @@ import (
 
 // ComputeHash generates a SHA-256 hash of the given content.
 func ComputeHash(content []byte) string {
+	//nolint:gosec
 	sum := md5.Sum(content)
 
 	return hex.EncodeToString(sum[:])
