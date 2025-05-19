@@ -6,12 +6,6 @@ type target struct {
 	Typ string
 }
 
-//TODO: Use this for local search
-
-func (t *target) Include() string {
-	return "[" + t.Typ + "='" + t.Val + "']"
-}
-
 var (
 	// Bodiody is the target element for the body of the page.
 	//
@@ -27,12 +21,5 @@ var (
 		Val: "taggle",
 		Sel: "#taggle",
 		Typ: "id",
-	}
-
-	// LocalSearch is the target element for the local search input.
-	LocalSearch = target{
-		Val: "local-search", // TODO: Use this for local search
-		Sel: "#local-search",
-		Typ: "name",
 	}
 )
