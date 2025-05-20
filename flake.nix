@@ -6,8 +6,6 @@
     systems.url = "github:nix-systems/default";
     bun2nix.url = "github:baileyluTCD/bun2nix";
     flake-utils.url = "github:numtide/flake-utils";
-    nix2container.url = "github:nlewo/nix2container";
-    nix2container.inputs.nixpkgs.follows = "nixpkgs";
     rust-overlay.url = "github:oxalica/rust-overlay";
     rust-overlay.inputs.nixpkgs.follows = "nixpkgs";
   };
@@ -15,7 +13,6 @@
   outputs = inputs @ {
     self,
     flake-utils,
-    nix2container,
     ...
   }:
     flake-utils.lib.eachSystem ["x86_64-linux" "aarch64-linux" "aarch64-darwin"] (
@@ -44,12 +41,6 @@
               }
           )
           flake-scripts.scripts;
-        alpine = nix2container.pullImage {
-          imageName = "alpine";
-          imageDigest = "sha256:115731bab0862031b44766733890091c17924f9b7781b79997f5f163be262178";
-          arch = "amd64";
-          sha256 = "sha256-o4GvFCq6pvzASvlI5BLnk+Y4UN6qKL2dowuT0cp8q7Q=";
-        };
       in {
         devShells = let
           shell-shellHook = ''
@@ -183,18 +174,27 @@
           force_https = true;
           processes = ["app"];
           version = self.shortRev or "dirty";
-          src = builtins.path {
-            path = pkgs.lib.cleanSourceWith {
-              src = ./.;
-              filter = path: type: let
-                baseName = baseNameOf path;
-              in
-                !(
-                  (type == "directory" && baseName == ".direnv")
-                  || (type == "symlink" && baseName == ".git")
-                  || (type == "directory" && baseName == "data")
-                );
-            };
+          src = pkgs.lib.cleanSourceWith {
+            src = ./.;
+            filter = path: type: let
+              baseName = baseNameOf path;
+              path' = toString path;
+              isExcluded =
+                # Exclude common development directories
+                (baseName == ".direnv")
+                || (baseName == ".git")
+                || (baseName == "node_modules")
+                ||
+                # Exclude specific data directories, including internal/data
+                (baseName == "data" && type == "directory")
+                || (builtins.match ".*/internal/data(/.*|$)" path' != null)
+                ||
+                # Exclude build artifacts and temporary files
+                (baseName == "result")
+                || (pkgs.lib.hasSuffix ".swp" baseName)
+                || (pkgs.lib.hasSuffix "~" baseName);
+            in
+              !isExcluded;
             name = "source";
           };
 
@@ -256,9 +256,7 @@
 
           flyDevToml = settingsFormat.generate "fly.dev.toml" flyDevConfig;
           flyProdToml = settingsFormat.generate "fly.toml" flyProdConfig;
-          tag = "v6";
         in
-          rec
           {
             conneroh = pkgs.buildGoModule {
               inherit src version preBuild;
