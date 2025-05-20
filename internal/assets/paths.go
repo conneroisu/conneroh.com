@@ -38,9 +38,7 @@ func Slugify(s string) string {
 		path string
 		ok   bool
 	)
-	if strings.HasSuffix(s, ".md") {
-		s = strings.TrimSuffix(s, ".md")
-	}
+	s = strings.TrimSuffix(s, ".md")
 
 	path, ok = strings.CutPrefix(s, PostsLoc)
 	if ok {

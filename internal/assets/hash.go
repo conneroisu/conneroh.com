@@ -2,6 +2,7 @@ package assets
 
 import (
 	"context"
+	//nolint:gosec
 	"crypto/md5"
 	"database/sql"
 	"encoding/hex"
@@ -16,8 +17,10 @@ import (
 	"github.com/uptrace/bun"
 )
 
-// ComputeHash generates a SHA-256 hash of the given content.
+// ComputeHash generates an MD5 hash of the given content.
+// Note: MD5 is not cryptographically secure; only use for content fingerprinting.
 func ComputeHash(content []byte) string {
+	//nolint:gosec
 	sum := md5.Sum(content)
 
 	return hex.EncodeToString(sum[:])

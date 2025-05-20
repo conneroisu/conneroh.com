@@ -12,8 +12,9 @@ import (
 
 const (
 	awsAccessKeyIDVar = "AWS_ACCESS_KEY_ID"
-	awsSecretKeyVar   = "AWS_SECRET_ACCESS_KEY"
-	awsBaseURLVar     = "AWS_ENDPOINT_URL_S3"
+	//nolint:gosec
+	awsSecretKeyVar = "AWS_SECRET_ACCESS_KEY"
+	awsBaseURLVar   = "AWS_ENDPOINT_URL_S3"
 )
 
 // Client is an interface for AWS clients.
