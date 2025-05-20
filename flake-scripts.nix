@@ -20,14 +20,6 @@
       description = "Clean Project";
       deps = [pkgs.git];
     };
-    reset-db = {
-      exec = ''
-        for f in "./master.db" "./master.db-shm" "./master.db-wal"; do
-          rm -f "$f"
-        done
-      '';
-      description = "Reset the database";
-    };
     tests = {
       exec = ''
         REPO_ROOT="$(git rev-parse --show-toplevel)"
@@ -39,14 +31,11 @@
     lint = {
       exec = ''
         REPO_ROOT="$(git rev-parse --show-toplevel)"
-        templ generate
-        golangci-lint run
-        statix check "$REPO_ROOT"/flake.nix
+        templ generate "$REPO_ROOT"
+        golangci-lint run "$REPO_ROOT"
+        statix check "$REPO_ROOT"
         deadnix "$REPO_ROOT"/flake.nix
-
-        # Run Rust clippy
-        echo "Running Rust clippy..."
-        cd "$REPO_ROOT"/live && cargo clippy -- -D warnings
+        nix flake check
       '';
       deps = with pkgs; [golangci-lint statix deadnix templ rustc cargo];
       description = "Run Nix/Go/Rust Linting Steps.";

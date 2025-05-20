@@ -22,7 +22,7 @@
           config.allowUnfree = true;
           overlays = [
             (final: prev: {
-              go = prev.go_1_24;
+              final.go = prev.go_1_24;
             })
             inputs.rust-overlay.overlays.default
           ];
