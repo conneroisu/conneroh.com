@@ -18,3 +18,4 @@ tigris.yaml
 *.db-wal
 *_templ.go
 target
+CLAUDE.md
