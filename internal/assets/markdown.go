@@ -132,11 +132,6 @@ func ParseMarkdown(md goldmark.Markdown, item DirMatchItem) (*Doc, error) {
 		return nil, eris.Wrapf(err, "failed to set defaults for document: %s", item.Path)
 	}
 
-	// Parse markdown
-	err = md.Convert([]byte(doc.Content), &buf)
-	if err != nil {
-		return nil, eris.Wrapf(err, "failed to parse markdown: %s", doc.Path)
-	}
 	// Create a new parser context
 	pCtx := parser.NewContext()
 

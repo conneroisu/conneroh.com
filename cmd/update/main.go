@@ -48,14 +48,14 @@ func main() {
 		syscall.SIGHUP)
 	defer stop()
 
-	err := Run(ctx, os.Getenv, *workers, *taskBuffer)
+	err := UpdateDB(ctx, os.Getenv, *workers, *taskBuffer)
 	if err != nil {
 		panic(err)
 	}
 }
 
-// Run executes the main application logic.
-func Run(
+// UpdateDB executes the main application logic.
+func UpdateDB(
 	ctx context.Context,
 	getenv func(string) string,
 	_, _ int,
