@@ -1,14 +1,17 @@
 ---
 id: cpp
-aliases: []
+aliases:
+  - C++
 tags:
   - programming-language
 created_at: 2025-03-27T14:13:15.000-06:00
 description: C++ is a high-performance, general-purpose programming language developed by Bjarne Stroustrup in the early 1980s as an extension of C, incorporating object-oriented features while maintaining efficiency and low-level control.
-icon: cplusplus-plain
+icon: cpp
 title: C++
-updated_at: 2025-03-28T20:07:43.000-06:00
+updated_at: 2025-05-21T08:56:28.000-06:00
 ---
+
+# C++
 
 C++ is a high-performance, general-purpose programming language developed by **Bjarne Stroustrup** in the early 1980s as an extension of C, incorporating object-oriented features while maintaining efficiency and low-level control.
 

@@ -78,6 +78,7 @@ var contentTypes = map[string]string{
 	".mp4":   "video/mp4",
 	".webm":  "video/webm",
 	".wav":   "audio/wav",
+	".mov":   "video/quicktime",
 	".ico":   "image/x-icon",
 	".woff":  "font/woff",
 	".woff2": "font/woff2",
@@ -98,4 +99,13 @@ func GetContentType(path string) string {
 // BucketPath returns the path to the bucket for a given file path.
 func BucketPath(path string) string {
 	return "https://conneroisu.fly.storage.tigris.dev/assets/" + path
+}
+
+func isVideoType(contentType string) bool {
+	switch contentType {
+	case "video/mp4", "video/quicktime", "video/webm":
+		return true
+	default:
+		return false
+	}
 }

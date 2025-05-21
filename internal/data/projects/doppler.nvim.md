@@ -7,8 +7,10 @@ tags:
 banner_path: projects/doppler.nvim.webp
 created_at: 2025-03-28T19:17:42.000-06:00
 description: A Neovim plugin that seamlessly integrates Doppler's secret management
+projects:
+  - dotfiles
 title: doppler.nvim
-updated_at: 2025-05-15T14:07:05.000-06:00
+updated_at: 2025-05-21T08:50:16.000-06:00
 ---
 
 ## Understanding doppler.nvim

@@ -7,7 +7,6 @@ import (
 	"database/sql"
 	"encoding/hex"
 	"errors"
-	"log/slog"
 	"os"
 	"sort"
 	"strings"
@@ -28,8 +27,6 @@ func ComputeHash(content []byte) string {
 
 // MatchItem takes a path and returns a DirMatchItem.
 func MatchItem(fs afero.Fs, path string) (DirMatchItem, error) {
-	slog.Debug("assets.MatchItem()", "path", path)
-	defer slog.Debug("assets.MatchItem() done", "path", path)
 	content, err := afero.ReadFile(fs, path)
 	if err != nil {
 		return DirMatchItem{}, err
@@ -59,7 +56,6 @@ func HashDirMatch(
 	path string,
 	db *bun.DB,
 ) ([]DirMatchItem, error) {
-	slog.Debug("assets.HashDirMatch()", "path", path)
 	var files []string
 	var pathMap []DirMatchItem
 	err := afero.Walk(

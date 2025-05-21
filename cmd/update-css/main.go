@@ -9,6 +9,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/a-h/templ"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/layouts"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/views"
@@ -87,60 +88,56 @@ func run(ctx context.Context) error {
 		return eris.Wrapf(err, "(update-css) failed to get tags")
 	}
 
+	comps := []templ.Component{}
+	for _, post := range allPosts {
+		comps = append(comps, views.Post(post))
+	}
+	for _, project := range allProjects {
+		comps = append(comps, views.Project(project))
+	}
+	for _, tag := range allTags {
+		comps = append(comps, views.Tag(tag))
+	}
+	comps = append(comps, views.List(
+		routing.ProjectPluralPath,
+		&allPosts,
+		&allProjects,
+		&allTags,
+		"",
+		1,
+		10,
+	))
+	comps = append(comps, views.List(
+		routing.TagsPluralPath,
+		&allPosts,
+		&allProjects,
+		&allTags,
+		"",
+		1,
+		10,
+	))
+	comps = append(comps, views.List(
+		routing.PostPluralPath,
+		&allPosts,
+		&allProjects,
+		&allTags,
+		"",
+		1,
+		10,
+	))
+	comps = append(comps, layouts.Page(views.Home(
+		&allPosts,
+		&allProjects,
+		&allTags,
+	)))
+	comps = append(comps, views.Code500())
+	comps = append(comps, components.ThankYou())
+
 	return twerge.CodeGen(
 		twerge.Default(),
 		"cmd/conneroh/classes/classes.go",
 		"input.css",
 		"cmd/conneroh/classes/classes.html",
-		layouts.Page(views.Home(
-			&allPosts,
-			&allProjects,
-			&allTags,
-		)),
-		layouts.Page(views.List(
-			routing.PostPluralPath,
-			&allPosts,
-			&allProjects,
-			&allTags,
-			"",
-			1,
-			10,
-		)),
-		layouts.Page(views.Code500()),
-		layouts.Page(views.List(
-			routing.ProjectPluralPath,
-			&allPosts,
-			&allProjects,
-			&allTags,
-			"",
-			1,
-			10,
-		)),
-		layouts.Page(views.List(
-			routing.TagsPluralPath,
-			&allPosts,
-			&allProjects,
-			&allTags,
-			"",
-			1,
-			10,
-		)),
-		components.TagControl(
-			&assets.Tag{},
-		),
-		layouts.Page(views.Post(
-			allPosts[0],
-		)),
-		layouts.Page(views.Project(
-			allProjects[0],
-		)),
-		layouts.Page(views.Tag(
-			allTags[0],
-		)),
-		views.Post(
-			allPosts[0],
-		),
-		layouts.Layout("hello"),
-		components.ThankYou(),
+		comps...,
 	)
 }

@@ -7,18 +7,15 @@
   scripts = {
     dx = {
       exec = ''$EDITOR "$(git rev-parse --show-toplevel)"/flake.nix'';
-      deps = [pkgs.git];
       description = "Edit flake.nix";
     };
     gx = {
       exec = ''$EDITOR "$(git rev-parse --show-toplevel)"/go.mod'';
-      deps = [pkgs.git];
       description = "Edit go.mod";
     };
     clean = {
       exec = ''git clean -fdx'';
       description = "Clean Project";
-      deps = [pkgs.git];
     };
     tests = {
       exec = ''
