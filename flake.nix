@@ -192,9 +192,7 @@
                 # Exclude build artifacts and temporary files
                 (baseName == "result")
                 || (pkgs.lib.hasSuffix ".swp" baseName)
-                || (pkgs.lib.hasSuffix "~" baseName)
-                # Exlude non-go files
-                || (pkgs.lib.hasSuffix ".go" baseName);
+                || (pkgs.lib.hasSuffix "~" baseName);
             in
               !isExcluded;
             name = "source";
