@@ -284,12 +284,7 @@
             };
             deployPackage = pkgs.writeShellApplication {
               name = "deployPackage";
-              runtimeInputs = with pkgs; [
-                doppler
-                skopeo
-                flyctl
-                cacert
-              ];
+              runtimeInputs = with pkgs; [doppler skopeo flyctl cacert];
               bashOptions = ["errexit" "pipefail"];
               text = ''
                 set -e
@@ -300,14 +295,12 @@
 
                 [ -z "$arg" ] && { echo "No argument provided. Please provide a target environment. (dev or prod)"; exit 1; }
 
+                [ -z "$MASTER_FLY_AUTH_TOKEN" ] && MASTER_FLY_AUTH_TOKEN="$(doppler secrets get --plain MASTER_FLY_AUTH_TOKEN)"
+                TOKEN="$MASTER_FLY_AUTH_TOKEN"
                 if [ "$arg" = "dev" ]; then
-                  [ -z "$FLY_DEV_AUTH_TOKEN" ] && FLY_DEV_AUTH_TOKEN="$(doppler secrets get --plain FLY_DEV_AUTH_TOKEN)"
-                  TOKEN="$FLY_DEV_AUTH_TOKEN"
                   export FLY_NAME="conneroh-com-dev"
                   export CONFIG_FILE=${flyDevToml}
                 else
-                  [ -z "$FLY_AUTH_TOKEN" ] && FLY_AUTH_TOKEN="$(doppler secrets get --plain FLY_AUTH_TOKEN)"
-                  TOKEN="$FLY_AUTH_TOKEN"
                   export FLY_NAME="conneroh-com"
                   export CONFIG_FILE=${flyProdToml}
                 fi
