@@ -52,7 +52,7 @@ func New(getenv func(string) string) (*DefaultAWSClient, error) {
 			HTTPClient: &http.Client{
 				Transport: http.DefaultTransport,
 				Timeout:   10 * time.Second,
-				CheckRedirect: func(req *http.Request, via []*http.Request) error {
+				CheckRedirect: func(_ *http.Request, _ []*http.Request) error {
 					return http.ErrUseLastResponse
 				},
 			},
