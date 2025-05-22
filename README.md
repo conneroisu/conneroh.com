@@ -192,21 +192,6 @@ The site uses HTMX for navigation and content loading:
 </a>
 ```
 
-Alpine.js is used for client-side interactivity:
-
-```html
-<!-- Example of Alpine.js usage for tabs -->
-<div x-data="{ activeTab: 'posts' }">
-  <button
-    @click="activeTab = 'posts'"
-    :class="{ 'active': activeTab === 'posts' }"
-  >
-    Posts
-  </button>
-  <div x-show="activeTab === 'posts'">Posts content here...</div>
-</div>
-```
-
 ## Contributing
 
 This project is personal, but suggestions and bug reports are most welcome. Please open an issue or submit a pull request.
