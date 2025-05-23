@@ -6,8 +6,7 @@
     systems.url = "github:nix-systems/default";
     bun2nix.url = "github:baileyluTCD/bun2nix";
     flake-utils.url = "github:numtide/flake-utils";
-    rust-overlay.url = "github:oxalica/rust-overlay";
-    rust-overlay.inputs.nixpkgs.follows = "nixpkgs";
+    msb.url = "github:rrbutani/nix-mk-shell-bin";
   };
 
   outputs = inputs @ {
@@ -24,7 +23,6 @@
             (final: prev: {
               final.go = prev.go_1_24;
             })
-            inputs.rust-overlay.overlays.default
           ];
         };
 
@@ -98,10 +96,6 @@
               htmx-lsp
               vscode-langservers-extracted
               sqlite
-
-              rust-bin.stable.latest.default # Rust
-              rust-analyzer
-              pkg-config
 
               flyctl # Infra
               openssl.dev
@@ -246,6 +240,11 @@
           flyProdToml = settingsFormat.generate "fly.toml" flyProdConfig;
         in
           {
+            shellBin = inputs.msb.lib.mkShellBin {
+              drv = self.devShells.${system}.default;
+              nixpkgs = pkgs;
+              bashPrompt = "[hello]$ ";
+            };
             conneroh = pkgs.buildGoModule {
               inherit src version preBuild;
               vendorHash = "sha256-DYqIBhMpuNc62m9fCU7T6Sl17tmpTztD70qG1OGUEN8=";
