@@ -19,11 +19,8 @@
       system: let
         pkgs = import inputs.nixpkgs {
           inherit system;
-          config.allowUnfree = true;
           overlays = [
-            (final: prev: {
-              final.go = prev.go_1_24;
-            })
+            (final: prev: {final.go = prev.go_1_24;})
           ];
         };
 
@@ -92,7 +89,6 @@
               nodePackages.typescript-language-server
               nodePackages.prettier
               svgcleaner
-              sqlite-web
               harper
               htmx-lsp
               vscode-langservers-extracted
@@ -200,7 +196,6 @@
           flyDevConfig = {
             app = "conneroh-com-dev";
             primary_region = "ord";
-            build = {};
             http_service = {
               inherit internal_port force_https processes;
               auto_stop_machines = "stop";
@@ -219,7 +214,6 @@
           flyProdConfig = {
             app = "conneroh-com";
             primary_region = "ord";
-            build = {};
             http_service = {
               inherit internal_port force_https processes;
               auto_stop_machines = "stop";
@@ -284,7 +278,6 @@
                 self.packages."${system}".conneroh
                 (pkgs.runCommand "database-files" {} ''
                   mkdir -p $out/root
-                  # Joint Shm and Wal
                   cp ${./master.db} $out/root/master.db
                 '')
               ];
@@ -333,7 +326,9 @@
               '';
             };
           }
-          // pkgs.lib.genAttrs (builtins.attrNames flake-scripts.scripts) (name: scriptPackages.${name});
+          // pkgs.lib.genAttrs (builtins.attrNames flake-scripts.scripts) (
+            name: scriptPackages.${name}
+          );
       }
     );
 }
