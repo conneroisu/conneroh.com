@@ -12,6 +12,7 @@
   outputs = inputs @ {
     self,
     flake-utils,
+    msb,
     ...
   }:
     flake-utils.lib.eachSystem ["x86_64-linux" "aarch64-linux" "aarch64-darwin"] (
@@ -41,7 +42,7 @@
           flake-scripts.scripts;
       in {
         devShells = let
-          shell-shellHook = ''
+          shellHook = ''
             export REPO_ROOT=$(git rev-parse --show-toplevel)
             echo "Available commands:"
             ${pkgs.lib.concatStringsSep "\n" (
@@ -49,7 +50,7 @@
             )}
           '';
 
-          shell-env = {
+          env = {
             PLAYWRIGHT_BROWSERS_PATH = "${pkgs.playwright-driver.browsers}";
             PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = "1";
             PLAYWRIGHT_NODEJS_PATH = "${pkgs.nodejs_20}/bin/node";
@@ -135,13 +136,11 @@
             ++ builtins.attrValues scriptPackages;
         in {
           default = pkgs.mkShell {
-            shellHook = shell-shellHook;
-            env = shell-env;
+            inherit shellHook env;
             packages = shell-packages;
           };
           devcontainer = pkgs.mkShell {
-            env = shell-env;
-            shellHook = shell-shellHook;
+            inherit shellHook env;
             packages =
               shell-packages
               ++ (with pkgs; [
@@ -238,12 +237,28 @@
 
           flyDevToml = settingsFormat.generate "fly.dev.toml" flyDevConfig;
           flyProdToml = settingsFormat.generate "fly.toml" flyProdConfig;
+          alpine = pkgs.dockerTools.pullImage {
+            imageName = "alpine";
+            imageDigest = "sha256:115731bab0862031b44766733890091c17924f9b7781b79997f5f163be262178";
+            arch = "amd64";
+            sha256 = "sha256-Eb4oYIKZOj6lg8ej+/4sFFCvvJtrzwjKRjtBQG8CHJQ=";
+          };
         in
           {
-            shellBin = inputs.msb.lib.mkShellBin {
-              drv = self.devShells.${system}.default;
+            shellBin = msb.lib.mkShellBin {
+              drv = self.devShells.${system}.devcontainer;
               nixpkgs = pkgs;
               bashPrompt = "[hello]$ ";
+            };
+            devContainer = pkgs.dockerTools.buildImage {
+              name = "devContainer";
+              fromImage = alpine;
+              tag = "latest";
+              config = {
+                entrypoint = [
+                  "${self.packages.${system}.shellBin}/bin/nix-shell-env-shell"
+                ];
+              };
             };
             conneroh = pkgs.buildGoModule {
               inherit src version preBuild;
