@@ -1,4 +1,4 @@
-package llama
+package assets
 
 import (
 	"context"
@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/conneroisu/conneroh.com/internal/assets"
 	"github.com/ollama/ollama/api"
 	"github.com/rotisserie/eris"
 	"gonum.org/v1/gonum/mat"
@@ -15,40 +14,49 @@ import (
 const (
 	ollamaURLVar   = "OLLAMA_URL"
 	embeddingModel = "nomic-embed-text"
-	embeddingDim   = assets.EmbedLength
+	embeddingDim   = EmbedLength
 )
 
-// Client is the minimal interface for the Ollama client.
-type Client interface {
-	Embeddings(ctx context.Context, req *api.EmbeddingRequest) (*api.EmbeddingResponse, error)
+// Llama is the minimal interface for the Ollama client.
+type Llama interface {
+	Embeddings(
+		ctx context.Context,
+		req *api.EmbeddingRequest,
+	) (*api.EmbeddingResponse, error)
 }
 
-// OllamaClient is a wrapper for the Ollama client.
-type OllamaClient struct {
-	client Client
-}
+// DefaultLlamaClient is a wrapper for the Ollama client.
+type DefaultLlamaClient struct{ client *api.Client }
 
 // NewOllamaClient creates a new OllamaClient.
-func NewOllamaClient(getenv func(string) string) (*OllamaClient, error) {
+func NewOllamaClient(getenv func(string) string) (*DefaultLlamaClient, error) {
 	urlStr := getenv(ollamaURLVar)
 	if urlStr == "" {
-		return nil, eris.Wrapf(ErrMissingCreds, "missing %s", ollamaURLVar)
+		return nil, eris.Wrapf(
+			ErrMissingCreds,
+			"missing %s",
+			ollamaURLVar,
+		)
 	}
 	urlVal, err := url.Parse(urlStr)
 	if err != nil {
-		return nil, eris.Wrapf(ErrInvalidCreds, "invalid %s", ollamaURLVar)
+		return nil, eris.Wrapf(
+			ErrInvalidCreds,
+			"invalid %s",
+			ollamaURLVar,
+		)
 	}
 
-	return &OllamaClient{
+	return &DefaultLlamaClient{
 		client: api.NewClient(urlVal, http.DefaultClient),
 	}, nil
 }
 
 // Embeddings returns the embeddings for the provided text.
-func (c *OllamaClient) Embeddings(
+func (c *DefaultLlamaClient) Embeddings(
 	ctx context.Context,
 	content string,
-	emb *assets.Doc,
+	emb *Doc,
 ) (err error) {
 	resp, err := c.client.Embeddings(ctx, &api.EmbeddingRequest{
 		Model:  embeddingModel,
@@ -64,7 +72,7 @@ func (c *OllamaClient) Embeddings(
 
 	emb.X, emb.Y, emb.Z = projectTo3D(
 		resp.Embedding,
-		projectionMatrixCreate(assets.EmbedLength, 3),
+		projectionMatrixCreate(EmbedLength, 3),
 	)
 	// copy(emb.Vec[:], resp.Embedding[:assets.EmbedLength])
 
@@ -74,7 +82,8 @@ func (c *OllamaClient) Embeddings(
 // Generate a deterministic projection matrix for dimensionality reduction.
 func projectionMatrixCreate(inputDim, outputDim int) *mat.Dense {
 	// Create a matrix with dimensions [outputDim x inputDim]
-	// This will multiply directly with the input vector without transposition
+	// This will multiply directly with the input vector without
+	// transposition
 	matrix := mat.NewDense(outputDim, inputDim, nil)
 
 	for i := range outputDim { // For each output dimension
@@ -82,7 +91,8 @@ func projectionMatrixCreate(inputDim, outputDim int) *mat.Dense {
 		center := (i * inputDim) / outputDim
 
 		for j := range inputDim {
-			// Calculate a weight based on distance from the center point
+			// Calculate a weight based on distance from the center
+			// point.
 			// Use a Gaussian-like function for smooth projection
 			dist := float64(j - center)
 			weight := math.Exp(-0.5 * (dist * dist) / float64(inputDim/10))

@@ -3,7 +3,6 @@ package components
 import (
 	"fmt"
 	"github.com/conneroisu/conneroh.com/internal/assets"
-	"github.com/conneroisu/conneroh.com/internal/hx"
 	"github.com/conneroisu/conneroh.com/internal/routing"
 	"github.com/conneroisu/twerge"
 	"strconv"
@@ -22,7 +21,7 @@ templ TagControl(
 	<div
 		class={ twerge.It("text-sm px-3 items-center hover:underline bg-emerald-800 w-full transition-colors py-1 hover:bg-emerald-600 h-8 rounded-sm justify-between font-medium text-emerald-300 hover:text-white flex flex-row") }
 		hx-get={ tag.PagePath() }
-		hx-target={ hx.Bodiody.Sel }
+		hx-target="#bodiody"
 		hx-push-url="true"
 		hx-on:click="event.stopPropagation()"
 		preload="mouseover"

@@ -13,7 +13,6 @@ import (
 	"github.com/conneroisu/conneroh.com/internal/assets"
 	"github.com/conneroisu/conneroh.com/internal/copygen"
 	"github.com/conneroisu/conneroh.com/internal/logger"
-	"github.com/conneroisu/conneroh.com/internal/tigris"
 	"github.com/rotisserie/eris"
 	"github.com/spf13/afero"
 	"github.com/uptrace/bun"
@@ -79,7 +78,7 @@ func UpdateDB(
 	// if err != nil {
 	// 	return eris.Wrap(err, "failed to create Ollama client")
 	// }
-	ti, err := tigris.New(getenv)
+	ti, err := assets.NewTigris(getenv)
 	if err != nil {
 		return eris.Wrap(err, "failed to create Tigris client")
 	}
