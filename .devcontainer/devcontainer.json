@@ -1,9 +1,6 @@
 {
   "name": "Conner Ohnesorge Portfolio Dev Environment",
-  "build": {
-    "dockerfile": "Dockerfile",
-    "context": ".."
-  },
+  "image": "ghcr.io/conneroisu/conneroh.com:v6",
   "features": {},
   "customizations": {
     "vscode": {
@@ -51,6 +48,7 @@
         "editor.codeActionsOnSave": {
           "source.organizeImports": "explicit"
         },
+        "editor.lineNumbers": "relative",
         "files.associations": {
           "*.templ": "templ"
         },

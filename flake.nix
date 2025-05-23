@@ -237,12 +237,13 @@
             arch = "amd64";
             sha256 = "sha256-Eb4oYIKZOj6lg8ej+/4sFFCvvJtrzwjKRjtBQG8CHJQ=";
           };
+          tag = "v6";
         in
           {
-            shellBin = msb.lib.mkShellBin {
+            devShellBin = msb.lib.mkShellBin {
               drv = self.devShells.${system}.devcontainer;
               nixpkgs = pkgs;
-              bashPrompt = "[hello]$ ";
+              bashPrompt = "[conneroh]$ ";
             };
             devContainer = pkgs.dockerTools.buildImage {
               name = "devContainer";
@@ -250,7 +251,7 @@
               tag = "latest";
               config = {
                 entrypoint = [
-                  "${self.packages.${system}.shellBin}/bin/nix-shell-env-shell"
+                  "${self.packages.${system}.devShellBin}/bin/nix-shell-env-shell"
                 ];
               };
             };
@@ -323,6 +324,25 @@
                   -c "$CONFIG_FILE" \
                   -i "$REGISTRY:latest" \
                   -t "$TOKEN"
+              '';
+            };
+            deployDev = pkgs.writeShellApplication {
+              name = "deployDev";
+              runtimeInputs = with pkgs; [doppler skopeo flyctl cacert];
+              bashOptions = ["errexit" "pipefail"];
+              text = ''
+                set -e
+                [ -z "$GHCR_TOKEN" ] && GHCR_TOKEN="$(doppler secrets get --plain GHCR_TOKEN)"
+                TOKEN="$GHCR_TOKEN"
+
+                REGISTRY="ghcr.io/conneroisu/conneroh.com"
+                echo "Copying image to $REGISTRY"
+                skopeo copy \
+                  --insecure-policy \
+                  docker-archive:"${self.packages."${system}".devContainer}" \
+                  "docker://$REGISTRY:${tag}" \
+                  --dest-creds x:"$TOKEN" \
+                  --format v2s2
               '';
             };
           }
