@@ -13,7 +13,6 @@ import (
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/layouts"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/views"
 	"github.com/conneroisu/conneroh.com/internal/assets"
-	"github.com/conneroisu/conneroh.com/internal/hx"
 	"github.com/conneroisu/conneroh.com/internal/routing"
 	"github.com/gorilla/schema"
 	"github.com/rotisserie/eris"
@@ -65,7 +64,7 @@ func listHandler(
 	db *bun.DB,
 ) routing.APIFunc {
 	return func(w http.ResponseWriter, r *http.Request) error {
-		header := r.Header.Get(hx.HdrRequest)
+		header := r.Header.Get(routing.HdrRequest)
 		query := r.URL.Query().Get("search")
 		pageStr := r.URL.Query().Get("page")
 		if pageStr == "" {

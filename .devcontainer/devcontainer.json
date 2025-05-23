@@ -1,0 +1,143 @@
+{
+  "name": "Conner Ohnesorge Portfolio Remote Dev Environment",
+  "image": "ghcr.io/conneroisu/conneroh.com:v6",
+  "features": {},
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "VisualStudioExptTeam.vscodeintellicode",
+        "github.copilot",
+        "github.copilot-chat",
+        "golang.go",
+        "a-h.templ",
+        "JasonMcGhee.claude-debugs-for-you",
+        "bradlc.vscode-tailwindcss",
+        "esbenp.prettier-vscode",
+        "ms-vscode.vscode-typescript-next",
+        "jnoortheen.nix-ide",
+        "kamadorueda.alejandra",
+        "arrterian.nix-env-selector",
+        "bbenoist.nix",
+        "mkhl.direnv",
+        "ms-vscode.live-server",
+        "formulahendry.auto-rename-tag",
+        "christian-kohler.path-intellisense",
+        "streetsidesoftware.code-spell-checker",
+        "ms-vscode.vscode-json",
+        "redhat.vscode-yaml",
+        "ms-vscode.vscode-markdown",
+        "yzhang.markdown-all-in-one",
+        "DavidAnson.vscode-markdownlint",
+        "ms-vscode.vscode-html-css-support",
+        "bradlc.vscode-tailwindcss",
+        "formulahendry.auto-close-tag"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "terminal.integrated.profiles.linux": {
+          "bash": {
+            "path": "/bin/bash",
+            "args": []
+          },
+          "dev-shell": {
+            "path": "/usr/local/bin/dev",
+            "args": []
+          }
+        },
+        "go.toolsManagement.autoUpdate": true,
+        "go.useLanguageServer": true,
+        "go.lintTool": "golangci-lint",
+        "go.formatTool": "goimports",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+          "source.organizeImports": "explicit"
+        },
+        "editor.lineNumbers": "relative",
+        "files.associations": {
+          "*.templ": "templ"
+        },
+        "emmet.includeLanguages": {
+          "templ": "html"
+        },
+        "tailwindCSS.includeLanguages": {
+          "templ": "html"
+        },
+        "tailwindCSS.experimental.classRegex": [
+          [
+            "class\\s*:\\s*\"([^\"]*)",
+            "\"([^\"]*)\""
+          ],
+          [
+            "class\\s*=\\s*\"([^\"]*)",
+            "\"([^\"]*)\""
+          ],
+          [
+            "tw\\(['\"`]([^'\"`]*)['\"`]\\)",
+            "([^'\"`]*)"
+          ]
+        ],
+        "nix.enableLanguageServer": true,
+        "nix.serverPath": "nixd",
+        "editor.defaultFormatter": "kamadorueda.alejandra",
+        "[nix]": {
+          "editor.defaultFormatter": "kamadorueda.alejandra"
+        },
+        "[go]": {
+          "editor.defaultFormatter": "golang.go"
+        },
+        "[templ]": {
+          "editor.defaultFormatter": "a-h.templ"
+        },
+        "[typescript]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "[javascript]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "[json]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "[css]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "[markdown]": {
+          "editor.defaultFormatter": "yzhang.markdown-all-in-one"
+        }
+      }
+    }
+  },
+  "remoteUser": "vscode",
+  "workspaceFolder": "/workspace",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+  "mounts": [
+    "source=${localWorkspaceFolder}/.devcontainer/.bashrc,target=/home/vscode/.bashrc,type=bind,consistency=cached"
+  ],
+  "forwardPorts": [
+    8080,
+    3000,
+    5173,
+    8000
+  ],
+  "portsAttributes": {
+    "8080": {
+      "label": "Go Server",
+      "onAutoForward": "notify"
+    },
+    "3000": {
+      "label": "Dev Server",
+      "onAutoForward": "silent"
+    },
+    "5173": {
+      "label": "Vite Dev Server",
+      "onAutoForward": "silent"
+    },
+    "8000": {
+      "label": "Preview Server",
+      "onAutoForward": "silent"
+    }
+  },
+  "postCreateCommand": "echo 'Container setup complete! Run \"dev\" to enter the development shell.'",
+  "containerEnv": {
+    "TZ": "UTC"
+  }
+}

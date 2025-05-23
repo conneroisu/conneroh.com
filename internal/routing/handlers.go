@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/a-h/templ"
-	"github.com/conneroisu/conneroh.com/internal/hx"
 )
 
 // APIFunc is a function that handles an API request and returns an error.
@@ -25,7 +24,7 @@ func Make(fn APIFunc) http.HandlerFunc {
 				"path",
 				r.URL.Path,
 			)
-			target := r.Header.Get(hx.HdrTarget)
+			target := r.Header.Get(HdrTarget)
 			if target != "" {
 				http.Redirect(w, r, "/500", http.StatusFound) // 302 Found or http.StatusTemporaryRedirect (307)
 			}
@@ -41,7 +40,7 @@ func MorphableHandler(
 	morph templ.Component,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var header = r.Header.Get(hx.HdrRequest)
+		var header = r.Header.Get(HdrRequest)
 		if header == "" {
 			templ.Handler(wrapper(morph)).ServeHTTP(w, r)
 		} else {

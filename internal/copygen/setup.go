@@ -11,10 +11,4 @@ type Copygen interface {
 	ToProject(*assets.Doc) *assets.Project
 	// depth domain.Tag 2
 	ToTag(*assets.Doc) *assets.Tag
-
-	ToCache(*assets.Doc) *assets.Cache
-
-	CachedToPost(*assets.Cache, *assets.Doc) *assets.Post
-	CachedToProject(*assets.Cache, *assets.Doc) *assets.Project
-	CachedToTag(*assets.Cache, *assets.Doc) *assets.Tag
 }

@@ -6,25 +6,21 @@
     systems.url = "github:nix-systems/default";
     bun2nix.url = "github:baileyluTCD/bun2nix";
     flake-utils.url = "github:numtide/flake-utils";
-    rust-overlay.url = "github:oxalica/rust-overlay";
-    rust-overlay.inputs.nixpkgs.follows = "nixpkgs";
+    msb.url = "github:rrbutani/nix-mk-shell-bin";
   };
 
   outputs = inputs @ {
     self,
     flake-utils,
+    msb,
     ...
   }:
     flake-utils.lib.eachSystem ["x86_64-linux" "aarch64-linux" "aarch64-darwin"] (
       system: let
         pkgs = import inputs.nixpkgs {
           inherit system;
-          config.allowUnfree = true;
           overlays = [
-            (final: prev: {
-              final.go = prev.go_1_24;
-            })
-            inputs.rust-overlay.overlays.default
+            (final: prev: {final.go = prev.go_1_24;})
           ];
         };
 
@@ -43,7 +39,7 @@
           flake-scripts.scripts;
       in {
         devShells = let
-          shell-shellHook = ''
+          shellHook = ''
             export REPO_ROOT=$(git rev-parse --show-toplevel)
             echo "Available commands:"
             ${pkgs.lib.concatStringsSep "\n" (
@@ -51,7 +47,7 @@
             )}
           '';
 
-          shell-env = {
+          env = {
             PLAYWRIGHT_BROWSERS_PATH = "${pkgs.playwright-driver.browsers}";
             PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = "1";
             PLAYWRIGHT_NODEJS_PATH = "${pkgs.nodejs_20}/bin/node";
@@ -93,15 +89,10 @@
               nodePackages.typescript-language-server
               nodePackages.prettier
               svgcleaner
-              sqlite-web
               harper
               htmx-lsp
               vscode-langservers-extracted
               sqlite
-
-              rust-bin.stable.latest.default # Rust
-              rust-analyzer
-              pkg-config
 
               flyctl # Infra
               openssl.dev
@@ -141,13 +132,11 @@
             ++ builtins.attrValues scriptPackages;
         in {
           default = pkgs.mkShell {
-            shellHook = shell-shellHook;
-            env = shell-env;
+            inherit shellHook env;
             packages = shell-packages;
           };
           devcontainer = pkgs.mkShell {
-            env = shell-env;
-            shellHook = shell-shellHook;
+            inherit shellHook env;
             packages =
               shell-packages
               ++ (with pkgs; [
@@ -180,29 +169,18 @@
               baseName = baseNameOf path;
               path' = toString path;
               isExcluded =
-                # Exclude common development directories
                 (baseName == ".direnv")
                 || (baseName == ".git")
                 || (baseName == "node_modules")
-                ||
-                # Exclude specific data directories, including internal/data
-                (baseName == "data" && type == "directory")
+                || (baseName == "data" && type == "directory")
                 || (builtins.match ".*/internal/data(/.*|$)" path' != null)
-                ||
-                # Exclude build artifacts and temporary files
-                (baseName == "result")
+                || (baseName == "result")
                 || (pkgs.lib.hasSuffix ".swp" baseName)
                 || (pkgs.lib.hasSuffix "~" baseName);
             in
               !isExcluded;
             name = "source";
           };
-
-          databaseFiles = pkgs.runCommand "database-files" {} ''
-            mkdir -p $out/root
-            # Joint Shm and Wal
-            cp ${./master.db} $out/root/master.db
-          '';
 
           preBuild = ''
             ${pkgs.templ}/bin/templ generate
@@ -218,7 +196,6 @@
           flyDevConfig = {
             app = "conneroh-com-dev";
             primary_region = "ord";
-            build = {};
             http_service = {
               inherit internal_port force_https processes;
               auto_stop_machines = "stop";
@@ -237,7 +214,6 @@
           flyProdConfig = {
             app = "conneroh-com";
             primary_region = "ord";
-            build = {};
             http_service = {
               inherit internal_port force_https processes;
               auto_stop_machines = "stop";
@@ -255,8 +231,30 @@
 
           flyDevToml = settingsFormat.generate "fly.dev.toml" flyDevConfig;
           flyProdToml = settingsFormat.generate "fly.toml" flyProdConfig;
+          alpine = pkgs.dockerTools.pullImage {
+            imageName = "alpine";
+            imageDigest = "sha256:115731bab0862031b44766733890091c17924f9b7781b79997f5f163be262178";
+            arch = "amd64";
+            sha256 = "sha256-Eb4oYIKZOj6lg8ej+/4sFFCvvJtrzwjKRjtBQG8CHJQ=";
+          };
+          tag = "v6";
         in
           {
+            devShellBin = msb.lib.mkShellBin {
+              drv = self.devShells.${system}.devcontainer;
+              nixpkgs = pkgs;
+              bashPrompt = "[conneroh]$ ";
+            };
+            devContainer = pkgs.dockerTools.buildImage {
+              name = "devContainer";
+              fromImage = alpine;
+              tag = "latest";
+              config = {
+                entrypoint = [
+                  "${self.packages.${system}.devShellBin}/bin/nix-shell-env-shell"
+                ];
+              };
+            };
             conneroh = pkgs.buildGoModule {
               inherit src version preBuild;
               vendorHash = "sha256-DYqIBhMpuNc62m9fCU7T6Sl17tmpTztD70qG1OGUEN8=";
@@ -279,7 +277,10 @@
               };
               copyToRoot = [
                 self.packages."${system}".conneroh
-                databaseFiles
+                (pkgs.runCommand "database-files" {} ''
+                  mkdir -p $out/root
+                  cp ${./master.db} $out/root/master.db
+                '')
               ];
             };
             deployPackage = pkgs.writeShellApplication {
@@ -325,8 +326,29 @@
                   -t "$TOKEN"
               '';
             };
+            deployDev = pkgs.writeShellApplication {
+              name = "deployDev";
+              runtimeInputs = with pkgs; [doppler skopeo flyctl cacert];
+              bashOptions = ["errexit" "pipefail"];
+              text = ''
+                set -e
+                [ -z "$GHCR_TOKEN" ] && GHCR_TOKEN="$(doppler secrets get --plain GHCR_TOKEN)"
+                TOKEN="$GHCR_TOKEN"
+
+                REGISTRY="ghcr.io/conneroisu/conneroh.com"
+                echo "Copying image to $REGISTRY"
+                skopeo copy \
+                  --insecure-policy \
+                  docker-archive:"${self.packages."${system}".devContainer}" \
+                  "docker://$REGISTRY:${tag}" \
+                  --dest-creds x:"$TOKEN" \
+                  --format v2s2
+              '';
+            };
           }
-          // pkgs.lib.genAttrs (builtins.attrNames flake-scripts.scripts) (name: scriptPackages.${name});
+          // pkgs.lib.genAttrs (builtins.attrNames flake-scripts.scripts) (
+            name: scriptPackages.${name}
+          );
       }
     );
 }
