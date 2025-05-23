@@ -106,8 +106,8 @@ func UploadToS3(
 	return nil
 }
 
-// credHandler is the bucket for the api security.
-// It implements the aws.Authenitcator.
+// credHandler is the bucket for the API security.
+// It implements the aws.CredentialsProvider interface.
 type credHandler struct {
 	id  string
 	key string
