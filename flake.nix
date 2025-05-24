@@ -144,6 +144,10 @@
                 coreutils-full
                 toybox
                 curl
+                getent # Required by devcontainers for user listing
+                bashInteractive # Full bash shell (not just sh)
+                shadow # User management utilities
+                sudo
                 wget
                 docker
                 git
@@ -233,11 +237,11 @@
           flyProdToml = settingsFormat.generate "fly.toml" flyProdConfig;
           alpine = pkgs.dockerTools.pullImage {
             imageName = "alpine";
-            imageDigest = "sha256:115731bab0862031b44766733890091c17924f9b7781b79997f5f163be262178";
+            imageDigest = "sha256:a8560b36e8b8210634f77d9f7f9efd7ffa463e380b75e2e74aff4511df3ef88c";
             arch = "amd64";
             sha256 = "sha256-Eb4oYIKZOj6lg8ej+/4sFFCvvJtrzwjKRjtBQG8CHJQ=";
           };
-          tag = "v6";
+          tag = "v7";
         in
           {
             devShellBin = msb.lib.mkShellBin {
@@ -249,9 +253,32 @@
               name = "devContainer";
               fromImage = alpine;
               tag = "latest";
+              runAsRoot = ''
+                #!${pkgs.runtimeShell}
+                ${pkgs.dockerTools.shadowSetup}
+
+                # Create vscode group and user with UID 1000
+                groupadd -r -g 1000 vscode
+                useradd -r -g vscode -u 1000 vscode -m -s ${pkgs.bashInteractive}/bin/bash
+
+                # Create home directory with proper permissions
+                mkdir -p /home/vscode
+                chown -R vscode:vscode /home/vscode
+
+                # Optional: Add sudo access (common in devcontainers)
+                mkdir -p /etc/sudoers.d
+                echo "vscode ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/vscode
+                chmod 0440 /etc/sudoers.d/vscode
+              '';
               config = {
                 entrypoint = [
                   "${self.packages.${system}.devShellBin}/bin/nix-shell-env-shell"
+                ];
+                User = "vscode";
+                WorkingDir = "/home/vscode";
+                Env = [
+                  "USER=vscode"
+                  "HOME=/home/vscode"
                 ];
               };
             };

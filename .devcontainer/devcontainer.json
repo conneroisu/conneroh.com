@@ -1,6 +1,6 @@
 {
   "name": "Conner Ohnesorge Portfolio Remote Dev Environment",
-  "image": "ghcr.io/conneroisu/conneroh.com:v6",
+  "image": "ghcr.io/conneroisu/conneroh.com:v7",
   "features": {},
   "customizations": {
     "vscode": {
