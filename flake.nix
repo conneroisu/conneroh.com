@@ -141,6 +141,7 @@
               shell-packages
               ++ (with pkgs; [
                 # Container Deps
+                nix
                 coreutils-full
                 toybox
                 curl
@@ -154,10 +155,13 @@
                 gnugrep
                 gnused
                 jq
-                nix
                 skopeo
                 util-linux
                 gh
+                code
+                code-server
+                gnugrep
+                gnused
               ]);
           };
         };
@@ -241,7 +245,7 @@
             arch = "amd64";
             sha256 = "sha256-Eb4oYIKZOj6lg8ej+/4sFFCvvJtrzwjKRjtBQG8CHJQ=";
           };
-          tag = "v7";
+          tag = "v8";
         in
           {
             devShellBin = msb.lib.mkShellBin {
@@ -256,16 +260,13 @@
               runAsRoot = ''
                 #!${pkgs.runtimeShell}
                 ${pkgs.dockerTools.shadowSetup}
-
                 # Create vscode group and user with UID 1000
                 groupadd -r -g 1000 vscode
                 useradd -r -g vscode -u 1000 vscode -m -s ${pkgs.bashInteractive}/bin/bash
-
                 # Create home directory with proper permissions
                 mkdir -p /home/vscode
                 chown -R vscode:vscode /home/vscode
-
-                # Optional: Add sudo access (common in devcontainers)
+                # Add sudo access
                 mkdir -p /etc/sudoers.d
                 echo "vscode ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/vscode
                 chmod 0440 /etc/sudoers.d/vscode
