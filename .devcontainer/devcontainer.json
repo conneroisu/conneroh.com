@@ -1,17 +1,15 @@
 {
   "$schema": "https://gist.githubusercontent.com/conneroisu/809b4e2f683f3836321b41c77ff8e262/raw/6838b547ade7c3c27c5c715966ff16eaf39f578d/devcontainer-schema",
   "name": "Conner Ohnesorge Portfolio Remote Dev Environment",
-  "image": "ghcr.io/conneroisu/conneroh.com:v8",
-  "features": {
-    "ghcr.io/devcontainers/features/sshd:1": {
-      "version": "latest"
-    }
-  },
+  "image": "ghcr.io/zombiezen/codespaces-nix",
+  "onCreateCommand": "direnv allow",
+  "waitFor": "onCreateCommand",
   "customizations": {
     "vscode": {
       "extensions": [
         "VisualStudioExptTeam.vscodeintellicode",
         "github.copilot",
+        "vscodevim.vim",
         "github.copilot-chat",
         "golang.go",
         "a-h.templ",
@@ -38,17 +36,6 @@
         "formulahendry.auto-close-tag"
       ],
       "settings": {
-        "terminal.integrated.defaultProfile.linux": "bash",
-        "terminal.integrated.profiles.linux": {
-          "bash": {
-            "path": "/bin/bash",
-            "args": []
-          },
-          "dev-shell": {
-            "path": "/usr/local/bin/dev",
-            "args": []
-          }
-        },
         "go.toolsManagement.autoUpdate": true,
         "go.useLanguageServer": true,
         "go.lintTool": "golangci-lint",
@@ -67,20 +54,6 @@
         "tailwindCSS.includeLanguages": {
           "templ": "html"
         },
-        "tailwindCSS.experimental.classRegex": [
-          [
-            "class\\s*:\\s*\"([^\"]*)",
-            "\"([^\"]*)\""
-          ],
-          [
-            "class\\s*=\\s*\"([^\"]*)",
-            "\"([^\"]*)\""
-          ],
-          [
-            "tw\\(['\"`]([^'\"`]*)['\"`]\\)",
-            "([^'\"`]*)"
-          ]
-        ],
         "nix.enableLanguageServer": true,
         "nix.serverPath": "nixd",
         "editor.defaultFormatter": "kamadorueda.alejandra",
@@ -111,12 +84,6 @@
       }
     }
   },
-  "remoteUser": "vscode",
-  "workspaceFolder": "/workspace",
-  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
-  "mounts": [
-    "source=${localWorkspaceFolder}/.devcontainer/.bashrc,target=/home/vscode/.bashrc,type=bind,consistency=cached"
-  ],
   "forwardPorts": [
     8080,
     3000,
