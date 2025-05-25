@@ -22,6 +22,7 @@
           overlays = [
             (final: prev: {final.go = prev.go_1_24;})
           ];
+          config.allowUnfree = true;
         };
 
         buildWithSpecificGo = pkg: pkg.override {buildGoModule = pkgs.buildGo124Module;};
@@ -158,7 +159,7 @@
                 skopeo
                 util-linux
                 gh
-                code
+                vscode
                 code-server
                 gnugrep
                 gnused
