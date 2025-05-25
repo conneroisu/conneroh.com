@@ -98,6 +98,7 @@
               flyctl # Infra
               openssl.dev
               skopeo
+              git-bug
 
               (
                 pkgs.buildGoModule rec {
