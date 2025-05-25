@@ -6,13 +6,11 @@
     systems.url = "github:nix-systems/default";
     bun2nix.url = "github:baileyluTCD/bun2nix";
     flake-utils.url = "github:numtide/flake-utils";
-    msb.url = "github:rrbutani/nix-mk-shell-bin";
   };
 
   outputs = inputs @ {
     self,
     flake-utils,
-    msb,
     ...
   }:
     flake-utils.lib.eachSystem ["x86_64-linux" "aarch64-linux" "aarch64-darwin"] (
@@ -137,35 +135,6 @@
             inherit shellHook env;
             packages = shell-packages;
           };
-          devcontainer = pkgs.mkShell {
-            inherit shellHook env;
-            packages =
-              shell-packages
-              ++ (with pkgs; [
-                # Container Deps
-                nix
-                coreutils-full
-                toybox
-                curl
-                getent # Required by devcontainers for user listing
-                bashInteractive # Full bash shell (not just sh)
-                shadow # User management utilities
-                sudo
-                wget
-                docker
-                git
-                gnugrep
-                gnused
-                jq
-                skopeo
-                util-linux
-                gh
-                vscode
-                code-server
-                gnugrep
-                gnused
-              ]);
-          };
         };
 
         packages = let
@@ -241,50 +210,8 @@
 
           flyDevToml = settingsFormat.generate "fly.dev.toml" flyDevConfig;
           flyProdToml = settingsFormat.generate "fly.toml" flyProdConfig;
-          alpine = pkgs.dockerTools.pullImage {
-            imageName = "alpine";
-            imageDigest = "sha256:a8560b36e8b8210634f77d9f7f9efd7ffa463e380b75e2e74aff4511df3ef88c";
-            arch = "amd64";
-            sha256 = "sha256-Eb4oYIKZOj6lg8ej+/4sFFCvvJtrzwjKRjtBQG8CHJQ=";
-          };
-          tag = "v8";
         in
           {
-            devShellBin = msb.lib.mkShellBin {
-              drv = self.devShells.${system}.devcontainer;
-              nixpkgs = pkgs;
-              bashPrompt = "[conneroh]$ ";
-            };
-            devContainer = pkgs.dockerTools.buildImage {
-              name = "devContainer";
-              fromImage = alpine;
-              tag = "latest";
-              runAsRoot = ''
-                #!${pkgs.runtimeShell}
-                ${pkgs.dockerTools.shadowSetup}
-                # Create vscode group and user with UID 1000
-                groupadd -r -g 1000 vscode
-                useradd -r -g vscode -u 1000 vscode -m -s ${pkgs.bashInteractive}/bin/bash
-                # Create home directory with proper permissions
-                mkdir -p /home/vscode
-                chown -R vscode:vscode /home/vscode
-                # Add sudo access
-                mkdir -p /etc/sudoers.d
-                echo "vscode ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/vscode
-                chmod 0440 /etc/sudoers.d/vscode
-              '';
-              config = {
-                entrypoint = [
-                  "${self.packages.${system}.devShellBin}/bin/nix-shell-env-shell"
-                ];
-                User = "vscode";
-                WorkingDir = "/home/vscode";
-                Env = [
-                  "USER=vscode"
-                  "HOME=/home/vscode"
-                ];
-              };
-            };
             conneroh = pkgs.buildGoModule {
               inherit src version preBuild;
               vendorHash = "sha256-DYqIBhMpuNc62m9fCU7T6Sl17tmpTztD70qG1OGUEN8=";
@@ -354,25 +281,6 @@
                   -c "$CONFIG_FILE" \
                   -i "$REGISTRY:latest" \
                   -t "$TOKEN"
-              '';
-            };
-            deployDev = pkgs.writeShellApplication {
-              name = "deployDev";
-              runtimeInputs = with pkgs; [doppler skopeo flyctl cacert];
-              bashOptions = ["errexit" "pipefail"];
-              text = ''
-                set -e
-                [ -z "$GHCR_TOKEN" ] && GHCR_TOKEN="$(doppler secrets get --plain GHCR_TOKEN)"
-                TOKEN="$GHCR_TOKEN"
-
-                REGISTRY="ghcr.io/conneroisu/conneroh.com"
-                echo "Copying image to $REGISTRY"
-                skopeo copy \
-                  --insecure-policy \
-                  docker-archive:"${self.packages."${system}".devContainer}" \
-                  "docker://$REGISTRY:${tag}" \
-                  --dest-creds x:"$TOKEN" \
-                  --format v2s2
               '';
             };
           }
