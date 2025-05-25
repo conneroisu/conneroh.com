@@ -1,7 +1,12 @@
 {
+  "$schema": "https://gist.githubusercontent.com/conneroisu/809b4e2f683f3836321b41c77ff8e262/raw/6838b547ade7c3c27c5c715966ff16eaf39f578d/devcontainer-schema",
   "name": "Conner Ohnesorge Portfolio Remote Dev Environment",
-  "image": "ghcr.io/conneroisu/conneroh.com:v7",
-  "features": {},
+  "image": "ghcr.io/conneroisu/conneroh.com:v8",
+  "features": {
+    "ghcr.io/devcontainers/features/sshd:1": {
+      "version": "latest"
+    }
+  },
   "customizations": {
     "vscode": {
       "extensions": [
@@ -136,8 +141,5 @@
       "onAutoForward": "silent"
     }
   },
-  "postCreateCommand": "echo 'Container setup complete! Run \"dev\" to enter the development shell.'",
-  "containerEnv": {
-    "TZ": "UTC"
-  }
+  "postCreateCommand": "echo 'Container setup complete! Run \"dev\" to enter the development shell.'"
 }
