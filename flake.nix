@@ -322,6 +322,7 @@
                     local registry="registry.fly.io/''${app_name}"
                     echo "Copying image to ''${registry}..."
 
+                    echo "skopeo copy"
                     skopeo copy \
                       --insecure-policy \
                       docker-archive:"${self.packages."${system}".C-conneroh}" \
@@ -329,7 +330,8 @@
                       --format v2s2 \
                       --dest-creds x:"$MASTER_FLY_AUTH_TOKEN"
 
-                    # Deploy
+                    echo "flyctl deploy"
+                      # Deploy
                     flyctl deploy \
                       --app "''${app_name}" \
                       --config fly.pr.toml \
