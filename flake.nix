@@ -361,8 +361,8 @@
 
                     echo "Destroying app: ''${app_name}"
 
-                    if flyctl apps list --json | jq -e ".[] | select(.Name == \"''${app_name}\")" > /dev/null; then
-                        flyctl apps destroy "''${app_name}" --yes
+                    if flyctl apps list -t "$MASTER_FLY_AUTH_TOKEN" --json | jq -e ".[] | select(.Name == \"''${app_name}\")" > /dev/null; then
+                        flyctl apps destroy "''${app_name}" --yes -t "$MASTER_FLY_AUTH_TOKEN"
                         echo "App ''${app_name} destroyed successfully"
                     else
                         echo "App ''${app_name} not found, nothing to destroy"
