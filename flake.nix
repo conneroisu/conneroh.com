@@ -337,6 +337,7 @@
                       --config fly.pr.toml \
                       --image "''${registry}:latest" \
                       --remote-only \
+                      -t "$MASTER_FLY_AUTH_TOKEN"
                       "$@"
 
                     # Output deployment information
