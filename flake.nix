@@ -238,10 +238,10 @@
               bashOptions = ["errexit" "pipefail"];
               text = ''
                 set -e
-                
+
                 # This script now only deploys to production
                 # For PR/dev deployments, use the pr-preview package
-                
+
                 [ -z "$FLY_AUTH_TOKEN" ] && FLY_AUTH_TOKEN="$(doppler secrets get --plain FLY_AUTH_TOKEN)"
                 TOKEN="$FLY_AUTH_TOKEN"
                 export FLY_NAME="conneroh-com"
@@ -269,41 +269,41 @@
             # PR Preview deployment script
             pr-preview = pkgs.writeShellScriptBin "pr-preview" ''
                 set -euo pipefail
-                
+
                 # Add required tools to PATH
                 export PATH="${pkgs.lib.makeBinPath (with pkgs; [flyctl skopeo jq git gnused coreutils])}:$PATH"
-                
+
                 # Script configuration
                 readonly APP_PREFIX="pr"
                 readonly FLY_ORG="''${FLY_ORG:-personal}"
                 readonly FLY_REGION="''${FLY_REGION:-ord}"
-                
+
                 # Functions
                 generate_app_name() {
                     local pr_number="$1"
                     echo "''${APP_PREFIX}-''${pr_number}-conneroh-com" | tr '[:upper:]' '[:lower:]'
                 }
-                
+
                 deploy_pr_app() {
                     local pr_number="$1"
                     shift
-                    
+
                     local app_name
                     app_name=$(generate_app_name "$pr_number")
-                    
+
                     echo "Deploying PR #''${pr_number} to app: ''${app_name}"
-                    
+
                     # Check if app exists
                     if ! flyctl apps list --json | jq -e ".[] | select(.Name == \"''${app_name}\")" > /dev/null; then
                         echo "Creating new app: ''${app_name}"
-                        flyctl apps create "''${app_name}" --org "''${FLY_ORG}"
+                        flyctl apps create "''${app_name}" --org "''${FLY_ORG}" -t "$MASTER_FLY_AUTH_TOKEN"
                     fi
-                    
+
                     # Create fly.toml for PR preview
                     cat > fly.pr.toml <<EOF
                 app = "''${app_name}"
                 primary_region = "''${FLY_REGION}"
-                
+
                 [http_service]
                   internal_port = ${toString internal_port}
                   force_https = ${if force_https then "true" else "false"}
@@ -311,23 +311,23 @@
                   auto_start_machines = true
                   min_machines_running = 0
                   processes = ["app"]
-                
+
                 [[vm]]
                   memory = "512M"
                   cpu_kind = "shared"
                   cpus = 1
                 EOF
-                    
+
                     # Copy image to Fly.io registry
                     local registry="registry.fly.io/''${app_name}"
                     echo "Copying image to ''${registry}..."
-                    
+
                     skopeo copy \
                       --insecure-policy \
                       docker-archive:"${self.packages."${system}".C-conneroh}" \
                       "docker://''${registry}:latest" \
                       --dest-creds x:"''${MASTER_FLY_AUTH_TOKEN}"
-                    
+
                     # Deploy
                     flyctl deploy \
                       --app "''${app_name}" \
@@ -335,11 +335,11 @@
                       --image "''${registry}:latest" \
                       --remote-only \
                       "$@"
-                    
+
                     # Output deployment information
                     echo "Deployment complete!"
                     echo "URL: https://''${app_name}.fly.dev"
-                    
+
                     # Get deployment details
                     flyctl status --app "''${app_name}" --json | jq '{
                         app: .Name,
@@ -348,15 +348,15 @@
                         status: .DeploymentStatus.Status
                     }'
                 }
-                
+
                 destroy_pr_app() {
                     local pr_number="$1"
-                    
+
                     local app_name
                     app_name=$(generate_app_name "$pr_number")
-                    
+
                     echo "Destroying app: ''${app_name}"
-                    
+
                     if flyctl apps list --json | jq -e ".[] | select(.Name == \"''${app_name}\")" > /dev/null; then
                         flyctl apps destroy "''${app_name}" --yes
                         echo "App ''${app_name} destroyed successfully"
@@ -364,7 +364,7 @@
                         echo "App ''${app_name} not found, nothing to destroy"
                     fi
                 }
-                
+
                 # Main command handling
                 case "''${1:-}" in
                     deploy)
