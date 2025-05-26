@@ -248,8 +248,8 @@
                 export CONFIG_FILE=${flyProdToml}
 
                 REGISTRY="registry.fly.io/$FLY_NAME"
-                echo "Copying image to Fly.io... to $REGISTRY"
 
+                echo "Copying image to Fly.io... to $REGISTRY"
                 skopeo copy \
                   --insecure-policy \
                   docker-archive:"${self.packages."${system}".C-conneroh}" \
@@ -325,23 +325,24 @@
                     skopeo copy \
                       --insecure-policy \
                       docker-archive:"${self.packages."${system}".C-conneroh}" \
-                      "docker://''${registry}:latest" \
+                      "docker://$registry:latest" \
+                      --format v2s2 \
                       --dest-creds x:"$MASTER_FLY_AUTH_TOKEN"
 
                     # Deploy
                     flyctl deploy \
-                      --app "''${app_name}" \
+                      --app "${app_name}" \
                       --config fly.pr.toml \
-                      --image "''${registry}:latest" \
+                      --image "$registry:latest" \
                       --remote-only \
                       "$@"
 
                     # Output deployment information
                     echo "Deployment complete!"
-                    echo "URL: https://''${app_name}.fly.dev"
+                    echo "URL: https://$app_name.fly.dev"
 
                     # Get deployment details
-                    flyctl status --app "''${app_name}" --json | jq '{
+                    flyctl status --app "$app_name" --json | jq '{
                         app: .Name,
                         url: "https://\(.Name).fly.dev",
                         version: .DeploymentStatus.Version,
@@ -355,18 +356,18 @@
                     local app_name
                     app_name=$(generate_app_name "$pr_number")
 
-                    echo "Destroying app: ''${app_name}"
+                    echo "Destroying app: $app_name"
 
-                    if flyctl apps list --json | jq -e ".[] | select(.Name == \"''${app_name}\")" > /dev/null; then
-                        flyctl apps destroy "''${app_name}" --yes
-                        echo "App ''${app_name} destroyed successfully"
+                    if flyctl apps list --json | jq -e ".[] | select(.Name == \"$app_name\")" > /dev/null; then
+                        flyctl apps destroy "$app_name" --yes
+                        echo "App $app_name destroyed successfully"
                     else
-                        echo "App ''${app_name} not found, nothing to destroy"
+                        echo "App $app_name not found, nothing to destroy"
                     fi
                 }
 
                 # Main command handling
-                case "''${1:-}" in
+                case "$1:-}" in
                     deploy)
                         shift
                         deploy_pr_app "$@"
