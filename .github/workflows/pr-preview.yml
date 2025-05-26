@@ -22,7 +22,7 @@ jobs:
       - name: Deploy PR Preview
         run: |
           echo "Deploying PR #${{ github.event.pull_request.number }} preview..."
-          nix run --accept-flake-config .#pr-preview -- deploy ${{ github.event.pull_request.number }}
+          nix run --accept-flake-config .#pr-preview deploy ${{ github.event.pull_request.number }}
 
         env:
           MASTER_FLY_AUTH_TOKEN: ${{ secrets.MASTER_FLY_AUTH_TOKEN }}
