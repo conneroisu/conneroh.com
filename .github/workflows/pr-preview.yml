@@ -82,7 +82,7 @@ jobs:
           echo "Destroying PR #${{ github.event.pull_request.number }} preview..."
           nix run --accept-flake-config .#pr-preview -- destroy ${{ github.event.pull_request.number }}
         env:
-          FLY_API_TOKEN: ${{ secrets.FLY_DEV_AUTH_TOKEN }}
+          MASTER_FLY_AUTH_TOKEN: ${{ secrets.MASTER_FLY_AUTH_TOKEN }}
           FLY_ORG: personal
 
       - name: Comment deployment removal
