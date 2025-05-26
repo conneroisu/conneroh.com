@@ -345,7 +345,7 @@
                     echo "URL: https://''${app_name}.fly.dev"
 
                     # Get deployment details
-                    flyctl status --app "''${app_name}" --json | jq '{
+                    flyctl status --app "''${app_name}" -t "$MASTER_FLY_AUTH_TOKEN" --json | jq '{
                         app: .Name,
                         url: "https://\(.Name).fly.dev",
                         version: .DeploymentStatus.Version,
