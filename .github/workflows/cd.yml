@@ -3,9 +3,6 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
   workflow_dispatch: {}
 permissions:
   contents: read
@@ -14,7 +11,6 @@ permissions:
 jobs:
   deploy-prod:
     name: Deploy To Production
-    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -22,20 +18,6 @@ jobs:
       - name: Deploy to Production
         run: |
           echo "Deploying to Production environment on Fly.io..."
-          nix run --accept-flake-config .#deployPackage prod
+          nix run --accept-flake-config .#deployPackage
         env:
           FLY_AUTH_TOKEN: ${{ secrets.FLY_AUTH_TOKEN }}
-
-  deploy-dev:
-    name: Deploy To Development
-    if: github.ref != 'refs/heads/main'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: DeterminateSystems/nix-installer-action@main
-      - name: Deploy to Development
-        run: |
-          echo "Deploying to Development environment on Fly.io..."
-          nix run --accept-flake-config .#deployPackage dev
-        env:
-          FLY_DEV_AUTH_TOKEN: ${{ secrets.FLY_DEV_AUTH_TOKEN }}
