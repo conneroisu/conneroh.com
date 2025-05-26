@@ -294,7 +294,7 @@
                     echo "Deploying PR #''${pr_number} to app: ''${app_name}"
 
                     # Check if app exists
-                    if ! flyctl apps list --json | jq -e ".[] | select(.Name == \"''${app_name}\")" > /dev/null; then
+                    if ! flyctl apps list --json -t "$MASTER_FLY_AUTH_TOKEN" | jq -e ".[] | select(.Name == \"''${app_name}\")" > /dev/null; then
                         echo "Creating new app: ''${app_name}"
                         flyctl apps create "''${app_name}" --org "''${FLY_ORG}" -t "$MASTER_FLY_AUTH_TOKEN"
                     fi
