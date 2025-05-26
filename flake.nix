@@ -319,8 +319,8 @@
                 EOF
 
                     # Copy image to Fly.io registry
-                    local registry="registry.fly.io/''${app_name}"
-                    echo "Copying image to ''${registry}..."
+                    local registry="registry.fly.io/$app_name"
+                    echo "Copying image to $registry..."
 
                     skopeo copy \
                       --insecure-policy \
@@ -331,7 +331,7 @@
 
                     # Deploy
                     flyctl deploy \
-                      --app "${app_name}" \
+                      --app "$app_name" \
                       --config fly.pr.toml \
                       --image "$registry:latest" \
                       --remote-only \
