@@ -326,7 +326,7 @@
                       --insecure-policy \
                       docker-archive:"${self.packages."${system}".C-conneroh}" \
                       "docker://''${registry}:latest" \
-                      --format v2s2
+                      --format v2s2 \
                       --dest-creds x:"$MASTER_FLY_AUTH_TOKEN"
 
                     # Deploy
