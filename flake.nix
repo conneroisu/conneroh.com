@@ -326,7 +326,7 @@
                       --insecure-policy \
                       docker-archive:"${self.packages."${system}".C-conneroh}" \
                       "docker://''${registry}:latest" \
-                      --dest-creds x:"''${MASTER_FLY_AUTH_TOKEN}"
+                      --dest-creds x:"$MASTER_FLY_AUTH_TOKEN"
 
                     # Deploy
                     flyctl deploy \
