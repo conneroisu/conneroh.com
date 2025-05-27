@@ -150,9 +150,7 @@
             exec = rooted ''
               cd "$REPO_ROOT" && air
             '';
-            env = {
-              DEBUG = "true";
-            };
+            env.DEBUG = "true";
             deps = with pkgs; [air git];
             description = "Run the application with air for hot reloading";
           };
@@ -160,9 +158,7 @@
             exec = ''
               go run ./cmd/live-ci/main.go
             '';
-            env = {
-              DEBUG = "true";
-            };
+            env.DEBUG = "true";
             deps = with pkgs;
               [
                 playwright-driver # Browser Archives and Driver Scripts
@@ -211,7 +207,7 @@
                 inherit name;
                 text = script.exec;
                 runtimeInputs = script.deps or [];
-                env = script.env or {};
+                runtimeEnv = script.env or {};
               }
           )
           scripts;
