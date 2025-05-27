@@ -498,11 +498,7 @@
 
               [http_service]
                 internal_port = ${toString internal_port}
-                force_https = ${
-                if force_https
-                then "true"
-                else "false"
-              }
+                force_https = true
                 auto_stop_machines = "stop"
                 auto_start_machines = true
                 min_machines_running = 0
