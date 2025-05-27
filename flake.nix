@@ -24,13 +24,21 @@
         };
 
         buildWithSpecificGo = pkg: pkg.override {buildGoModule = pkgs.buildGo124Module;};
+        rooted = exec:
+          builtins.concatStringsSep "\n"
+          [
+            ''
+              REPO_ROOT="$(git rev-parse --show-toplevel)"
+            ''
+            exec
+          ];
         scripts = {
           dx = {
-            exec = ''$EDITOR "$(git rev-parse --show-toplevel)"/flake.nix'';
+            exec = rooted ''$EDITOR "$REPO_ROOT"/flake.nix'';
             description = "Edit flake.nix";
           };
           gx = {
-            exec = ''$EDITOR "$(git rev-parse --show-toplevel)"/go.mod'';
+            exec = rooted ''$EDITOR "$REPO_ROOT"/go.mod'';
             description = "Edit go.mod";
           };
           clean = {
@@ -38,16 +46,14 @@
             description = "Clean Project";
           };
           tests = {
-            exec = ''
-              REPO_ROOT="$(git rev-parse --show-toplevel)"
+            exec = rooted ''
               go test -v "$REPO_ROOT"/...
             '';
             deps = [pkgs.go];
             description = "Run all go tests";
           };
           lint = {
-            exec = ''
-              REPO_ROOT="$(git rev-parse --show-toplevel)"
+            exec = rooted ''
               templ generate "$REPO_ROOT"
               golangci-lint run "$REPO_ROOT"
               statix check "$REPO_ROOT"
@@ -58,8 +64,7 @@
             description = "Run Nix/Go/Rust Linting Steps.";
           };
           generate-css = {
-            exec = ''
-              REPO_ROOT="$(git rev-parse --show-toplevel)"
+            exec = rooted ''
               templ generate --log-level error "$REPO_ROOT"
               go run "$REPO_ROOT"/cmd/update-css --cwd "$REPO_ROOT"
               tailwindcss -i ./input.css \
@@ -70,13 +75,12 @@
             description = "Update the generated html and css files.";
           };
           generate-db = {
-            exec = ''doppler run -- go run "$(git rev-parse --show-toplevel)"/cmd/update'';
+            exec = rooted ''doppler run -- go run "$REPO_ROOT"/cmd/update'';
             deps = with pkgs; [doppler];
             description = "Update the generated go files from the md docs.";
           };
           generate-reload = {
-            exec = ''
-              REPO_ROOT="$(git rev-parse --show-toplevel)"
+            exec = rooted ''
               TEMPL_HASH=$(nix-hash --type sha256 --base32 "$REPO_ROOT"/cmd/conneroh/**/*.templ | sha256sum | cut -d' ' -f1)
               OLD_TEMPL_HASH=$(cat "$REPO_ROOT"/internal/cache/templ.hash)
               DOCS_HASH=$(nix-hash --type sha256 --base32 ./internal/data/**/*.md | sha256sum | cut -d' ' -f1)
@@ -97,8 +101,7 @@
             description = "Code Generation Steps for specific directory changes.";
           };
           generate-js = {
-            exec = ''
-              REPO_ROOT="$(git rev-parse --show-toplevel)"
+            exec = rooted ''
               bun build "$REPO_ROOT"/index.js \
                 --minify \
                 --minify-syntax \
@@ -120,9 +123,8 @@
             description = "Generate all files in parallel";
           };
           format = {
-            exec = ''
-              cd "$(git rev-parse --show-toplevel)"
-              go fmt ./...
+            exec = rooted ''
+              go fmt "$REPO_ROOT"/...
               git ls-files \
                   --others \
                   --exclude-standard \
@@ -134,22 +136,23 @@
                   -w \
                   --max-len=80 \
                   --shorten-comments \
-                  --ignored-dirs=.direnv .
-              cd -
+                  --ignored-dirs=.direnv "$REPO_ROOT"
             '';
             deps = with pkgs; [go git golines];
             description = "Format code files";
           };
           generate-templates = {
-            exec = ''templ generate "$(git rev-parse --show-toplevel)"'';
+            exec = ''templ generate "$REPO_ROOT"'';
             deps = with pkgs; [templ];
             description = "Generate templates";
           };
           run = {
-            exec = ''
-              export DEBUG=true
-              cd "$(git rev-parse --show-toplevel)" && air
+            exec = rooted ''
+              cd "$REPO_ROOT" && air
             '';
+            env = {
+              DEBUG = "true";
+            };
             deps = with pkgs; [air git];
             description = "Run the application with air for hot reloading";
           };
@@ -208,13 +211,13 @@
                 inherit name;
                 text = script.exec;
                 runtimeInputs = script.deps or [];
+                env = script.env or {};
               }
           )
           scripts;
       in {
         devShells = let
           shellHook = ''
-            export REPO_ROOT=$(git rev-parse --show-toplevel)
             echo "Available commands:"
             ${pkgs.lib.concatStringsSep "\n" (
               pkgs.lib.mapAttrsToList (name: script: ''echo "  ${name} - ${script.description}"'') scripts
