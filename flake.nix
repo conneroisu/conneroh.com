@@ -453,6 +453,9 @@
               readonly FLY_ORG="''${FLY_ORG:-personal}"
               readonly FLY_REGION="''${FLY_REGION:-ord}"
 
+              [ -z "$MASTER_FLY_AUTH_TOKEN" ] && MASTER_FLY_AUTH_TOKEN="$(doppler secrets get --plain MASTER_FLY_AUTH_TOKEN)"
+              fly auth login -t "$MASTER_FLY_AUTH_TOKEN"
+
               # Functions
               generate_app_name() {
                   local pr_number="$1"
