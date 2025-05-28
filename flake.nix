@@ -469,7 +469,7 @@
 
                   echo "Destroying app: ''${app_name}"
 
-                  if flyctl apps list -t "$MASTER_FLY_AUTH_TOKEN" --json | jq -e ".[] | select(.Name == \"''${app_name}\")" > /dev/null; then
+                  if flyctl apps list --json -t "$MASTER_FLY_AUTH_TOKEN" | jq -e ".[] | select(.Name == \"''${app_name}\")" > /dev/null; then
                       flyctl apps destroy -t "$MASTER_FLY_AUTH_TOKEN" "''${app_name}" --yes
                       echo "App ''${app_name} destroyed successfully"
                   else
@@ -535,7 +535,7 @@
                   echo "URL: https://''${app_name}.fly.dev"
 
                   # Get deployment details
-                  flyctl status --app -t "$MASTER_FLY_AUTH_TOKEN" "''${app_name}" --json | jq '{
+                  flyctl status --app "''${app_name}" --json -t "$MASTER_FLY_AUTH_TOKEN" | jq '{
                       app: .Name,
                       url: "https://\(.Name).fly.dev",
                       version: .DeploymentStatus.Version,
