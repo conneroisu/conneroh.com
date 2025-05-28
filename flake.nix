@@ -67,7 +67,7 @@
             exec = rooted ''
               templ generate --log-level error "$REPO_ROOT"
               go run "$REPO_ROOT"/cmd/update-css --cwd "$REPO_ROOT"
-              tailwindcss -i ./input.css \
+              tailwindcss -i "$REPO_ROOT"/input.css \
                   -o "$REPO_ROOT"/cmd/conneroh/_static/dist/style.css \
                   --cwd "$REPO_ROOT"
             '';
