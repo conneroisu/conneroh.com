@@ -18,6 +18,12 @@
     url = "https://registry.npmjs.org/@ampproject/remapping/-/remapping-2.3.0.tgz";
     hash = "sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==";
   };
+  "@imacrayon/alpine-ajax" = {
+    out_path = "@imacrayon/alpine-ajax";
+    name = "@imacrayon/alpine-ajax@0.12.2";
+    url = "https://registry.npmjs.org/@imacrayon/alpine-ajax/-/alpine-ajax-0.12.2.tgz";
+    hash = "sha512-X9U4wOgHcokUqSzTfad7TW33f4Vw/+VPZFTFzHzb2gO+57smtD8SrkTtaYdyZeEWwY0dyP5ZLhYfeOr5c9uPSw==";
+  };
   "@isaacs/fs-minipass" = {
     out_path = "@isaacs/fs-minipass";
     name = "@isaacs/fs-minipass@4.0.1";
@@ -383,18 +389,6 @@
     name = "graceful-fs@4.2.11";
     url = "https://registry.npmjs.org/graceful-fs/-/graceful-fs-4.2.11.tgz";
     hash = "sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==";
-  };
-  "htmx-ext-preload" = {
-    out_path = "htmx-ext-preload";
-    name = "htmx-ext-preload@2.1.1";
-    url = "https://registry.npmjs.org/htmx-ext-preload/-/htmx-ext-preload-2.1.1.tgz";
-    hash = "sha512-Gm9NJTMgbR4OAhZ8a4abkBSVccuI+yCVJs5Nrsn2mWDv+Ha5bSwSw8Bc4Y8D+TCaeNSFd8Qz/fe1sqBIVmv0GA==";
-  };
-  "htmx.org" = {
-    out_path = "htmx.org";
-    name = "htmx.org@2.0.4";
-    url = "https://registry.npmjs.org/htmx.org/-/htmx.org-2.0.4.tgz";
-    hash = "sha512-HLxMCdfXDOJirs3vBZl/ZLoY+c7PfM4Ahr2Ad4YXh6d22T5ltbTXFFkpx9Tgb2vvmWFMbIc3LqN2ToNkZJvyYQ==";
   };
   "is-extglob" = {
     out_path = "is-extglob";

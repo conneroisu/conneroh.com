@@ -1,5 +1,4 @@
-import "htmx.org";
-import "htmx-ext-preload";
+import ajax from "@imacrayon/alpine-ajax";
 import Alpine from "alpinejs";
 import intersect from "@alpinejs/intersect";
 import anchor from "@alpinejs/anchor";
@@ -15,16 +14,15 @@ window.Alpine = Alpine;
 
 Alpine.plugin(intersect);
 Alpine.plugin(anchor);
+Alpine.plugin(ajax);
 Alpine.start();
 
-import htmx from "htmx.org";
-
-htmx.config.globalViewTransitions = true;
-
-// Scroll to top when HTMX replaces main content
-document.addEventListener('htmx:afterSwap', function(event) {
-  // Check if the swapped element is the main content area
-  if ((event as any).detail.target.id === 'bodiody') {
+// Scroll to top when Alpine AJAX replaces main content
+document.addEventListener('ajax:after', function(event) {
+  // Check if any of the rendered targets is the main content area
+  const targets = (event as any).detail.render || [];
+  const hasMainContent = targets.some((target: any) => target?.id === 'bodiody');
+  if (hasMainContent) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 });
