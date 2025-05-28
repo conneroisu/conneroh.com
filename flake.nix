@@ -454,7 +454,6 @@
               readonly FLY_REGION="''${FLY_REGION:-ord}"
 
               [ -z "$MASTER_FLY_AUTH_TOKEN" ] && MASTER_FLY_AUTH_TOKEN="$(doppler secrets get --plain MASTER_FLY_AUTH_TOKEN)"
-              fly auth login -t "$MASTER_FLY_AUTH_TOKEN"
 
               # Functions
               generate_app_name() {
@@ -470,8 +469,8 @@
 
                   echo "Destroying app: ''${app_name}"
 
-                  if flyctl apps list --json | jq -e ".[] | select(.Name == \"''${app_name}\")" > /dev/null; then
-                      flyctl apps destroy "''${app_name}" --yes
+                  if flyctl apps list -t "$MASTER_FLY_AUTH_TOKEN" --json | jq -e ".[] | select(.Name == \"''${app_name}\")" > /dev/null; then
+                      flyctl apps destroy -t "$MASTER_FLY_AUTH_TOKEN" "''${app_name}" --yes
                       echo "App ''${app_name} destroyed successfully"
                   else
                       echo "App ''${app_name} not found, nothing to destroy"
@@ -488,9 +487,9 @@
                   echo "Deploying PR #''${pr_number} to app: ''${app_name}"
 
                   # Check if app exists
-                  if ! flyctl apps list --json | jq -e ".[] | select(.Name == \"''${app_name}\")" > /dev/null; then
+                  if ! flyctl apps list -t "$MASTER_FLY_AUTH_TOKEN" --json | jq -e ".[] | select(.Name == \"''${app_name}\")" > /dev/null; then
                       echo "Creating new app: ''${app_name}"
-                      flyctl apps create "''${app_name}" --org "''${FLY_ORG}"
+                      flyctl apps create -t "$MASTER_FLY_AUTH_TOKEN" "''${app_name}" --org "''${FLY_ORG}"
                   fi
 
                   # Create fly.toml for PR preview
@@ -528,6 +527,7 @@
                     --config fly.pr.toml \
                     --image "''${registry}:latest" \
                     --remote-only \
+                    -t "$MASTER_FLY_AUTH_TOKEN"
                     "$@"
 
                   # Output deployment information
@@ -535,7 +535,7 @@
                   echo "URL: https://''${app_name}.fly.dev"
 
                   # Get deployment details
-                  flyctl status --app "''${app_name}" --json | jq '{
+                  flyctl status --app -t "$MASTER_FLY_AUTH_TOKEN" "''${app_name}" --json | jq '{
                       app: .Name,
                       url: "https://\(.Name).fly.dev",
                       version: .DeploymentStatus.Version,
