@@ -11,17 +11,18 @@
 # Node
 node_modules
 .env
-
-# Rust
-result
-target
-
 # Editors
 .vscode
 .idea
-
 tmp
 *.wlf
 *.log
 .DS_Store
+result
+tigris.yaml
+*.db-journal
+*.db-shm
+*.db-wal
+*_templ.go
+target
 CLAUDE.md
