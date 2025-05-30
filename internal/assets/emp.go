@@ -13,6 +13,8 @@ var (
 	EmpTag = new(Tag)
 	// EmpProject is a pointer to a Project.
 	EmpProject = new(Project)
+	// EmpEmployment is a pointer to an Employment.
+	EmpEmployment = new(Employment)
 	// EmpCache is a pointer to a Cache.
 	EmpCache = new(Cache)
 	// EmpPostToTag is a pointer to a PostToTag.
@@ -27,6 +29,14 @@ var (
 	EmpProjectToProject = new(ProjectToProject)
 	// EmpTagToTag is a pointer to a TagToTag.
 	EmpTagToTag = new(TagToTag)
+	// EmpEmploymentToTag is a pointer to an EmploymentToTag.
+	EmpEmploymentToTag = new(EmploymentToTag)
+	// EmpEmploymentToPost is a pointer to an EmploymentToPost.
+	EmpEmploymentToPost = new(EmploymentToPost)
+	// EmpEmploymentToProject is a pointer to an EmploymentToProject.
+	EmpEmploymentToProject = new(EmploymentToProject)
+	// EmpEmploymentToEmployment is a pointer to an EmploymentToEmployment.
+	EmpEmploymentToEmployment = new(EmploymentToEmployment)
 )
 
 var models = []any{
@@ -36,9 +46,14 @@ var models = []any{
 	EmpProjectToTag,
 	EmpProjectToProject,
 	EmpTagToTag,
+	EmpEmploymentToTag,
+	EmpEmploymentToPost,
+	EmpEmploymentToProject,
+	EmpEmploymentToEmployment,
 	EmpPost,
 	EmpTag,
 	EmpProject,
+	EmpEmployment,
 	EmpCache,
 }
 
@@ -70,9 +85,14 @@ func RegisterModels(db *bun.DB) {
 		(*ProjectToTag)(nil),
 		(*ProjectToProject)(nil),
 		(*TagToTag)(nil),
+		(*EmploymentToTag)(nil),
+		(*EmploymentToPost)(nil),
+		(*EmploymentToProject)(nil),
+		(*EmploymentToEmployment)(nil),
 		(*Post)(nil),
 		(*Tag)(nil),
 		(*Project)(nil),
+		(*Employment)(nil),
 		(*Cache)(nil),
 	)
 }

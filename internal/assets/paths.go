@@ -18,6 +18,8 @@ const (
 	TagsLoc = "tags/"
 	// ProjectsLoc is the location of the projects relative to the vault.
 	ProjectsLoc = "projects/"
+	// EmploymentsLoc is the location of the employments relative to the vault.
+	EmploymentsLoc = "employments/"
 )
 
 // Pathify returns the slugified path of a document or media asset.
@@ -49,6 +51,10 @@ func Slugify(s string) string {
 		return path
 	}
 	path, ok = strings.CutPrefix(s, TagsLoc)
+	if ok {
+		return path
+	}
+	path, ok = strings.CutPrefix(s, EmploymentsLoc)
 	if ok {
 		return path
 	}

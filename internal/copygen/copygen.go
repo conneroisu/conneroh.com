@@ -60,3 +60,25 @@ func ToTag(tT *assets.Tag, fD *assets.Doc) {
 	tT.ProjectSlugs = fD.ProjectSlugs
 	tT.Projects = fD.Projects
 }
+
+// ToEmployment copies a *assets.Doc to a *assets.Employment.
+func ToEmployment(tE *assets.Employment, fD *assets.Doc) {
+	// *assets.Employment fields
+	tE.X = fD.X
+	tE.Y = fD.Y
+	tE.Z = fD.Z
+	tE.Title = fD.Title
+	tE.Slug = fD.Slug
+	tE.Description = fD.Description
+	tE.Content = fD.Content
+	tE.BannerPath = fD.BannerPath
+	tE.CreatedAt = fD.CreatedAt
+	tE.TagSlugs = fD.TagSlugs
+	tE.PostSlugs = fD.PostSlugs
+	tE.ProjectSlugs = fD.ProjectSlugs
+	tE.EmploymentSlugs = fD.EmploymentSlugs
+	tE.Tags = fD.Tags
+	tE.Posts = fD.Posts
+	tE.Projects = fD.Projects
+	tE.Employments = fD.Employments
+}

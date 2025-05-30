@@ -17,6 +17,8 @@ const (
 	ProjectPluralPath PluralPath = "projects"
 	// TagsPluralPath is the target of a plural tag view.
 	TagsPluralPath PluralPath = "tags"
+	// EmploymentPluralPath is the target of a plural employment view.
+	EmploymentPluralPath PluralPath = "employments"
 )
 
 // GetPostURL returns the URL for a post.
@@ -32,6 +34,11 @@ func GetProjectURL(base string, project *assets.Project) string {
 // GetTagURL returns the URL for a tag.
 func GetTagURL(base string, tag *assets.Tag) string {
 	return fmt.Sprintf("%s/tag/%s", base, tag.Slug)
+}
+
+// GetEmploymentURL returns the URL for an employment.
+func GetEmploymentURL(base string, employment *assets.Employment) string {
+	return fmt.Sprintf("%s/employment/%s", base, employment.Slug)
 }
 
 const (

@@ -558,3 +558,233 @@ func UpsertTagRelationships(
 		return nil
 	}
 }
+
+// UpsertEmployment saves an employment to the database (to be called from the DB worker).
+func UpsertEmployment(
+	ctx context.Context,
+	db *bun.DB,
+	employment *Employment,
+) (RelationshipFn, error) {
+	insertCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+	_, err := db.NewInsert().
+		Model(employment).
+		On("CONFLICT (slug) DO UPDATE").
+		Set("title = EXCLUDED.title").
+		Set("description = EXCLUDED.description").
+		Set("content = EXCLUDED.content").
+		Set("banner_path = EXCLUDED.banner_path").
+		Set("created_at = EXCLUDED.created_at").
+		Set("x = EXCLUDED.x").
+		Set("y = EXCLUDED.y").
+		Set("z = EXCLUDED.z").
+		Exec(insertCtx)
+	slog.Debug(
+		"saved employment",
+		slog.String("slug", employment.Slug),
+		slog.String("banner_path", employment.BannerPath),
+	)
+	if err != nil {
+		if errors.Is(err, context.DeadlineExceeded) {
+			return nil, eris.Wrapf(
+				err,
+				"database operation timed out for employment: %s",
+				employment.Slug,
+			)
+		}
+
+		return nil, eris.Wrapf(err, "failed to save employment: %s", employment.Slug)
+	}
+
+	return UpsertEmploymentRelationships(db, employment), nil
+}
+
+// UpsertEmploymentRelationships updates relationships for an employment (to be called from the DB worker).
+func UpsertEmploymentRelationships(
+	db *bun.DB,
+	employment *Employment,
+) RelationshipFn {
+	return func(ctx context.Context) error {
+		var relatedTag Tag
+		for _, tagSlug := range employment.TagSlugs {
+			err := db.NewSelect().
+				Model(&relatedTag).
+				Where("slug = ?", tagSlug).
+				Scan(ctx)
+			if err != nil {
+				if errors.Is(err, context.DeadlineExceeded) {
+					return eris.Wrapf(
+						err,
+						"database operation timed out for tag: %s",
+						tagSlug,
+					)
+				}
+				if errors.Is(err, sql.ErrNoRows) {
+					return eris.Errorf(
+						"tag not found: %s (referenced from %s)",
+						tagSlug,
+						employment.Slug,
+					)
+				}
+
+				return eris.Wrapf(
+					err,
+					"failed to find tag: %s",
+					tagSlug,
+				)
+			}
+			_, err = db.NewInsert().
+				Model(&EmploymentToTag{
+					EmploymentID: employment.ID,
+					TagID:        relatedTag.ID,
+				}).
+				On("CONFLICT (employment_id, tag_id) DO NOTHING").
+				Exec(ctx)
+			if err != nil {
+				return eris.Wrapf(
+					err,
+					"failed to create employment-tag relationship: %s -> %s",
+					employment.Slug,
+					tagSlug,
+				)
+			}
+		}
+
+		var relatedPost Post
+		for _, postSlug := range employment.PostSlugs {
+			err := db.NewSelect().
+				Model(&relatedPost).
+				Where("slug = ?", postSlug).
+				Scan(ctx)
+			if err != nil {
+				if errors.Is(err, context.DeadlineExceeded) {
+					return eris.Wrapf(
+						err,
+						"database operation timed out for post: %s",
+						postSlug,
+					)
+				}
+				if errors.Is(err, sql.ErrNoRows) {
+					return eris.Errorf(
+						"post not found: %s (referenced from %s)",
+						postSlug,
+						employment.Slug,
+					)
+				}
+
+				return eris.Wrapf(
+					err,
+					"failed to find post: %s",
+					postSlug,
+				)
+			}
+			_, err = db.NewInsert().
+				Model(&EmploymentToPost{
+					EmploymentID: employment.ID,
+					PostID:       relatedPost.ID,
+				}).
+				On("CONFLICT (employment_id, post_id) DO NOTHING").
+				Exec(ctx)
+			if err != nil {
+				return eris.Wrapf(
+					err,
+					"failed to create employment-post relationship: %s -> %s",
+					employment.Slug,
+					postSlug,
+				)
+			}
+		}
+
+		var relatedProject Project
+		for _, projectSlug := range employment.ProjectSlugs {
+			err := db.NewSelect().
+				Model(&relatedProject).
+				Where("slug = ?", projectSlug).
+				Scan(ctx)
+			if err != nil {
+				if errors.Is(err, context.DeadlineExceeded) {
+					return eris.Wrapf(
+						err,
+						"database operation timed out for project: %s",
+						projectSlug,
+					)
+				}
+				if errors.Is(err, sql.ErrNoRows) {
+					return eris.Errorf(
+						"project not found: %s (referenced from %s)",
+						projectSlug,
+						employment.Slug,
+					)
+				}
+
+				return eris.Wrapf(
+					err,
+					"failed to find project: %s",
+					projectSlug,
+				)
+			}
+			_, err = db.NewInsert().
+				Model(&EmploymentToProject{
+					EmploymentID: employment.ID,
+					ProjectID:    relatedProject.ID,
+				}).
+				On("CONFLICT (employment_id, project_id) DO NOTHING").
+				Exec(ctx)
+			if err != nil {
+				return eris.Wrapf(
+					err,
+					"failed to create employment-project relationship: %s -> %s",
+					employment.Slug,
+					projectSlug,
+				)
+			}
+		}
+
+		var relatedEmployment Employment
+		for _, employmentSlug := range employment.EmploymentSlugs {
+			err := db.NewSelect().
+				Model(&relatedEmployment).
+				Where("slug = ?", employmentSlug).
+				Scan(ctx)
+			if err != nil {
+				if errors.Is(err, context.DeadlineExceeded) {
+					return eris.Wrapf(
+						err,
+						"database operation timed out for employment: %s",
+						employmentSlug,
+					)
+				}
+				if errors.Is(err, sql.ErrNoRows) {
+					return eris.Errorf(
+						"employment not found: %s (referenced from %s)",
+						employmentSlug,
+						employment.Slug,
+					)
+				}
+
+				return eris.Wrapf(
+					err,
+					"failed to find employment: %s",
+					employmentSlug,
+				)
+			}
+			_, err = db.NewInsert().
+				Model(&EmploymentToEmployment{
+					SourceEmploymentID: employment.ID,
+					TargetEmploymentID: relatedEmployment.ID,
+				}).
+				On("CONFLICT (source_employment_id, target_employment_id) DO NOTHING").
+				Exec(ctx)
+			if err != nil {
+				return eris.Wrapf(
+					err,
+					"failed to create employment-employment relationship: %s -> %s",
+					employment.Slug,
+					employmentSlug,
+				)
+			}
+		}
+
+		return nil
+	}
+}

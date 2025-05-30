@@ -13,6 +13,7 @@ templ List(
 	posts *[]*assets.Post,
 	projects *[]*assets.Project,
 	tags *[]*assets.Tag,
+	employments *[]*assets.Employment,
 	query string,
 	page int,
 	pageCount int,
@@ -37,6 +38,7 @@ templ List(
 				posts,
 				projects,
 				tags,
+				employments,
 				page,
 				pageCount,
 			)
@@ -111,6 +113,7 @@ templ ListResults(
 	posts *[]*assets.Post,
 	projects *[]*assets.Project,
 	tags *[]*assets.Tag,
+	employments *[]*assets.Employment,
 	page, pageCount int,
 ) {
 	<div
@@ -157,6 +160,18 @@ templ ListResults(
 							"hx-target":   "#bodiody",
 							"hx-get":      tag.PagePath(),
 							"hx-push-url": "true",
+							"preload":     "mouseover",
+						})
+					}
+				}
+			case routing.EmploymentPluralPath:
+				for i, employment := range *employments {
+					if i < routing.MaxListLargeItems {
+						@components.EmploymentItem(employment, templ.Attributes{
+							"class":       twerge.It("overflow-hidden bg-gray-800 transform rounded-lg transition-all hover:shadow-lg duration-300 shadow-md hover:-translate-y-1 cursor-pointer h-full"),
+							"hx-target":   "#bodiody",
+							"hx-get":      employment.PagePath(),
+							"hx-push-url": employment.PagePath(),
 							"preload":     "mouseover",
 						})
 					}
