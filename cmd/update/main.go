@@ -22,12 +22,8 @@ import (
 )
 
 const (
-	numWorkers     = 20
-	taskBufferInt  = 1000
-	fullAssetLoc   = assets.AssetsLoc
-	fullPostLoc    = assets.PostsLoc
-	fullProjectLoc = assets.ProjectsLoc
-	fullTagLoc     = assets.TagsLoc
+	numWorkers    = 20
+	taskBufferInt = 1000
 )
 
 var (
@@ -47,14 +43,14 @@ func main() {
 		syscall.SIGHUP)
 	defer stop()
 
-	err := UpdateDB(ctx, os.Getenv, *workers, *taskBuffer)
+	err := run(ctx, os.Getenv, *workers, *taskBuffer)
 	if err != nil {
 		panic(err)
 	}
 }
 
-// UpdateDB executes the main application logic.
-func UpdateDB(
+// run executes the main application logic.
+func run(
 	ctx context.Context,
 	getenv func(string) string,
 	_, _ int,
@@ -84,7 +80,7 @@ func UpdateDB(
 	}
 	md := assets.NewMD(fs)
 
-	todoAssets, err := assets.HashDirMatch(ctx, fs, fullAssetLoc, db)
+	todoAssets, err := assets.HashDirMatch(ctx, fs, assets.AssetsLoc, db)
 	if err != nil {
 		return err
 	}
@@ -102,7 +98,7 @@ func UpdateDB(
 		}
 	}
 
-	todoPosts, err := assets.HashDirMatch(ctx, fs, fullPostLoc, db)
+	todoPosts, err := assets.HashDirMatch(ctx, fs, assets.PostsLoc, db)
 	if err != nil {
 		return eris.Wrap(err, "failed to hash posts")
 	}
@@ -125,7 +121,7 @@ func UpdateDB(
 		relFns = append(relFns, relFn)
 	}
 
-	todoProjects, err := assets.HashDirMatch(ctx, fs, fullProjectLoc, db)
+	todoProjects, err := assets.HashDirMatch(ctx, fs, assets.ProjectsLoc, db)
 	if err != nil {
 		return eris.Wrap(err, "failed to hash projects")
 	}
@@ -148,7 +144,7 @@ func UpdateDB(
 		relFns = append(relFns, relFn)
 	}
 
-	todoTags, err := assets.HashDirMatch(ctx, fs, fullTagLoc, db)
+	todoTags, err := assets.HashDirMatch(ctx, fs, assets.TagsLoc, db)
 	if err != nil {
 		return eris.Wrap(err, "failed to hash tags")
 	}
