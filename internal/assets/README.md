@@ -23,18 +23,13 @@ Package assets contains the main data.
 - [func IsAllowedAsset\(path string\) bool](<#IsAllowedAsset>)
 - [func IsAllowedDocumentType\(path string\) bool](<#IsAllowedDocumentType>)
 - [func IsAllowedMediaType\(path string\) bool](<#IsAllowedMediaType>)
-- [func MinkowskiDistance\(xq, index \*mat.VecDense, p float64\) \(float64, error\)](<#MinkowskiDistance>)
 - [func NewMD\(fs afero.Fs\) goldmark.Markdown](<#NewMD>)
-- [func NormalizeScores\(sim \[\]float64\) \[\]float64](<#NormalizeScores>)
 - [func Pathify\(s string\) string](<#Pathify>)
 - [func RegisterModels\(db \*bun.DB\)](<#RegisterModels>)
 - [func Slugify\(s string\) string](<#Slugify>)
 - [func UploadToS3\(ctx context.Context, client Tigris, bucket string, path string, data \[\]byte\) error](<#UploadToS3>)
 - [func Validate\(path string, emb \*Doc\) error](<#Validate>)
 - [type Cache](<#Cache>)
-- [type Calculator](<#Calculator>)
-  - [func NewCalculator\(opts ...Option\) \*Calculator](<#NewCalculator>)
-  - [func \(c \*Calculator\) Similarity\(qVec, iVec \[\]float64\) \(sim float64, err error\)](<#Calculator.Similarity>)
 - [type CustomTime](<#CustomTime>)
   - [func \(ct \*CustomTime\) UnmarshalYAML\(value \*yaml.Node\) error](<#CustomTime.UnmarshalYAML>)
 - [type DefaultTigrisClient](<#DefaultTigrisClient>)
@@ -45,14 +40,6 @@ Package assets contains the main data.
 - [type Doc](<#Doc>)
   - [func ParseMarkdown\(md goldmark.Markdown, item DirMatchItem\) \(\*Doc, error\)](<#ParseMarkdown>)
   - [func \(emb \*Doc\) GetTitle\(\) string](<#Doc.GetTitle>)
-- [type Option](<#Option>)
-  - [func WithEuclideanDistance\(coefficient float64\) Option](<#WithEuclideanDistance>)
-  - [func WithHammingDistance\(coefficient float64\) Option](<#WithHammingDistance>)
-  - [func WithJaccardSimilarity\(coefficient float64\) Option](<#WithJaccardSimilarity>)
-  - [func WithManhattanDistance\(coefficient float64\) Option](<#WithManhattanDistance>)
-  - [func WithPearsonCorrelation\(coefficient float64\) Option](<#WithPearsonCorrelation>)
-  - [func WithSimilarityDotMatrix\(coefficient float64\) Option](<#WithSimilarityDotMatrix>)
-  - [func WithWorkers\(workers int\) Option](<#WithWorkers>)
 - [type Post](<#Post>)
   - [func \(emb \*Post\) PagePath\(\) string](<#Post.PagePath>)
   - [func \(emb \*Post\) String\(\) string](<#Post.String>)
@@ -76,7 +63,6 @@ Package assets contains the main data.
   - [func \(emb \*Tag\) String\(\) string](<#Tag.String>)
 - [type TagToTag](<#TagToTag>)
 - [type Tigris](<#Tigris>)
-- [type Utterance](<#Utterance>)
 
 
 ## Constants
@@ -260,21 +246,6 @@ func IsAllowedMediaType(path string) bool
 
 IsAllowedMediaType returns true if the provided path is an allowed asset type.
 
-<a name="MinkowskiDistance"></a>
-## func [MinkowskiDistance](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/simularity.go#L379>)
-
-```go
-func MinkowskiDistance(xq, index *mat.VecDense, p float64) (float64, error)
-```
-
-MinkowskiDistance calculates the Minkowski distance between two vectors.
-
-The Minkowski distance is the sum of the absolute differences between corresponding elements in the two vectors raised to the power of p.
-
-$$d\(x, y\) = \\sum\_\{i=1\}^\{n\} |x\_i \- y\_i|^p$$
-
-where n is the length of the vectors.
-
 <a name="NewMD"></a>
 ## func [NewMD](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/markdown.go#L28-L30>)
 
@@ -283,17 +254,6 @@ func NewMD(fs afero.Fs) goldmark.Markdown
 ```
 
 NewMD creates a new markdown parser.
-
-<a name="NormalizeScores"></a>
-## func [NormalizeScores](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/simularity.go#L224>)
-
-```go
-func NormalizeScores(sim []float64) []float64
-```
-
-NormalizeScores normalizes the similarity scores to a 0\-1 range. The function takes a slice of float64 values representing the similarity scores.
-
-The function takes a slice of float64 values representing the similarity scores and returns a slice of float64 values representing the normalized similarity scores.
 
 <a name="Pathify"></a>
 ## func [Pathify](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/paths.go#L24>)
@@ -323,7 +283,7 @@ func Slugify(s string) string
 Slugify returns the path to the document page or media asset page.
 
 <a name="UploadToS3"></a>
-## func [UploadToS3](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/s3.go#L69-L75>)
+## func [UploadToS3](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/s3.go#L68-L74>)
 
 ```go
 func UploadToS3(ctx context.Context, client Tigris, bucket string, path string, data []byte) error
@@ -355,35 +315,6 @@ type Cache struct {
 }
 ```
 
-<a name="Calculator"></a>
-## type [Calculator](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/simularity.go#L13-L16>)
-
-Calculator is a struct that can be used to calculate similarity between two strings.
-
-```go
-type Calculator struct {
-    // contains filtered or unexported fields
-}
-```
-
-<a name="NewCalculator"></a>
-### func [NewCalculator](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/simularity.go#L29>)
-
-```go
-func NewCalculator(opts ...Option) *Calculator
-```
-
-NewCalculator creates a new Calculator with the given options.
-
-<a name="Calculator.Similarity"></a>
-### func \(\*Calculator\) [Similarity](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/simularity.go#L39>)
-
-```go
-func (c *Calculator) Similarity(qVec, iVec []float64) (sim float64, err error)
-```
-
-Similarity calculates the similarity between two strings.
-
 <a name="CustomTime"></a>
 ## type [CustomTime](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L22>)
 
@@ -403,7 +334,7 @@ func (ct *CustomTime) UnmarshalYAML(value *yaml.Node) error
 UnmarshalYAML implements the yaml.Unmarshaler interface.
 
 <a name="DefaultTigrisClient"></a>
-## type [DefaultTigrisClient](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/s3.go#L35>)
+## type [DefaultTigrisClient](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/s3.go#L34>)
 
 DefaultTigrisClient is a wrapper for the AWS S3 client.
 
@@ -412,7 +343,7 @@ type DefaultTigrisClient struct{ *s3.Client }
 ```
 
 <a name="NewTigris"></a>
-### func [NewTigris](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/s3.go#L38>)
+### func [NewTigris](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/s3.go#L37>)
 
 ```go
 func NewTigris(getenv func(string) string) (*DefaultTigrisClient, error)
@@ -499,96 +430,6 @@ func (emb *Doc) GetTitle() string
 ```
 
 GetTitle returns the title of the embedding.
-
-<a name="Option"></a>
-## type [Option](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/simularity.go#L19>)
-
-Option is a function that can be used to configure a Calculator.
-
-```go
-type Option func(c *Calculator)
-```
-
-<a name="WithEuclideanDistance"></a>
-### func [WithEuclideanDistance](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/simularity.go#L139>)
-
-```go
-func WithEuclideanDistance(coefficient float64) Option
-```
-
-WithEuclideanDistance sets the EuclideanDistance function with a coefficient.
-
-$$d\(x, y\) = \\sqrt\{\\sum\_\{i=1\}^\{n\}\(x\_i \- y\_i\)^2\}$$.
-
-<a name="WithHammingDistance"></a>
-### func [WithHammingDistance](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/simularity.go#L195>)
-
-```go
-func WithHammingDistance(coefficient float64) Option
-```
-
-WithHammingDistance sets the HammingDistance function with a coefficient.
-
-<a name="WithJaccardSimilarity"></a>
-### func [WithJaccardSimilarity](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/simularity.go#L169>)
-
-```go
-func WithJaccardSimilarity(coefficient float64) Option
-```
-
-WithJaccardSimilarity sets the JaccardSimilarity function with a coefficient.
-
-$$J\(A, B\)=\\frac\{|A \\cap B|\}\{|A \\cup B|\}$$
-
-It adds the jaccard similarity to the comparison functions with the given coefficient.
-
-<a name="WithManhattanDistance"></a>
-### func [WithManhattanDistance](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/simularity.go#L154>)
-
-```go
-func WithManhattanDistance(coefficient float64) Option
-```
-
-WithManhattanDistance sets the ManhattanDistance function with a coefficient.
-
-$$d\(x, y\) = |x\_1 \- y\_1| \+ |x\_2 \- y\_2| \+ ... \+ |x\_n \- y\_n|$$
-
-It adds the manhatten distance to the comparison functions with the given coefficient.
-
-<a name="WithPearsonCorrelation"></a>
-### func [WithPearsonCorrelation](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/simularity.go#L185>)
-
-```go
-func WithPearsonCorrelation(coefficient float64) Option
-```
-
-WithPearsonCorrelation sets the PearsonCorrelation function with a coefficient.
-
-$$r=\\frac\{\\sum\\left\(x\_\{i\}\-\\bar\{x\}\\right\)\\left\(y\_\{i\}\-\\bar\{y\}\\right\)\}\{\\sqrt\{\\sum\\left\(x\_\{i\}\-\\bar\{x\}\\right\)^\{2\} \\sum\\left\(y\_\{i\}\-\\bar\{y\}\\right\)^\{2\}\}\}$$
-
-It adds the pearson correlation to the comparison functions with the given coefficient.
-
-<a name="WithSimilarityDotMatrix"></a>
-### func [WithSimilarityDotMatrix](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/simularity.go#L127>)
-
-```go
-func WithSimilarityDotMatrix(coefficient float64) Option
-```
-
-WithSimilarityDotMatrix sets the similarity function to use with a coefficient.
-
-$$a \\cdot b=\\sum\_\{i=1\}^\{n\} a\_\{i\} b\_\{i\}$$
-
-It adds the similarity dot matrix to the comparison functions with the given coefficient.
-
-<a name="WithWorkers"></a>
-### func [WithWorkers](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/simularity.go#L114>)
-
-```go
-func WithWorkers(workers int) Option
-```
-
-WithWorkers sets the number of workers to use for the calculation.
 
 <a name="Post"></a>
 ## type [Post](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L77-L100>)
@@ -902,9 +743,9 @@ type TagToTag struct {
 ```
 
 <a name="Tigris"></a>
-## type [Tigris](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/s3.go#L26-L32>)
+## type [Tigris](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/s3.go#L25-L31>)
 
-Tigris is an interface for AWS clients.
+Tigris is an minimal interface for AWS clients.
 
 ```go
 type Tigris interface {
@@ -913,22 +754,6 @@ type Tigris interface {
         params *s3.PutObjectInput,
         optFns ...func(*s3.Options),
     ) (*s3.PutObjectOutput, error)
-}
-```
-
-<a name="Utterance"></a>
-## type [Utterance](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/simularity.go#L208-L215>)
-
-Utterance represents a utterance in the semantic router.
-
-```go
-type Utterance struct {
-    // ID is the ID of the utterance.
-    ID  int
-    // Utterance is the text of the utterance.
-    Utterance string
-    // Embed is the embedding of the utterance. It is a vector of floats.
-    Embed embedding
 }
 ```
 

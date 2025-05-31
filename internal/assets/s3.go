@@ -17,12 +17,11 @@ const (
 	defaultS3Timeout = 20 * time.Second
 
 	awsAccessKeyIDVar = "AWS_ACCESS_KEY_ID"
-	//nolint:gosec
-	awsSecretKeyVar = "AWS_SECRET_ACCESS_KEY"
-	awsBaseURLVar   = "AWS_ENDPOINT_URL_S3"
+	awsSecretKeyVar   = "AWS_SECRET_ACCESS_KEY" //nolint:gosec
+	awsBaseURLVar     = "AWS_ENDPOINT_URL_S3"
 )
 
-// Tigris is an interface for AWS clients.
+// Tigris is an minimal interface for AWS clients.
 type Tigris interface {
 	PutObject(
 		ctx context.Context,
