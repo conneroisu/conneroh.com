@@ -10,13 +10,13 @@ templ Project(
 	project *assets.Project,
 ) {
 	<div
-		class={ twerge.It("px-4 container mx-auto py-8") }
+		class={ twerge.It("px-4 mx-auto py-8 max-w-4xl") }
 	>
 		if project.BannerPath != "" {
 			@components.Image(
 				project.BannerPath,
 				project.Title,
-				twerge.It("w-full md:h-96 object-center rounded-lg object-cover shadow-md mb-8 h-64"),
+				twerge.It("w-full md:h-96 object-center rounded-lg object-cover shadow-md mb-8 h-64 bg-gray-800"),
 			)
 		}
 		<div
@@ -80,11 +80,6 @@ templ Project(
 		<div
 			class={ twerge.It("bg-gray-800 rounded-lg mb-8 overflow-hidden p-6 shadow-lg") }
 		>
-			<h2
-				class={ twerge.It("text-white mb-4 text-2xl font-semibold") }
-			>
-				Content
-			</h2>
 			<div
 				class={ twerge.It("max-w-none my-6 text-gray-300 leading-relaxed") }
 			>
