@@ -270,7 +270,6 @@
               flyctl # Infra
               openssl.dev
               skopeo
-              git-bug
 
               (
                 pkgs.buildGoModule rec {
@@ -382,7 +381,7 @@
           {
             conneroh = pkgs.buildGoModule {
               inherit src version preBuild;
-              vendorHash = "sha256-DYqIBhMpuNc62m9fCU7T6Sl17tmpTztD70qG1OGUEN8=";
+              vendorHash = "sha256-JrxAoDVkt/ozjmhLda1ygintg6/H7eIQ7SAdCRzqRUM=";
               name = "conneroh.com";
               goSum = ./go.sum;
               subPackages = ["."];

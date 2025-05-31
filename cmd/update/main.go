@@ -74,10 +74,6 @@ func UpdateDB(
 		return eris.Wrap(err, "failed to initialize database")
 	}
 	fs := afero.NewBasePathFs(afero.NewOsFs(), assets.VaultLoc)
-	// ol, err := llama.NewOllamaClient(getenv)
-	// if err != nil {
-	// 	return eris.Wrap(err, "failed to create Ollama client")
-	// }
 	ti, err := assets.NewTigris(getenv)
 	if err != nil {
 		return eris.Wrap(err, "failed to create Tigris client")

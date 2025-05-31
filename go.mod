@@ -11,13 +11,11 @@ require (
 	github.com/conneroisu/twerge v0.4.5
 	github.com/gorilla/schema v1.4.1
 	github.com/litao91/goldmark-mathjax v0.0.0-20210217064022-a43cf739a50f
-	github.com/ollama/ollama v0.7.0
 	github.com/playwright-community/playwright-go v0.5200.0
 	github.com/quailyquaily/goldmark-enclave v0.1.9
 	github.com/rotisserie/eris v0.5.4
 	github.com/sourcegraph/conc v0.3.0
 	github.com/spf13/afero v1.14.0
-	github.com/stretchr/testify v1.10.0
 	github.com/uptrace/bun v1.2.11
 	github.com/uptrace/bun/dialect/sqlitedialect v1.2.11
 	github.com/uptrace/bun/extra/bundebug v1.2.11
@@ -56,6 +54,7 @@ require (
 	github.com/go-stack/stack v1.8.1 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
+	github.com/kr/text v0.2.0 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/ncruces/go-strftime v0.1.9 // indirect
