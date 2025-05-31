@@ -144,6 +144,7 @@ func run(
 		relFns = append(relFns, relFn)
 	}
 
+	// Tags
 	items, err = assets.HashDirMatch(ctx, fs, assets.TagsLoc, db)
 	if err != nil {
 		return eris.Wrap(err, "failed to hash tags")
