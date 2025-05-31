@@ -14,26 +14,90 @@ Package assets contains the main data.
 
 - [Constants](<#constants>)
 - [Variables](<#variables>)
-- [func Defaults\(emb \*Embedded\) error](<#Defaults>)
-- [func New\[T Post | Project | Tag\]\(emb \*Embedded\) \*T](<#New>)
-- [func Validate\(emb \*Embedded\) error](<#Validate>)
+- [func BucketPath\(path string\) string](<#BucketPath>)
+- [func ComputeHash\(content \[\]byte\) string](<#ComputeHash>)
+- [func DBName\(\) string](<#DBName>)
+- [func Defaults\(doc \*Doc\) error](<#Defaults>)
+- [func GetContentType\(path string\) string](<#GetContentType>)
+- [func InitDB\(ctx context.Context, db \*bun.DB\) error](<#InitDB>)
+- [func IsAllowedAsset\(path string\) bool](<#IsAllowedAsset>)
+- [func IsAllowedDocumentType\(path string\) bool](<#IsAllowedDocumentType>)
+- [func IsAllowedMediaType\(path string\) bool](<#IsAllowedMediaType>)
+- [func MinkowskiDistance\(xq, index \*mat.VecDense, p float64\) \(float64, error\)](<#MinkowskiDistance>)
+- [func NewMD\(fs afero.Fs\) goldmark.Markdown](<#NewMD>)
+- [func NormalizeScores\(sim \[\]float64\) \[\]float64](<#NormalizeScores>)
+- [func Pathify\(s string\) string](<#Pathify>)
+- [func RegisterModels\(db \*bun.DB\)](<#RegisterModels>)
+- [func Slugify\(s string\) string](<#Slugify>)
+- [func UploadToS3\(ctx context.Context, client Tigris, bucket string, path string, data \[\]byte\) error](<#UploadToS3>)
+- [func Validate\(path string, emb \*Doc\) error](<#Validate>)
+- [type Cache](<#Cache>)
+- [type Calculator](<#Calculator>)
+  - [func NewCalculator\(opts ...Option\) \*Calculator](<#NewCalculator>)
+  - [func \(c \*Calculator\) Similarity\(qVec, iVec \[\]float64\) \(sim float64, err error\)](<#Calculator.Similarity>)
 - [type CustomTime](<#CustomTime>)
   - [func \(ct \*CustomTime\) UnmarshalYAML\(value \*yaml.Node\) error](<#CustomTime.UnmarshalYAML>)
-- [type Embeddable](<#Embeddable>)
-- [type Embedded](<#Embedded>)
-  - [func \(emb \*Embedded\) GetEmb\(\) \*Embedded](<#Embedded.GetEmb>)
-  - [func \(emb \*Embedded\) GetTitle\(\) string](<#Embedded.GetTitle>)
-- [type Employment](<#Employment>)
-  - [func \(emb \*Employment\) PagePath\(\) string](<#Employment.PagePath>)
+- [type DefaultTigrisClient](<#DefaultTigrisClient>)
+  - [func NewTigris\(getenv func\(string\) string\) \(\*DefaultTigrisClient, error\)](<#NewTigris>)
+- [type DirMatchItem](<#DirMatchItem>)
+  - [func HashDirMatch\(ctx context.Context, fs afero.Fs, path string, db \*bun.DB\) \(\[\]DirMatchItem, error\)](<#HashDirMatch>)
+  - [func MatchItem\(fs afero.Fs, path string\) \(DirMatchItem, error\)](<#MatchItem>)
+- [type Doc](<#Doc>)
+  - [func ParseMarkdown\(md goldmark.Markdown, item DirMatchItem\) \(\*Doc, error\)](<#ParseMarkdown>)
+  - [func \(emb \*Doc\) GetTitle\(\) string](<#Doc.GetTitle>)
+- [type Option](<#Option>)
+  - [func WithEuclideanDistance\(coefficient float64\) Option](<#WithEuclideanDistance>)
+  - [func WithHammingDistance\(coefficient float64\) Option](<#WithHammingDistance>)
+  - [func WithJaccardSimilarity\(coefficient float64\) Option](<#WithJaccardSimilarity>)
+  - [func WithManhattanDistance\(coefficient float64\) Option](<#WithManhattanDistance>)
+  - [func WithPearsonCorrelation\(coefficient float64\) Option](<#WithPearsonCorrelation>)
+  - [func WithSimilarityDotMatrix\(coefficient float64\) Option](<#WithSimilarityDotMatrix>)
+  - [func WithWorkers\(workers int\) Option](<#WithWorkers>)
 - [type Post](<#Post>)
   - [func \(emb \*Post\) PagePath\(\) string](<#Post.PagePath>)
+  - [func \(emb \*Post\) String\(\) string](<#Post.String>)
+- [type PostToPost](<#PostToPost>)
+- [type PostToProject](<#PostToProject>)
+- [type PostToTag](<#PostToTag>)
 - [type Project](<#Project>)
   - [func \(emb \*Project\) PagePath\(\) string](<#Project.PagePath>)
+  - [func \(emb \*Project\) String\(\) string](<#Project.String>)
+- [type ProjectToProject](<#ProjectToProject>)
+- [type ProjectToTag](<#ProjectToTag>)
+- [type RelationshipFn](<#RelationshipFn>)
+  - [func UpsertPost\(ctx context.Context, db \*bun.DB, post \*Post\) \(RelationshipFn, error\)](<#UpsertPost>)
+  - [func UpsertPostRelationships\(db \*bun.DB, post \*Post\) RelationshipFn](<#UpsertPostRelationships>)
+  - [func UpsertProject\(ctx context.Context, db \*bun.DB, project \*Project\) \(RelationshipFn, error\)](<#UpsertProject>)
+  - [func UpsertProjectRelationships\(db \*bun.DB, project \*Project\) RelationshipFn](<#UpsertProjectRelationships>)
+  - [func UpsertTag\(ctx context.Context, db \*bun.DB, tag \*Tag\) \(RelationshipFn, error\)](<#UpsertTag>)
+  - [func UpsertTagRelationships\(db \*bun.DB, tag \*Tag\) RelationshipFn](<#UpsertTagRelationships>)
 - [type Tag](<#Tag>)
   - [func \(emb \*Tag\) PagePath\(\) string](<#Tag.PagePath>)
+  - [func \(emb \*Tag\) String\(\) string](<#Tag.String>)
+- [type TagToTag](<#TagToTag>)
+- [type Tigris](<#Tigris>)
+- [type Utterance](<#Utterance>)
 
 
 ## Constants
+
+<a name="VaultLoc"></a>
+
+```go
+const (
+    // VaultLoc is the location of the vault.
+    // This is the location of the documents and assets.
+    VaultLoc = "internal/data/"
+    // AssetsLoc is the location of the assets relative to the vault.
+    AssetsLoc = "assets/"
+    // PostsLoc is the location of the posts relative to the vault.
+    PostsLoc = "posts/"
+    // TagsLoc is the location of the tags relative to the vault.
+    TagsLoc = "tags/"
+    // ProjectsLoc is the location of the projects relative to the vault.
+    ProjectsLoc = "projects/"
+)
+```
 
 <a name="EmbedLength"></a>
 
@@ -46,6 +110,33 @@ const (
 
 ## Variables
 
+<a name="EmpPost"></a>
+
+```go
+var (
+    // EmpPost is a pointer to a Post.
+    EmpPost = new(Post)
+    // EmpTag is a pointer to a Tag.
+    EmpTag = new(Tag)
+    // EmpProject is a pointer to a Project.
+    EmpProject = new(Project)
+    // EmpCache is a pointer to a Cache.
+    EmpCache = new(Cache)
+    // EmpPostToTag is a pointer to a PostToTag.
+    EmpPostToTag = new(PostToTag)
+    // EmpPostToPost is a pointer to a PostToPost.
+    EmpPostToPost = new(PostToPost)
+    // EmpPostToProject is a pointer to a PostToProject.
+    EmpPostToProject = new(PostToProject)
+    // EmpProjectToTag is a pointer to a ProjectToTag.
+    EmpProjectToTag = new(ProjectToTag)
+    // EmpProjectToProject is a pointer to a ProjectToProject.
+    EmpProjectToProject = new(ProjectToProject)
+    // EmpTagToTag is a pointer to a TagToTag.
+    EmpTagToTag = new(TagToTag)
+)
+```
+
 <a name="ErrValueMissing"></a>
 
 ```go
@@ -55,38 +146,246 @@ var (
 
     // ErrValueInvalid is returned when the slug is invalid.
     ErrValueInvalid = eris.Errorf("invalid value")
+
+    // ErrMissingCreds is returned when the credentials are missing.
+    ErrMissingCreds = errors.New("missing credentials (ENV)")
+
+    // ErrInvalidCreds is returned when the credentials are invalid.
+    ErrInvalidCreds = errors.New("invalid credentials (ENV)")
 )
 ```
 
+<a name="AllowedAssetTypes"></a>
+
+```go
+var (
+    // AllowedAssetTypes is a list of allowed asset types.
+    AllowedAssetTypes = []string{
+        "image/png",
+        "image/jpeg",
+        "image/jpg",
+        "image/gif",
+        "image/webp",
+        "image/avif",
+        "image/tiff",
+        "image/svg+xml",
+        "application/pdf",
+    }
+    // AllowedDocumentTypes is a list of allowed document types.
+    AllowedDocumentTypes = []string{
+        "text/markdown",
+        "text/markdown; charset=utf-8",
+    }
+)
+```
+
+<a name="BucketPath"></a>
+## func [BucketPath](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/paths.go#L100>)
+
+```go
+func BucketPath(path string) string
+```
+
+BucketPath returns the path to the bucket for a given file path.
+
+<a name="ComputeHash"></a>
+## func [ComputeHash](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/hash.go#L21>)
+
+```go
+func ComputeHash(content []byte) string
+```
+
+ComputeHash generates an MD5 hash of the given content. Note: MD5 is not cryptographically secure; only use for content fingerprinting.
+
+<a name="DBName"></a>
+## func [DBName](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L12>)
+
+```go
+func DBName() string
+```
+
+DBName returns the name/file of the database.
+
 <a name="Defaults"></a>
-## func [Defaults](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L135>)
+## func [Defaults](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/validation.go#L10>)
 
 ```go
-func Defaults(emb *Embedded) error
+func Defaults(doc *Doc) error
 ```
 
-Defaults sets the default values for the embedding if they are missing.
+Defaults sets the default values for the document if they are missing.
 
-<a name="New"></a>
-## func [New](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L120-L122>)
+<a name="GetContentType"></a>
+## func [GetContentType](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/paths.go#L90>)
 
 ```go
-func New[T Post | Project | Tag](emb *Embedded) *T
+func GetContentType(path string) string
 ```
 
-New creates a new instance of the given type.
+GetContentType returns the content type for a file extension.
+
+<a name="InitDB"></a>
+## func [InitDB](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/emp.go#L46-L49>)
+
+```go
+func InitDB(ctx context.Context, db *bun.DB) error
+```
+
+InitDB initializes the database.
+
+<a name="IsAllowedAsset"></a>
+## func [IsAllowedAsset](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/types.go#L38>)
+
+```go
+func IsAllowedAsset(path string) bool
+```
+
+IsAllowedAsset returns true if the provided path is an allowed asset.
+
+<a name="IsAllowedDocumentType"></a>
+## func [IsAllowedDocumentType](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/types.go#L43>)
+
+```go
+func IsAllowedDocumentType(path string) bool
+```
+
+IsAllowedDocumentType returns true if the provided path is an allowed document type.
+
+<a name="IsAllowedMediaType"></a>
+## func [IsAllowedMediaType](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/types.go#L30>)
+
+```go
+func IsAllowedMediaType(path string) bool
+```
+
+IsAllowedMediaType returns true if the provided path is an allowed asset type.
+
+<a name="MinkowskiDistance"></a>
+## func [MinkowskiDistance](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/simularity.go#L379>)
+
+```go
+func MinkowskiDistance(xq, index *mat.VecDense, p float64) (float64, error)
+```
+
+MinkowskiDistance calculates the Minkowski distance between two vectors.
+
+The Minkowski distance is the sum of the absolute differences between corresponding elements in the two vectors raised to the power of p.
+
+$$d\(x, y\) = \\sum\_\{i=1\}^\{n\} |x\_i \- y\_i|^p$$
+
+where n is the length of the vectors.
+
+<a name="NewMD"></a>
+## func [NewMD](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/markdown.go#L28-L30>)
+
+```go
+func NewMD(fs afero.Fs) goldmark.Markdown
+```
+
+NewMD creates a new markdown parser.
+
+<a name="NormalizeScores"></a>
+## func [NormalizeScores](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/simularity.go#L224>)
+
+```go
+func NormalizeScores(sim []float64) []float64
+```
+
+NormalizeScores normalizes the similarity scores to a 0\-1 range. The function takes a slice of float64 values representing the similarity scores.
+
+The function takes a slice of float64 values representing the similarity scores and returns a slice of float64 values representing the normalized similarity scores.
+
+<a name="Pathify"></a>
+## func [Pathify](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/paths.go#L24>)
+
+```go
+func Pathify(s string) string
+```
+
+Pathify returns the slugified path of a document or media asset.
+
+<a name="RegisterModels"></a>
+## func [RegisterModels](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/emp.go#L64>)
+
+```go
+func RegisterModels(db *bun.DB)
+```
+
+RegisterModels registers all the M2M relationship models with Bun.
+
+<a name="Slugify"></a>
+## func [Slugify](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/paths.go#L36>)
+
+```go
+func Slugify(s string) string
+```
+
+Slugify returns the path to the document page or media asset page.
+
+<a name="UploadToS3"></a>
+## func [UploadToS3](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/s3.go#L69-L75>)
+
+```go
+func UploadToS3(ctx context.Context, client Tigris, bucket string, path string, data []byte) error
+```
+
+UploadToS3 uploads a file to S3.
 
 <a name="Validate"></a>
-## func [Validate](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L151-L153>)
+## func [Validate](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/validation.go#L20-L23>)
 
 ```go
-func Validate(emb *Embedded) error
+func Validate(path string, emb *Doc) error
 ```
 
 Validate validate the given embedding.
 
+<a name="Cache"></a>
+## type [Cache](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L69-L75>)
+
+Cache is a any asset.
+
+```go
+type Cache struct {
+    bun.BaseModel `bun:"caches"`
+
+    ID   int64  `bun:"id,pk,autoincrement"`
+    Path string `bun:"path,unique"`
+    Hash string `bun:"hashed,unique"`
+}
+```
+
+<a name="Calculator"></a>
+## type [Calculator](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/simularity.go#L13-L16>)
+
+Calculator is a struct that can be used to calculate similarity between two strings.
+
+```go
+type Calculator struct {
+    // contains filtered or unexported fields
+}
+```
+
+<a name="NewCalculator"></a>
+### func [NewCalculator](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/simularity.go#L29>)
+
+```go
+func NewCalculator(opts ...Option) *Calculator
+```
+
+NewCalculator creates a new Calculator with the given options.
+
+<a name="Calculator.Similarity"></a>
+### func \(\*Calculator\) [Similarity](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/simularity.go#L39>)
+
+```go
+func (c *Calculator) Similarity(qVec, iVec []float64) (sim float64, err error)
+```
+
+Similarity calculates the similarity between two strings.
+
 <a name="CustomTime"></a>
-## type [CustomTime](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L25>)
+## type [CustomTime](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L22>)
 
 CustomTime allows us to customize the YAML time parsing.
 
@@ -95,107 +394,236 @@ type CustomTime struct{ time.Time }
 ```
 
 <a name="CustomTime.UnmarshalYAML"></a>
-### func \(\*CustomTime\) [UnmarshalYAML](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L28>)
+### func \(\*CustomTime\) [UnmarshalYAML](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L25>)
 
 ```go
 func (ct *CustomTime) UnmarshalYAML(value *yaml.Node) error
 ```
 
-UnmarshalYAML implements the yaml.Unmarshaler interface
+UnmarshalYAML implements the yaml.Unmarshaler interface.
 
-<a name="Embeddable"></a>
-## type [Embeddable](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L48-L51>)
+<a name="DefaultTigrisClient"></a>
+## type [DefaultTigrisClient](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/s3.go#L35>)
 
-Embeddable is an interface for embedding content.
+DefaultTigrisClient is a wrapper for the AWS S3 client.
 
 ```go
-type Embeddable interface {
-    GetEmb() *Embedded
-    PagePath() string
+type DefaultTigrisClient struct{ *s3.Client }
+```
+
+<a name="NewTigris"></a>
+### func [NewTigris](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/s3.go#L38>)
+
+```go
+func NewTigris(getenv func(string) string) (*DefaultTigrisClient, error)
+```
+
+NewTigris creates a new Tigris client.
+
+<a name="DirMatchItem"></a>
+## type [DirMatchItem](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/hash.go#L43-L47>)
+
+DirMatchItem contains the path and content of a file.
+
+```go
+type DirMatchItem struct {
+    Path    string
+    Content string
+    Hash    string
 }
 ```
 
-<a name="Embedded"></a>
-## type [Embedded](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L70-L91>)
-
-Embedded is a base struct for all embeddedable structs.
+<a name="HashDirMatch"></a>
+### func [HashDirMatch](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/hash.go#L53-L58>)
 
 ```go
-type Embedded struct {
-    Title           string `yaml:"title"`
-    Slug            string `yaml:"slug"`
-    Description     string `yaml:"description"`
-    Content         string
-    BannerPath      string `yaml:"banner_path"`
-    RawContent      string
-    Icon            string    `yaml:"icon"`
-    CreatedAt       time.Time `yaml:"created_at"`
-    UpdatedAt       time.Time `yaml:"updated_at"`
-    X               float64
-    Y               float64
-    Z               float64
-    TagSlugs        []string      `yaml:"tags"`
-    PostSlugs       []string      `yaml:"posts"`
-    ProjectSlugs    []string      `yaml:"projects"`
-    EmploymentSlugs []string      `yaml:"employments"`
-    Posts           []*Post       `yaml:"-" structgen:"PostSlugs"`
-    Tags            []*Tag        `yaml:"-" structgen:"TagSlugs"`
-    Projects        []*Project    `yaml:"-" structgen:"ProjectSlugs"`
-    Employments     []*Employment `yaml:"-" structgen:"EmploymentSlugs"`
+func HashDirMatch(ctx context.Context, fs afero.Fs, path string, db *bun.DB) ([]DirMatchItem, error)
+```
+
+HashDirMatch takes an fs, path, and a db.
+
+It returns a slice of paths if the hash of the directory does not match the hash in the database.
+
+<a name="MatchItem"></a>
+### func [MatchItem](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/hash.go#L29>)
+
+```go
+func MatchItem(fs afero.Fs, path string) (DirMatchItem, error)
+```
+
+MatchItem takes a path and returns a DirMatchItem.
+
+<a name="Doc"></a>
+## type [Doc](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L47-L67>)
+
+Doc is a base struct for all embeddedable structs.
+
+```go
+type Doc struct {
+    Title        string     `yaml:"title"`
+    Path         string     `yaml:"-"`
+    Slug         string     `yaml:"slug"`
+    Description  string     `yaml:"description"`
+    Content      string     `yaml:"-"`
+    BannerPath   string     `yaml:"banner_path"`
+    Icon         string     `yaml:"icon"`
+    CreatedAt    CustomTime `yaml:"created_at"`
+    UpdatedAt    CustomTime `yaml:"updated_at"`
+    TagSlugs     []string   `yaml:"tags"`
+    PostSlugs    []string   `yaml:"posts"`
+    ProjectSlugs []string   `yaml:"projects"`
+    Hash         string     `yaml:"-"`
+    X            float64    `json:"x"`
+    Y            float64    `json:"y"`
+    Z            float64    `json:"z"`
+    Posts        []*Post    `yaml:"-"`
+    Tags         []*Tag     `yaml:"-"`
+    Projects     []*Project `yaml:"-"`
 }
 ```
 
-<a name="Embedded.GetEmb"></a>
-### func \(\*Embedded\) [GetEmb](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L95>)
+<a name="ParseMarkdown"></a>
+### func [ParseMarkdown](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/markdown.go#L120>)
 
 ```go
-func (emb *Embedded) GetEmb() *Embedded
+func ParseMarkdown(md goldmark.Markdown, item DirMatchItem) (*Doc, error)
 ```
 
-GetEmb returns the embedding struct itself.
+ParseMarkdown parses a markdown document.
 
-<a name="Embedded.GetTitle"></a>
-### func \(\*Embedded\) [GetTitle](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L205>)
+<a name="Doc.GetTitle"></a>
+### func \(\*Doc\) [GetTitle](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L217>)
 
 ```go
-func (emb *Embedded) GetTitle() string
+func (emb *Doc) GetTitle() string
 ```
 
 GetTitle returns the title of the embedding.
 
-<a name="Employment"></a>
-## type [Employment](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L65-L67>)
+<a name="Option"></a>
+## type [Option](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/simularity.go#L19>)
 
-Employment is an employment of a tag.
-
-```go
-type Employment struct {
-    Embedded
-}
-```
-
-<a name="Employment.PagePath"></a>
-### func \(\*Employment\) [PagePath](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L115>)
+Option is a function that can be used to configure a Calculator.
 
 ```go
-func (emb *Employment) PagePath() string
+type Option func(c *Calculator)
 ```
 
-PagePath returns the path to the employment page.
+<a name="WithEuclideanDistance"></a>
+### func [WithEuclideanDistance](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/simularity.go#L139>)
+
+```go
+func WithEuclideanDistance(coefficient float64) Option
+```
+
+WithEuclideanDistance sets the EuclideanDistance function with a coefficient.
+
+$$d\(x, y\) = \\sqrt\{\\sum\_\{i=1\}^\{n\}\(x\_i \- y\_i\)^2\}$$.
+
+<a name="WithHammingDistance"></a>
+### func [WithHammingDistance](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/simularity.go#L195>)
+
+```go
+func WithHammingDistance(coefficient float64) Option
+```
+
+WithHammingDistance sets the HammingDistance function with a coefficient.
+
+<a name="WithJaccardSimilarity"></a>
+### func [WithJaccardSimilarity](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/simularity.go#L169>)
+
+```go
+func WithJaccardSimilarity(coefficient float64) Option
+```
+
+WithJaccardSimilarity sets the JaccardSimilarity function with a coefficient.
+
+$$J\(A, B\)=\\frac\{|A \\cap B|\}\{|A \\cup B|\}$$
+
+It adds the jaccard similarity to the comparison functions with the given coefficient.
+
+<a name="WithManhattanDistance"></a>
+### func [WithManhattanDistance](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/simularity.go#L154>)
+
+```go
+func WithManhattanDistance(coefficient float64) Option
+```
+
+WithManhattanDistance sets the ManhattanDistance function with a coefficient.
+
+$$d\(x, y\) = |x\_1 \- y\_1| \+ |x\_2 \- y\_2| \+ ... \+ |x\_n \- y\_n|$$
+
+It adds the manhatten distance to the comparison functions with the given coefficient.
+
+<a name="WithPearsonCorrelation"></a>
+### func [WithPearsonCorrelation](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/simularity.go#L185>)
+
+```go
+func WithPearsonCorrelation(coefficient float64) Option
+```
+
+WithPearsonCorrelation sets the PearsonCorrelation function with a coefficient.
+
+$$r=\\frac\{\\sum\\left\(x\_\{i\}\-\\bar\{x\}\\right\)\\left\(y\_\{i\}\-\\bar\{y\}\\right\)\}\{\\sqrt\{\\sum\\left\(x\_\{i\}\-\\bar\{x\}\\right\)^\{2\} \\sum\\left\(y\_\{i\}\-\\bar\{y\}\\right\)^\{2\}\}\}$$
+
+It adds the pearson correlation to the comparison functions with the given coefficient.
+
+<a name="WithSimilarityDotMatrix"></a>
+### func [WithSimilarityDotMatrix](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/simularity.go#L127>)
+
+```go
+func WithSimilarityDotMatrix(coefficient float64) Option
+```
+
+WithSimilarityDotMatrix sets the similarity function to use with a coefficient.
+
+$$a \\cdot b=\\sum\_\{i=1\}^\{n\} a\_\{i\} b\_\{i\}$$
+
+It adds the similarity dot matrix to the comparison functions with the given coefficient.
+
+<a name="WithWorkers"></a>
+### func [WithWorkers](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/simularity.go#L114>)
+
+```go
+func WithWorkers(workers int) Option
+```
+
+WithWorkers sets the number of workers to use for the calculation.
 
 <a name="Post"></a>
-## type [Post](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L53-L55>)
+## type [Post](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L77-L100>)
 
 Post is a post with all its projects and tags.
 
 ```go
 type Post struct {
-    Embedded
+    bun.BaseModel `bun:"posts"`
+
+    ID  int64 `bun:"id,pk,autoincrement" `
+    X   float64
+    Y   float64
+    Z   float64
+
+    Title       string     `bun:"title"`
+    Slug        string     `bun:"slug,unique"`
+    Description string     `bun:"description"`
+    Content     string     `bun:"content"`
+    BannerPath  string     `bun:"banner_path"`
+    CreatedAt   CustomTime `bun:"created_at"`
+
+    TagSlugs     []string
+    PostSlugs    []string
+    ProjectSlugs []string
+
+    // M2M relationships
+    Tags     []*Tag     `bun:"m2m:post_to_tags,join:Post=Tag"`
+    Posts    []*Post    `bun:"m2m:post_to_posts,join:SourcePost=TargetPost"`
+    Projects []*Project `bun:"m2m:post_to_projects,join:Post=Project"`
 }
 ```
 
 <a name="Post.PagePath"></a>
-### func \(\*Post\) [PagePath](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L100>)
+### func \(\*Post\) [PagePath](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L222>)
 
 ```go
 func (emb *Post) PagePath() string
@@ -203,19 +631,98 @@ func (emb *Post) PagePath() string
 
 PagePath returns the path to the post page.
 
+<a name="Post.String"></a>
+### func \(\*Post\) [String](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L236>)
+
+```go
+func (emb *Post) String() string
+```
+
+
+
+<a name="PostToPost"></a>
+## type [PostToPost](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L186-L193>)
+
+PostToPost represents a many\-to\-many relationship between posts and other posts.
+
+```go
+type PostToPost struct {
+    bun.BaseModel `bun:"post_to_posts"`
+
+    SourcePostID int64 `bun:"source_post_id,pk"`
+    SourcePost   *Post `bun:"rel:belongs-to,join:source_post_id=id"`
+    TargetPostID int64 `bun:"target_post_id,pk"`
+    TargetPost   *Post `bun:"rel:belongs-to,join:target_post_id=id"`
+}
+```
+
+<a name="PostToProject"></a>
+## type [PostToProject](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L166-L173>)
+
+PostToProject represents a many\-to\-many relationship between posts and projects.
+
+```go
+type PostToProject struct {
+    bun.BaseModel `bun:"post_to_projects"`
+
+    PostID    int64    `bun:"post_id,pk"`
+    Post      *Post    `bun:"rel:belongs-to,join:post_id=id"`
+    ProjectID int64    `bun:"project_id,pk"`
+    Project   *Project `bun:"rel:belongs-to,join:project_id=id"`
+}
+```
+
+<a name="PostToTag"></a>
+## type [PostToTag](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L156-L163>)
+
+PostToTag represents a many\-to\-many relationship between posts and tags.
+
+```go
+type PostToTag struct {
+    bun.BaseModel `bun:"post_to_tags"`
+
+    PostID int64 `bun:"post_id,pk"`
+    Post   *Post `bun:"rel:belongs-to,join:post_id=id"`
+    TagID  int64 `bun:"tag_id,pk"`
+    Tag    *Tag  `bun:"rel:belongs-to,join:tag_id=id"`
+}
+```
+
 <a name="Project"></a>
-## type [Project](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L57-L59>)
+## type [Project](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L103-L127>)
 
 Project is a project with all its posts and tags.
 
 ```go
 type Project struct {
-    Embedded
+    bun.BaseModel `bun:"projects"`
+
+    ID  int64 `bun:"id,pk,autoincrement" yaml:"-"`
+
+    X   float64
+    Y   float64
+    Z   float64
+
+    Title       string     `bun:"title"`
+    Slug        string     `bun:"slug,unique"`
+    Description string     `bun:"description"`
+    Content     string     `bun:"content"`
+    BannerPath  string     `bun:"banner_path"`
+    CreatedAt   CustomTime `bun:"created_at"`
+
+    TagSlugs     []string `bun:"tag_slugs"`
+    PostSlugs    []string `bun:"post_slugs"`
+    ProjectSlugs []string `bun:"project_slugs"`
+
+    // M2M relationships
+    Tags     []*Tag     `bun:"m2m:project_to_tags,join:Project=Tag"`
+    Posts    []*Post    `bun:"m2m:post_to_projects,join:Project=Post"`
+    Projects []*Project `bun:"m2m:project_to_projects,join:SourceProject=TargetProject"`
 }
 ```
 
 <a name="Project.PagePath"></a>
-### func \(\*Project\) [PagePath](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L105>)
+### func \(\*Project\) [PagePath](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L227>)
 
 ```go
 func (emb *Project) PagePath() string
@@ -223,25 +730,207 @@ func (emb *Project) PagePath() string
 
 PagePath returns the path to the project page.
 
+<a name="Project.String"></a>
+### func \(\*Project\) [String](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L240>)
+
+```go
+func (emb *Project) String() string
+```
+
+
+
+<a name="ProjectToProject"></a>
+## type [ProjectToProject](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L196-L203>)
+
+ProjectToProject represents a many\-to\-many relationship between projects and other projects.
+
+```go
+type ProjectToProject struct {
+    bun.BaseModel `bun:"project_to_projects"`
+
+    SourceProjectID int64    `bun:"source_project_id,pk"`
+    SourceProject   *Project `bun:"rel:belongs-to,join:source_project_id=id"`
+    TargetProjectID int64    `bun:"target_project_id,pk"`
+    TargetProject   *Project `bun:"rel:belongs-to,join:target_project_id=id"`
+}
+```
+
+<a name="ProjectToTag"></a>
+## type [ProjectToTag](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L176-L183>)
+
+ProjectToTag represents a many\-to\-many relationship between projects and tags.
+
+```go
+type ProjectToTag struct {
+    bun.BaseModel `bun:"project_to_tags"`
+
+    ProjectID int64    `bun:"project_id,pk"`
+    Project   *Project `bun:"rel:belongs-to,join:project_id=id"`
+    TagID     int64    `bun:"tag_id,pk"`
+    Tag       *Tag     `bun:"rel:belongs-to,join:tag_id=id"`
+}
+```
+
+<a name="RelationshipFn"></a>
+## type [RelationshipFn](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/upsert.go#L15>)
+
+RelationshipFn is a function that updates relationships.
+
+```go
+type RelationshipFn func(context.Context) error
+```
+
+<a name="UpsertPost"></a>
+### func [UpsertPost](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/upsert.go#L18-L22>)
+
+```go
+func UpsertPost(ctx context.Context, db *bun.DB, post *Post) (RelationshipFn, error)
+```
+
+UpsertPost saves a post to the database \(to be called from the DB worker\).
+
+<a name="UpsertPostRelationships"></a>
+### func [UpsertPostRelationships](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/upsert.go#L128-L131>)
+
+```go
+func UpsertPostRelationships(db *bun.DB, post *Post) RelationshipFn
+```
+
+UpsertPostRelationships updates relationships for a post \(to be called from the DB worker\).
+
+<a name="UpsertProject"></a>
+### func [UpsertProject](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/upsert.go#L58-L62>)
+
+```go
+func UpsertProject(ctx context.Context, db *bun.DB, project *Project) (RelationshipFn, error)
+```
+
+UpsertProject saves a project to the database \(to be called from the DB worker\).
+
+<a name="UpsertProjectRelationships"></a>
+### func [UpsertProjectRelationships](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/upsert.go#L273-L276>)
+
+```go
+func UpsertProjectRelationships(db *bun.DB, project *Project) RelationshipFn
+```
+
+UpsertProjectRelationships updates relationships for a project.
+
+<a name="UpsertTag"></a>
+### func [UpsertTag](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/upsert.go#L93-L97>)
+
+```go
+func UpsertTag(ctx context.Context, db *bun.DB, tag *Tag) (RelationshipFn, error)
+```
+
+UpsertTag saves a tag to the database \(to be called from the DB worker\).
+
+<a name="UpsertTagRelationships"></a>
+### func [UpsertTagRelationships](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/upsert.go#L418-L421>)
+
+```go
+func UpsertTagRelationships(db *bun.DB, tag *Tag) RelationshipFn
+```
+
+UpsertTagRelationships updates relationships for a tag .
+
 <a name="Tag"></a>
-## type [Tag](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L61-L63>)
+## type [Tag](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L130-L154>)
 
 Tag is a tag with all its posts and projects.
 
 ```go
 type Tag struct {
-    Embedded
+    bun.BaseModel `bun:"tags"`
+
+    ID  int64 `bun:"id,pk,autoincrement"`
+    X   float64
+    Y   float64
+    Z   float64
+
+    Title       string     `bun:"title"`
+    Slug        string     `bun:"slug,unique"`
+    Description string     `bun:"description"`
+    Content     string     `bun:"content"`
+    BannerPath  string     `bun:"banner_path"`
+    Icon        string     `bun:"icon"`
+    CreatedAt   CustomTime `bun:"created_at"`
+
+    TagSlugs     []string `bun:"tag_slugs"`
+    PostSlugs    []string `bun:"post_slugs"`
+    ProjectSlugs []string `bun:"project_slugs"`
+
+    // M2M relationships
+    Tags     []*Tag     `bun:"m2m:tag_to_tags,join:SourceTag=TargetTag"`
+    Posts    []*Post    `bun:"m2m:post_to_tags,join:Tag=Post"`
+    Projects []*Project `bun:"m2m:project_to_tags,join:Tag=Project"`
 }
 ```
 
 <a name="Tag.PagePath"></a>
-### func \(\*Tag\) [PagePath](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L110>)
+### func \(\*Tag\) [PagePath](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L232>)
 
 ```go
 func (emb *Tag) PagePath() string
 ```
 
 PagePath returns the path to the tag page.
+
+<a name="Tag.String"></a>
+### func \(\*Tag\) [String](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L244>)
+
+```go
+func (emb *Tag) String() string
+```
+
+
+
+<a name="TagToTag"></a>
+## type [TagToTag](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L206-L213>)
+
+TagToTag represents a many\-to\-many relationship between tags and other tags.
+
+```go
+type TagToTag struct {
+    bun.BaseModel `bun:"tag_to_tags"`
+
+    SourceTagID int64 `bun:"source_tag_id,pk"`
+    SourceTag   *Tag  `bun:"rel:belongs-to,join:source_tag_id=id"`
+    TargetTagID int64 `bun:"target_tag_id,pk"`
+    TargetTag   *Tag  `bun:"rel:belongs-to,join:target_tag_id=id"`
+}
+```
+
+<a name="Tigris"></a>
+## type [Tigris](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/s3.go#L26-L32>)
+
+Tigris is an interface for AWS clients.
+
+```go
+type Tigris interface {
+    PutObject(
+        ctx context.Context,
+        params *s3.PutObjectInput,
+        optFns ...func(*s3.Options),
+    ) (*s3.PutObjectOutput, error)
+}
+```
+
+<a name="Utterance"></a>
+## type [Utterance](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/simularity.go#L208-L215>)
+
+Utterance represents a utterance in the semantic router.
+
+```go
+type Utterance struct {
+    // ID is the ID of the utterance.
+    ID  int
+    // Utterance is the text of the utterance.
+    Utterance string
+    // Embed is the embedding of the utterance. It is a vector of floats.
+    Embed embedding
+}
+```
 
 Generated by [gomarkdoc](<https://github.com/princjef/gomarkdoc>)
 
