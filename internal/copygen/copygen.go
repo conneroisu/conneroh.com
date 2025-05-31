@@ -9,9 +9,6 @@ import "github.com/conneroisu/conneroh.com/internal/assets"
 // ToPost copies a *assets.Doc to a *assets.Post.
 func ToPost(tP *assets.Post, fD *assets.Doc) {
 	// *assets.Post fields
-	tP.X = fD.X
-	tP.Y = fD.Y
-	tP.Z = fD.Z
 	tP.Title = fD.Title
 	tP.Slug = fD.Slug
 	tP.Description = fD.Description
@@ -28,9 +25,6 @@ func ToPost(tP *assets.Post, fD *assets.Doc) {
 // ToProject copies a *assets.Doc to a *assets.Project.
 func ToProject(tP *assets.Project, fD *assets.Doc) {
 	// *assets.Project fields
-	tP.X = fD.X
-	tP.Y = fD.Y
-	tP.Z = fD.Z
 	tP.Title = fD.Title
 	tP.Slug = fD.Slug
 	tP.Description = fD.Description
@@ -45,9 +39,6 @@ func ToProject(tP *assets.Project, fD *assets.Doc) {
 // ToTag copies a *assets.Doc to a *assets.Tag.
 func ToTag(tT *assets.Tag, fD *assets.Doc) {
 	// *assets.Tag fields
-	tT.X = fD.X
-	tT.Y = fD.Y
-	tT.Z = fD.Z
 	tT.Title = fD.Title
 	tT.Slug = fD.Slug
 	tT.Description = fD.Description

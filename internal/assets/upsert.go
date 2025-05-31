@@ -30,9 +30,6 @@ func UpsertPost(
 		Set("content = EXCLUDED.content").
 		Set("banner_path = EXCLUDED.banner_path").
 		Set("created_at = EXCLUDED.created_at").
-		Set("x = EXCLUDED.x").
-		Set("y = EXCLUDED.y").
-		Set("z = EXCLUDED.z").
 		Exec(insertCtx)
 	slog.Debug(
 		"saved post",
@@ -70,9 +67,6 @@ func UpsertProject(
 		Set("content = EXCLUDED.content").
 		Set("banner_path = EXCLUDED.banner_path").
 		Set("created_at = EXCLUDED.created_at").
-		Set("x = EXCLUDED.x").
-		Set("y = EXCLUDED.y").
-		Set("z = EXCLUDED.z").
 		Exec(insertCtx)
 	if err != nil {
 		if errors.Is(err, context.DeadlineExceeded) {
@@ -105,9 +99,6 @@ func UpsertTag(
 		Set("content = EXCLUDED.content").
 		Set("banner_path = EXCLUDED.banner_path").
 		Set("created_at = EXCLUDED.created_at").
-		Set("x = EXCLUDED.x").
-		Set("y = EXCLUDED.y").
-		Set("z = EXCLUDED.z").
 		Exec(insertCtx)
 	if err != nil {
 		if errors.Is(err, context.DeadlineExceeded) {

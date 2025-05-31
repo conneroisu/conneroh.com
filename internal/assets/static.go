@@ -58,9 +58,6 @@ type (
 		PostSlugs    []string   `yaml:"posts"`
 		ProjectSlugs []string   `yaml:"projects"`
 		Hash         string     `yaml:"-"`
-		X            float64    `json:"x"`
-		Y            float64    `json:"y"`
-		Z            float64    `json:"z"`
 		Posts        []*Post    `yaml:"-"`
 		Tags         []*Tag     `yaml:"-"`
 		Projects     []*Project `yaml:"-"`
@@ -78,9 +75,6 @@ type (
 		bun.BaseModel `bun:"posts"`
 
 		ID int64 `bun:"id,pk,autoincrement" `
-		X  float64
-		Y  float64
-		Z  float64
 
 		Title       string     `bun:"title"`
 		Slug        string     `bun:"slug,unique"`
@@ -105,10 +99,6 @@ type (
 
 		ID int64 `bun:"id,pk,autoincrement" yaml:"-"`
 
-		X float64
-		Y float64
-		Z float64
-
 		Title       string     `bun:"title"`
 		Slug        string     `bun:"slug,unique"`
 		Description string     `bun:"description"`
@@ -131,9 +121,6 @@ type (
 		bun.BaseModel `bun:"tags"`
 
 		ID int64 `bun:"id,pk,autoincrement"`
-		X  float64
-		Y  float64
-		Z  float64
 
 		Title       string     `bun:"title"`
 		Slug        string     `bun:"slug,unique"`
