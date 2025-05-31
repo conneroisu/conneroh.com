@@ -438,23 +438,19 @@
               '';
             };
 
-            # PR Preview deployment script
             pr-preview = pkgs.writeShellScriptBin "pr-preview" ''
               set -euo pipefail
 
-              # Add required tools to PATH
               export PATH="${
                 pkgs.lib.makeBinPath (with pkgs; [flyctl skopeo jq git gnused coreutils])
               }:$PATH"
 
-              # Script configuration
               readonly APP_PREFIX="pr"
               readonly FLY_ORG="''${FLY_ORG:-personal}"
               readonly FLY_REGION="''${FLY_REGION:-ord}"
 
               [ -z "$MASTER_FLY_AUTH_TOKEN" ] && MASTER_FLY_AUTH_TOKEN="$(doppler secrets get --plain MASTER_FLY_AUTH_TOKEN)"
 
-              # Functions
               generate_app_name() {
                   local pr_number="$1"
                   echo "''${APP_PREFIX}-''${pr_number}-conneroh-com" | tr '[:upper:]' '[:lower:]'
@@ -528,11 +524,9 @@
                     -t "$MASTER_FLY_AUTH_TOKEN"
                     "$@"
 
-                  # Output deployment information
                   echo "Deployment complete!"
                   echo "URL: https://''${app_name}.fly.dev"
 
-                  # Get deployment details
                   flyctl status --app "''${app_name}" --json -t "$MASTER_FLY_AUTH_TOKEN" | jq '{
                       app: .Name,
                       url: "https://\(.Name).fly.dev",
