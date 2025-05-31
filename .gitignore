@@ -11,6 +11,8 @@
 # Node
 node_modules
 .env
+package-lock.json
+
 # Editors
 .vscode
 .idea
