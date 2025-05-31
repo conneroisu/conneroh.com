@@ -11,7 +11,7 @@ templ Post(
 	post *assets.Post,
 ) {
 	<div
-		class={ twerge.It("px-4 container mx-auto py-8") }
+		class={ twerge.It("px-4 mx-auto py-8 max-w-5xl") }
 	>
 		if post.BannerPath != "" {
 			@components.Image(
