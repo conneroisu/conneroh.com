@@ -156,7 +156,7 @@
           };
           live-ci = {
             exec = ''
-              go run ./cmd/live-ci/main.go
+              go run "$REPO_ROOT"/cmd/live-ci/main.go
             '';
             env.DEBUG = "true";
             deps = with pkgs;
@@ -510,7 +510,6 @@
                 cpus = 1
               EOF
 
-                  # Copy image to Fly.io registry
                   local registry="registry.fly.io/''${app_name}"
                   echo "Copying image to ''${registry}..."
 
@@ -520,7 +519,7 @@
                     "docker://''${registry}:latest" \
                     --dest-creds x:"''${MASTER_FLY_AUTH_TOKEN}"
 
-                  # Deploy
+                  echo "Deploying PR #''${pr_number} to app: ''${app_name}"
                   flyctl deploy \
                     --app "''${app_name}" \
                     --config fly.pr.toml \
