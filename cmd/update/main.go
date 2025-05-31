@@ -26,11 +26,6 @@ const (
 	taskBufferInt = 1000
 )
 
-var (
-	workers    = flag.Int("workers", numWorkers, "number of parallel workers")
-	taskBuffer = flag.Int("buffer", taskBufferInt, "size of task buffer")
-)
-
 func main() {
 	flag.Parse()
 	slog.SetDefault(logger.DefaultLogger)
@@ -43,7 +38,7 @@ func main() {
 		syscall.SIGHUP)
 	defer stop()
 
-	err := run(ctx, os.Getenv, *workers, *taskBuffer)
+	err := run(ctx, os.Getenv)
 	if err != nil {
 		panic(err)
 	}
@@ -53,9 +48,11 @@ func main() {
 func run(
 	ctx context.Context,
 	getenv func(string) string,
-	_, _ int,
 ) error {
-	var relFns []assets.RelationshipFn
+	var (
+		relFns []assets.RelationshipFn
+		items  []assets.DirMatchItem
+	)
 	sqldb, err := sql.Open("sqlite", assets.DBName())
 	if err != nil {
 		return eris.Wrap(err, "failed to open database")
@@ -80,11 +77,12 @@ func run(
 	}
 	md := assets.NewMD(fs)
 
-	todoAssets, err := assets.HashDirMatch(ctx, fs, assets.AssetsLoc, db)
+	// Assets
+	items, err = assets.HashDirMatch(ctx, fs, assets.AssetsLoc, db)
 	if err != nil {
 		return err
 	}
-	for _, item := range todoAssets {
+	for _, item := range items {
 		slog.Info("uploading to S3", "path", item.Path)
 		err = assets.UploadToS3(
 			ctx,
@@ -98,11 +96,12 @@ func run(
 		}
 	}
 
-	todoPosts, err := assets.HashDirMatch(ctx, fs, assets.PostsLoc, db)
+	// Posts
+	items, err = assets.HashDirMatch(ctx, fs, assets.PostsLoc, db)
 	if err != nil {
 		return eris.Wrap(err, "failed to hash posts")
 	}
-	for _, item := range todoPosts {
+	for _, item := range items {
 		slog.Info("processing post", "path", item.Path)
 		var (
 			post  assets.Post
@@ -121,11 +120,12 @@ func run(
 		relFns = append(relFns, relFn)
 	}
 
-	todoProjects, err := assets.HashDirMatch(ctx, fs, assets.ProjectsLoc, db)
+	// Projects
+	items, err = assets.HashDirMatch(ctx, fs, assets.ProjectsLoc, db)
 	if err != nil {
 		return eris.Wrap(err, "failed to hash projects")
 	}
-	for _, item := range todoProjects {
+	for _, item := range items {
 		slog.Info("processing project", "path", item.Path)
 		var (
 			project assets.Project
@@ -144,11 +144,11 @@ func run(
 		relFns = append(relFns, relFn)
 	}
 
-	todoTags, err := assets.HashDirMatch(ctx, fs, assets.TagsLoc, db)
+	items, err = assets.HashDirMatch(ctx, fs, assets.TagsLoc, db)
 	if err != nil {
 		return eris.Wrap(err, "failed to hash tags")
 	}
-	for _, item := range todoTags {
+	for _, item := range items {
 		slog.Info("processing tag", "path", item.Path)
 		var (
 			tag   assets.Tag
