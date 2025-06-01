@@ -108,6 +108,7 @@ func listHandler(
 					&filtered,
 					nil,
 					nil,
+					nil,
 					query,
 					page,
 					totalPages,
@@ -116,6 +117,7 @@ func listHandler(
 				templ.Handler(views.ListResults(
 					target,
 					&filtered,
+					nil,
 					nil,
 					nil,
 					page,
@@ -152,6 +154,7 @@ func listHandler(
 					nil,
 					&filtered,
 					nil,
+					nil,
 					query,
 					page,
 					totalPages,
@@ -161,6 +164,7 @@ func listHandler(
 					target,
 					nil,
 					&filtered,
+					nil,
 					nil,
 					page,
 					totalPages,
@@ -196,6 +200,7 @@ func listHandler(
 					nil,
 					nil,
 					&filtered,
+					nil,
 					query,
 					page,
 					totalPages,
@@ -203,6 +208,54 @@ func listHandler(
 			} else {
 				templ.Handler(views.ListResults(
 					target,
+					nil,
+					nil,
+					&filtered,
+					nil,
+					page,
+					totalPages,
+				)).ServeHTTP(w, r)
+			}
+		case routing.EmploymentPluralPath:
+			if len(allEmployments) == 0 {
+				err = db.NewSelect().Model(&allEmployments).
+					Order("updated_at").
+					Relation("Tags").
+					Relation("Posts").
+					Relation("Projects").
+					Relation("Employments").
+					Scan(r.Context())
+				if err != nil {
+					return eris.Wrap(
+						err,
+						"failed to scan employments for employment list",
+					)
+				}
+			}
+			filtered, totalPages := filter(
+				allEmployments,
+				query,
+				page,
+				routing.MaxListLargeItems,
+				func(employment *assets.Employment) string {
+					return employment.Title
+				},
+			)
+			if header == "" {
+				templ.Handler(layouts.Page(views.List(
+					target,
+					nil,
+					nil,
+					nil,
+					&filtered,
+					query,
+					page,
+					totalPages,
+				))).ServeHTTP(w, r)
+			} else {
+				templ.Handler(views.ListResults(
+					target,
+					nil,
 					nil,
 					nil,
 					&filtered,
@@ -272,10 +325,26 @@ func HandleHome(db *bun.DB) func(w http.ResponseWriter, r *http.Request) error {
 				)
 			}
 		}
+		if len(allEmployments) == 0 {
+			err = db.NewSelect().Model(&allEmployments).
+				Order("updated_at").
+				Relation("Tags").
+				Relation("Posts").
+				Relation("Projects").
+				Relation("Employments").
+				Scan(r.Context())
+			if err != nil {
+				return eris.Wrap(
+					err,
+					"failed to scan employments for home page",
+				)
+			}
+		}
 		var home = views.Home(
 			&allPosts,
 			&allProjects,
 			&allTags,
+			&allEmployments,
 		)
 		homePage = &home
 		routing.MorphableHandler(
@@ -319,6 +388,7 @@ func HandleProjects(db *bun.DB) routing.APIFunc {
 			routing.ProjectPluralPath,
 			nil,
 			&allProjects,
+			nil,
 			nil,
 			"",
 			1,
@@ -453,6 +523,7 @@ func HandleTags(db *bun.DB) routing.APIFunc {
 			nil,
 			nil,
 			&allTags,
+			nil,
 			"",
 			1,
 			(len(allTags)+routing.MaxListSmallItems-1)/routing.MaxListSmallItems,
@@ -543,6 +614,7 @@ func HandlePosts(db *bun.DB) routing.APIFunc {
 			&allPosts,
 			nil,
 			nil,
+			nil,
 			"",
 			1,
 			(len(allPosts)+routing.MaxListLargeItems-1)/routing.MaxListLargeItems,
@@ -551,6 +623,99 @@ func HandlePosts(db *bun.DB) routing.APIFunc {
 		routing.MorphableHandler(
 			layouts.Page,
 			posts,
+		).ServeHTTP(w, r)
+
+		return nil
+	}
+}
+
+// HandleEmployments handles the employments page. aka /employments.
+func HandleEmployments(db *bun.DB) routing.APIFunc {
+	// Handler Component Cache
+	var employmentList *templ.Component
+
+	return func(w http.ResponseWriter, r *http.Request) error {
+		if employmentList != nil {
+			routing.MorphableHandler(
+				layouts.Page,
+				*employmentList,
+			).ServeHTTP(w, r)
+
+			return nil
+		}
+		if len(allEmployments) == 0 {
+			err := db.NewSelect().Model(&allEmployments).
+				Order("created_at").
+				Relation("Tags").
+				Relation("Posts").
+				Relation("Projects").
+				Relation("Employments").
+				Scan(r.Context())
+			if err != nil {
+				return eris.Wrap(
+					err,
+					"failed to scan employments for employments page",
+				)
+			}
+		}
+		var employments = views.List(
+			routing.EmploymentPluralPath,
+			nil,
+			nil,
+			nil,
+			&allEmployments,
+			"",
+			1,
+			(len(allEmployments)+routing.MaxListLargeItems-1)/routing.MaxListLargeItems,
+		)
+		employmentList = &employments
+		routing.MorphableHandler(
+			layouts.Page,
+			employments,
+		).ServeHTTP(w, r)
+
+		return nil
+	}
+}
+
+// HandleEmployment handles the employment page. aka /employment/{slug...}.
+func HandleEmployment(db *bun.DB) routing.APIFunc {
+	// Handler Component Slug-Mapped Cache
+	var employmentMap = map[string]templ.Component{}
+
+	return func(w http.ResponseWriter, r *http.Request) error {
+		var (
+			emp  assets.Employment
+			comp templ.Component
+			ok   bool
+			slug = routing.Slug(r)
+		)
+		if comp, ok = employmentMap[slug]; ok {
+			routing.MorphableHandler(
+				layouts.Page,
+				comp,
+			).ServeHTTP(w, r)
+
+			return nil
+		}
+		err := db.NewSelect().Model(&emp).
+			Where("slug = ?", slug).
+			Relation("Tags").
+			Relation("Posts").
+			Relation("Projects").
+			Relation("Employments").
+			Limit(1).Scan(r.Context())
+		if err != nil {
+			return eris.Wrap(
+				err,
+				"failed to scan employment",
+			)
+		}
+		comp = views.Employment(&emp)
+		employmentMap[slug] = comp
+		routing.MorphableHandler(
+			layouts.Page,
+			comp,
 		).ServeHTTP(w, r)
 
 		return nil
@@ -662,6 +827,24 @@ func filter[T any](
 				if v.Icon != "" && strings.Contains(strings.ToLower(v.Icon), query) {
 					score += 10
 					matchFound = true
+				}
+			case *assets.Employment:
+				// Check description
+				if strings.Contains(strings.ToLower(v.Description), query) {
+					score += 50
+					matchFound = true
+				}
+				// Check content
+				if strings.Contains(strings.ToLower(v.Content), query) {
+					score += 30
+					matchFound = true
+				}
+				// Check tags
+				for _, tag := range v.Tags {
+					if tag != nil && strings.Contains(strings.ToLower(tag.Title), query) {
+						score += 25
+						matchFound = true
+					}
 				}
 			}
 

@@ -148,6 +148,15 @@ templ header() {
 							>
 								Tags
 							</a>
+							<a
+								class={ twerge.It("hover:text-white cursor-pointer text-gray-300") }
+								hx-target="#bodiody"
+								hx-get="/employments"
+								hx-push-url="true"
+								preload="mouseover"
+							>
+								Employments
+							</a>
 						</div>
 					</div>
 				</div>
@@ -191,6 +200,16 @@ templ header() {
 						preload="ontouchstart"
 					>
 						Tags
+					</a>
+					<a
+						class={ twerge.It("text-base text-gray-300 hover:bg-gray-700 hover:text-white pl-3 pr-4 block py-2 font-medium") }
+						hx-target="#bodiody"
+						hx-get="/employments"
+						hx-push-url="true"
+						@click="isMenuOpen = false"
+						preload="ontouchstart"
+					>
+						Employments
 					</a>
 				</div>
 			</div>

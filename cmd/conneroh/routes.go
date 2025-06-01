@@ -15,9 +15,10 @@ import (
 
 var (
 	// Instance Caches.
-	allPosts    = []*assets.Post{}
-	allProjects = []*assets.Project{}
-	allTags     = []*assets.Tag{}
+	allPosts       = []*assets.Post{}
+	allProjects    = []*assets.Project{}
+	allTags        = []*assets.Tag{}
+	allEmployments = []*assets.Employment{}
 )
 
 // AddRoutes adds all routes to the router.
@@ -67,6 +68,15 @@ func AddRoutes(
 	h.HandleFunc(
 		"GET /tag/{slug...}",
 		routing.Make(HandleTag(db)))
+	h.HandleFunc(
+		"GET /employments",
+		routing.Make(HandleEmployments(db)))
+	h.Handle(
+		"GET /search/employments",
+		routing.Make(listHandler(routing.EmploymentPluralPath, db)))
+	h.HandleFunc(
+		"GET /employment/{slug...}",
+		routing.Make(HandleEmployment(db)))
 
 	h.HandleFunc(
 		"GET /500",

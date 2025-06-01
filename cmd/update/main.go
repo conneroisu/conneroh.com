@@ -22,9 +22,16 @@ import (
 )
 
 const (
-	numWorkers    = 20
-	taskBufferInt = 1000
+
+	numWorkers         = 20
+	taskBufferInt      = 1000
+	fullAssetLoc       = assets.AssetsLoc
+	fullPostLoc        = assets.PostsLoc
+	fullProjectLoc     = assets.ProjectsLoc
+	fullTagLoc         = assets.TagsLoc
+	fullEmploymentLoc  = assets.EmploymentsLoc
 )
+
 
 func main() {
 	flag.Parse()
@@ -164,6 +171,29 @@ func run(
 		relFn, err = assets.UpsertTag(ctx, db, &tag)
 		if err != nil {
 			return eris.Wrap(err, "failed to upsert tag")
+		}
+		relFns = append(relFns, relFn)
+	}
+
+	todoEmployments, err := assets.HashDirMatch(ctx, fs, fullEmploymentLoc, db)
+	if err != nil {
+		return eris.Wrap(err, "failed to hash employments")
+	}
+	for _, item := range todoEmployments {
+		slog.Info("processing employment", "path", item.Path)
+		var (
+			employment assets.Employment
+			doc        *assets.Doc
+			relFn      assets.RelationshipFn
+		)
+		doc, err = assets.ParseMarkdown(md, item)
+		if err != nil {
+			return eris.Wrap(err, "failed to parse markdown")
+		}
+		copygen.ToEmployment(&employment, doc)
+		relFn, err = assets.UpsertEmployment(ctx, db, &employment)
+		if err != nil {
+			return eris.Wrap(err, "failed to upsert employment")
 		}
 		relFns = append(relFns, relFn)
 	}

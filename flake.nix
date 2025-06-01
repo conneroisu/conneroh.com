@@ -255,6 +255,7 @@
               pprof
               graphviz
 
+              doppler
               tailwindcss # Web
               tailwindcss-language-server
               bun
