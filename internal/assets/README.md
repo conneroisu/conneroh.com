@@ -40,6 +40,13 @@ Package assets contains the main data.
 - [type Doc](<#Doc>)
   - [func ParseMarkdown\(md goldmark.Markdown, item DirMatchItem\) \(\*Doc, error\)](<#ParseMarkdown>)
   - [func \(emb \*Doc\) GetTitle\(\) string](<#Doc.GetTitle>)
+- [type Employment](<#Employment>)
+  - [func \(emb \*Employment\) PagePath\(\) string](<#Employment.PagePath>)
+  - [func \(emb \*Employment\) String\(\) string](<#Employment.String>)
+- [type EmploymentToEmployment](<#EmploymentToEmployment>)
+- [type EmploymentToPost](<#EmploymentToPost>)
+- [type EmploymentToProject](<#EmploymentToProject>)
+- [type EmploymentToTag](<#EmploymentToTag>)
 - [type Post](<#Post>)
   - [func \(emb \*Post\) PagePath\(\) string](<#Post.PagePath>)
   - [func \(emb \*Post\) String\(\) string](<#Post.String>)
@@ -52,6 +59,8 @@ Package assets contains the main data.
 - [type ProjectToProject](<#ProjectToProject>)
 - [type ProjectToTag](<#ProjectToTag>)
 - [type RelationshipFn](<#RelationshipFn>)
+  - [func UpsertEmployment\(ctx context.Context, db \*bun.DB, employment \*Employment\) \(RelationshipFn, error\)](<#UpsertEmployment>)
+  - [func UpsertEmploymentRelationships\(db \*bun.DB, employment \*Employment\) RelationshipFn](<#UpsertEmploymentRelationships>)
   - [func UpsertPost\(ctx context.Context, db \*bun.DB, post \*Post\) \(RelationshipFn, error\)](<#UpsertPost>)
   - [func UpsertPostRelationships\(db \*bun.DB, post \*Post\) RelationshipFn](<#UpsertPostRelationships>)
   - [func UpsertProject\(ctx context.Context, db \*bun.DB, project \*Project\) \(RelationshipFn, error\)](<#UpsertProject>)
@@ -82,6 +91,8 @@ const (
     TagsLoc = "tags/"
     // ProjectsLoc is the location of the projects relative to the vault.
     ProjectsLoc = "projects/"
+    // EmploymentsLoc is the location of the employments relative to the vault.
+    EmploymentsLoc = "employments/"
 )
 ```
 
@@ -106,6 +117,8 @@ var (
     EmpTag = new(Tag)
     // EmpProject is a pointer to a Project.
     EmpProject = new(Project)
+    // EmpEmployment is a pointer to an Employment.
+    EmpEmployment = new(Employment)
     // EmpCache is a pointer to a Cache.
     EmpCache = new(Cache)
     // EmpPostToTag is a pointer to a PostToTag.
@@ -120,6 +133,14 @@ var (
     EmpProjectToProject = new(ProjectToProject)
     // EmpTagToTag is a pointer to a TagToTag.
     EmpTagToTag = new(TagToTag)
+    // EmpEmploymentToTag is a pointer to an EmploymentToTag.
+    EmpEmploymentToTag = new(EmploymentToTag)
+    // EmpEmploymentToPost is a pointer to an EmploymentToPost.
+    EmpEmploymentToPost = new(EmploymentToPost)
+    // EmpEmploymentToProject is a pointer to an EmploymentToProject.
+    EmpEmploymentToProject = new(EmploymentToProject)
+    // EmpEmploymentToEmployment is a pointer to an EmploymentToEmployment.
+    EmpEmploymentToEmployment = new(EmploymentToEmployment)
 )
 ```
 
@@ -166,7 +187,7 @@ var (
 ```
 
 <a name="BucketPath"></a>
-## func [BucketPath](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/paths.go#L100>)
+## func [BucketPath](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/paths.go#L106>)
 
 ```go
 func BucketPath(path string) string
@@ -202,7 +223,7 @@ func Defaults(doc *Doc) error
 Defaults sets the default values for the document if they are missing.
 
 <a name="GetContentType"></a>
-## func [GetContentType](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/paths.go#L90>)
+## func [GetContentType](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/paths.go#L96>)
 
 ```go
 func GetContentType(path string) string
@@ -211,7 +232,7 @@ func GetContentType(path string) string
 GetContentType returns the content type for a file extension.
 
 <a name="InitDB"></a>
-## func [InitDB](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/emp.go#L46-L49>)
+## func [InitDB](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/emp.go#L61-L64>)
 
 ```go
 func InitDB(ctx context.Context, db *bun.DB) error
@@ -256,7 +277,7 @@ func NewMD(fs afero.Fs) goldmark.Markdown
 NewMD creates a new markdown parser.
 
 <a name="Pathify"></a>
-## func [Pathify](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/paths.go#L24>)
+## func [Pathify](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/paths.go#L26>)
 
 ```go
 func Pathify(s string) string
@@ -265,7 +286,7 @@ func Pathify(s string) string
 Pathify returns the slugified path of a document or media asset.
 
 <a name="RegisterModels"></a>
-## func [RegisterModels](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/emp.go#L64>)
+## func [RegisterModels](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/emp.go#L79>)
 
 ```go
 func RegisterModels(db *bun.DB)
@@ -274,7 +295,7 @@ func RegisterModels(db *bun.DB)
 RegisterModels registers all the M2M relationship models with Bun.
 
 <a name="Slugify"></a>
-## func [Slugify](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/paths.go#L36>)
+## func [Slugify](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/paths.go#L38>)
 
 ```go
 func Slugify(s string) string
@@ -301,7 +322,7 @@ func Validate(path string, emb *Doc) error
 Validate validate the given embedding.
 
 <a name="Cache"></a>
-## type [Cache](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L69-L75>)
+## type [Cache](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L68-L74>)
 
 Cache is a any asset.
 
@@ -385,31 +406,30 @@ func MatchItem(fs afero.Fs, path string) (DirMatchItem, error)
 MatchItem takes a path and returns a DirMatchItem.
 
 <a name="Doc"></a>
-## type [Doc](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L47-L67>)
+## type [Doc](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L47-L66>)
 
 Doc is a base struct for all embeddedable structs.
 
 ```go
 type Doc struct {
-    Title        string     `yaml:"title"`
-    Path         string     `yaml:"-"`
-    Slug         string     `yaml:"slug"`
-    Description  string     `yaml:"description"`
-    Content      string     `yaml:"-"`
-    BannerPath   string     `yaml:"banner_path"`
-    Icon         string     `yaml:"icon"`
-    CreatedAt    CustomTime `yaml:"created_at"`
-    UpdatedAt    CustomTime `yaml:"updated_at"`
-    TagSlugs     []string   `yaml:"tags"`
-    PostSlugs    []string   `yaml:"posts"`
-    ProjectSlugs []string   `yaml:"projects"`
-    Hash         string     `yaml:"-"`
-    X            float64    `json:"x"`
-    Y            float64    `json:"y"`
-    Z            float64    `json:"z"`
-    Posts        []*Post    `yaml:"-"`
-    Tags         []*Tag     `yaml:"-"`
-    Projects     []*Project `yaml:"-"`
+    Title           string        `yaml:"title"`
+    Path            string        `yaml:"-"`
+    Slug            string        `yaml:"slug"`
+    Description     string        `yaml:"description"`
+    Content         string        `yaml:"-"`
+    BannerPath      string        `yaml:"banner_path"`
+    Icon            string        `yaml:"icon"`
+    CreatedAt       CustomTime    `yaml:"created_at"`
+    UpdatedAt       CustomTime    `yaml:"updated_at"`
+    TagSlugs        []string      `yaml:"tags"`
+    PostSlugs       []string      `yaml:"posts"`
+    ProjectSlugs    []string      `yaml:"projects"`
+    EmploymentSlugs []string      `yaml:"employments"`
+    Hash            string        `yaml:"-"`
+    Posts           []*Post       `yaml:"-"`
+    Tags            []*Tag        `yaml:"-"`
+    Projects        []*Project    `yaml:"-"`
+    Employments     []*Employment `yaml:"-"`
 }
 ```
 
@@ -423,7 +443,7 @@ func ParseMarkdown(md goldmark.Markdown, item DirMatchItem) (*Doc, error)
 ParseMarkdown parses a markdown document.
 
 <a name="Doc.GetTitle"></a>
-### func \(\*Doc\) [GetTitle](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L217>)
+### func \(\*Doc\) [GetTitle](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L278>)
 
 ```go
 func (emb *Doc) GetTitle() string
@@ -431,19 +451,16 @@ func (emb *Doc) GetTitle() string
 
 GetTitle returns the title of the embedding.
 
-<a name="Post"></a>
-## type [Post](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L77-L100>)
+<a name="Employment"></a>
+## type [Employment](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L152-L174>)
 
-Post is a post with all its projects and tags.
+Employment is an employment with all its posts, projects, and tags.
 
 ```go
-type Post struct {
-    bun.BaseModel `bun:"posts"`
+type Employment struct {
+    bun.BaseModel `bun:"employments"`
 
-    ID  int64 `bun:"id,pk,autoincrement" `
-    X   float64
-    Y   float64
-    Z   float64
+    ID  int64 `bun:"id,pk,autoincrement"`
 
     Title       string     `bun:"title"`
     Slug        string     `bun:"slug,unique"`
@@ -452,19 +469,134 @@ type Post struct {
     BannerPath  string     `bun:"banner_path"`
     CreatedAt   CustomTime `bun:"created_at"`
 
-    TagSlugs     []string
-    PostSlugs    []string
-    ProjectSlugs []string
+    TagSlugs        []string `bun:"tag_slugs"`
+    PostSlugs       []string `bun:"post_slugs"`
+    ProjectSlugs    []string `bun:"project_slugs"`
+    EmploymentSlugs []string `bun:"employment_slugs"`
 
     // M2M relationships
-    Tags     []*Tag     `bun:"m2m:post_to_tags,join:Post=Tag"`
-    Posts    []*Post    `bun:"m2m:post_to_posts,join:SourcePost=TargetPost"`
-    Projects []*Project `bun:"m2m:post_to_projects,join:Post=Project"`
+    Tags        []*Tag        `bun:"m2m:employment_to_tags,join:Employment=Tag"`
+    Posts       []*Post       `bun:"m2m:employment_to_posts,join:Employment=Post"`
+    Projects    []*Project    `bun:"m2m:employment_to_projects,join:Employment=Project"`
+    Employments []*Employment `bun:"m2m:employment_to_employments,join:SourceEmployment=TargetEmployment"`
+}
+```
+
+<a name="Employment.PagePath"></a>
+### func \(\*Employment\) [PagePath](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L298>)
+
+```go
+func (emb *Employment) PagePath() string
+```
+
+PagePath returns the path to the employment page.
+
+<a name="Employment.String"></a>
+### func \(\*Employment\) [String](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L314>)
+
+```go
+func (emb *Employment) String() string
+```
+
+
+
+<a name="EmploymentToEmployment"></a>
+## type [EmploymentToEmployment](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L267-L274>)
+
+EmploymentToEmployment represents a many\-to\-many relationship between employments and other employments.
+
+```go
+type EmploymentToEmployment struct {
+    bun.BaseModel `bun:"employment_to_employments"`
+
+    SourceEmploymentID int64       `bun:"source_employment_id,pk"`
+    SourceEmployment   *Employment `bun:"rel:belongs-to,join:source_employment_id=id"`
+    TargetEmploymentID int64       `bun:"target_employment_id,pk"`
+    TargetEmployment   *Employment `bun:"rel:belongs-to,join:target_employment_id=id"`
+}
+```
+
+<a name="EmploymentToPost"></a>
+## type [EmploymentToPost](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L247-L254>)
+
+EmploymentToPost represents a many\-to\-many relationship between employments and posts.
+
+```go
+type EmploymentToPost struct {
+    bun.BaseModel `bun:"employment_to_posts"`
+
+    EmploymentID int64       `bun:"employment_id,pk"`
+    Employment   *Employment `bun:"rel:belongs-to,join:employment_id=id"`
+    PostID       int64       `bun:"post_id,pk"`
+    Post         *Post       `bun:"rel:belongs-to,join:post_id=id"`
+}
+```
+
+<a name="EmploymentToProject"></a>
+## type [EmploymentToProject](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L257-L264>)
+
+EmploymentToProject represents a many\-to\-many relationship between employments and projects.
+
+```go
+type EmploymentToProject struct {
+    bun.BaseModel `bun:"employment_to_projects"`
+
+    EmploymentID int64       `bun:"employment_id,pk"`
+    Employment   *Employment `bun:"rel:belongs-to,join:employment_id=id"`
+    ProjectID    int64       `bun:"project_id,pk"`
+    Project      *Project    `bun:"rel:belongs-to,join:project_id=id"`
+}
+```
+
+<a name="EmploymentToTag"></a>
+## type [EmploymentToTag](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L237-L244>)
+
+EmploymentToTag represents a many\-to\-many relationship between employments and tags.
+
+```go
+type EmploymentToTag struct {
+    bun.BaseModel `bun:"employment_to_tags"`
+
+    EmploymentID int64       `bun:"employment_id,pk"`
+    Employment   *Employment `bun:"rel:belongs-to,join:employment_id=id"`
+    TagID        int64       `bun:"tag_id,pk"`
+    Tag          *Tag        `bun:"rel:belongs-to,join:tag_id=id"`
+}
+```
+
+<a name="Post"></a>
+## type [Post](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L76-L98>)
+
+Post is a post with all its projects and tags.
+
+```go
+type Post struct {
+    bun.BaseModel `bun:"posts"`
+
+    ID  int64 `bun:"id,pk,autoincrement" `
+
+    Title       string     `bun:"title"`
+    Slug        string     `bun:"slug,unique"`
+    Description string     `bun:"description"`
+    Content     string     `bun:"content"`
+    BannerPath  string     `bun:"banner_path"`
+    CreatedAt   CustomTime `bun:"created_at"`
+
+    TagSlugs        []string
+    PostSlugs       []string
+    ProjectSlugs    []string
+    EmploymentSlugs []string
+
+    // M2M relationships
+    Tags        []*Tag        `bun:"m2m:post_to_tags,join:Post=Tag"`
+    Posts       []*Post       `bun:"m2m:post_to_posts,join:SourcePost=TargetPost"`
+    Projects    []*Project    `bun:"m2m:post_to_projects,join:Post=Project"`
+    Employments []*Employment `bun:"m2m:employment_to_posts,join:Post=Employment"`
 }
 ```
 
 <a name="Post.PagePath"></a>
-### func \(\*Post\) [PagePath](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L222>)
+### func \(\*Post\) [PagePath](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L283>)
 
 ```go
 func (emb *Post) PagePath() string
@@ -473,7 +605,7 @@ func (emb *Post) PagePath() string
 PagePath returns the path to the post page.
 
 <a name="Post.String"></a>
-### func \(\*Post\) [String](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L236>)
+### func \(\*Post\) [String](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L302>)
 
 ```go
 func (emb *Post) String() string
@@ -482,7 +614,7 @@ func (emb *Post) String() string
 
 
 <a name="PostToPost"></a>
-## type [PostToPost](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L186-L193>)
+## type [PostToPost](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L207-L214>)
 
 PostToPost represents a many\-to\-many relationship between posts and other posts.
 
@@ -498,7 +630,7 @@ type PostToPost struct {
 ```
 
 <a name="PostToProject"></a>
-## type [PostToProject](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L166-L173>)
+## type [PostToProject](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L187-L194>)
 
 PostToProject represents a many\-to\-many relationship between posts and projects.
 
@@ -514,7 +646,7 @@ type PostToProject struct {
 ```
 
 <a name="PostToTag"></a>
-## type [PostToTag](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L156-L163>)
+## type [PostToTag](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L177-L184>)
 
 PostToTag represents a many\-to\-many relationship between posts and tags.
 
@@ -530,7 +662,7 @@ type PostToTag struct {
 ```
 
 <a name="Project"></a>
-## type [Project](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L103-L127>)
+## type [Project](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L101-L123>)
 
 Project is a project with all its posts and tags.
 
@@ -540,10 +672,6 @@ type Project struct {
 
     ID  int64 `bun:"id,pk,autoincrement" yaml:"-"`
 
-    X   float64
-    Y   float64
-    Z   float64
-
     Title       string     `bun:"title"`
     Slug        string     `bun:"slug,unique"`
     Description string     `bun:"description"`
@@ -551,19 +679,21 @@ type Project struct {
     BannerPath  string     `bun:"banner_path"`
     CreatedAt   CustomTime `bun:"created_at"`
 
-    TagSlugs     []string `bun:"tag_slugs"`
-    PostSlugs    []string `bun:"post_slugs"`
-    ProjectSlugs []string `bun:"project_slugs"`
+    TagSlugs        []string `bun:"tag_slugs"`
+    PostSlugs       []string `bun:"post_slugs"`
+    ProjectSlugs    []string `bun:"project_slugs"`
+    EmploymentSlugs []string `bun:"employment_slugs"`
 
     // M2M relationships
-    Tags     []*Tag     `bun:"m2m:project_to_tags,join:Project=Tag"`
-    Posts    []*Post    `bun:"m2m:post_to_projects,join:Project=Post"`
-    Projects []*Project `bun:"m2m:project_to_projects,join:SourceProject=TargetProject"`
+    Tags        []*Tag        `bun:"m2m:project_to_tags,join:Project=Tag"`
+    Posts       []*Post       `bun:"m2m:post_to_projects,join:Project=Post"`
+    Projects    []*Project    `bun:"m2m:project_to_projects,join:SourceProject=TargetProject"`
+    Employments []*Employment `bun:"m2m:employment_to_projects,join:Project=Employment"`
 }
 ```
 
 <a name="Project.PagePath"></a>
-### func \(\*Project\) [PagePath](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L227>)
+### func \(\*Project\) [PagePath](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L288>)
 
 ```go
 func (emb *Project) PagePath() string
@@ -572,7 +702,7 @@ func (emb *Project) PagePath() string
 PagePath returns the path to the project page.
 
 <a name="Project.String"></a>
-### func \(\*Project\) [String](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L240>)
+### func \(\*Project\) [String](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L306>)
 
 ```go
 func (emb *Project) String() string
@@ -581,7 +711,7 @@ func (emb *Project) String() string
 
 
 <a name="ProjectToProject"></a>
-## type [ProjectToProject](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L196-L203>)
+## type [ProjectToProject](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L217-L224>)
 
 ProjectToProject represents a many\-to\-many relationship between projects and other projects.
 
@@ -597,7 +727,7 @@ type ProjectToProject struct {
 ```
 
 <a name="ProjectToTag"></a>
-## type [ProjectToTag](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L176-L183>)
+## type [ProjectToTag](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L197-L204>)
 
 ProjectToTag represents a many\-to\-many relationship between projects and tags.
 
@@ -621,6 +751,24 @@ RelationshipFn is a function that updates relationships.
 type RelationshipFn func(context.Context) error
 ```
 
+<a name="UpsertEmployment"></a>
+### func [UpsertEmployment](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/upsert.go#L554-L558>)
+
+```go
+func UpsertEmployment(ctx context.Context, db *bun.DB, employment *Employment) (RelationshipFn, error)
+```
+
+UpsertEmployment saves an employment to the database \(to be called from the DB worker\).
+
+<a name="UpsertEmploymentRelationships"></a>
+### func [UpsertEmploymentRelationships](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/upsert.go#L594-L597>)
+
+```go
+func UpsertEmploymentRelationships(db *bun.DB, employment *Employment) RelationshipFn
+```
+
+UpsertEmploymentRelationships updates relationships for an employment \(to be called from the DB worker\).
+
 <a name="UpsertPost"></a>
 ### func [UpsertPost](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/upsert.go#L18-L22>)
 
@@ -631,7 +779,7 @@ func UpsertPost(ctx context.Context, db *bun.DB, post *Post) (RelationshipFn, er
 UpsertPost saves a post to the database \(to be called from the DB worker\).
 
 <a name="UpsertPostRelationships"></a>
-### func [UpsertPostRelationships](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/upsert.go#L128-L131>)
+### func [UpsertPostRelationships](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/upsert.go#L119-L122>)
 
 ```go
 func UpsertPostRelationships(db *bun.DB, post *Post) RelationshipFn
@@ -640,7 +788,7 @@ func UpsertPostRelationships(db *bun.DB, post *Post) RelationshipFn
 UpsertPostRelationships updates relationships for a post \(to be called from the DB worker\).
 
 <a name="UpsertProject"></a>
-### func [UpsertProject](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/upsert.go#L58-L62>)
+### func [UpsertProject](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/upsert.go#L55-L59>)
 
 ```go
 func UpsertProject(ctx context.Context, db *bun.DB, project *Project) (RelationshipFn, error)
@@ -649,7 +797,7 @@ func UpsertProject(ctx context.Context, db *bun.DB, project *Project) (Relations
 UpsertProject saves a project to the database \(to be called from the DB worker\).
 
 <a name="UpsertProjectRelationships"></a>
-### func [UpsertProjectRelationships](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/upsert.go#L273-L276>)
+### func [UpsertProjectRelationships](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/upsert.go#L264-L267>)
 
 ```go
 func UpsertProjectRelationships(db *bun.DB, project *Project) RelationshipFn
@@ -658,7 +806,7 @@ func UpsertProjectRelationships(db *bun.DB, project *Project) RelationshipFn
 UpsertProjectRelationships updates relationships for a project.
 
 <a name="UpsertTag"></a>
-### func [UpsertTag](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/upsert.go#L93-L97>)
+### func [UpsertTag](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/upsert.go#L87-L91>)
 
 ```go
 func UpsertTag(ctx context.Context, db *bun.DB, tag *Tag) (RelationshipFn, error)
@@ -667,7 +815,7 @@ func UpsertTag(ctx context.Context, db *bun.DB, tag *Tag) (RelationshipFn, error
 UpsertTag saves a tag to the database \(to be called from the DB worker\).
 
 <a name="UpsertTagRelationships"></a>
-### func [UpsertTagRelationships](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/upsert.go#L418-L421>)
+### func [UpsertTagRelationships](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/upsert.go#L409-L412>)
 
 ```go
 func UpsertTagRelationships(db *bun.DB, tag *Tag) RelationshipFn
@@ -676,7 +824,7 @@ func UpsertTagRelationships(db *bun.DB, tag *Tag) RelationshipFn
 UpsertTagRelationships updates relationships for a tag .
 
 <a name="Tag"></a>
-## type [Tag](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L130-L154>)
+## type [Tag](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L126-L149>)
 
 Tag is a tag with all its posts and projects.
 
@@ -685,9 +833,6 @@ type Tag struct {
     bun.BaseModel `bun:"tags"`
 
     ID  int64 `bun:"id,pk,autoincrement"`
-    X   float64
-    Y   float64
-    Z   float64
 
     Title       string     `bun:"title"`
     Slug        string     `bun:"slug,unique"`
@@ -697,19 +842,21 @@ type Tag struct {
     Icon        string     `bun:"icon"`
     CreatedAt   CustomTime `bun:"created_at"`
 
-    TagSlugs     []string `bun:"tag_slugs"`
-    PostSlugs    []string `bun:"post_slugs"`
-    ProjectSlugs []string `bun:"project_slugs"`
+    TagSlugs        []string `bun:"tag_slugs"`
+    PostSlugs       []string `bun:"post_slugs"`
+    ProjectSlugs    []string `bun:"project_slugs"`
+    EmploymentSlugs []string `bun:"employment_slugs"`
 
     // M2M relationships
-    Tags     []*Tag     `bun:"m2m:tag_to_tags,join:SourceTag=TargetTag"`
-    Posts    []*Post    `bun:"m2m:post_to_tags,join:Tag=Post"`
-    Projects []*Project `bun:"m2m:project_to_tags,join:Tag=Project"`
+    Tags        []*Tag        `bun:"m2m:tag_to_tags,join:SourceTag=TargetTag"`
+    Posts       []*Post       `bun:"m2m:post_to_tags,join:Tag=Post"`
+    Projects    []*Project    `bun:"m2m:project_to_tags,join:Tag=Project"`
+    Employments []*Employment `bun:"m2m:employment_to_tags,join:Tag=Employment"`
 }
 ```
 
 <a name="Tag.PagePath"></a>
-### func \(\*Tag\) [PagePath](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L232>)
+### func \(\*Tag\) [PagePath](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L293>)
 
 ```go
 func (emb *Tag) PagePath() string
@@ -718,7 +865,7 @@ func (emb *Tag) PagePath() string
 PagePath returns the path to the tag page.
 
 <a name="Tag.String"></a>
-### func \(\*Tag\) [String](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L244>)
+### func \(\*Tag\) [String](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L310>)
 
 ```go
 func (emb *Tag) String() string
@@ -727,7 +874,7 @@ func (emb *Tag) String() string
 
 
 <a name="TagToTag"></a>
-## type [TagToTag](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L206-L213>)
+## type [TagToTag](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L227-L234>)
 
 TagToTag represents a many\-to\-many relationship between tags and other tags.
 

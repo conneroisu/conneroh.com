@@ -1,18 +1,18 @@
 ---
-title: Machine Learning Researcher at Iowa State University
-slug: machine-learning-researcher-iowa-state
-description: Developed an EEG gesture recognition program as part of a senior research project, conducting extensive data analysis and implementing real-time gesture recognition.
-created_at: 2021-12-01T09:00:00.000-06:00
-updated_at: 2022-04-30T17:00:00.000-06:00
-banner_path: 
+id: machine-learning-researcher-iowa-state
+aliases:
+  - Machine Learning Researcher at Iowa State University
 tags:
-  - hdl/machine-learning
-  - hdl/data-analysis
-  - hdl/real-time-systems
+  - ideology/machine-learning
   - programming-language/python
-  - hdl/artificial-intelligence
-projects: []
+  - programming-language/matlab
+created_at: 2021-12-01T09:00:00.000-06:00
+description: Developed an EEG gesture recognition program as part of a senior research project, conducting extensive data analysis and implementing real-time gesture recognition.
 employments: []
+projects: []
+slug: machine-learning-researcher-iowa-state
+title: Machine Learning Researcher at Iowa State University
+updated_at: 2025-06-01T18:54:55.000-06:00
 ---
 
 # Machine Learning Researcher at Iowa State University

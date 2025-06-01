@@ -55,9 +55,6 @@ func ToTag(tT *assets.Tag, fD *assets.Doc) {
 // ToEmployment copies a *assets.Doc to a *assets.Employment.
 func ToEmployment(tE *assets.Employment, fD *assets.Doc) {
 	// *assets.Employment fields
-	tE.X = fD.X
-	tE.Y = fD.Y
-	tE.Z = fD.Z
 	tE.Title = fD.Title
 	tE.Slug = fD.Slug
 	tE.Description = fD.Description

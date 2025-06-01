@@ -566,9 +566,6 @@ func UpsertEmployment(
 		Set("content = EXCLUDED.content").
 		Set("banner_path = EXCLUDED.banner_path").
 		Set("created_at = EXCLUDED.created_at").
-		Set("x = EXCLUDED.x").
-		Set("y = EXCLUDED.y").
-		Set("z = EXCLUDED.z").
 		Exec(insertCtx)
 	slog.Debug(
 		"saved employment",

@@ -26,6 +26,8 @@ Package conneroh provides implementations for conneroh.
 ## Index
 
 - [func AddRoutes\(\_ context.Context, h \*http.ServeMux, db \*bun.DB\) error](<#AddRoutes>)
+- [func HandleEmployment\(db \*bun.DB\) routing.APIFunc](<#HandleEmployment>)
+- [func HandleEmployments\(db \*bun.DB\) routing.APIFunc](<#HandleEmployments>)
 - [func HandleHome\(db \*bun.DB\) func\(w http.ResponseWriter, r \*http.Request\) error](<#HandleHome>)
 - [func HandlePost\(db \*bun.DB\) routing.APIFunc](<#HandlePost>)
 - [func HandlePosts\(db \*bun.DB\) routing.APIFunc](<#HandlePosts>)
@@ -39,7 +41,7 @@ Package conneroh provides implementations for conneroh.
 
 
 <a name="AddRoutes"></a>
-## func [AddRoutes](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/routes.go#L24-L28>)
+## func [AddRoutes](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/routes.go#L25-L29>)
 
 ```go
 func AddRoutes(_ context.Context, h *http.ServeMux, db *bun.DB) error
@@ -47,8 +49,26 @@ func AddRoutes(_ context.Context, h *http.ServeMux, db *bun.DB) error
 
 AddRoutes adds all routes to the router.
 
+<a name="HandleEmployment"></a>
+## func [HandleEmployment](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/handlers.go#L682>)
+
+```go
+func HandleEmployment(db *bun.DB) routing.APIFunc
+```
+
+HandleEmployment handles the employment page. aka /employment/\{slug...\}.
+
+<a name="HandleEmployments"></a>
+## func [HandleEmployments](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/handlers.go#L633>)
+
+```go
+func HandleEmployments(db *bun.DB) routing.APIFunc
+```
+
+HandleEmployments handles the employments page. aka /employments.
+
 <a name="HandleHome"></a>
-## func [HandleHome](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/handlers.go#L220>)
+## func [HandleHome](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/handlers.go#L273>)
 
 ```go
 func HandleHome(db *bun.DB) func(w http.ResponseWriter, r *http.Request) error
@@ -57,7 +77,7 @@ func HandleHome(db *bun.DB) func(w http.ResponseWriter, r *http.Request) error
 HandleHome handles the home page. aka /\{$\}.
 
 <a name="HandlePost"></a>
-## func [HandlePost](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/handlers.go#L338>)
+## func [HandlePost](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/handlers.go#L408>)
 
 ```go
 func HandlePost(db *bun.DB) routing.APIFunc
@@ -66,7 +86,7 @@ func HandlePost(db *bun.DB) routing.APIFunc
 HandlePost handles the post page. aka /post/\{slug...\}.
 
 <a name="HandlePosts"></a>
-## func [HandlePosts](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/handlers.go#L514>)
+## func [HandlePosts](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/handlers.go#L585>)
 
 ```go
 func HandlePosts(db *bun.DB) routing.APIFunc
@@ -75,7 +95,7 @@ func HandlePosts(db *bun.DB) routing.APIFunc
 HandlePosts handles the posts page. aka /posts.
 
 <a name="HandleProject"></a>
-## func [HandleProject](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/handlers.go#L383>)
+## func [HandleProject](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/handlers.go#L453>)
 
 ```go
 func HandleProject(db *bun.DB) routing.APIFunc
@@ -84,7 +104,7 @@ func HandleProject(db *bun.DB) routing.APIFunc
 HandleProject handles the project page. aka /project/\{slug...\}.
 
 <a name="HandleProjects"></a>
-## func [HandleProjects](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/handlers.go#L291>)
+## func [HandleProjects](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/handlers.go#L360>)
 
 ```go
 func HandleProjects(db *bun.DB) routing.APIFunc
@@ -93,7 +113,7 @@ func HandleProjects(db *bun.DB) routing.APIFunc
 HandleProjects handles the projects page. aka /projects.
 
 <a name="HandleTag"></a>
-## func [HandleTag](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/handlers.go#L471>)
+## func [HandleTag](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/handlers.go#L542>)
 
 ```go
 func HandleTag(db *bun.DB) routing.APIFunc
@@ -102,7 +122,7 @@ func HandleTag(db *bun.DB) routing.APIFunc
 HandleTag handles the tag page. aka /tag/\{slug...\}.
 
 <a name="HandleTags"></a>
-## func [HandleTags](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/handlers.go#L426>)
+## func [HandleTags](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/handlers.go#L496>)
 
 ```go
 func HandleTags(db *bun.DB) routing.APIFunc

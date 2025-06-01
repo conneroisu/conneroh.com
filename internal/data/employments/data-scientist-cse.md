@@ -1,17 +1,19 @@
 ---
-title: Data Scientist at CSE
-slug: data-scientist-cse
-description: Developed resource constrained data pipelines and large-scale scrapers of college sports data using Golang and optimized MySQL databases.
-created_at: 2024-06-01T09:00:00.000-06:00
-updated_at: 2024-08-31T17:00:00.000-06:00
-banner_path: 
+id: data-scientist-cse
+aliases:
+  - Data Scientist at CSE
 tags:
   - programming-language/go
   - programming-language/python
-  - system/mysql
+  - database/mysql
   - programming-language/sql
-projects: []
+created_at: 2024-06-01T09:00:00.000-06:00
+description: Developed resource constrained data pipelines and large-scale scrapers of college sports data using Golang and optimized MySQL databases.
 employments: []
+projects: []
+slug: data-scientist-cse
+title: Data Scientist at CSE
+updated_at: 2025-06-01T18:51:19.000-06:00
 ---
 
 # Data Scientist at CSE

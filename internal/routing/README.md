@@ -18,6 +18,7 @@ Package routing provides implementations for routing.
 
 - [Constants](<#constants>)
 - [func GeneratePagination\(currentPage, totalPages, maxDisplay int\) \[\]string](<#GeneratePagination>)
+- [func GetEmploymentURL\(base string, employment \*assets.Employment\) string](<#GetEmploymentURL>)
 - [func GetPostURL\(base string, post \*assets.Post\) string](<#GetPostURL>)
 - [func GetProjectURL\(base string, project \*assets.Project\) string](<#GetProjectURL>)
 - [func GetTagURL\(base string, tag \*assets.Tag\) string](<#GetTagURL>)
@@ -121,8 +122,17 @@ func GeneratePagination(currentPage, totalPages, maxDisplay int) []string
 
 GeneratePagination generates a pagination list of page numbers.
 
+<a name="GetEmploymentURL"></a>
+## func [GetEmploymentURL](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/targets.go#L40>)
+
+```go
+func GetEmploymentURL(base string, employment *assets.Employment) string
+```
+
+GetEmploymentURL returns the URL for an employment.
+
 <a name="GetPostURL"></a>
-## func [GetPostURL](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/targets.go#L23>)
+## func [GetPostURL](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/targets.go#L25>)
 
 ```go
 func GetPostURL(base string, post *assets.Post) string
@@ -131,7 +141,7 @@ func GetPostURL(base string, post *assets.Post) string
 GetPostURL returns the URL for a post.
 
 <a name="GetProjectURL"></a>
-## func [GetProjectURL](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/targets.go#L28>)
+## func [GetProjectURL](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/targets.go#L30>)
 
 ```go
 func GetProjectURL(base string, project *assets.Project) string
@@ -140,7 +150,7 @@ func GetProjectURL(base string, project *assets.Project) string
 GetProjectURL returns the URL for a project.
 
 <a name="GetTagURL"></a>
-## func [GetTagURL](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/targets.go#L33>)
+## func [GetTagURL](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/targets.go#L35>)
 
 ```go
 func GetTagURL(base string, tag *assets.Tag) string
@@ -212,6 +222,8 @@ const (
     ProjectPluralPath PluralPath = "projects"
     // TagsPluralPath is the target of a plural tag view.
     TagsPluralPath PluralPath = "tags"
+    // EmploymentPluralPath is the target of a plural employment view.
+    EmploymentPluralPath PluralPath = "employments"
 )
 ```
 
