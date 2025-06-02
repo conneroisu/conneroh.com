@@ -118,14 +118,16 @@ func (r *resolver) ResolveWikilink(n *wikilink.Node) ([]byte, error) {
 
 // ParseMarkdown parses a markdown document.
 func ParseMarkdown(md goldmark.Markdown, item DirMatchItem) (*Doc, error) {
-	// Parse document
-	doc := &Doc{
-		Path:    item.Path,
-		Content: item.Content,
-		Slug:    Slugify(item.Path),
-	}
+	var (
+		buf bytes.Buffer
+		// Parse document
+		doc = &Doc{
+			Path:    item.Path,
+			Content: item.Content,
+			Slug:    Slugify(item.Path),
+		}
+	)
 
-	var buf bytes.Buffer
 	// Set default values
 	err := Defaults(doc)
 	if err != nil {
@@ -147,7 +149,8 @@ func ParseMarkdown(md goldmark.Markdown, item DirMatchItem) (*Doc, error) {
 		return nil, eris.Errorf("frontmatter is nil for %s", doc.Path)
 	}
 
-	if err := metadata.Decode(doc); err != nil {
+	err = metadata.Decode(doc)
+	if err != nil {
 		return nil, eris.Wrapf(err, "failed to decode frontmatter: %s", doc.Path)
 	}
 

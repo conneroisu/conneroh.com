@@ -55,9 +55,10 @@ func run(ctx context.Context) error {
 	db.AddQueryHook(bundebug.NewQueryHook(bundebug.WithVerbose(true)))
 
 	var (
-		allPosts    []*assets.Post
-		allProjects []*assets.Project
-		allTags     []*assets.Tag
+		allPosts       []*assets.Post
+		allProjects    []*assets.Project
+		allTags        []*assets.Tag
+		allEmployments []*assets.Employment
 	)
 
 	err = db.NewSelect().
@@ -87,6 +88,16 @@ func run(ctx context.Context) error {
 	if err != nil {
 		return eris.Wrapf(err, "(update-css) failed to get tags")
 	}
+	err = db.NewSelect().
+		Model(&allEmployments).
+		Relation("Tags").
+		Relation("Posts").
+		Relation("Projects").
+		Relation("Employments").
+		Scan(ctx)
+	if err != nil {
+		return eris.Wrapf(err, "(update-css) failed to get employments")
+	}
 
 	comps := []templ.Component{}
 	for _, post := range allPosts {
@@ -98,11 +109,15 @@ func run(ctx context.Context) error {
 	for _, tag := range allTags {
 		comps = append(comps, views.Tag(tag))
 	}
+	for _, employment := range allEmployments {
+		comps = append(comps, views.Employment(employment))
+	}
 	comps = append(comps, views.List(
 		routing.ProjectPluralPath,
 		&allPosts,
 		&allProjects,
 		&allTags,
+		&allEmployments,
 		"",
 		1,
 		10,
@@ -112,6 +127,7 @@ func run(ctx context.Context) error {
 		&allPosts,
 		&allProjects,
 		&allTags,
+		&allEmployments,
 		"",
 		1,
 		10,
@@ -121,6 +137,7 @@ func run(ctx context.Context) error {
 		&allPosts,
 		&allProjects,
 		&allTags,
+		&allEmployments,
 		"",
 		1,
 		10,
@@ -129,6 +146,7 @@ func run(ctx context.Context) error {
 		&allPosts,
 		&allProjects,
 		&allTags,
+		&allEmployments,
 	)))
 	comps = append(comps, views.Code500())
 	comps = append(comps, components.ThankYou())

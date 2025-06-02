@@ -11,4 +11,6 @@ type Copygen interface {
 	ToProject(*assets.Doc) *assets.Project
 	// depth domain.Tag 2
 	ToTag(*assets.Doc) *assets.Tag
+	// depth domain.Employment 2
+	ToEmployment(*assets.Doc) *assets.Employment
 }

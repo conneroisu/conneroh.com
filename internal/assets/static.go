@@ -13,11 +13,6 @@ func DBName() string {
 	return "file:master.db"
 }
 
-const (
-	// EmbedLength is the length of the full embedding.
-	EmbedLength = 768
-)
-
 // CustomTime allows us to customize the YAML time parsing.
 type CustomTime struct{ time.Time }
 
@@ -45,29 +40,27 @@ func (ct *CustomTime) UnmarshalYAML(value *yaml.Node) error {
 type (
 	// Doc is a base struct for all embeddedable structs.
 	Doc struct {
-		Title            string        `yaml:"title"`
-		Path             string        `yaml:"-"`
-		Slug             string        `yaml:"slug"`
-		Description      string        `yaml:"description"`
-		Content          string        `yaml:"-"`
-		BannerPath       string        `yaml:"banner_path"`
-		Icon             string        `yaml:"icon"`
-		CreatedAt        CustomTime    `yaml:"created_at"`
-		UpdatedAt        CustomTime    `yaml:"updated_at"`
-		TagSlugs         []string      `yaml:"tags"`
-		PostSlugs        []string      `yaml:"posts"`
-		ProjectSlugs     []string      `yaml:"projects"`
-		EmploymentSlugs  []string      `yaml:"employments"`
-		Hash             string        `yaml:"-"`
-		X                float64       `json:"x"`
-		Y                float64       `json:"y"`
-		Z                float64       `json:"z"`
-		Posts            []*Post       `yaml:"-"`
-		Tags             []*Tag        `yaml:"-"`
-		Projects         []*Project    `yaml:"-"`
-		Employments      []*Employment `yaml:"-"`
+		Title           string        `yaml:"title"`
+		Path            string        `yaml:"-"`
+		Slug            string        `yaml:"slug"`
+		Description     string        `yaml:"description"`
+		Content         string        `yaml:"-"`
+		BannerPath      string        `yaml:"banner_path"`
+		Icon            string        `yaml:"icon"`
+		CreatedAt       CustomTime    `yaml:"created_at"`
+		UpdatedAt       CustomTime    `yaml:"updated_at"`
+		EndDate         *CustomTime   `yaml:"end_date"`
+		TagSlugs        []string      `yaml:"tags"`
+		PostSlugs       []string      `yaml:"posts"`
+		ProjectSlugs    []string      `yaml:"projects"`
+		EmploymentSlugs []string      `yaml:"employments"`
+		Hash            string        `yaml:"-"`
+		Posts           []*Post       `yaml:"-"`
+		Tags            []*Tag        `yaml:"-"`
+		Projects        []*Project    `yaml:"-"`
+		Employments     []*Employment `yaml:"-"`
 	}
-	// Cache is a any asset.
+	// Cache represents an asset cache.
 	Cache struct {
 		bun.BaseModel `bun:"caches"`
 
@@ -80,9 +73,6 @@ type (
 		bun.BaseModel `bun:"posts"`
 
 		ID int64 `bun:"id,pk,autoincrement" `
-		X  float64
-		Y  float64
-		Z  float64
 
 		Title       string     `bun:"title"`
 		Slug        string     `bun:"slug,unique"`
@@ -109,10 +99,6 @@ type (
 
 		ID int64 `bun:"id,pk,autoincrement" yaml:"-"`
 
-		X float64
-		Y float64
-		Z float64
-
 		Title       string     `bun:"title"`
 		Slug        string     `bun:"slug,unique"`
 		Description string     `bun:"description"`
@@ -137,9 +123,6 @@ type (
 		bun.BaseModel `bun:"tags"`
 
 		ID int64 `bun:"id,pk,autoincrement"`
-		X  float64
-		Y  float64
-		Z  float64
 
 		Title       string     `bun:"title"`
 		Slug        string     `bun:"slug,unique"`
@@ -161,21 +144,19 @@ type (
 		Employments []*Employment `bun:"m2m:employment_to_tags,join:Tag=Employment"`
 	}
 
-	// Employment is an employment with all its posts, projects and tags.
+	// Employment is an employment with all its posts, projects, and tags.
 	Employment struct {
 		bun.BaseModel `bun:"employments"`
 
 		ID int64 `bun:"id,pk,autoincrement"`
-		X  float64
-		Y  float64
-		Z  float64
 
-		Title       string     `bun:"title"`
-		Slug        string     `bun:"slug,unique"`
-		Description string     `bun:"description"`
-		Content     string     `bun:"content"`
-		BannerPath  string     `bun:"banner_path"`
-		CreatedAt   CustomTime `bun:"created_at"`
+		Title       string      `bun:"title"`
+		Slug        string      `bun:"slug,unique"`
+		Description string      `bun:"description"`
+		Content     string      `bun:"content"`
+		BannerPath  string      `bun:"banner_path"`
+		CreatedAt   CustomTime  `bun:"created_at"`
+		EndDate     *CustomTime `bun:"end_date"`
 
 		TagSlugs        []string `bun:"tag_slugs"`
 		PostSlugs       []string `bun:"post_slugs"`
@@ -310,6 +291,11 @@ func (emb *Tag) PagePath() string {
 	return "/tag/" + emb.Slug
 }
 
+// PagePath returns the path to the employment page.
+func (emb *Employment) PagePath() string {
+	return "/employment/" + emb.Slug
+}
+
 func (emb *Post) String() string {
 	return fmt.Sprintf("Post: %s %s %s %d", emb.Title, emb.Slug, emb.Description, emb.ID)
 }
@@ -320,11 +306,6 @@ func (emb *Project) String() string {
 
 func (emb *Tag) String() string {
 	return fmt.Sprintf("Tag: %s %s %s %d", emb.Title, emb.Slug, emb.Description, emb.ID)
-}
-
-// PagePath returns the path to the employment page.
-func (emb *Employment) PagePath() string {
-	return "/employment/" + emb.Slug
 }
 
 func (emb *Employment) String() string {

@@ -8,93 +8,105 @@
 import "github.com/conneroisu/conneroh.com/cmd/conneroh/views"
 ```
 
-templ: version: v0.3.857
+templ: version: v0.3.865
 
-templ: version: v0.3.857
+templ: version: v0.3.865
 
-templ: version: v0.3.857
+templ: version: v0.3.865
 
-templ: version: v0.3.857
+templ: version: v0.3.865
 
-templ: version: v0.3.857
+templ: version: v0.3.865
 
-templ: version: v0.3.857
+templ: version: v0.3.865
+
+templ: version: v0.3.865
 
 Package views contains the HTML templates for the website.
 
 ## Index
 
-- [func Home\(fullPosts \*\[\]\*assets.Post, fullProjects \*\[\]\*assets.Project, fullTags \*\[\]\*assets.Tag\) templ.Component](<#Home>)
-- [func List\(target routing.PluralPath, posts \*\[\]\*assets.Post, projects \*\[\]\*assets.Project, tags \*\[\]\*assets.Tag, query string, page int, pageCount int\) templ.Component](<#List>)
-- [func ListResults\(target routing.PluralPath, posts \*\[\]\*assets.Post, projects \*\[\]\*assets.Project, tags \*\[\]\*assets.Tag, page, pageCount int\) templ.Component](<#ListResults>)
-- [func Post\(post \*assets.Post, fullPosts \*\[\]\*assets.Post, fullProjects \*\[\]\*assets.Project, fullTags \*\[\]\*assets.Tag\) templ.Component](<#Post>)
-- [func Project\(project \*assets.Project, fullPosts \*\[\]\*assets.Post, fullProjects \*\[\]\*assets.Project, fullTags \*\[\]\*assets.Tag\) templ.Component](<#Project>)
-- [func Search\(query string, results \[\]assets.Embeddable\) templ.Component](<#Search>)
-- [func Tag\(tag \*assets.Tag, fullPosts \*\[\]\*assets.Post, fullProjects \*\[\]\*assets.Project, fullTags \*\[\]\*assets.Tag\) templ.Component](<#Tag>)
+- [func Code500\(\) templ.Component](<#Code500>)
+- [func Employment\(employment \*assets.Employment\) templ.Component](<#Employment>)
+- [func Home\(fullPosts \*\[\]\*assets.Post, fullProjects \*\[\]\*assets.Project, fullTags \*\[\]\*assets.Tag, fullEmployments \*\[\]\*assets.Employment\) templ.Component](<#Home>)
+- [func List\(target routing.PluralPath, posts \*\[\]\*assets.Post, projects \*\[\]\*assets.Project, tags \*\[\]\*assets.Tag, employments \*\[\]\*assets.Employment, query string, page int, pageCount int\) templ.Component](<#List>)
+- [func ListResults\(target routing.PluralPath, posts \*\[\]\*assets.Post, projects \*\[\]\*assets.Project, tags \*\[\]\*assets.Tag, employments \*\[\]\*assets.Employment, page, pageCount int\) templ.Component](<#ListResults>)
+- [func Post\(post \*assets.Post\) templ.Component](<#Post>)
+- [func Project\(project \*assets.Project\) templ.Component](<#Project>)
+- [func Tag\(tag \*assets.Tag\) templ.Component](<#Tag>)
 
 
-<a name="Home"></a>
-## func [Home](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/home_templ.go#L17-L21>)
+<a name="Code500"></a>
+## func [Code500](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/500_templ.go#L16>)
 
 ```go
-func Home(fullPosts *[]*assets.Post, fullProjects *[]*assets.Project, fullTags *[]*assets.Tag) templ.Component
+func Code500() templ.Component
+```
+
+
+
+<a name="Employment"></a>
+## func [Employment](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/employments_templ.go#L18-L20>)
+
+```go
+func Employment(employment *assets.Employment) templ.Component
+```
+
+Individual Employment component
+
+<a name="Home"></a>
+## func [Home](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/home_templ.go#L17-L22>)
+
+```go
+func Home(fullPosts *[]*assets.Post, fullProjects *[]*assets.Project, fullTags *[]*assets.Tag, fullEmployments *[]*assets.Employment) templ.Component
 ```
 
 
 
 <a name="List"></a>
-## func [List](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/list_templ.go#L19-L27>)
+## func [List](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/list_templ.go#L19-L28>)
 
 ```go
-func List(target routing.PluralPath, posts *[]*assets.Post, projects *[]*assets.Project, tags *[]*assets.Tag, query string, page int, pageCount int) templ.Component
+func List(target routing.PluralPath, posts *[]*assets.Post, projects *[]*assets.Project, tags *[]*assets.Tag, employments *[]*assets.Employment, query string, page int, pageCount int) templ.Component
 ```
 
 
 
 <a name="ListResults"></a>
-## func [ListResults](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/list_templ.go#L421-L427>)
+## func [ListResults](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/list_templ.go#L423-L430>)
 
 ```go
-func ListResults(target routing.PluralPath, posts *[]*assets.Post, projects *[]*assets.Project, tags *[]*assets.Tag, page, pageCount int) templ.Component
+func ListResults(target routing.PluralPath, posts *[]*assets.Post, projects *[]*assets.Project, tags *[]*assets.Tag, employments *[]*assets.Employment, page, pageCount int) templ.Component
 ```
 
 
 
 <a name="Post"></a>
-## func [Post](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/posts_templ.go#L19-L24>)
+## func [Post](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/posts_templ.go#L18-L20>)
 
 ```go
-func Post(post *assets.Post, fullPosts *[]*assets.Post, fullProjects *[]*assets.Project, fullTags *[]*assets.Tag) templ.Component
+func Post(post *assets.Post) templ.Component
 ```
 
 Individual Post component
 
 <a name="Project"></a>
-## func [Project](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/projects_templ.go#L17-L22>)
+## func [Project](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/projects_templ.go#L17-L19>)
 
 ```go
-func Project(project *assets.Project, fullPosts *[]*assets.Post, fullProjects *[]*assets.Project, fullTags *[]*assets.Tag) templ.Component
+func Project(project *assets.Project) templ.Component
 ```
 
 
-
-<a name="Search"></a>
-## func [Search](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/search_templ.go#L18>)
-
-```go
-func Search(query string, results []assets.Embeddable) templ.Component
-```
-
-Search is the full search results page
 
 <a name="Tag"></a>
-## func [Tag](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/tags_templ.go#L20-L25>)
+## func [Tag](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/tags_templ.go#L19-L21>)
 
 ```go
-func Tag(tag *assets.Tag, fullPosts *[]*assets.Post, fullProjects *[]*assets.Project, fullTags *[]*assets.Tag) templ.Component
+func Tag(tag *assets.Tag) templ.Component
 ```
 
-Tag component for displaying a single tag and its associated content
+
 
 Generated by [gomarkdoc](<https://github.com/princjef/gomarkdoc>)
 

@@ -1,16 +1,25 @@
+# Nix
 .devenv
 .dirhash
 .direnv
 .devenv*
+
+# Git
 .pre-commit-config.json
 .pre-commit-config.yaml
+
+# Node
 node_modules
 .env
+package-lock.json
+
+# Editors
+.vscode
+.idea
 tmp
 *.wlf
 *.log
 .DS_Store
-.vscode
 result
 tigris.yaml
 *.db-journal

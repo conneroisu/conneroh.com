@@ -17,13 +17,16 @@ Package routing provides implementations for routing.
 ## Index
 
 - [Constants](<#constants>)
-- [func ComputeAllURLs\(base string\) \[\]string](<#ComputeAllURLs>)
 - [func GeneratePagination\(currentPage, totalPages, maxDisplay int\) \[\]string](<#GeneratePagination>)
+- [func GetEmploymentURL\(base string, employment \*assets.Employment\) string](<#GetEmploymentURL>)
 - [func GetPostURL\(base string, post \*assets.Post\) string](<#GetPostURL>)
 - [func GetProjectURL\(base string, project \*assets.Project\) string](<#GetProjectURL>)
 - [func GetTagURL\(base string, tag \*assets.Tag\) string](<#GetTagURL>)
-- [func MorphableHandler\(full templ.Component, morph templ.Component\) http.HandlerFunc](<#MorphableHandler>)
+- [func Make\(fn APIFunc\) http.HandlerFunc](<#Make>)
+- [func MorphableHandler\(wrapper func\(comp templ.Component\) templ.Component, morph templ.Component\) http.HandlerFunc](<#MorphableHandler>)
 - [func Paginate\[T any\]\(items \[\]T, page int, pageSize int\) \(\[\]T, int\)](<#Paginate>)
+- [func Slug\(r \*http.Request\) string](<#Slug>)
+- [type APIFunc](<#APIFunc>)
 - [type PluralPath](<#PluralPath>)
 
 
@@ -45,20 +48,73 @@ const (
 
     // Ellipsis represents pagination gaps.
     Ellipsis = "..."
+
+    // PaginationHalfDivisor is used to calculate pagination ranges.
+    PaginationHalfDivisor = 2
+
+    // PaginationEndAdjustment is used to adjust the end range in pagination.
+    PaginationEndAdjustment = 2
 )
 ```
 
-<a name="ComputeAllURLs"></a>
-## func [ComputeAllURLs](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/urls.go#L10>)
+<a name="HdrBoosted"></a>
 
 ```go
-func ComputeAllURLs(base string) []string
+const (
+
+    // HdrBoosted indicates that the request was sent via an element using [hx-boost](https://htmx.org/docs/#boost).
+    HdrBoosted = "HX-Boosted"
+    // HdrCurrentURL indicates the current URL of the page.
+    HdrCurrentURL = "HX-Current-Url"
+    // HdrHistoryRestoreRequest indicates that the request was sent via an element using [hx-history-restore](https://htmx.org/docs/#history-restore).
+    HdrHistoryRestoreRequest = "HX-History-Restore-Request"
+    // HdrPrompt indicates that the request was sent via an element using [hx-prompt](https://htmx.org/docs/#prompt).
+    HdrPrompt = "HX-Prompt"
+    // HdrRequest is always set to "true".
+    HdrRequest = "HX-Request"
+    // HdrTarget is the id of the target element if it exists.
+    HdrTarget = "HX-Target"
+    // HdrTriggerName is the name of the triggered element if it exists.
+    HdrTriggerName = "HX-Trigger-Name"
+    // HdrTrigger is the id of the triggered element if it exists.
+    HdrTrigger = "HX-Trigger"
+
+    // HdrLocation is the URL to redirect to without doing a full page reload.
+    HdrLocation = "HX-Location"
+    // HdrPushURL is the URL to pushState into client history to without doing a full page reload.
+    HdrPushURL = "HX-Push-Url"
+    // HdrRedirect is the URL to client-side redirect to.
+    HdrRedirect = "HX-Redirect"
+    // HdrRefresh is the URL to client-side refresh to.
+    HdrRefresh = "HX-Refresh"
+    // HdrReplaceURL is the URL to replaceState into client history to without doing a full page reload.
+    HdrReplaceURL = "HX-Replace-Url"
+    // HdrReswap allows you to specify how the response will be swapped.
+    HdrReswap = "HX-Reswap"
+    // HdrRetarget is a CSS selector that updates the target of the content update to a different element on the page.
+    HdrRetarget = "HX-Retarget"
+    // HdrReselect is a CSS selector that allows you to choose which part of the response is used to be swapped in.
+    HdrReselect = "HX-Reselect"
+    // HdrTriggerResponse allows you to trigger client-side events.
+    HdrTriggerResponse = "HX-Trigger"
+    // HdrTriggerAfterSettle allows you to trigger client-side events after the settle step.
+    HdrTriggerAfterSettle = "HX-Trigger-After-Settle"
+    // HdrTriggerAfterSwap allows you to trigger client-side events after the swap step.
+    HdrTriggerAfterSwap = "HX-Trigger-After-Swap"
+)
 ```
 
-ComputeAllURLs computes all URLs for all posts, projects, and tags given a base URL.
+<a name="SlugVarName"></a>
+
+```go
+const (
+    // SlugVarName is the name/path-key of the slug variable.
+    SlugVarName = "slug"
+)
+```
 
 <a name="GeneratePagination"></a>
-## func [GeneratePagination](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/pagination.go#L47>)
+## func [GeneratePagination](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/pagination.go#L53>)
 
 ```go
 func GeneratePagination(currentPage, totalPages, maxDisplay int) []string
@@ -66,8 +122,17 @@ func GeneratePagination(currentPage, totalPages, maxDisplay int) []string
 
 GeneratePagination generates a pagination list of page numbers.
 
+<a name="GetEmploymentURL"></a>
+## func [GetEmploymentURL](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/targets.go#L40>)
+
+```go
+func GetEmploymentURL(base string, employment *assets.Employment) string
+```
+
+GetEmploymentURL returns the URL for an employment.
+
 <a name="GetPostURL"></a>
-## func [GetPostURL](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/targets.go#L23>)
+## func [GetPostURL](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/targets.go#L25>)
 
 ```go
 func GetPostURL(base string, post *assets.Post) string
@@ -76,7 +141,7 @@ func GetPostURL(base string, post *assets.Post) string
 GetPostURL returns the URL for a post.
 
 <a name="GetProjectURL"></a>
-## func [GetProjectURL](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/targets.go#L28>)
+## func [GetProjectURL](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/targets.go#L30>)
 
 ```go
 func GetProjectURL(base string, project *assets.Project) string
@@ -85,7 +150,7 @@ func GetProjectURL(base string, project *assets.Project) string
 GetProjectURL returns the URL for a project.
 
 <a name="GetTagURL"></a>
-## func [GetTagURL](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/targets.go#L33>)
+## func [GetTagURL](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/targets.go#L35>)
 
 ```go
 func GetTagURL(base string, tag *assets.Tag) string
@@ -93,17 +158,26 @@ func GetTagURL(base string, tag *assets.Tag) string
 
 GetTagURL returns the URL for a tag.
 
-<a name="MorphableHandler"></a>
-## func [MorphableHandler](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/handlers.go#L12-L15>)
+<a name="Make"></a>
+## func [Make](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/handlers.go#L14>)
 
 ```go
-func MorphableHandler(full templ.Component, morph templ.Component) http.HandlerFunc
+func Make(fn APIFunc) http.HandlerFunc
 ```
 
-MorphableHandler returns a handler that checks for the presence of the hx\-trigger header and serves either the full or morphed view.
+Make returns a handler that calls the given function.
+
+<a name="MorphableHandler"></a>
+## func [MorphableHandler](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/handlers.go#L38-L41>)
+
+```go
+func MorphableHandler(wrapper func(comp templ.Component) templ.Component, morph templ.Component) http.HandlerFunc
+```
+
+MorphableHandler returns a handler that checks for the presence of the htmx request header and either serves the morphed component or the component wrapper.
 
 <a name="Paginate"></a>
-## func [Paginate](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/pagination.go#L23-L27>)
+## func [Paginate](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/pagination.go#L29-L33>)
 
 ```go
 func Paginate[T any](items []T, page int, pageSize int) ([]T, int)
@@ -111,10 +185,28 @@ func Paginate[T any](items []T, page int, pageSize int) ([]T, int)
 
 Paginate paginates a list of items.
 
+<a name="Slug"></a>
+## func [Slug](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/slugs.go#L11>)
+
+```go
+func Slug(r *http.Request) string
+```
+
+Slug returns the slug of the tag from the request.
+
+<a name="APIFunc"></a>
+## type [APIFunc](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/handlers.go#L11>)
+
+APIFunc is a function that handles an API request and returns an error.
+
+```go
+type APIFunc func(http.ResponseWriter, *http.Request) error
+```
+
 <a name="PluralPath"></a>
 ## type [PluralPath](<https://github.com/conneroisu/conneroh.com/blob/main/internal/routing/targets.go#L11>)
 
-PluralPath is the target of a plural view. string
+PluralPath is the target of a plural view. string.
 
 ```go
 type PluralPath = string
@@ -130,6 +222,8 @@ const (
     ProjectPluralPath PluralPath = "projects"
     // TagsPluralPath is the target of a plural tag view.
     TagsPluralPath PluralPath = "tags"
+    // EmploymentPluralPath is the target of a plural employment view.
+    EmploymentPluralPath PluralPath = "employments"
 )
 ```
 

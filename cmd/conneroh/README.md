@@ -25,37 +25,142 @@ Package conneroh provides implementations for conneroh.
 
 ## Index
 
-- [func AddRoutes\(\_ context.Context, h \*http.ServeMux\) error](<#AddRoutes>)
-- [func NewServer\(ctx context.Context\) http.Handler](<#NewServer>)
+- [func AddRoutes\(\_ context.Context, h \*http.ServeMux, db \*bun.DB\) error](<#AddRoutes>)
+- [func HandleEmployment\(db \*bun.DB\) routing.APIFunc](<#HandleEmployment>)
+- [func HandleEmployments\(db \*bun.DB\) routing.APIFunc](<#HandleEmployments>)
+- [func HandleHome\(db \*bun.DB\) func\(w http.ResponseWriter, r \*http.Request\) error](<#HandleHome>)
+- [func HandlePost\(db \*bun.DB\) routing.APIFunc](<#HandlePost>)
+- [func HandlePosts\(db \*bun.DB\) routing.APIFunc](<#HandlePosts>)
+- [func HandleProject\(db \*bun.DB\) routing.APIFunc](<#HandleProject>)
+- [func HandleProjects\(db \*bun.DB\) routing.APIFunc](<#HandleProjects>)
+- [func HandleTag\(db \*bun.DB\) routing.APIFunc](<#HandleTag>)
+- [func HandleTags\(db \*bun.DB\) routing.APIFunc](<#HandleTags>)
+- [func NewServer\(ctx context.Context\) \(http.Handler, error\)](<#NewServer>)
 - [func Run\(ctx context.Context, \_ func\(string\) string\) error](<#Run>)
+- [type ContactForm](<#ContactForm>)
 
 
 <a name="AddRoutes"></a>
-## func [AddRoutes](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/routes.go#L17-L20>)
+## func [AddRoutes](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/routes.go#L25-L29>)
 
 ```go
-func AddRoutes(_ context.Context, h *http.ServeMux) error
+func AddRoutes(_ context.Context, h *http.ServeMux, db *bun.DB) error
 ```
 
 AddRoutes adds all routes to the router.
 
-<a name="NewServer"></a>
-## func [NewServer](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/root.go#L32-L34>)
+<a name="HandleEmployment"></a>
+## func [HandleEmployment](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/handlers.go#L682>)
 
 ```go
-func NewServer(ctx context.Context) http.Handler
+func HandleEmployment(db *bun.DB) routing.APIFunc
 ```
 
-NewServer creates a new web\-ui server
+HandleEmployment handles the employment page. aka /employment/\{slug...\}.
+
+<a name="HandleEmployments"></a>
+## func [HandleEmployments](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/handlers.go#L633>)
+
+```go
+func HandleEmployments(db *bun.DB) routing.APIFunc
+```
+
+HandleEmployments handles the employments page. aka /employments.
+
+<a name="HandleHome"></a>
+## func [HandleHome](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/handlers.go#L273>)
+
+```go
+func HandleHome(db *bun.DB) func(w http.ResponseWriter, r *http.Request) error
+```
+
+HandleHome handles the home page. aka /\{$\}.
+
+<a name="HandlePost"></a>
+## func [HandlePost](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/handlers.go#L408>)
+
+```go
+func HandlePost(db *bun.DB) routing.APIFunc
+```
+
+HandlePost handles the post page. aka /post/\{slug...\}.
+
+<a name="HandlePosts"></a>
+## func [HandlePosts](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/handlers.go#L585>)
+
+```go
+func HandlePosts(db *bun.DB) routing.APIFunc
+```
+
+HandlePosts handles the posts page. aka /posts.
+
+<a name="HandleProject"></a>
+## func [HandleProject](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/handlers.go#L453>)
+
+```go
+func HandleProject(db *bun.DB) routing.APIFunc
+```
+
+HandleProject handles the project page. aka /project/\{slug...\}.
+
+<a name="HandleProjects"></a>
+## func [HandleProjects](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/handlers.go#L360>)
+
+```go
+func HandleProjects(db *bun.DB) routing.APIFunc
+```
+
+HandleProjects handles the projects page. aka /projects.
+
+<a name="HandleTag"></a>
+## func [HandleTag](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/handlers.go#L542>)
+
+```go
+func HandleTag(db *bun.DB) routing.APIFunc
+```
+
+HandleTag handles the tag page. aka /tag/\{slug...\}.
+
+<a name="HandleTags"></a>
+## func [HandleTags](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/handlers.go#L496>)
+
+```go
+func HandleTags(db *bun.DB) routing.APIFunc
+```
+
+HandleTags handles the tags page. aka /tags.
+
+<a name="NewServer"></a>
+## func [NewServer](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/root.go#L40-L42>)
+
+```go
+func NewServer(ctx context.Context) (http.Handler, error)
+```
+
+NewServer creates a new server.
 
 <a name="Run"></a>
-## func [Run](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/root.go#L61-L64>)
+## func [Run](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/root.go#L79-L82>)
 
 ```go
 func Run(ctx context.Context, _ func(string) string) error
 ```
 
 Run is the entry point for the application.
+
+<a name="ContactForm"></a>
+## type [ContactForm](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/handlers.go#L24-L29>)
+
+ContactForm is the struct schema for the contact form.
+
+```go
+type ContactForm struct {
+    Name    string `schema:"name,required"`
+    Email   string `schema:"email,required"`
+    Subject string `schema:"subject,required"`
+    Message string `schema:"message,required"`
+}
+```
 
 Generated by [gomarkdoc](<https://github.com/princjef/gomarkdoc>)
 

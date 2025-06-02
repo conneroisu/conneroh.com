@@ -204,39 +204,31 @@ templ EmploymentItem(employment *assets.Employment, attrs templ.Attributes) {
 					{ employment.Title }
 				</h2>
 				<p
-					class={ twerge.It("text-gray-300 mb-4 line-clamp-3") }
+					class={ twerge.It("text-gray-300 mb-4 line-clamp-2") }
 				>
 					{ employment.Description }
 				</p>
 				<div
-					class={ twerge.It("mb-4 grid grid-cols-2 flex-wrap gap-2") }
+					class={ twerge.It("mb-4 grid-cols-2 grid flex-wrap gap-2") }
 				>
-					for i, tag := range employment.Tags[0:min(len(employment.Tags), maxShownTags-1)] {
-						if i < maxShownTags-1 || len(employment.Tags) == maxShownTags {
-							@TagControl(tag)
-						} else if i == maxShownTags {
-						}
+					for _, tag := range employment.Tags[0:min(len(employment.Tags), maxShownTags-1)] {
+						@TagControl(tag)
 					}
 					if len(employment.Tags) > maxShownTags {
 						@moreTagsButton(strconv.Itoa(len(employment.Tags[maxShownTags-1:])))
 					}
 				</div>
-				<span
-					class={ twerge.It("text-sm text-gray-400") }
-				>
-					Started: { employment.CreatedAt.Format("Jan 2006") }
-				</span>
 			</div>
 			<span
 				class={ twerge.It("text-py-1 bottom-0 px-2 rounded-tr-md text-white left-0 absolute border-emerald-800 border-2 border-l-0 border-b-0") }
 			>
 				{ strconv.Itoa(len(employment.Projects)) } projects
 			</span>
-			<span
+			<div
 				class={ twerge.It("px-2 bottom-0 py-1 right-0 text-xs rounded-tl-md text-white absolute border-emerald-800 border-2 border-r-0 border-b-0") }
 			>
-				{ strconv.Itoa(len(employment.Tags)) } tags
-			</span>
+				{ employment.CreatedAt.Format("Jan 2006") }
+			</div>
 		</div>
 		if len(employment.Tags) > maxShownTags {
 			<div

@@ -22,6 +22,7 @@ import (
 )
 
 const (
+
 	numWorkers         = 20
 	taskBufferInt      = 1000
 	fullAssetLoc       = assets.AssetsLoc
@@ -31,10 +32,6 @@ const (
 	fullEmploymentLoc  = assets.EmploymentsLoc
 )
 
-var (
-	workers    = flag.Int("workers", numWorkers, "number of parallel workers")
-	taskBuffer = flag.Int("buffer", taskBufferInt, "size of task buffer")
-)
 
 func main() {
 	flag.Parse()
@@ -48,19 +45,21 @@ func main() {
 		syscall.SIGHUP)
 	defer stop()
 
-	err := UpdateDB(ctx, os.Getenv, *workers, *taskBuffer)
+	err := run(ctx, os.Getenv)
 	if err != nil {
 		panic(err)
 	}
 }
 
-// UpdateDB executes the main application logic.
-func UpdateDB(
+// run executes the main application logic.
+func run(
 	ctx context.Context,
 	getenv func(string) string,
-	_, _ int,
 ) error {
-	var relFns []assets.RelationshipFn
+	var (
+		relFns []assets.RelationshipFn
+		items  []assets.DirMatchItem
+	)
 	sqldb, err := sql.Open("sqlite", assets.DBName())
 	if err != nil {
 		return eris.Wrap(err, "failed to open database")
@@ -75,10 +74,6 @@ func UpdateDB(
 		return eris.Wrap(err, "failed to initialize database")
 	}
 	fs := afero.NewBasePathFs(afero.NewOsFs(), assets.VaultLoc)
-	// ol, err := llama.NewOllamaClient(getenv)
-	// if err != nil {
-	// 	return eris.Wrap(err, "failed to create Ollama client")
-	// }
 	ti, err := assets.NewTigris(getenv)
 	if err != nil {
 		return eris.Wrap(err, "failed to create Tigris client")
@@ -89,11 +84,12 @@ func UpdateDB(
 	}
 	md := assets.NewMD(fs)
 
-	todoAssets, err := assets.HashDirMatch(ctx, fs, fullAssetLoc, db)
+	// Assets
+	items, err = assets.HashDirMatch(ctx, fs, assets.AssetsLoc, db)
 	if err != nil {
 		return err
 	}
-	for _, item := range todoAssets {
+	for _, item := range items {
 		slog.Info("uploading to S3", "path", item.Path)
 		err = assets.UploadToS3(
 			ctx,
@@ -107,11 +103,12 @@ func UpdateDB(
 		}
 	}
 
-	todoPosts, err := assets.HashDirMatch(ctx, fs, fullPostLoc, db)
+	// Posts
+	items, err = assets.HashDirMatch(ctx, fs, assets.PostsLoc, db)
 	if err != nil {
 		return eris.Wrap(err, "failed to hash posts")
 	}
-	for _, item := range todoPosts {
+	for _, item := range items {
 		slog.Info("processing post", "path", item.Path)
 		var (
 			post  assets.Post
@@ -130,11 +127,12 @@ func UpdateDB(
 		relFns = append(relFns, relFn)
 	}
 
-	todoProjects, err := assets.HashDirMatch(ctx, fs, fullProjectLoc, db)
+	// Projects
+	items, err = assets.HashDirMatch(ctx, fs, assets.ProjectsLoc, db)
 	if err != nil {
 		return eris.Wrap(err, "failed to hash projects")
 	}
-	for _, item := range todoProjects {
+	for _, item := range items {
 		slog.Info("processing project", "path", item.Path)
 		var (
 			project assets.Project
@@ -153,11 +151,12 @@ func UpdateDB(
 		relFns = append(relFns, relFn)
 	}
 
-	todoTags, err := assets.HashDirMatch(ctx, fs, fullTagLoc, db)
+	// Tags
+	items, err = assets.HashDirMatch(ctx, fs, assets.TagsLoc, db)
 	if err != nil {
 		return eris.Wrap(err, "failed to hash tags")
 	}
-	for _, item := range todoTags {
+	for _, item := range items {
 		slog.Info("processing tag", "path", item.Path)
 		var (
 			tag   assets.Tag

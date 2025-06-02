@@ -1,22 +1,22 @@
 ---
-title: Controls Systems Engineer Intern at Freund-Vector
-slug: controls-systems-engineer-intern-freund-vector
-description: Developed solutions for product development of granulation, compactor, and mixer machines. Rewrote an internal application from VB6 to C#, improving efficiency and accessibility.
-created_at: 2023-06-01T09:00:00.000-06:00
-updated_at: 2023-08-31T17:00:00.000-06:00
-banner_path: 
+id: controls-systems-engineer-intern-freund-vector
+aliases:
+  - Controls Systems Engineer Intern at Freund-Vector
 tags:
   - programming-language/csharp
-  - hdl/systems-engineering
-  - hdl/control-systems
-  - hdl/manufacturing
-  - hdl/engineering
-  - hdl/electrical-engineering
-  - hdl/robotics
-  - hdl/computer-engineering
-  - hdl/plc-programming
-projects: []
+  - ideology/systems-engineering
+  - ideology/control-systems
+  - ideology/manufacturing
+  - ideology/robotics
+  - ideology/plc-programming
+created_at: 2023-06-01T09:00:00.000-06:00
+end_date: 2023-08-31T17:00:00.000-06:00
+description: Developed solutions for product development of granulation, compactor, and mixer machines. Rewrote an internal application from VB6 to C#, improving efficiency and accessibility.
 employments: []
+projects: []
+slug: controls-systems-engineer-intern-freund-vector
+title: Controls Systems Engineer Intern at Freund-Vector
+updated_at: 2025-06-01T18:50:24.000-06:00
 ---
 
 # Controls Systems Engineer Intern at Freund-Vector

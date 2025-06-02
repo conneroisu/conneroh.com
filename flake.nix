@@ -27,9 +27,7 @@
         rooted = exec:
           builtins.concatStringsSep "\n"
           [
-            ''
-              REPO_ROOT="$(git rev-parse --show-toplevel)"
-            ''
+            ''REPO_ROOT="$(git rev-parse --show-toplevel)"''
             exec
           ];
         scripts = {
@@ -154,50 +152,6 @@
             deps = with pkgs; [air git];
             description = "Run the application with air for hot reloading";
           };
-          live-ci = {
-            exec = ''
-              go run ./cmd/live-ci/main.go
-            '';
-            env.DEBUG = "true";
-            deps = with pkgs;
-              [
-                playwright-driver # Browser Archives and Driver Scripts
-                nodejs_20 # Required for Playwright driver
-                pkg-config # Needed for some browser dependencies
-                at-spi2-core # Accessibility support
-                cairo # 2D graphics library
-                cups # Printing system
-                dbus # Message bus system
-                expat # XML parser
-                ffmpeg # Media processing
-                fontconfig # Font configuration and customization
-                freetype # Font rendering engine
-                gdk-pixbuf # Image loading library
-                glib # Low-level core library
-                gtk3 # GUI toolkit
-                go
-              ]
-              ++ (with pkgs;
-                lib.optionals stdenv.isDarwin [
-                  libiconv
-                ])
-              ++ (with pkgs;
-                lib.optionals stdenv.isLinux [
-                  chromium # Chromium browser
-                  xorg.libXcomposite # X11 Composite extension - needed by browsers
-                  xorg.libXdamage # X11 Damage extension - needed by browsers
-                  xorg.libXfixes # X11 Fixes extension - needed by browsers
-                  xorg.libXrandr # X11 RandR extension - needed by browsers
-                  xorg.libX11 # X11 client-side library
-                  xorg.libxcb # X11 C Bindings library
-                  mesa # OpenGL implementation
-                  alsa-lib # Audio library
-                  nss # Network Security Services
-                  nspr # NetScape Portable Runtime
-                  pango # Text layout and rendering
-                ]);
-            description = "Run the application with air for hot reloading";
-          };
         };
         scriptPackages =
           pkgs.lib.mapAttrs
@@ -271,7 +225,6 @@
               flyctl # Infra
               openssl.dev
               skopeo
-              git-bug
 
               (
                 pkgs.buildGoModule rec {
@@ -383,7 +336,7 @@
           {
             conneroh = pkgs.buildGoModule {
               inherit src version preBuild;
-              vendorHash = "sha256-DYqIBhMpuNc62m9fCU7T6Sl17tmpTztD70qG1OGUEN8=";
+              vendorHash = "sha256-447MwdXuirsxql/A+BvUoQHW+FhiWkfCtet4eyCa5qI=";
               name = "conneroh.com";
               goSum = ./go.sum;
               subPackages = ["."];
@@ -440,23 +393,19 @@
               '';
             };
 
-            # PR Preview deployment script
             pr-preview = pkgs.writeShellScriptBin "pr-preview" ''
               set -euo pipefail
 
-              # Add required tools to PATH
               export PATH="${
                 pkgs.lib.makeBinPath (with pkgs; [flyctl skopeo jq git gnused coreutils])
               }:$PATH"
 
-              # Script configuration
               readonly APP_PREFIX="pr"
               readonly FLY_ORG="''${FLY_ORG:-personal}"
               readonly FLY_REGION="''${FLY_REGION:-ord}"
 
               [ -z "$MASTER_FLY_AUTH_TOKEN" ] && MASTER_FLY_AUTH_TOKEN="$(doppler secrets get --plain MASTER_FLY_AUTH_TOKEN)"
 
-              # Functions
               generate_app_name() {
                   local pr_number="$1"
                   echo "''${APP_PREFIX}-''${pr_number}-conneroh-com" | tr '[:upper:]' '[:lower:]'
@@ -512,7 +461,6 @@
                 cpus = 1
               EOF
 
-                  # Copy image to Fly.io registry
                   local registry="registry.fly.io/''${app_name}"
                   echo "Copying image to ''${registry}..."
 
@@ -522,7 +470,7 @@
                     "docker://''${registry}:latest" \
                     --dest-creds x:"''${MASTER_FLY_AUTH_TOKEN}"
 
-                  # Deploy
+                  echo "Deploying PR #''${pr_number} to app: ''${app_name}"
                   flyctl deploy \
                     --app "''${app_name}" \
                     --config fly.pr.toml \
@@ -531,11 +479,9 @@
                     -t "$MASTER_FLY_AUTH_TOKEN"
                     "$@"
 
-                  # Output deployment information
                   echo "Deployment complete!"
                   echo "URL: https://''${app_name}.fly.dev"
 
-                  # Get deployment details
                   flyctl status --app "''${app_name}" --json -t "$MASTER_FLY_AUTH_TOKEN" | jq '{
                       app: .Name,
                       url: "https://\(.Name).fly.dev",

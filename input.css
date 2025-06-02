@@ -3,11 +3,6 @@
 @tailwind utilities;
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Enable smooth scrolling by default */
-html {
-	scroll-behavior: smooth;
-}
-
 .htmx-indicator {
 	opacity: 1;
 }
@@ -40,7 +35,6 @@ html {
 	--callout-example-rgb: 124, 77, 255;
 	/* Purple-Blue */
 	--callout-quote-rgb: 158, 158, 158;
-
 	/* Default callout styling variables */
 	--callout-border-opacity: 0.25;
 	--callout-border-width: 1px;
@@ -48,7 +42,6 @@ html {
 	--callout-blend-mode: normal;
 	--callout-icon-size: 1.3em;
 	--callout-icon-color: rgb(var(--callout-color));
-
 	--background: hsl(240 10% 3.9%);
 	--foreground: hsl(0 0% 98%);
 	--muted: hsl(240 3.7% 15.9%);
@@ -300,27 +293,107 @@ html {
 		}
 
 		ul {
-			@apply text-gray-400 py-5;
+			@apply text-gray-400 py-5 list-disc pl-6 space-y-2;
 		}
 
+		ul>li {
+			@apply text-gray-300 leading-relaxed;
+
+			/* Enhanced bullet styling for better visibility */
+			&::marker {
+				@apply text-green-400;
+			}
+		}
+
+		/* Nested lists */
+		ul ul {
+			@apply list-disc pl-6 pt-2 pb-0;
+		}
+
+		ul ul>li {
+			@apply text-gray-400;
+
+			&::marker {
+				@apply text-green-300;
+			}
+		}
+
+		/* Ordered lists */
+		ol {
+			@apply text-gray-400 py-5 list-decimal pl-6 space-y-2;
+		}
+
+		ol>li {
+			@apply text-gray-300 leading-relaxed;
+
+			&::marker {
+				@apply text-green-400 font-semibold;
+			}
+		}
+
+		ol ol {
+			@apply list-decimal pl-6 pt-2 pb-0;
+		}
+
+		ol ol>li {
+			@apply text-gray-400;
+
+			&::marker {
+				@apply text-green-300;
+			}
+		}
+
+		/* Mixed nested lists */
+		ul ol,
+		ol ul {
+			@apply pt-2 pb-0;
+		}
+
+		/* Special styling for todo lists within callouts */
+		.callout[data-callout="todo"] ul {
+			@apply py-3;
+		}
+
+		.callout[data-callout="todo"] ul>li {
+			@apply text-gray-200;
+
+			&::marker {
+				@apply text-teal-400;
+			}
+		}
+
+		/* Code blocks in lists */
+		li code {
+			@apply bg-gray-800 text-green-400 px-2 py-1 rounded text-sm;
+		}
+
+		/* Links in lists */
+		li a {
+			@apply text-blue-400 hover:text-blue-300 hover:underline;
+		}
+
+		/* Inline code in paragraphs */
+		p code {
+			@apply bg-gray-800 text-green-400 px-2 py-1 rounded text-sm;
+		}
 	}
+}
 
 
-
-	/* twerge:begin */
-/* from px-4 container mx-auto py-8 */
+/* twerge:begin */
+/* from px-4 mx-auto py-8 max-w-5xl */
 .tw-0 { 
-	@apply container py-8 px-4 mx-auto; 
+	@apply mx-auto py-8 max-w-5xl px-4; 
 }
 
 /* from w-full md:h-96 rounded-lg object-cover shadow-md mb-8 h-64 */
 .tw-1 { 
-	@apply object-cover md:h-96 h-64 mb-8 w-full shadow-md rounded-lg; 
+	@apply md:h-96 shadow-md mb-8 h-64 rounded-lg object-cover w-full; 
 }
 
 /* from bg-gray-800 rounded-lg mb-8 overflow-hidden p-6 shadow-lg */
 .tw-2 { 
-	@apply rounded-lg overflow-hidden shadow-lg bg-gray-800 p-6 mb-8; 
+	@apply rounded-lg bg-gray-800 mb-8 p-6 overflow-hidden shadow-lg; 
 }
 
 /* from pb-4 mb-4 border-b border-gray-700 */
@@ -330,7 +403,7 @@ html {
 
 /* from font-bold text-white mb-4 text-4xl */
 .tw-4 { 
-	@apply font-bold text-white mb-4 text-4xl; 
+	@apply mb-4 text-4xl font-bold text-white; 
 }
 
 /* from font-semibold text-white text-2xl */
@@ -340,7 +413,7 @@ html {
 
 /* from h-1 bg-green-500 mt-2 w-16 */
 .tw-6 { 
-	@apply h-1 bg-green-500 mt-2 w-16; 
+	@apply w-16 h-1 bg-green-500 mt-2; 
 }
 
 /* from max-w-none */
@@ -360,132 +433,132 @@ html {
 
 /* from text-gray-400 text-sm pr-2 */
 .tw-10 { 
-	@apply text-gray-400 text-sm pr-2; 
+	@apply pr-2 text-gray-400 text-sm; 
 }
 
 /* from text-gray-400 text-sm hover:underline hover:text-green-400 transition-colors duration-200 pr-2 */
 .tw-11 { 
-	@apply hover:text-green-400 transition-colors duration-200 pr-2 text-gray-400 text-sm hover:underline; 
+	@apply duration-200 pr-2 text-gray-400 text-sm hover:underline hover:text-green-400 transition-colors; 
 }
 
 /* from items-center text-sm text-gray-400 mt-6 flex */
 .tw-12 { 
-	@apply text-gray-400 mt-6 flex items-center text-sm; 
-}
-
-/* from text-white mb-4 text-2xl font-semibold */
-.tw-13 { 
-	@apply text-white mb-4 text-2xl font-semibold; 
+	@apply flex items-center text-sm text-gray-400 mt-6; 
 }
 
 /* from max-w-none my-6 text-gray-300 leading-relaxed */
-.tw-14 { 
-	@apply my-6 text-gray-300 leading-relaxed max-w-none; 
+.tw-13 { 
+	@apply max-w-none my-6 text-gray-300 leading-relaxed; 
 }
 
 /* from pt-8 mt-12 border-t border-gray-700 */
-.tw-15 { 
-	@apply border-t border-gray-700 pt-8 mt-12; 
+.tw-14 { 
+	@apply pt-8 mt-12 border-t border-gray-700; 
 }
 
 /* from text-2xl font-bold text-white mb-4 */
-.tw-16 { 
-	@apply text-2xl font-bold text-white mb-4; 
+.tw-15 { 
+	@apply font-bold text-white mb-4 text-2xl; 
 }
 
 /* from grid grid-cols-1 md:grid-cols-2 gap-4 */
-.tw-17 { 
-	@apply md:grid-cols-2 gap-4 grid grid-cols-1; 
+.tw-16 { 
+	@apply grid grid-cols-1 md:grid-cols-2 gap-4; 
 }
 
 /* from bg-gray-800 transition-all flex transform hover:-translate-y-3 flex-col shadow-md rounded-lg hover:shadow-lg duration-300 overflow-hidden h-full */
-.tw-18 { 
-	@apply hover:shadow-lg duration-300 overflow-hidden hover:-translate-y-3 shadow-md rounded-lg h-full transition-all flex bg-gray-800 transform flex-col; 
+.tw-17 { 
+	@apply bg-gray-800 transition-all shadow-md hover:shadow-lg duration-300 overflow-hidden flex transform hover:-translate-y-3 h-full flex-col rounded-lg; 
 }
 
 /* from h-full w-full */
-.tw-19 { 
+.tw-18 { 
 	@apply h-full w-full; 
 }
 
 /* from relative w-full */
-.tw-20 { 
+.tw-19 { 
 	@apply relative w-full; 
 }
 
 /* from w-full h-48 object-cover */
-.tw-21 { 
+.tw-20 { 
 	@apply object-cover w-full h-48; 
 }
 
 /* from flex-grow flex p-6 flex-col */
-.tw-22 { 
+.tw-21 { 
 	@apply flex-grow p-6 flex-col flex; 
 }
 
 /* from mb-3 text-xl hover:underline font-semibold text-white line-clamp-2 */
-.tw-23 { 
-	@apply mb-3 text-xl hover:underline line-clamp-2 font-semibold text-white; 
+.tw-22 { 
+	@apply hover:underline font-semibold text-white line-clamp-2 mb-3 text-xl; 
 }
 
 /* from text-gray-300 mb-4 line-clamp-2 */
-.tw-24 { 
-	@apply text-gray-300 mb-4 line-clamp-2; 
+.tw-23 { 
+	@apply mb-4 line-clamp-2 text-gray-300; 
 }
 
 /* from mb-4 grid-cols-2 grid flex-wrap gap-2 */
-.tw-25 { 
-	@apply flex-wrap gap-2 mb-4 grid-cols-2 grid; 
+.tw-24 { 
+	@apply grid-cols-2 grid flex-wrap gap-2 mb-4; 
 }
 
 /* from text-py-1 bottom-0 px-2 rounded-tr-md text-white left-0 absolute border-emerald-800 border-2 border-l-0 border-b-0 */
-.tw-26 { 
-	@apply text-white px-2 border-2 bottom-0 rounded-tr-md border-emerald-800 left-0 absolute border-b-0 border-l-0; 
+.tw-25 { 
+	@apply border-l-0 text-white rounded-tr-md border-b-0 px-2 absolute border-emerald-800 border-2 bottom-0 left-0; 
 }
 
 /* from px-2 bottom-0 py-1 right-0 text-xs rounded-tl-md text-white absolute border-emerald-800 border-2 border-r-0 border-b-0 */
-.tw-27 { 
-	@apply px-2 py-1 text-xs border-2 right-0 border-emerald-800 border-r-0 text-white absolute bottom-0 rounded-tl-md border-b-0; 
+.tw-26 { 
+	@apply right-0 border-emerald-800 px-2 text-xs rounded-tl-md text-white bottom-0 py-1 absolute border-2 border-r-0 border-b-0; 
 }
 
-/* from w-full md:h-96 object-center rounded-lg object-cover shadow-md mb-8 h-64 */
-.tw-28 { 
-	@apply mb-8 w-full object-center object-cover h-64 rounded-lg shadow-md md:h-96; 
+/* from w-full md:h-96 object-center rounded-lg object-cover shadow-md mb-8 h-64 bg-gray-800 */
+.tw-27 { 
+	@apply object-center rounded-lg object-cover shadow-md mb-8 h-64 bg-gray-800 w-full md:h-96; 
 }
 
 /* from mt-12 */
-.tw-29 { 
+.tw-28 { 
 	@apply mt-12; 
 }
 
 /* from gap-6 grid grid-cols-1 md:grid-cols-2 */
-.tw-30 { 
-	@apply grid-cols-1 md:grid-cols-2 gap-6 grid; 
+.tw-29 { 
+	@apply gap-6 grid grid-cols-1 md:grid-cols-2; 
 }
 
 /* from bg-gray-800 rounded-lg shadow-md overflow-hidden p-6 */
-.tw-31 { 
-	@apply overflow-hidden bg-gray-800 rounded-lg p-6 shadow-md; 
+.tw-30 { 
+	@apply bg-gray-800 p-6 shadow-md rounded-lg overflow-hidden; 
 }
 
 /* from text-xl font-semibold text-white mb-2 */
-.tw-32 { 
-	@apply text-xl font-semibold text-white mb-2; 
+.tw-31 { 
+	@apply text-white mb-2 text-xl font-semibold; 
 }
 
 /* from font-medium flex items-center text-green-400 hover:underline text-sm */
-.tw-33 { 
-	@apply font-medium flex items-center text-green-400 hover:underline text-sm; 
+.tw-32 { 
+	@apply flex items-center text-green-400 hover:underline text-sm font-medium; 
 }
 
 /* from ml-1 h-4 w-4 */
-.tw-34 { 
+.tw-33 { 
 	@apply ml-1 h-4 w-4; 
+}
+
+/* from px-4 container mx-auto py-8 */
+.tw-34 { 
+	@apply container py-8 px-4 mx-auto; 
 }
 
 /* from mb-12 text-center */
 .tw-35 { 
-	@apply text-center mb-12; 
+	@apply mb-12 text-center; 
 }
 
 /* from p-4 inline-block */
@@ -495,12 +568,12 @@ html {
 
 /* from text-xl text-gray-300 max-w-2xl mx-auto */
 .tw-37 { 
-	@apply text-xl text-gray-300 max-w-2xl mx-auto; 
+	@apply max-w-2xl mx-auto text-xl text-gray-300; 
 }
 
 /* from border-b border-gray-700 mb-6 */
 .tw-38 { 
-	@apply border-gray-700 mb-6 border-b; 
+	@apply border-b border-gray-700 mb-6; 
 }
 
 /* from space-x-8 flex */
@@ -510,7 +583,7 @@ html {
 
 /* from px-1 sm:text-base text-sm font-medium py-4 border-b-2 */
 .tw-40 { 
-	@apply py-4 sm:text-base text-sm font-medium border-b-2 px-1; 
+	@apply border-b-2 px-1 sm:text-base text-sm font-medium py-4; 
 }
 
 /* from text-green-500 border-green-500 */
@@ -520,7 +593,7 @@ html {
 
 /* from text-gray-400 hover:text-gray-300 border-transparent */
 .tw-42 { 
-	@apply hover:text-gray-300 border-transparent text-gray-400; 
+	@apply text-gray-400 hover:text-gray-300 border-transparent; 
 }
 
 /* from text-3xl font-bold mb-6 text-white */
@@ -530,7 +603,7 @@ html {
 
 /* from border-gray-700 border-b p-3 */
 .tw-44 { 
-	@apply border-gray-700 border-b p-3; 
+	@apply border-b p-3 border-gray-700; 
 }
 
 /* from relative */
@@ -540,7 +613,7 @@ html {
 
 /* from w-full focus:outline-none border rounded-md pr-4 py-2 pl-10 bg-gray-700 text-white focus:ring-2 border-gray-600 focus:ring-green-500 */
 .tw-46 { 
-	@apply border py-2 border-gray-600 rounded-md bg-gray-700 pl-10 text-white w-full focus:ring-green-500 pr-4 focus:ring-2 focus:outline-none; 
+	@apply pr-4 text-white focus:ring-green-500 py-2 w-full border bg-gray-700 pl-10 border-gray-600 focus:ring-2 focus:outline-none rounded-md; 
 }
 
 /* from text-gray-500 absolute left-3 top-2.5 */
@@ -575,17 +648,17 @@ html {
 
 /* from px-4 container mx-auto py-2 */
 .tw-53 { 
-	@apply py-2 px-4 container mx-auto; 
+	@apply px-4 container mx-auto py-2; 
 }
 
 /* from flex justify-center items-center mt-8 space-x-2 */
 .tw-54 { 
-	@apply space-x-2 flex justify-center items-center mt-8; 
+	@apply flex justify-center items-center mt-8 space-x-2; 
 }
 
 /* from px-3 bg-gray-800 transition-colors rounded-md border py-2 border-gray-700 text-gray-300 hover:bg-gray-700 opacity-50 flex items-center */
 .tw-55 { 
-	@apply border-gray-700 text-gray-300 flex bg-gray-800 transition-colors rounded-md opacity-50 py-2 hover:bg-gray-700 items-center border px-3; 
+	@apply border transition-colors border-gray-700 hover:bg-gray-700 items-center px-3 rounded-md text-gray-300 py-2 opacity-50 bg-gray-800 flex; 
 }
 
 /* from hidden md:flex space-x-2 */
@@ -595,27 +668,27 @@ html {
 
 /* from flex md:hidden space-x-2 */
 .tw-57 { 
-	@apply md:hidden space-x-2 flex; 
+	@apply space-x-2 flex md:hidden; 
 }
 
 /* from grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 grid pt-2 */
 .tw-58 { 
-	@apply gap-6 grid pt-2 grid-cols-1 md:grid-cols-2 lg:grid-cols-3; 
+	@apply grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 grid pt-2; 
 }
 
 /* from px-3 bg-gray-800 transition-colors rounded-md border py-2 border-gray-700 text-gray-300 hover:bg-gray-700 */
 .tw-59 { 
-	@apply py-2 rounded-md text-gray-300 hover:bg-gray-700 border bg-gray-800 px-3 border-gray-700 transition-colors; 
+	@apply py-2 rounded-md border px-3 border-gray-700 bg-gray-800 transition-colors text-gray-300 hover:bg-gray-700; 
 }
 
 /* from px-3 bg-gray-800 transition-colors rounded-md border py-2 border-gray-700 text-gray-300 hover:bg-gray-700 flex items-center */
 .tw-60 { 
-	@apply rounded-md border text-gray-300 transition-colors bg-gray-800 border-gray-700 py-2 flex items-center hover:bg-gray-700 px-3; 
+	@apply hover:bg-gray-700 flex transition-colors py-2 text-gray-300 px-3 bg-gray-800 border items-center border-gray-700 rounded-md; 
 }
 
 /* from p-6 rounded-lg overflow-hidden bg-gray-800 shadow-md hover:shadow-lg duration-300 transform transition-all hover:-translate-y-1 cursor-pointer h-full */
 .tw-61 { 
-	@apply transition-all shadow-md hover:shadow-lg p-6 duration-300 overflow-hidden bg-gray-800 transform h-full cursor-pointer rounded-lg hover:-translate-y-1; 
+	@apply h-full hover:shadow-lg hover:-translate-y-1 shadow-md bg-gray-800 p-6 overflow-hidden transition-all rounded-lg transform duration-300 cursor-pointer; 
 }
 
 /* from items-center justify-between mb-3 flex p-6 */
@@ -625,22 +698,22 @@ html {
 
 /* from font-semibold text-white text-xl */
 .tw-63 { 
-	@apply text-white text-xl font-semibold; 
+	@apply font-semibold text-white text-xl; 
 }
 
 /* from rounded-sm h-8 justify-center items-center flex w-8 */
 .tw-64 { 
-	@apply h-8 items-center justify-center flex w-8 rounded-sm; 
+	@apply flex rounded-sm justify-center w-8 h-8 items-center; 
 }
 
 /* from bg-gray-800 transition-all flex transform hover:-translate-y-3 flex-col shadow-md rounded-lg hover:shadow-lg duration-300 overflow-hidden h-full cursor-pointer */
 .tw-65 { 
-	@apply transform hover:-translate-y-3 hover:shadow-lg h-full bg-gray-800 shadow-md flex-col duration-300 overflow-hidden transition-all flex rounded-lg cursor-pointer; 
+	@apply h-full shadow-md duration-300 overflow-hidden flex flex-col hover:shadow-lg hover:-translate-y-3 cursor-pointer bg-gray-800 transform rounded-lg transition-all; 
 }
 
 /* from overflow-hidden bg-gray-800 transform rounded-lg transition-all hover:shadow-lg duration-300 shadow-md hover:-translate-y-1 cursor-pointer h-full */
 .tw-66 { 
-	@apply hover:-translate-y-1 overflow-hidden bg-gray-800 duration-300 shadow-md h-full transform transition-all cursor-pointer hover:shadow-lg rounded-lg; 
+	@apply transition-all duration-300 shadow-md bg-gray-800 hover:shadow-lg cursor-pointer rounded-lg transform hover:-translate-y-1 h-full overflow-hidden; 
 }
 
 /* from p-6 */
@@ -650,17 +723,17 @@ html {
 
 /* from bg-green-600 font-medium px-3 py-2 text-white rounded-md */
 .tw-68 { 
-	@apply font-medium bg-green-600 px-3 py-2 text-white rounded-md; 
+	@apply rounded-md font-medium px-3 text-white bg-green-600 py-2; 
 }
 
 /* from text-gray-400 px-2 py-1 */
 .tw-69 { 
-	@apply text-gray-400 px-2 py-1; 
+	@apply py-1 text-gray-400 px-2; 
 }
 
 /* from text-sm px-3 items-center hover:underline bg-emerald-800 w-full transition-colors py-1 hover:bg-emerald-600 h-8 rounded-sm justify-between font-medium text-emerald-300 hover:text-white flex flex-row */
 .tw-70 { 
-	@apply px-3 text-emerald-300 hover:bg-emerald-600 h-8 justify-between hover:underline transition-colors py-1 text-sm bg-emerald-800 flex-row w-full font-medium hover:text-white items-center rounded-sm flex; 
+	@apply h-8 font-medium transition-colors rounded-sm text-sm bg-emerald-800 px-3 hover:underline hover:text-white hover:bg-emerald-600 justify-between flex items-center w-full text-emerald-300 flex-row py-1; 
 }
 
 /* from items-center flex pr-3 */
@@ -670,17 +743,17 @@ html {
 
 /* from items-center flex */
 .tw-72 { 
-	@apply flex items-center; 
+	@apply items-center flex; 
 }
 
 /* from absolute z-10 grid sm:grid-cols-2 md:grid-cols-3 gap-1 */
 .tw-73 { 
-	@apply absolute z-10 grid sm:grid-cols-2 md:grid-cols-3 gap-1; 
+	@apply grid sm:grid-cols-2 md:grid-cols-3 gap-1 absolute z-10; 
 }
 
 /* from bg-gray-900 flex flex-col min-h-screen */
 .tw-74 { 
-	@apply bg-gray-900 flex flex-col min-h-screen; 
+	@apply min-h-screen bg-gray-900 flex flex-col; 
 }
 
 /* from border-gray-800 border-b */
@@ -690,7 +763,7 @@ html {
 
 /* from container mx-auto lg:px-8 sm:px-6 px-4 */
 .tw-76 { 
-	@apply sm:px-6 px-4 container lg:px-8 mx-auto; 
+	@apply sm:px-6 mx-auto px-4 container lg:px-8; 
 }
 
 /* from justify-between h-16 flex items-center */
@@ -700,12 +773,12 @@ html {
 
 /* from p-2 focus:outline-none sm:hidden hover:text-white hover:bg-gray-700 rounded-md text-gray-300 mr-2 */
 .tw-78 { 
-	@apply hover:bg-gray-700 mr-2 hover:text-white rounded-md text-gray-300 sm:hidden p-2 focus:outline-none; 
+	@apply p-2 mr-2 focus:outline-none hover:bg-gray-700 sm:hidden text-gray-300 rounded-md hover:text-white; 
 }
 
 /* from text-white cursor-pointer pr-4 text-xl font-bold */
 .tw-79 { 
-	@apply text-white cursor-pointer pr-4 text-xl font-bold; 
+	@apply text-xl font-bold text-white cursor-pointer pr-4; 
 }
 
 /* from space-x-8 hidden sm:flex items-center ml-8 */
@@ -715,17 +788,17 @@ html {
 
 /* from hover:text-white cursor-pointer text-gray-300 */
 .tw-81 { 
-	@apply hover:text-white cursor-pointer text-gray-300; 
+	@apply text-gray-300 hover:text-white cursor-pointer; 
 }
 
 /* from pb-4 space-y-1 sm:hidden pt-2 */
 .tw-82 { 
-	@apply pb-4 space-y-1 sm:hidden pt-2; 
+	@apply space-y-1 sm:hidden pt-2 pb-4; 
 }
 
 /* from text-base text-gray-300 hover:bg-gray-700 hover:text-white pl-3 pr-4 block py-2 font-medium */
 .tw-83 { 
-	@apply text-gray-300 hover:bg-gray-700 hover:text-white pl-3 pr-4 font-medium text-base block py-2; 
+	@apply text-base text-gray-300 hover:text-white pr-4 block py-2 hover:bg-gray-700 pl-3 font-medium; 
 }
 
 /* from flex-grow */
@@ -735,7 +808,7 @@ html {
 
 /* from bg-gradient-to-b from-gray-900 to-gray-800 py-20 */
 .tw-85 { 
-	@apply bg-gradient-to-b from-gray-900 to-gray-800 py-20; 
+	@apply to-gray-800 py-20 bg-gradient-to-b from-gray-900; 
 }
 
 /* from container px-4 mx-auto */
@@ -745,17 +818,17 @@ html {
 
 /* from flex-col lg:flex-row items-center justify-between flex */
 .tw-87 { 
-	@apply justify-between flex flex-col lg:flex-row items-center; 
+	@apply flex-col lg:flex-row items-center justify-between flex; 
 }
 
 /* from lg:w-1/2 mb-10 lg:mb-0 */
 .tw-88 { 
-	@apply lg:w-1/2 mb-10 lg:mb-0; 
+	@apply mb-10 lg:mb-0 lg:w-1/2; 
 }
 
 /* from mb-4 md:text-5xl text-4xl leading-tight font-bold lg:text-6xl text-white */
 .tw-89 { 
-	@apply mb-4 md:text-5xl text-white text-4xl leading-tight font-bold lg:text-6xl; 
+	@apply font-bold lg:text-6xl text-white mb-4 md:text-5xl text-4xl leading-tight; 
 }
 
 /* from text-xl text-gray-300 mb-8 max-w-md */
@@ -775,12 +848,12 @@ html {
 
 /* from py-3 text-gray-900 rounded-md hover:opacity-90 font-medium transition-opacity bg-white px-6 */
 .tw-93 { 
-	@apply transition-opacity text-gray-900 rounded-md hover:opacity-90 font-medium bg-white px-6 py-3; 
+	@apply font-medium bg-white px-6 rounded-md py-3 text-gray-900 hover:opacity-90 transition-opacity; 
 }
 
 /* from font-medium border-gray-600 py-3 rounded-md px-6 text-gray-300 transition-colors hover:bg-gray-800 border */
 .tw-94 { 
-	@apply rounded-md font-medium border-gray-600 py-3 px-6 border text-gray-300 transition-colors hover:bg-gray-800; 
+	@apply border border-gray-600 text-gray-300 font-medium hover:bg-gray-800 px-6 transition-colors py-3 rounded-md; 
 }
 
 /* from lg:w-1/2 relative */
@@ -790,37 +863,37 @@ html {
 
 /* from mx-auto rounded-full h-64 bg-blue-600 relative md:w-80 md:h-80 w-64 shadow-lg */
 .tw-96 { 
-	@apply md:w-80 md:h-80 rounded-full relative w-64 shadow-lg h-64 mx-auto bg-blue-600; 
+	@apply h-64 relative bg-blue-600 md:w-80 md:h-80 shadow-lg rounded-full w-64 mx-auto; 
 }
 
 /* from flex text-white justify-center inset-0 font-bold items-center absolute text-xl */
 .tw-97 { 
-	@apply items-center justify-center inset-0 font-bold absolute text-xl flex text-white; 
+	@apply flex inset-0 items-center text-xl text-white absolute justify-center font-bold; 
 }
 
 /* from rounded-full bg-blue-600 relative mx-auto shadow-lg */
 .tw-98 { 
-	@apply shadow-lg rounded-full bg-blue-600 relative mx-auto; 
+	@apply bg-blue-600 relative mx-auto shadow-lg rounded-full; 
 }
 
 /* from -right-4 h-24 -bottom-4 rounded-full w-24 z-0 absolute bg-purple-600 */
 .tw-99 { 
-	@apply h-24 -bottom-4 rounded-full absolute -right-4 z-0 bg-purple-600 w-24; 
+	@apply h-24 -bottom-4 bg-purple-600 -right-4 w-24 z-0 absolute rounded-full; 
 }
 
 /* from z-0 absolute h-16 bg-pink-600 -top-4 rounded-full -left-4 w-16 */
 .tw-100 { 
-	@apply bg-pink-600 -top-4 -left-4 absolute rounded-full w-16 z-0 h-16; 
+	@apply bg-pink-600 -top-4 w-16 rounded-full -left-4 z-0 absolute h-16; 
 }
 
 /* from bg-gray-800 py-16 */
 .tw-101 { 
-	@apply bg-gray-800 py-16; 
+	@apply py-16 bg-gray-800; 
 }
 
 /* from justify-between items-center mb-12 pr-4 flex flex-col md:flex-row */
 .tw-102 { 
-	@apply items-center mb-12 pr-4 flex flex-col md:flex-row justify-between; 
+	@apply md:flex-row justify-between items-center mb-12 pr-4 flex flex-col; 
 }
 
 /* from mb-4 text-3xl font-bold text-white */
@@ -830,17 +903,17 @@ html {
 
 /* from font-medium flex items-center text-green-400 hover:underline text-lg cursor-pointer */
 .tw-104 { 
-	@apply text-green-400 hover:underline text-lg cursor-pointer font-medium flex items-center; 
+	@apply text-lg cursor-pointer font-medium flex items-center text-green-400 hover:underline; 
 }
 
 /* from grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 grid */
 .tw-105 { 
-	@apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8; 
+	@apply lg:grid-cols-3 gap-8 grid grid-cols-1 md:grid-cols-2; 
 }
 
 /* from bg-gray-900 transition-all flex transform hover:-translate-y-3 flex-col shadow-md rounded-lg hover:shadow-lg duration-300 overflow-hidden cursor-pointer h-full */
 .tw-106 { 
-	@apply flex rounded-lg transition-all hover:-translate-y-3 shadow-md cursor-pointer bg-gray-900 overflow-hidden duration-300 transform flex-col hover:shadow-lg h-full; 
+	@apply transform duration-300 flex flex-col hover:-translate-y-3 bg-gray-900 rounded-lg hover:shadow-lg shadow-md transition-all overflow-hidden cursor-pointer h-full; 
 }
 
 /* from bg-gray-900 py-16 */
@@ -848,224 +921,363 @@ html {
 	@apply bg-gray-900 py-16; 
 }
 
-/* from grid grid-cols-1 lg:grid-cols-2 gap-8 */
+/* from text-center mb-12 */
 .tw-108 { 
+	@apply text-center mb-12; 
+}
+
+/* from text-gray-300 max-w-2xl mx-auto */
+.tw-109 { 
+	@apply text-gray-300 max-w-2xl mx-auto; 
+}
+
+/* from hidden md:block */
+.tw-110 { 
+	@apply hidden md:block; 
+}
+
+/* from absolute left-1/2 -translate-x-1/2 w-0.5 h-full bg-gradient-to-b from-green-500 via-green-400 to-transparent */
+.tw-111 { 
+	@apply absolute left-1/2 w-0.5 h-full via-green-400 to-transparent -translate-x-1/2 bg-gradient-to-b from-green-500; 
+}
+
+/* from space-y-12 */
+.tw-112 { 
+	@apply space-y-12; 
+}
+
+/* from relative flex justify-start */
+.tw-113 { 
+	@apply relative flex justify-start; 
+}
+
+/* from relative flex justify-end */
+.tw-114 { 
+	@apply relative flex justify-end; 
+}
+
+/* from absolute left-1/2 -translate-x-1/2 w-4 h-4 bg-green-500 rounded-full border-4 border-gray-900 z-10 */
+.tw-115 { 
+	@apply w-4 bg-green-500 z-10 -translate-x-1/2 absolute rounded-full border-gray-900 h-4 border-4 left-1/2; 
+}
+
+/* from w-5/12 mr-auto text-right */
+.tw-116 { 
+	@apply w-5/12 mr-auto text-right; 
+}
+
+/* from w-5/12 ml-auto */
+.tw-117 { 
+	@apply w-5/12 ml-auto; 
+}
+
+/* from bg-gray-800 rounded-lg p-6 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 */
+.tw-118 { 
+	@apply rounded-lg hover:-translate-y-1 bg-gray-800 shadow-lg transition-all p-6 hover:shadow-xl; 
+}
+
+/* from text-sm text-green-400 font-semibold mb-1 */
+.tw-119 { 
+	@apply text-sm text-green-400 font-semibold mb-1; 
+}
+
+/* from text-xl font-bold text-white mb-2 */
+.tw-120 { 
+	@apply mb-2 text-xl font-bold text-white; 
+}
+
+/* from text-gray-300 text-sm line-clamp-3 */
+.tw-121 { 
+	@apply text-gray-300 text-sm line-clamp-3; 
+}
+
+/* from mt-3 flex flex-wrap gap-2 justify-end */
+.tw-122 { 
+	@apply justify-end mt-3 flex flex-wrap gap-2; 
+}
+
+/* from mt-3 flex flex-wrap gap-2 */
+.tw-123 { 
+	@apply mt-3 flex flex-wrap gap-2; 
+}
+
+/* from text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded hover:bg-green-600 hover:text-white transition-colors cursor-pointer inline-block */
+.tw-124 { 
+	@apply text-xs text-gray-300 cursor-pointer inline-block rounded py-1 transition-colors hover:bg-green-600 bg-gray-700 px-2 hover:text-white; 
+}
+
+/* from text-xs text-gray-500 */
+.tw-125 { 
+	@apply text-xs text-gray-500; 
+}
+
+/* from md:hidden */
+.tw-126 { 
+	@apply md:hidden; 
+}
+
+/* from absolute left-4 w-0.5 h-full bg-gradient-to-b from-green-500 via-green-400 to-transparent */
+.tw-127 { 
+	@apply h-full bg-gradient-to-b from-green-500 via-green-400 to-transparent absolute left-4 w-0.5; 
+}
+
+/* from space-y-8 pl-12 */
+.tw-128 { 
+	@apply space-y-8 pl-12; 
+}
+
+/* from absolute -left-8 top-6 w-4 h-4 bg-green-500 rounded-full border-4 border-gray-900 */
+.tw-129 { 
+	@apply border-gray-900 rounded-full border-4 absolute bg-green-500 w-4 h-4 -left-8 top-6; 
+}
+
+/* from block */
+.tw-130 { 
+	@apply block; 
+}
+
+/* from bg-gray-800 rounded-lg p-4 shadow-lg hover:shadow-xl transition-all */
+.tw-131 { 
+	@apply rounded-lg p-4 shadow-lg hover:shadow-xl transition-all bg-gray-800; 
+}
+
+/* from text-xs text-green-400 font-semibold mb-1 */
+.tw-132 { 
+	@apply font-semibold mb-1 text-xs text-green-400; 
+}
+
+/* from text-lg font-bold text-white mb-2 */
+.tw-133 { 
+	@apply text-lg font-bold text-white mb-2; 
+}
+
+/* from text-gray-300 text-sm line-clamp-2 */
+.tw-134 { 
+	@apply text-gray-300 text-sm line-clamp-2; 
+}
+
+/* from grid grid-cols-1 lg:grid-cols-2 gap-8 */
+.tw-135 { 
 	@apply grid grid-cols-1 lg:grid-cols-2 gap-8; 
 }
 
+/* from overflow-hidden bg-gray-900 transform rounded-lg transition-all hover:shadow-lg duration-300 shadow-md hover:-translate-y-1 cursor-pointer h-full */
+.tw-136 { 
+	@apply overflow-hidden bg-gray-900 rounded-lg duration-300 hover:-translate-y-1 h-full hover:shadow-lg cursor-pointer transform transition-all shadow-md; 
+}
+
 /* from font-medium flex items-center text-green-400 hover:underline text-lg */
-.tw-109 { 
+.tw-137 { 
 	@apply hover:underline text-lg font-medium flex items-center text-green-400; 
 }
 
 /* from grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 */
-.tw-110 { 
-	@apply grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8; 
+.tw-138 { 
+	@apply lg:grid-cols-4 gap-8 grid grid-cols-2 md:grid-cols-3; 
 }
 
-/* from p-6 rounded-lg overflow-hidden bg-gray-900 shadow-md hover:shadow-lg duration-300 transform transition-all hover:-translate-y-1 */
-.tw-111 { 
-	@apply hover:shadow-lg rounded-lg transition-all transform p-6 overflow-hidden duration-300 hover:-translate-y-1 bg-gray-900 shadow-md; 
+/* from p-6 rounded-lg overflow-hidden bg-gray-800 shadow-md hover:shadow-lg duration-300 transform transition-all hover:-translate-y-1 */
+.tw-139 { 
+	@apply hover:shadow-lg overflow-hidden rounded-lg bg-gray-800 duration-300 hover:-translate-y-1 p-6 shadow-md transform transition-all; 
 }
 
 /* from text-center max-w-2xl mx-auto */
-.tw-112 { 
+.tw-140 { 
 	@apply text-center max-w-2xl mx-auto; 
 }
 
 /* from text-gray-300 mb-8 */
-.tw-113 { 
-	@apply text-gray-300 mb-8; 
+.tw-141 { 
+	@apply mb-8 text-gray-300; 
 }
 
 /* from justify-center gap-4 mb-8 flex flex-wrap */
-.tw-114 { 
-	@apply flex-wrap justify-center gap-4 mb-8 flex; 
+.tw-142 { 
+	@apply justify-center gap-4 mb-8 flex flex-wrap; 
 }
 
 /* from hover:bg-green-400 w-12 rounded-full bg-gray-700 transition-colors flex text-gray-300 h-12 items-center justify-center */
-.tw-115 { 
-	@apply hover:bg-green-400 flex h-12 w-12 bg-gray-700 justify-center rounded-full transition-colors text-gray-300 items-center; 
+.tw-143 { 
+	@apply rounded-full items-center justify-center hover:bg-green-400 transition-colors w-12 bg-gray-700 text-gray-300 h-12 flex; 
 }
 
 /* from bg-gray-700 w-12 text-gray-300 justify-center hover:bg-gray-800 transition-colors rounded-full h-12 items-center flex */
-.tw-116 { 
-	@apply justify-center rounded-full h-12 w-12 text-gray-300 bg-gray-700 hover:bg-gray-800 items-center transition-colors flex; 
+.tw-144 { 
+	@apply justify-center items-center flex bg-gray-700 w-12 rounded-full h-12 text-gray-300 hover:bg-gray-800 transition-colors; 
 }
 
 /* from h-12 transition-colors justify-center rounded-full text-gray-300 bg-gray-700 flex w-12 items-center hover:bg-red-500 */
-.tw-117 { 
-	@apply text-gray-300 h-12 bg-gray-700 flex w-12 items-center transition-colors rounded-full justify-center hover:bg-red-500; 
+.tw-145 { 
+	@apply transition-colors text-gray-300 hover:bg-red-500 justify-center bg-gray-700 flex h-12 rounded-full items-center w-12; 
 }
 
 /* from bg-gray-800 p-8 rounded-lg space-y-6 shadow-md */
-.tw-118 { 
-	@apply space-y-6 shadow-md p-8 rounded-lg bg-gray-800; 
+.tw-146 { 
+	@apply rounded-lg bg-gray-800 space-y-6 shadow-md p-8; 
 }
 
 /* from mb-1 block text-sm font-medium text-gray-300 */
-.tw-119 { 
-	@apply font-medium text-gray-300 mb-1 block text-sm; 
+.tw-147 { 
+	@apply block text-sm font-medium text-gray-300 mb-1; 
 }
 
 /* from py-2 bg-gray-700 focus:outline-none border-gray-600 w-full focus:ring-green-500 border px-4 text-white rounded-md focus:ring-2 */
-.tw-120 { 
-	@apply border px-4 text-white bg-gray-700 focus:outline-none border-gray-600 w-full py-2 focus:ring-green-500 rounded-md focus:ring-2; 
+.tw-148 { 
+	@apply border text-white bg-gray-700 focus:ring-2 py-2 focus:outline-none w-full rounded-md border-gray-600 focus:ring-green-500 px-4; 
 }
 
 /* from rounded-md font-medium text-white transition-colors focus:ring-offset-2 focus:ring-2 focus:ring-green-500 w-full hover:bg-green-700 bg-green-600 py-3 focus:outline-none px-6 */
-.tw-121 { 
-	@apply bg-green-600 focus:ring-2 focus:ring-green-500 rounded-md w-full px-6 py-3 focus:ring-offset-2 hover:bg-green-700 focus:outline-none font-medium transition-colors text-white; 
+.tw-149 { 
+	@apply focus:outline-none focus:ring-offset-2 bg-green-600 focus:ring-green-500 font-medium text-white px-6 rounded-md hover:bg-green-700 focus:ring-2 w-full py-3 transition-colors; 
 }
 
 /* from bg-gray-800 border-t border-gray-700 py-12 */
-.tw-122 { 
-	@apply bg-gray-800 border-t border-gray-700 py-12; 
+.tw-150 { 
+	@apply border-t py-12 bg-gray-800 border-gray-700; 
 }
 
 /* from container mx-auto px-4 */
-.tw-123 { 
-	@apply container mx-auto px-4; 
+.tw-151 { 
+	@apply mx-auto px-4 container; 
 }
 
 /* from flex flex-col md:flex-row justify-between items-center */
-.tw-124 { 
+.tw-152 { 
 	@apply justify-between items-center flex flex-col md:flex-row; 
 }
 
 /* from mb-6 md:mb-0 */
-.tw-125 { 
+.tw-153 { 
 	@apply mb-6 md:mb-0; 
 }
 
 /* from text-white text-xl font-bold mb-2 */
-.tw-126 { 
-	@apply font-bold mb-2 text-white text-xl; 
+.tw-154 { 
+	@apply mb-2 text-white text-xl font-bold; 
 }
 
 /* from text-gray-400 */
-.tw-127 { 
+.tw-155 { 
 	@apply text-gray-400; 
 }
 
 /* from flex flex-wrap gap-4 justify-center */
-.tw-128 { 
-	@apply flex-wrap gap-4 justify-center flex; 
+.tw-156 { 
+	@apply flex flex-wrap gap-4 justify-center; 
 }
 
 /* from text-gray-400 hover:text-green-400 transition-colors */
-.tw-129 { 
+.tw-157 { 
 	@apply text-gray-400 hover:text-green-400 transition-colors; 
 }
 
 /* from mt-8 pt-8 border-t border-gray-700 flex flex-col md:flex-row justify-between items-center */
-.tw-130 { 
-	@apply border-gray-700 md:flex-row items-center mt-8 pt-8 border-t flex flex-col justify-between; 
+.tw-158 { 
+	@apply pt-8 border-t flex flex-col border-gray-700 md:flex-row justify-between items-center mt-8; 
 }
 
 /* from text-gray-500 text-sm */
-.tw-131 { 
+.tw-159 { 
 	@apply text-gray-500 text-sm; 
 }
 
 /* from mt-4 md:mt-0 */
-.tw-132 { 
+.tw-160 { 
 	@apply mt-4 md:mt-0; 
 }
 
 /* from text-gray-500 hover:text-gray-300 text-sm mx-2 transition-colors */
-.tw-133 { 
-	@apply transition-colors text-gray-500 hover:text-gray-300 text-sm mx-2; 
+.tw-161 { 
+	@apply hover:text-gray-300 text-sm mx-2 transition-colors text-gray-500; 
 }
 
 /* from min-h-screen flex items-center justify-center bg-gray-900 px-4 py-12 */
-.tw-134 { 
-	@apply min-h-screen items-center bg-gray-900 px-4 py-12 flex justify-center; 
+.tw-162 { 
+	@apply py-12 flex items-center justify-center min-h-screen bg-gray-900 px-4; 
 }
 
 /* from max-w-md w-full bg-gray-800 rounded-lg shadow-lg overflow-hidden */
-.tw-135 { 
-	@apply max-w-md w-full rounded-lg shadow-lg bg-gray-800 overflow-hidden; 
+.tw-163 { 
+	@apply max-w-md bg-gray-800 rounded-lg w-full shadow-lg overflow-hidden; 
 }
 
 /* from flex items-center justify-center mb-8 */
-.tw-136 { 
+.tw-164 { 
 	@apply mb-8 flex items-center justify-center; 
 }
 
 /* from h-24 w-24 rounded-full bg-red-500 flex items-center justify-center */
-.tw-137 { 
-	@apply bg-red-500 w-24 flex justify-center rounded-full items-center h-24; 
+.tw-165 { 
+	@apply w-24 justify-center bg-red-500 h-24 rounded-full flex items-center; 
 }
 
 /* from text-white */
-.tw-138 { 
+.tw-166 { 
 	@apply text-white; 
 }
 
 /* from text-3xl font-bold text-center text-white mb-4 */
-.tw-139 { 
-	@apply font-bold text-center text-white mb-4 text-3xl; 
+.tw-167 { 
+	@apply text-3xl font-bold text-center text-white mb-4; 
 }
 
 /* from h-1 w-16 bg-red-500 mx-auto mb-6 */
-.tw-140 { 
+.tw-168 { 
 	@apply w-16 bg-red-500 mx-auto mb-6 h-1; 
 }
 
 /* from text-gray-300 mb-8 text-center */
-.tw-141 { 
-	@apply text-gray-300 mb-8 text-center; 
+.tw-169 { 
+	@apply mb-8 text-center text-gray-300; 
 }
 
 /* from flex flex-col md:flex-row gap-4 justify-center */
-.tw-142 { 
-	@apply gap-4 justify-center flex flex-col md:flex-row; 
+.tw-170 { 
+	@apply justify-center flex flex-col md:flex-row gap-4; 
 }
 
 /* from inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-green-600 hover:bg-green-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 */
-.tw-143 { 
-	@apply rounded-md text-base focus:outline-none focus:ring-offset-2 border justify-center shadow-sm items-center py-3 font-medium focus:ring-green-500 bg-green-600 transition-colors focus:ring-2 px-6 border-transparent text-white hover:bg-green-700 inline-flex; 
+.tw-171 { 
+	@apply text-white focus:ring-green-500 bg-green-600 transition-colors inline-flex px-6 text-base font-medium border border-transparent justify-center rounded-md focus:ring-offset-2 focus:outline-none hover:bg-green-700 focus:ring-2 items-center py-3 shadow-sm; 
 }
 
 /* from inline-flex items-center justify-center px-6 py-3 border border-gray-700 rounded-md shadow-sm text-base font-medium text-gray-300 bg-gray-900 hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 */
-.tw-144 { 
-	@apply hover:bg-gray-700 focus:ring-offset-2 rounded-md shadow-sm text-base font-medium focus:ring-2 border text-gray-300 bg-gray-900 justify-center px-6 focus:outline-none inline-flex transition-colors py-3 border-gray-700 focus:ring-gray-500 items-center; 
+.tw-172 { 
+	@apply font-medium justify-center text-base inline-flex bg-gray-900 focus:ring-2 items-center focus:ring-offset-2 border-gray-700 transition-colors border rounded-md text-gray-300 hover:bg-gray-700 focus:outline-none focus:ring-gray-500 px-6 py-3 shadow-sm; 
 }
 
 /* from mt-8 text-sm text-gray-500 text-center */
-.tw-145 { 
+.tw-173 { 
 	@apply mt-8 text-sm text-gray-500 text-center; 
 }
 
 /* from bg-green-500 p-8 rounded-lg shadow-md text-center */
-.tw-146 { 
-	@apply bg-green-500 p-8 shadow-md text-center rounded-lg; 
+.tw-174 { 
+	@apply p-8 rounded-lg shadow-md text-center bg-green-500; 
 }
 
 /* from mb-6 flex justify-center */
-.tw-147 { 
+.tw-175 { 
 	@apply mb-6 flex justify-center; 
 }
 
 /* from bg-green-600 rounded-full p-4 w-16 h-16 flex items-center justify-center */
-.tw-148 { 
-	@apply bg-green-600 flex rounded-full h-16 justify-center p-4 w-16 items-center; 
+.tw-176 { 
+	@apply w-16 h-16 bg-green-600 flex items-center justify-center p-4 rounded-full; 
 }
 
 /* from h-8 w-8 text-white */
-.tw-149 { 
-	@apply text-white h-8 w-8; 
+.tw-177 { 
+	@apply h-8 w-8 text-white; 
 }
 
 /* from text-white mb-6 */
-.tw-150 { 
+.tw-178 { 
 	@apply text-white mb-6; 
 }
 
 
 /* twerge:end */
-}
 
 @theme inline {
 	--color-border: var(--border);
@@ -1093,4 +1305,97 @@ html {
 	--radius-lg: var(--radius);
 
 	--container-2xl: 1400px;
+}
+
+/* Target the specific structure in your HTML */
+div[style*="color:#f8f8f2;background-color:#272822"] {
+	max-width: 100%;
+	overflow-x: auto;
+	border-radius: 0.5rem;
+	padding: 1rem;
+}
+
+/* Ensure the table doesn't break the container */
+div[style*="color:#f8f8f2;background-color:#272822"] table {
+	min-width: 100%;
+	white-space: nowrap;
+}
+
+/* Ensure code content can scroll */
+div[style*="color:#f8f8f2;background-color:#272822"] code {
+	display: block;
+}
+
+/* Code content cell */
+div[style*="color:#f8f8f2;background-color:#272822"] td:last-child {
+	width: 100%;
+	padding-left: 1rem;
+}
+
+/* Alternative approach using class-based selectors */
+.highlight {
+	max-width: 100%;
+	overflow-x: auto;
+	background-color: #272822;
+	border-radius: 0.5rem;
+	padding: 1rem;
+}
+
+.highlight table {
+	min-width: 100%;
+	border-spacing: 0;
+	margin: 0;
+	border: 0;
+}
+
+.highlight pre {
+	white-space: pre;
+	overflow: visible;
+	margin: 0;
+	padding: 0;
+	color: #f8f8f2;
+	background-color: transparent;
+}
+
+.highlight code {
+	white-space: pre;
+	display: block;
+}
+
+/* Scrollbar styling for webkit browsers */
+.highlight::-webkit-scrollbar {
+	height: 8px;
+}
+
+.highlight::-webkit-scrollbar-track {
+	background: #1e1e1e;
+	border-radius: 4px;
+}
+
+.highlight::-webkit-scrollbar-thumb {
+	background: #555;
+	border-radius: 4px;
+}
+
+.highlight::-webkit-scrollbar-thumb:hover {
+	background: #777;
+}
+
+/* For Firefox */
+.highlight {
+	scrollbar-width: thin;
+	scrollbar-color: #555 #1e1e1e;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+	div[style*="color:#f8f8f2;background-color:#272822"] {
+		margin: 0 -1rem;
+		border-radius: 0;
+	}
+
+	.highlight {
+		margin: 0 -1rem;
+		border-radius: 0;
+	}
 }

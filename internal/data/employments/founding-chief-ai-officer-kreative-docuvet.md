@@ -1,21 +1,25 @@
 ---
-title: Founding Chief AI Officer at Kreative Docuvet
-slug: founding-chief-ai-officer-kreative-docuvet
-description: Created diarized transcription services and LLM pipelines for veterinary practices, built tools for exploring large language model responses, and collected a large veterinarian voice corpus.
-created_at: 2023-12-01T09:00:00.000-06:00
-updated_at: 2024-07-31T17:00:00.000-06:00
-banner_path: 
+id: founding-chief-ai-officer-kreative-docuvet
+aliases:
+  - Founding Chief AI Officer at Kreative Docuvet
 tags:
-  - hdl/artificial-intelligence
-  - system/llm
-  - system/data-pipeline
-  - system/postgresql
+  - database/postgres
   - programming-language/python
   - programming-language/sql
   - programming-language/javascript
+  - programming-language/typescript
+  - framework/nextjs
+  - framework/react
+  - framework/pytorch
+created_at: 2023-12-01T09:00:00.000-06:00
+end_date: 2024-07-31T17:00:00.000-06:00
+description: Created diarized transcription services and LLM pipelines for veterinary practices, built tools for exploring large language model responses, and collected a large veterinarian voice corpus.
+employments: []
 projects:
   - kreative-docuvet
-employments: []
+slug: founding-chief-ai-officer-kreative-docuvet
+title: Founding Chief AI Officer at Kreative Docuvet
+updated_at: 2025-06-01T18:53:31.000-06:00
 ---
 
 # Founding Chief AI Officer at Kreative Docuvet

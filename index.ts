@@ -17,8 +17,6 @@ Alpine.plugin(intersect);
 Alpine.plugin(anchor);
 Alpine.start();
 
-import htmx from "htmx.org";
-
 htmx.config.globalViewTransitions = true;
 
 // Scroll to top when HTMX replaces main content
@@ -37,17 +35,17 @@ document.addEventListener('DOMContentLoaded', function() {
     if (target.tagName === 'A') {
       const link = target as HTMLAnchorElement;
       const href = link.getAttribute('href');
-      
+
       // If it's a hash link to an element on the same page
       if (href && href.startsWith('#') && href.length > 1) {
         const targetElement = document.querySelector(href);
         if (targetElement) {
           event.preventDefault();
-          targetElement.scrollIntoView({ 
+          targetElement.scrollIntoView({
             behavior: 'smooth',
             block: 'start'
           });
-          
+
           // Update URL without jumping
           if (history.pushState) {
             history.pushState(null, '', href);

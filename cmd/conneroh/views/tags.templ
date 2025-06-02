@@ -100,7 +100,9 @@ templ Tag(
 				@List(
 					routing.PostPluralPath,
 					&tag.Posts,
-					nil, nil,
+					nil,
+					nil,
+					nil,
 					"",
 					0,
 					(len(tag.Posts)+routing.MaxListLargeItems-1)/routing.MaxListLargeItems,
@@ -117,7 +119,9 @@ templ Tag(
 					nil,
 					&tag.Projects,
 					nil,
-					"", 0,
+					nil,
+					"",
+					0,
 					(len(tag.Projects)+routing.MaxListLargeItems-1)/routing.MaxListLargeItems,
 				)
 			</div>
@@ -129,9 +133,12 @@ templ Tag(
 			>
 				@List(
 					routing.TagsPluralPath,
-					nil, nil,
+					nil,
+					nil,
 					&tag.Tags,
-					"", 0,
+					nil,
+					"",
+					0,
 					(len(tag.Tags)+routing.MaxListSmallItems-1)/routing.MaxListSmallItems,
 				)
 			</div>
