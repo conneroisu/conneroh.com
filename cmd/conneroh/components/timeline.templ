@@ -32,11 +32,11 @@ templ EmploymentTimeline(employments []*assets.Employment) {
 							<h3 class={ twerge.It("text-xl font-bold text-white mb-2") }>{ employment.Title }</h3>
 							<p class={ twerge.It("text-gray-300 text-sm line-clamp-3") }>{ employment.Description }</p>
 							if len(employment.Tags) > 0 {
-								<div class={ twerge.If(i%2 == 0, "mt-3 flex gap-2 justify-end", "mt-3 flex gap-2") }>
+								<div class={ twerge.If(i%2 == 0, "mt-3 flex flex-wrap gap-2 justify-end", "mt-3 flex flex-wrap gap-2") }>
 									for j, tag := range employment.Tags {
-										if j < 2 {
+										if j < 4 {
 											<span 
-												class={ twerge.It("text-xs bg-gray-800 text-gray-400 px-2 py-1 rounded hover:bg-green-600 hover:text-white transition-colors cursor-pointer inline-block") }
+												class={ twerge.It("text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded hover:bg-green-600 hover:text-white transition-colors cursor-pointer inline-block") }
 												hx-get={ tag.PagePath() }
 												hx-target="#bodiody"
 												hx-push-url="true"
@@ -48,8 +48,8 @@ templ EmploymentTimeline(employments []*assets.Employment) {
 											</span>
 										}
 									}
-									if len(employment.Tags) > 2 {
-										<span class={ twerge.It("text-xs text-gray-500") }>+{ len(employment.Tags) - 2 }</span>
+									if len(employment.Tags) > 4 {
+										<span class={ twerge.It("text-xs text-gray-500") }>+{ len(employment.Tags) - 4 }</span>
 									}
 								</div>
 							}
@@ -87,6 +87,28 @@ templ EmploymentTimelineMobile(employments []*assets.Employment) {
 							</div>
 							<h3 class={ twerge.It("text-lg font-bold text-white mb-2") }>{ employment.Title }</h3>
 							<p class={ twerge.It("text-gray-300 text-sm line-clamp-2") }>{ employment.Description }</p>
+							if len(employment.Tags) > 0 {
+								<div class={ twerge.It("mt-3 flex flex-wrap gap-2") }>
+									for j, tag := range employment.Tags {
+										if j < 4 {
+											<span 
+												class={ twerge.It("text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded hover:bg-green-600 hover:text-white transition-colors cursor-pointer inline-block") }
+												hx-get={ tag.PagePath() }
+												hx-target="#bodiody"
+												hx-push-url="true"
+												onclick="event.stopPropagation(); event.preventDefault();"
+												hx-on:click="event.stopPropagation()"
+												preload="mouseover"
+											>
+												{ tag.Title }
+											</span>
+										}
+									}
+									if len(employment.Tags) > 4 {
+										<span class={ twerge.It("text-xs text-gray-500") }>+{ len(employment.Tags) - 4 }</span>
+									}
+								</div>
+							}
 						</div>
 					</a>
 				</div>
