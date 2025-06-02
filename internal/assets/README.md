@@ -96,15 +96,6 @@ const (
 )
 ```
 
-<a name="EmbedLength"></a>
-
-```go
-const (
-    // EmbedLength is the length of the full embedding.
-    EmbedLength = 768
-)
-```
-
 ## Variables
 
 <a name="EmpPost"></a>
@@ -322,7 +313,7 @@ func Validate(path string, emb *Doc) error
 Validate validate the given embedding.
 
 <a name="Cache"></a>
-## type [Cache](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L68-L74>)
+## type [Cache](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L64-L70>)
 
 Cache is a any asset.
 
@@ -337,7 +328,7 @@ type Cache struct {
 ```
 
 <a name="CustomTime"></a>
-## type [CustomTime](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L22>)
+## type [CustomTime](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L17>)
 
 CustomTime allows us to customize the YAML time parsing.
 
@@ -346,7 +337,7 @@ type CustomTime struct{ time.Time }
 ```
 
 <a name="CustomTime.UnmarshalYAML"></a>
-### func \(\*CustomTime\) [UnmarshalYAML](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L25>)
+### func \(\*CustomTime\) [UnmarshalYAML](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L20>)
 
 ```go
 func (ct *CustomTime) UnmarshalYAML(value *yaml.Node) error
@@ -406,7 +397,7 @@ func MatchItem(fs afero.Fs, path string) (DirMatchItem, error)
 MatchItem takes a path and returns a DirMatchItem.
 
 <a name="Doc"></a>
-## type [Doc](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L47-L66>)
+## type [Doc](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L42-L62>)
 
 Doc is a base struct for all embeddedable structs.
 
@@ -421,6 +412,7 @@ type Doc struct {
     Icon            string        `yaml:"icon"`
     CreatedAt       CustomTime    `yaml:"created_at"`
     UpdatedAt       CustomTime    `yaml:"updated_at"`
+    EndDate         *CustomTime   `yaml:"end_date"`
     TagSlugs        []string      `yaml:"tags"`
     PostSlugs       []string      `yaml:"posts"`
     ProjectSlugs    []string      `yaml:"projects"`
@@ -443,7 +435,7 @@ func ParseMarkdown(md goldmark.Markdown, item DirMatchItem) (*Doc, error)
 ParseMarkdown parses a markdown document.
 
 <a name="Doc.GetTitle"></a>
-### func \(\*Doc\) [GetTitle](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L279>)
+### func \(\*Doc\) [GetTitle](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L275>)
 
 ```go
 func (emb *Doc) GetTitle() string
@@ -452,7 +444,7 @@ func (emb *Doc) GetTitle() string
 GetTitle returns the title of the embedding.
 
 <a name="Employment"></a>
-## type [Employment](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L152-L175>)
+## type [Employment](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L148-L171>)
 
 Employment is an employment with all its posts, projects, and tags.
 
@@ -484,7 +476,7 @@ type Employment struct {
 ```
 
 <a name="Employment.PagePath"></a>
-### func \(\*Employment\) [PagePath](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L299>)
+### func \(\*Employment\) [PagePath](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L295>)
 
 ```go
 func (emb *Employment) PagePath() string
@@ -493,7 +485,7 @@ func (emb *Employment) PagePath() string
 PagePath returns the path to the employment page.
 
 <a name="Employment.String"></a>
-### func \(\*Employment\) [String](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L315>)
+### func \(\*Employment\) [String](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L311>)
 
 ```go
 func (emb *Employment) String() string
@@ -502,7 +494,7 @@ func (emb *Employment) String() string
 
 
 <a name="EmploymentToEmployment"></a>
-## type [EmploymentToEmployment](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L268-L275>)
+## type [EmploymentToEmployment](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L264-L271>)
 
 EmploymentToEmployment represents a many\-to\-many relationship between employments and other employments.
 
@@ -518,7 +510,7 @@ type EmploymentToEmployment struct {
 ```
 
 <a name="EmploymentToPost"></a>
-## type [EmploymentToPost](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L248-L255>)
+## type [EmploymentToPost](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L244-L251>)
 
 EmploymentToPost represents a many\-to\-many relationship between employments and posts.
 
@@ -534,7 +526,7 @@ type EmploymentToPost struct {
 ```
 
 <a name="EmploymentToProject"></a>
-## type [EmploymentToProject](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L258-L265>)
+## type [EmploymentToProject](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L254-L261>)
 
 EmploymentToProject represents a many\-to\-many relationship between employments and projects.
 
@@ -550,7 +542,7 @@ type EmploymentToProject struct {
 ```
 
 <a name="EmploymentToTag"></a>
-## type [EmploymentToTag](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L238-L245>)
+## type [EmploymentToTag](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L234-L241>)
 
 EmploymentToTag represents a many\-to\-many relationship between employments and tags.
 
@@ -566,7 +558,7 @@ type EmploymentToTag struct {
 ```
 
 <a name="Post"></a>
-## type [Post](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L76-L98>)
+## type [Post](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L72-L94>)
 
 Post is a post with all its projects and tags.
 
@@ -597,7 +589,7 @@ type Post struct {
 ```
 
 <a name="Post.PagePath"></a>
-### func \(\*Post\) [PagePath](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L284>)
+### func \(\*Post\) [PagePath](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L280>)
 
 ```go
 func (emb *Post) PagePath() string
@@ -606,7 +598,7 @@ func (emb *Post) PagePath() string
 PagePath returns the path to the post page.
 
 <a name="Post.String"></a>
-### func \(\*Post\) [String](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L303>)
+### func \(\*Post\) [String](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L299>)
 
 ```go
 func (emb *Post) String() string
@@ -615,7 +607,7 @@ func (emb *Post) String() string
 
 
 <a name="PostToPost"></a>
-## type [PostToPost](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L208-L215>)
+## type [PostToPost](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L204-L211>)
 
 PostToPost represents a many\-to\-many relationship between posts and other posts.
 
@@ -631,7 +623,7 @@ type PostToPost struct {
 ```
 
 <a name="PostToProject"></a>
-## type [PostToProject](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L188-L195>)
+## type [PostToProject](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L184-L191>)
 
 PostToProject represents a many\-to\-many relationship between posts and projects.
 
@@ -647,7 +639,7 @@ type PostToProject struct {
 ```
 
 <a name="PostToTag"></a>
-## type [PostToTag](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L178-L185>)
+## type [PostToTag](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L174-L181>)
 
 PostToTag represents a many\-to\-many relationship between posts and tags.
 
@@ -663,7 +655,7 @@ type PostToTag struct {
 ```
 
 <a name="Project"></a>
-## type [Project](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L101-L123>)
+## type [Project](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L97-L119>)
 
 Project is a project with all its posts and tags.
 
@@ -694,7 +686,7 @@ type Project struct {
 ```
 
 <a name="Project.PagePath"></a>
-### func \(\*Project\) [PagePath](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L289>)
+### func \(\*Project\) [PagePath](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L285>)
 
 ```go
 func (emb *Project) PagePath() string
@@ -703,7 +695,7 @@ func (emb *Project) PagePath() string
 PagePath returns the path to the project page.
 
 <a name="Project.String"></a>
-### func \(\*Project\) [String](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L307>)
+### func \(\*Project\) [String](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L303>)
 
 ```go
 func (emb *Project) String() string
@@ -712,7 +704,7 @@ func (emb *Project) String() string
 
 
 <a name="ProjectToProject"></a>
-## type [ProjectToProject](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L218-L225>)
+## type [ProjectToProject](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L214-L221>)
 
 ProjectToProject represents a many\-to\-many relationship between projects and other projects.
 
@@ -728,7 +720,7 @@ type ProjectToProject struct {
 ```
 
 <a name="ProjectToTag"></a>
-## type [ProjectToTag](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L198-L205>)
+## type [ProjectToTag](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L194-L201>)
 
 ProjectToTag represents a many\-to\-many relationship between projects and tags.
 
@@ -825,7 +817,7 @@ func UpsertTagRelationships(db *bun.DB, tag *Tag) RelationshipFn
 UpsertTagRelationships updates relationships for a tag .
 
 <a name="Tag"></a>
-## type [Tag](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L126-L149>)
+## type [Tag](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L122-L145>)
 
 Tag is a tag with all its posts and projects.
 
@@ -857,7 +849,7 @@ type Tag struct {
 ```
 
 <a name="Tag.PagePath"></a>
-### func \(\*Tag\) [PagePath](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L294>)
+### func \(\*Tag\) [PagePath](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L290>)
 
 ```go
 func (emb *Tag) PagePath() string
@@ -866,7 +858,7 @@ func (emb *Tag) PagePath() string
 PagePath returns the path to the tag page.
 
 <a name="Tag.String"></a>
-### func \(\*Tag\) [String](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L311>)
+### func \(\*Tag\) [String](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L307>)
 
 ```go
 func (emb *Tag) String() string
@@ -875,7 +867,7 @@ func (emb *Tag) String() string
 
 
 <a name="TagToTag"></a>
-## type [TagToTag](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L228-L235>)
+## type [TagToTag](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L224-L231>)
 
 TagToTag represents a many\-to\-many relationship between tags and other tags.
 

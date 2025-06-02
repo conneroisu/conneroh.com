@@ -35,7 +35,17 @@ templ EmploymentTimeline(employments []*assets.Employment) {
 								<div class={ twerge.If(i%2 == 0, "mt-3 flex gap-2 justify-end", "mt-3 flex gap-2") }>
 									for j, tag := range employment.Tags {
 										if j < 2 {
-											<span class={ twerge.It("text-xs bg-gray-800 text-gray-400 px-2 py-1 rounded") }>{ tag.Title }</span>
+											<span 
+												class={ twerge.It("text-xs bg-gray-800 text-gray-400 px-2 py-1 rounded hover:bg-green-600 hover:text-white transition-colors cursor-pointer inline-block") }
+												hx-get={ tag.PagePath() }
+												hx-target="#bodiody"
+												hx-push-url="true"
+												onclick="event.stopPropagation(); event.preventDefault();"
+												hx-on:click="event.stopPropagation()"
+												preload="mouseover"
+											>
+												{ tag.Title }
+											</span>
 										}
 									}
 									if len(employment.Tags) > 2 {
