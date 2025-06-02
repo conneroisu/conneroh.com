@@ -60,7 +60,7 @@ type (
 		Projects        []*Project    `yaml:"-"`
 		Employments     []*Employment `yaml:"-"`
 	}
-	// Cache is a any asset.
+	// Cache represents an asset cache.
 	Cache struct {
 		bun.BaseModel `bun:"caches"`
 

@@ -315,7 +315,7 @@ Validate validate the given embedding.
 <a name="Cache"></a>
 ## type [Cache](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/static.go#L64-L70>)
 
-Cache is a any asset.
+Cache represents an asset cache.
 
 ```go
 type Cache struct {
