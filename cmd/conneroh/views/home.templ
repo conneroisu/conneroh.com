@@ -143,9 +143,38 @@ templ Home(
 			</div>
 		</div>
 	</section>
-	// Recent Posts Section
+	// Employment Timeline Section
 	<section
 		class={ twerge.It("bg-gray-900 py-16") }
+	>
+		<div
+			class={ twerge.It("container px-4 mx-auto") }
+		>
+			<div
+				class={ twerge.It("text-center mb-12") }
+			>
+				<h2
+					class={ twerge.It("mb-4 text-3xl font-bold text-white") }
+				>
+					Professional Experience
+				</h2>
+				<p class={ twerge.It("text-gray-300 max-w-2xl mx-auto") }>
+					My journey through various roles in engineering and technology
+				</p>
+			</div>
+			// Desktop timeline
+			<div class={ twerge.It("hidden md:block") }>
+				@components.EmploymentTimeline(*fullEmployments)
+			</div>
+			// Mobile timeline
+			<div class={ twerge.It("md:hidden") }>
+				@components.EmploymentTimelineMobile(*fullEmployments)
+			</div>
+		</div>
+	</section>
+	// Recent Posts Section
+	<section
+		class={ twerge.It("bg-gray-800 py-16") }
 	>
 		<div
 			class={ twerge.It("container px-4 mx-auto") }
@@ -187,7 +216,7 @@ templ Home(
 	</section>
 	// Skills/Tags Section
 	<section
-		class={ twerge.It("bg-gray-800 py-16") }
+		class={ twerge.It("bg-gray-900 py-16") }
 	>
 		<div
 			class={ twerge.It("container px-4 mx-auto") }
@@ -233,7 +262,7 @@ templ Home(
 	// Contact Section
 	<section
 		id="contact"
-		class={ twerge.It("bg-gray-900 py-16") }
+		class={ twerge.It("bg-gray-800 py-16") }
 		aria-label="Contact"
 	>
 		<div
