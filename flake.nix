@@ -336,7 +336,7 @@
           {
             conneroh = pkgs.buildGoModule {
               inherit src version preBuild;
-              vendorHash = "sha256-fSOo+rveTWOD998gX4WzHGcQLA1IxU8BzPyU4UM3ndc=";
+              vendorHash = "sha256-447MwdXuirsxql/A+BvUoQHW+FhiWkfCtet4eyCa5qI=";
               name = "conneroh.com";
               goSum = ./go.sum;
               subPackages = ["."];
