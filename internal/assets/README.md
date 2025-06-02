@@ -304,7 +304,7 @@ func Slugify(s string) string
 Slugify returns the path to the document page or media asset page.
 
 <a name="UploadToS3"></a>
-## func [UploadToS3](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/s3.go#L68-L74>)
+## func [UploadToS3](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/s3.go#L65-L71>)
 
 ```go
 func UploadToS3(ctx context.Context, client Tigris, bucket string, path string, data []byte) error
@@ -355,7 +355,7 @@ func (ct *CustomTime) UnmarshalYAML(value *yaml.Node) error
 UnmarshalYAML implements the yaml.Unmarshaler interface.
 
 <a name="DefaultTigrisClient"></a>
-## type [DefaultTigrisClient](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/s3.go#L34>)
+## type [DefaultTigrisClient](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/s3.go#L31>)
 
 DefaultTigrisClient is a wrapper for the AWS S3 client.
 
@@ -364,7 +364,7 @@ type DefaultTigrisClient struct{ *s3.Client }
 ```
 
 <a name="NewTigris"></a>
-### func [NewTigris](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/s3.go#L37>)
+### func [NewTigris](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/s3.go#L34>)
 
 ```go
 func NewTigris(getenv func(string) string) (*DefaultTigrisClient, error)
@@ -761,7 +761,7 @@ func UpsertEmployment(ctx context.Context, db *bun.DB, employment *Employment) (
 UpsertEmployment saves an employment to the database \(to be called from the DB worker\).
 
 <a name="UpsertEmploymentRelationships"></a>
-### func [UpsertEmploymentRelationships](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/upsert.go#L594-L597>)
+### func [UpsertEmploymentRelationships](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/upsert.go#L591-L594>)
 
 ```go
 func UpsertEmploymentRelationships(db *bun.DB, employment *Employment) RelationshipFn
@@ -890,7 +890,7 @@ type TagToTag struct {
 ```
 
 <a name="Tigris"></a>
-## type [Tigris](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/s3.go#L25-L31>)
+## type [Tigris](<https://github.com/conneroisu/conneroh.com/blob/main/internal/assets/s3.go#L22-L28>)
 
 Tigris is an minimal interface for AWS clients.
 

@@ -20,11 +20,14 @@ templ: version: v0.3.865
 
 templ: version: v0.3.865
 
+templ: version: v0.3.865
+
 Package views contains the HTML templates for the website.
 
 ## Index
 
 - [func Code500\(\) templ.Component](<#Code500>)
+- [func Employment\(employment \*assets.Employment\) templ.Component](<#Employment>)
 - [func Home\(fullPosts \*\[\]\*assets.Post, fullProjects \*\[\]\*assets.Project, fullTags \*\[\]\*assets.Tag, fullEmployments \*\[\]\*assets.Employment\) templ.Component](<#Home>)
 - [func List\(target routing.PluralPath, posts \*\[\]\*assets.Post, projects \*\[\]\*assets.Project, tags \*\[\]\*assets.Tag, employments \*\[\]\*assets.Employment, query string, page int, pageCount int\) templ.Component](<#List>)
 - [func ListResults\(target routing.PluralPath, posts \*\[\]\*assets.Post, projects \*\[\]\*assets.Project, tags \*\[\]\*assets.Tag, employments \*\[\]\*assets.Employment, page, pageCount int\) templ.Component](<#ListResults>)
@@ -41,6 +44,15 @@ func Code500() templ.Component
 ```
 
 
+
+<a name="Employment"></a>
+## func [Employment](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/employments_templ.go#L18-L20>)
+
+```go
+func Employment(employment *assets.Employment) templ.Component
+```
+
+Individual Employment component
 
 <a name="Home"></a>
 ## func [Home](<https://github.com/conneroisu/conneroh.com/blob/main/cmd/conneroh/views/home_templ.go#L17-L22>)
