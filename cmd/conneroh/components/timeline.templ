@@ -7,103 +7,64 @@ import (
 
 templ EmploymentTimeline(employments []*assets.Employment) {
 	<div class={ twerge.It("relative") }>
-		// Vertical line
-		<div class={ twerge.It("absolute left-1/2 transform -translate-x-1/2 w-0.5 h-full bg-gradient-to-b from-green-500 via-green-400 to-transparent") }></div>
-		
+		<div class={ twerge.It("absolute left-1/2 -translate-x-1/2 w-0.5 h-full bg-gradient-to-b from-green-500 via-green-400 to-transparent") }></div>
 		<div class={ twerge.It("space-y-12") }>
 			for i, employment := range employments {
-				<div class={ twerge.It(twerge.If(i%2 == 0, "relative flex items-center justify-start", "relative flex items-center justify-end")) }>
-					// Timeline dot
-					<div class={ twerge.It("absolute left-1/2 transform -translate-x-1/2 w-4 h-4 bg-green-500 rounded-full border-4 border-gray-800 z-10") }></div>
-					
-					// Employment card
-					<div 
-						class={ twerge.It(
-							twerge.If(i%2 == 0, "w-5/12 cursor-pointer mr-auto text-right", "w-5/12 cursor-pointer ml-auto text-left"),
-						) }
+				<div class={ twerge.If(i%2 == 0, "relative flex justify-start", "relative flex justify-end") }>
+					<div class={ twerge.It("absolute left-1/2 -translate-x-1/2 w-4 h-4 bg-green-500 rounded-full border-4 border-gray-800 z-10") }></div>
+					<a
+						class={ twerge.If(i%2 == 0, "w-5/12 mr-auto text-right", "w-5/12 ml-auto") }
+						href={ templ.SafeURL(employment.PagePath()) }
 						hx-target="#bodiody"
 						hx-get={ employment.PagePath() }
 						hx-push-url="true"
 						preload="mouseover"
 					>
-						<div class={ twerge.It("bg-gray-900 rounded-lg p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1") }>
-							<div class={ twerge.It("text-sm text-green-400 font-semibold mb-1") }>
-								{ employment.CreatedAt.Format("Jan 2006") } - Present
-							</div>
-							<h3 class={ twerge.It("text-xl font-bold text-white mb-2") }>
-								{ employment.Title }
-							</h3>
-							<p class={ twerge.It("text-gray-300 text-sm line-clamp-3") }>
-								{ employment.Description }
-							</p>
-							<div class={ twerge.It(twerge.If(i%2 == 0, "mt-3 flex flex-wrap gap-2 justify-end", "mt-3 flex flex-wrap gap-2 justify-start")) }>
-								for j, tag := range employment.Tags {
-									if j < 3 {
-										<span class={ twerge.It("text-xs bg-gray-800 text-gray-400 px-2 py-1 rounded") }>
-											{ tag.Title }
-										</span>
+						<div class={ twerge.It("bg-gray-900 rounded-lg p-6 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1") }>
+							<div class={ twerge.It("text-sm text-green-400 font-semibold mb-1") }>{ employment.CreatedAt.Format("Jan 2006") } - Present</div>
+							<h3 class={ twerge.It("text-xl font-bold text-white mb-2") }>{ employment.Title }</h3>
+							<p class={ twerge.It("text-gray-300 text-sm line-clamp-3") }>{ employment.Description }</p>
+							if len(employment.Tags) > 0 {
+								<div class={ twerge.If(i%2 == 0, "mt-3 flex gap-2 justify-end", "mt-3 flex gap-2") }>
+									for j, tag := range employment.Tags {
+										if j < 2 {
+											<span class={ twerge.It("text-xs bg-gray-800 text-gray-400 px-2 py-1 rounded") }>{ tag.Title }</span>
+										}
 									}
-								}
-								if len(employment.Tags) > 3 {
-									<span class={ twerge.It("text-xs text-gray-500") }>
-										+{ len(employment.Tags) - 3 } more
-									</span>
-								}
-							</div>
+									if len(employment.Tags) > 2 {
+										<span class={ twerge.It("text-xs text-gray-500") }>+{ len(employment.Tags) - 2 }</span>
+									}
+								</div>
+							}
 						</div>
-					</div>
+					</a>
 				</div>
 			}
 		</div>
 	</div>
 }
 
-// Responsive mobile timeline
 templ EmploymentTimelineMobile(employments []*assets.Employment) {
 	<div class={ twerge.It("relative") }>
-		// Vertical line on the left
-		<div class={ twerge.It("absolute left-4 top-0 w-0.5 h-full bg-gradient-to-b from-green-500 via-green-400 to-transparent") }></div>
-		
+		<div class={ twerge.It("absolute left-4 w-0.5 h-full bg-gradient-to-b from-green-500 via-green-400 to-transparent") }></div>
 		<div class={ twerge.It("space-y-8 pl-12") }>
 			for _, employment := range employments {
 				<div class={ twerge.It("relative") }>
-					// Timeline dot
 					<div class={ twerge.It("absolute -left-8 top-6 w-4 h-4 bg-green-500 rounded-full border-4 border-gray-800") }></div>
-					
-					// Employment card
-					<div 
-						class={ twerge.It("cursor-pointer") }
+					<a
+						href={ templ.SafeURL(employment.PagePath()) }
 						hx-target="#bodiody"
 						hx-get={ employment.PagePath() }
 						hx-push-url="true"
 						preload="mouseover"
+						class={ twerge.It("block") }
 					>
-						<div class={ twerge.It("bg-gray-900 rounded-lg p-4 shadow-lg hover:shadow-xl transition-all duration-300") }>
-							<div class={ twerge.It("text-xs text-green-400 font-semibold mb-1") }>
-								{ employment.CreatedAt.Format("Jan 2006") } - Present
-							</div>
-							<h3 class={ twerge.It("text-lg font-bold text-white mb-2") }>
-								{ employment.Title }
-							</h3>
-							<p class={ twerge.It("text-gray-300 text-sm line-clamp-2") }>
-								{ employment.Description }
-							</p>
-							<div class={ twerge.It("mt-2 flex flex-wrap gap-1") }>
-								for j, tag := range employment.Tags {
-									if j < 2 {
-										<span class={ twerge.It("text-xs bg-gray-800 text-gray-400 px-2 py-1 rounded") }>
-											{ tag.Title }
-										</span>
-									}
-								}
-								if len(employment.Tags) > 2 {
-									<span class={ twerge.It("text-xs text-gray-500") }>
-										+{ len(employment.Tags) - 2 }
-									</span>
-								}
-							</div>
+						<div class={ twerge.It("bg-gray-900 rounded-lg p-4 shadow-lg hover:shadow-xl transition-all") }>
+							<div class={ twerge.It("text-xs text-green-400 font-semibold mb-1") }>{ employment.CreatedAt.Format("Jan 2006") }</div>
+							<h3 class={ twerge.It("text-lg font-bold text-white mb-2") }>{ employment.Title }</h3>
+							<p class={ twerge.It("text-gray-300 text-sm line-clamp-2") }>{ employment.Description }</p>
 						</div>
-					</div>
+					</a>
 				</div>
 			}
 		</div>
