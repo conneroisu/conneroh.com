@@ -203,7 +203,7 @@ templ Home(
 				for i, post := range *fullPosts {
 					if i < 4 {
 						@components.PostItem(post, templ.Attributes{
-							"class":       twerge.It("overflow-hidden bg-gray-800 transform rounded-lg transition-all hover:shadow-lg duration-300 shadow-md hover:-translate-y-1 cursor-pointer h-full"),
+							"class":       twerge.It("overflow-hidden bg-gray-900 transform rounded-lg transition-all hover:shadow-lg duration-300 shadow-md hover:-translate-y-1 cursor-pointer h-full"),
 							"hx-target":   "#bodiody",
 							"hx-get":      post.PagePath(),
 							"hx-push-url": post.PagePath(),
@@ -247,7 +247,7 @@ templ Home(
 						@components.TagItem(
 							tag,
 							templ.Attributes{
-								"class":       twerge.It("p-6 rounded-lg overflow-hidden bg-gray-900 shadow-md hover:shadow-lg duration-300 transform transition-all hover:-translate-y-1"),
+								"class":       twerge.It("p-6 rounded-lg overflow-hidden bg-gray-800 shadow-md hover:shadow-lg duration-300 transform transition-all hover:-translate-y-1"),
 								"hx-target":   "#bodiody",
 								"hx-get":      tag.PagePath(),
 								"hx-push-url": "true",

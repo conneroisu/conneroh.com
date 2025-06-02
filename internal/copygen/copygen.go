@@ -18,8 +18,10 @@ func ToPost(tP *assets.Post, fD *assets.Doc) {
 	tP.TagSlugs = fD.TagSlugs
 	tP.PostSlugs = fD.PostSlugs
 	tP.ProjectSlugs = fD.ProjectSlugs
+	tP.EmploymentSlugs = fD.EmploymentSlugs
 	tP.Tags = fD.Tags
 	tP.Projects = fD.Projects
+	tP.Employments = fD.Employments
 }
 
 // ToProject copies a *assets.Doc to a *assets.Project.
@@ -34,6 +36,8 @@ func ToProject(tP *assets.Project, fD *assets.Doc) {
 	tP.TagSlugs = fD.TagSlugs
 	tP.PostSlugs = fD.PostSlugs
 	tP.ProjectSlugs = fD.ProjectSlugs
+	tP.EmploymentSlugs = fD.EmploymentSlugs
+	tP.Employments = fD.Employments
 }
 
 // ToTag copies a *assets.Doc to a *assets.Tag.
@@ -49,7 +53,9 @@ func ToTag(tT *assets.Tag, fD *assets.Doc) {
 	tT.TagSlugs = fD.TagSlugs
 	tT.PostSlugs = fD.PostSlugs
 	tT.ProjectSlugs = fD.ProjectSlugs
+	tT.EmploymentSlugs = fD.EmploymentSlugs
 	tT.Projects = fD.Projects
+	tT.Employments = fD.Employments
 }
 
 // ToEmployment copies a *assets.Doc to a *assets.Employment.
@@ -61,12 +67,9 @@ func ToEmployment(tE *assets.Employment, fD *assets.Doc) {
 	tE.Content = fD.Content
 	tE.BannerPath = fD.BannerPath
 	tE.CreatedAt = fD.CreatedAt
+	tE.EndDate = fD.EndDate
 	tE.TagSlugs = fD.TagSlugs
 	tE.PostSlugs = fD.PostSlugs
 	tE.ProjectSlugs = fD.ProjectSlugs
 	tE.EmploymentSlugs = fD.EmploymentSlugs
-	tE.Tags = fD.Tags
-	tE.Posts = fD.Posts
-	tE.Projects = fD.Projects
-	tE.Employments = fD.Employments
 }

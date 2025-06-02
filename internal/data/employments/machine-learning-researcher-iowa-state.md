@@ -7,6 +7,7 @@ tags:
   - programming-language/python
   - programming-language/matlab
 created_at: 2021-12-01T09:00:00.000-06:00
+end_date: 2022-04-30T17:00:00.000-06:00
 description: Developed an EEG gesture recognition program as part of a senior research project, conducting extensive data analysis and implementing real-time gesture recognition.
 employments: []
 projects: []

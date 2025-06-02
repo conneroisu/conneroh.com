@@ -12,6 +12,7 @@ tags:
   - framework/react
   - framework/pytorch
 created_at: 2023-12-01T09:00:00.000-06:00
+end_date: 2024-07-31T17:00:00.000-06:00
 description: Created diarized transcription services and LLM pipelines for veterinary practices, built tools for exploring large language model responses, and collected a large veterinarian voice corpus.
 employments: []
 projects:
