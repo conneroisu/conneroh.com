@@ -27,9 +27,7 @@
         rooted = exec:
           builtins.concatStringsSep "\n"
           [
-            ''
-              REPO_ROOT="$(git rev-parse --show-toplevel)"
-            ''
+            ''REPO_ROOT="$(git rev-parse --show-toplevel)"''
             exec
           ];
         scripts = {
@@ -152,50 +150,6 @@
             '';
             env.DEBUG = "true";
             deps = with pkgs; [air git];
-            description = "Run the application with air for hot reloading";
-          };
-          live-ci = {
-            exec = ''
-              go run "$REPO_ROOT"/cmd/live-ci/main.go
-            '';
-            env.DEBUG = "true";
-            deps = with pkgs;
-              [
-                playwright-driver # Browser Archives and Driver Scripts
-                nodejs_20 # Required for Playwright driver
-                pkg-config # Needed for some browser dependencies
-                at-spi2-core # Accessibility support
-                cairo # 2D graphics library
-                cups # Printing system
-                dbus # Message bus system
-                expat # XML parser
-                ffmpeg # Media processing
-                fontconfig # Font configuration and customization
-                freetype # Font rendering engine
-                gdk-pixbuf # Image loading library
-                glib # Low-level core library
-                gtk3 # GUI toolkit
-                go
-              ]
-              ++ (with pkgs;
-                lib.optionals stdenv.isDarwin [
-                  libiconv
-                ])
-              ++ (with pkgs;
-                lib.optionals stdenv.isLinux [
-                  chromium # Chromium browser
-                  xorg.libXcomposite # X11 Composite extension - needed by browsers
-                  xorg.libXdamage # X11 Damage extension - needed by browsers
-                  xorg.libXfixes # X11 Fixes extension - needed by browsers
-                  xorg.libXrandr # X11 RandR extension - needed by browsers
-                  xorg.libX11 # X11 client-side library
-                  xorg.libxcb # X11 C Bindings library
-                  mesa # OpenGL implementation
-                  alsa-lib # Audio library
-                  nss # Network Security Services
-                  nspr # NetScape Portable Runtime
-                  pango # Text layout and rendering
-                ]);
             description = "Run the application with air for hot reloading";
           };
         };
