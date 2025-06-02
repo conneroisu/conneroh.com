@@ -1,7 +1,6 @@
 package conneroh
 
 import (
-	"context"
 	"log/slog"
 	"net/http"
 
@@ -23,7 +22,6 @@ var (
 
 // AddRoutes adds all routes to the router.
 func AddRoutes(
-	_ context.Context,
 	h *http.ServeMux,
 	db *bun.DB,
 ) error {
@@ -32,8 +30,7 @@ func AddRoutes(
 
 	h.Handle(
 		"GET /dist/",
-		http.FileServer(http.FS(static.Dist)),
-	)
+		http.FileServer(http.FS(static.Dist)))
 
 	h.HandleFunc(
 		"GET /{$}",

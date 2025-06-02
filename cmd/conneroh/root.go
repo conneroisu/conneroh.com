@@ -37,9 +37,7 @@ const (
 )
 
 // NewServer creates a new server.
-func NewServer(
-	ctx context.Context,
-) (http.Handler, error) {
+func NewServer() (http.Handler, error) {
 	classes.SetCache()
 	slog.SetDefault(logger.DefaultLogger)
 	mux := http.NewServeMux()
@@ -53,7 +51,7 @@ func NewServer(
 	if os.Getenv("DEBUG") == "true" {
 		db.AddQueryHook(bundebug.NewQueryHook(bundebug.WithVerbose(true)))
 	}
-	err = AddRoutes(ctx, mux, db)
+	err = AddRoutes(mux, db)
 	if err != nil {
 		return nil, eris.Wrap(err, "error adding routes")
 	}
@@ -95,7 +93,7 @@ func Run(
 	)
 	defer cancel()
 
-	handler, err := NewServer(ctx) // Use original context for server setup
+	handler, err := NewServer()
 	if err != nil {
 		return err
 	}
