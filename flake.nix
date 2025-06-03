@@ -417,12 +417,6 @@
                 # Install dependencies
                 bun install
 
-                # Generate necessary files
-                ${self.packages."${system}".generate-all}/bin/generate-all
-
-                # Initialize database (allow failure for CI)
-                ${self.packages."${system}".generate-db}/bin/generate-db || echo "Database initialization skipped"
-
                 # Build and start the application directly (avoid air for cleaner shutdown)
                 echo "Building application for browser tests..."
                 go build -o ./tmp/test-server ./main.go
