@@ -80,9 +80,9 @@
           generate-reload = {
             exec = rooted ''
               TEMPL_HASH=$(nix-hash --type sha256 --base32 "$REPO_ROOT"/cmd/conneroh/**/*.templ | sha256sum | cut -d' ' -f1)
-              OLD_TEMPL_HASH=$(cat "$REPO_ROOT"/internal/cache/templ.hash)
+              OLD_TEMPL_HASH=$(cat "$REPO_ROOT"/internal/cache/templ.hash || echo "")
               DOCS_HASH=$(nix-hash --type sha256 --base32 ./internal/data/**/*.md | sha256sum | cut -d' ' -f1)
-              OLD_DOCS_HASH=$(cat "$REPO_ROOT"/internal/cache/docs.hash)
+              OLD_DOCS_HASH=$(cat "$REPO_ROOT"/internal/cache/docs.hash || echo "")
 
               if [ "$OLD_TEMPL_HASH" != "$TEMPL_HASH" ]; then
                 echo "OLD_TEMPL_HASH: $OLD_TEMPL_HASH; NEW_TEMPL_HASH: $TEMPL_HASH"
