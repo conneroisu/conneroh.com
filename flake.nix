@@ -397,7 +397,7 @@
               name = "runTests";
               runtimeInputs = with pkgs; [
                 bun
-                nodejs_20
+                nodejs_24
                 playwright-driver
                 playwright-driver.browsers
                 doppler
@@ -452,7 +452,7 @@
 
                 # Run all tests
                 echo "Running Vitest tests..."
-                npx playwright install-deps
+                sudo npx playwright install-deps
                 bun test:run
                 TEST_EXIT_CODE=$?
 
