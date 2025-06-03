@@ -452,6 +452,7 @@
 
                 # Run all tests
                 echo "Running Vitest tests..."
+                npx playwright install
                 bun test:run
                 TEST_EXIT_CODE=$?
 
