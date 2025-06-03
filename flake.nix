@@ -425,7 +425,7 @@
                 go build -o ./tmp/test-server ./main.go
 
                 echo "Starting application for browser tests..."
-                doppler run -- ./tmp/test-server &
+                ./tmp/test-server &
                 APP_PID=$!
 
                 # Function to cleanup all processes
@@ -435,7 +435,6 @@
                   kill -TERM -"$APP_PID" 2>/dev/null || true
                   # Also kill any test-server and doppler processes
                   pkill -f "test-server" 2>/dev/null || true
-                  pkill -f "doppler.*test-server" 2>/dev/null || true
                   # Give processes time to clean up
                   sleep 1
                   # Force kill if still running
