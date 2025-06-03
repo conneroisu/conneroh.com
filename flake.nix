@@ -459,12 +459,11 @@
                     # Check if the distribution is Ubuntu
                     if [[ -f /etc/os-release ]]; then
                         # Source the os-release file to get distribution info
-                        . /etc/os-release
+                         source /etc/os-release
 
                         # Check if it's Ubuntu (ID will be "ubuntu" for Ubuntu-based systems)
                         if [[ "$ID" == "ubuntu" ]] || [[ "$ID_LIKE" == *"ubuntu"* ]]; then
                             echo "Ubuntu detected - installing playwright dependencies"
-
                             # Install playwright system dependencies for Ubuntu
                             # You might need sudo for this
                             npx playwright install-deps
