@@ -417,6 +417,9 @@
                 # Install dependencies
                 bun install
 
+                # Generate necessary files
+                ${preBuild}
+
                 # Build and start the application directly (avoid air for cleaner shutdown)
                 echo "Building application for browser tests..."
                 go build -o ./tmp/test-server ./main.go
