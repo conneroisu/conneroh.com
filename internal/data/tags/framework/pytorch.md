@@ -2,7 +2,8 @@
 id: pytorch
 aliases:
   - PyTorch
-tags: []
+tags:
+  - framework
 created_at: 2025-04-11T08:08:00.000-06:00
 description: PyTorch is an open-source machine learning library created by Facebook's AI Research lab.
 icon: pytorch-original

@@ -2,7 +2,8 @@
 id: vue
 aliases:
   - Vue
-tags: []
+tags:
+  - framework
 created_at: 2025-04-11T08:07:54.000-06:00
 description: Vue is a JavaScript framework for building user interfaces.
 title: Vue

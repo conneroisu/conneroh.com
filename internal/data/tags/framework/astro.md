@@ -2,7 +2,8 @@
 id: astro
 aliases:
   - astro
-tags: []
+tags:
+  - framework
 created_at: 2025-04-09T12:03:25.000-06:00
 description: Astro is a static site generator for building fast, accessible, and interactive websites.
 title: astro
