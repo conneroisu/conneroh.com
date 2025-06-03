@@ -456,23 +456,8 @@
                 if [[ "$(uname -s)" == "Linux" ]]; then
                     echo "On Linux"
 
-                    # Check if the distribution is Ubuntu
-                    if [[ -f /etc/os-release ]]; then
-                        # Source the os-release file to get distribution info
-                         source /etc/os-release
-
-                        # Check if it's Ubuntu (ID will be "ubuntu" for Ubuntu-based systems)
-                        if [[ "$ID" == "ubuntu" ]] || [[ "$ID_LIKE" == *"ubuntu"* ]]; then
-                            echo "Ubuntu detected - installing playwright dependencies"
-                            # Install playwright system dependencies for Ubuntu
-                            # You might need sudo for this
-                            npx playwright install-deps
-                        else
-                            echo "Linux distribution: $ID"
-                        fi
-                    else
-                        echo "Cannot determine Linux distribution"
-                    fi
+                    # Install playwright system dependencies for Ubuntu
+                    npx playwright install-deps
                 fi
                 bun test:run
                 TEST_EXIT_CODE=$?
