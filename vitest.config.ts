@@ -3,18 +3,9 @@ import { defineConfig } from 'vitest/config'
 export default defineConfig({
   test: {
     setupFiles: ['./tests/setup.ts'],
-    browser: {
-      provider: 'playwright',
-      enabled: true,
-      headless: true,
-      instances: [
-        { browser: 'chromium' },
-      ],
-    },
     // Include test files
     include: [
       'tests/**/*.{test,spec}.{js,ts,jsx,tsx}',
-      '**/*.browser.{test,spec}.{js,ts,jsx,tsx}',
     ],
     // Exclude patterns
     exclude: [
@@ -23,10 +14,20 @@ export default defineConfig({
       'build/**',
       '.direnv/**',
     ],
-    // Test environment configuration
-    environment: 'happy-dom',
+    // Browser configuration for browser tests
+    browser: {
+      provider: 'playwright',
+      enabled: true,
+      headless: true,
+      name: 'chromium',
+      screenshotOnFailure: false,
+      viewport: {
+        width: 1280,
+        height: 720,
+      },
+    },
     // Reporter configuration
-    reporters: process.env.CI ? ['verbose', 'json'] : ['default'],
+    reporters: process.env.CI ? ['verbose'] : ['default'],
     // Coverage configuration
     coverage: {
       provider: 'v8',

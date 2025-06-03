@@ -407,6 +407,7 @@
                 go_1_24
               ];
               bashOptions = ["errexit" "pipefail"];
+              excludeShellChecks = ["SC2317"];
               text = ''
                 set -e
                 
@@ -421,10 +422,32 @@
                 # Initialize database (allow failure for CI)
                 ${self.packages."${system}".generate-db}/bin/generate-db || echo "Database initialization skipped"
                 
-                # Start the application in background
+                # Build and start the application directly (avoid air for cleaner shutdown)
+                echo "Building application for browser tests..."
+                go build -o ./tmp/test-server ./main.go
+                
                 echo "Starting application for browser tests..."
-                ${self.packages."${system}".run}/bin/run &
+                doppler run -- ./tmp/test-server &
                 APP_PID=$!
+                
+                # Function to cleanup all processes
+                cleanup() {
+                  echo "Cleaning up..."
+                  # Kill the entire process group to catch all children
+                  kill -TERM -"$APP_PID" 2>/dev/null || true
+                  # Also kill any test-server and doppler processes
+                  pkill -f "test-server" 2>/dev/null || true
+                  pkill -f "doppler.*test-server" 2>/dev/null || true
+                  # Give processes time to clean up
+                  sleep 1
+                  # Force kill if still running
+                  kill -KILL -"$APP_PID" 2>/dev/null || true
+                  pkill -9 -f "test-server" 2>/dev/null || true
+                  echo "Cleanup completed"
+                }
+                
+                # Set up trap to cleanup on exit
+                trap cleanup EXIT
                 
                 # Wait for server to be ready
                 echo "Waiting for server to start..."
@@ -435,10 +458,7 @@
                 bun test:run
                 TEST_EXIT_CODE=$?
                 
-                # Kill the application
-                kill $APP_PID || true
-                
-                # Exit with test exit code
+                # Cleanup will be called by the trap
                 exit $TEST_EXIT_CODE
               '';
             };
