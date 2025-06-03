@@ -242,7 +242,7 @@
               htmx-lsp
               vscode-langservers-extracted
               sqlite
-              
+
               # Testing
               nodejs_20
               playwright-driver
@@ -405,31 +405,32 @@
                 templ
                 tailwindcss
                 go_1_24
+                inputs.bun2nix.packages.${system}.default
               ];
               bashOptions = ["errexit" "pipefail"];
               excludeShellChecks = ["SC2317"];
               text = ''
                 set -e
-                
+
                 echo "Running tests..."
-                
+
                 # Install dependencies
                 bun install
-                
+
                 # Generate necessary files
                 ${self.packages."${system}".generate-all}/bin/generate-all
-                
+
                 # Initialize database (allow failure for CI)
                 ${self.packages."${system}".generate-db}/bin/generate-db || echo "Database initialization skipped"
-                
+
                 # Build and start the application directly (avoid air for cleaner shutdown)
                 echo "Building application for browser tests..."
                 go build -o ./tmp/test-server ./main.go
-                
+
                 echo "Starting application for browser tests..."
                 doppler run -- ./tmp/test-server &
                 APP_PID=$!
-                
+
                 # Function to cleanup all processes
                 cleanup() {
                   echo "Cleaning up..."
@@ -445,24 +446,24 @@
                   pkill -9 -f "test-server" 2>/dev/null || true
                   echo "Cleanup completed"
                 }
-                
+
                 # Set up trap to cleanup on exit
                 trap cleanup EXIT
-                
+
                 # Wait for server to be ready
                 echo "Waiting for server to start..."
                 timeout 30 bash -c 'until curl -s http://localhost:8080 > /dev/null 2>&1; do sleep 1; done'
-                
+
                 # Run all tests
                 echo "Running Vitest tests..."
                 bun test:run
                 TEST_EXIT_CODE=$?
-                
+
                 # Cleanup will be called by the trap
                 exit $TEST_EXIT_CODE
               '';
             };
-            
+
             deployPackage = pkgs.writeShellApplication {
               name = "deployPackage";
               runtimeInputs = with pkgs; [doppler skopeo flyctl cacert];
