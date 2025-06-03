@@ -21,7 +21,6 @@ jobs:
           echo "Running tests before deployment..."
           nix run --accept-flake-config .#runTests
         env:
-          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
           CI: true
           
       - name: Deploy to Production
