@@ -452,13 +452,7 @@
 
                 # Run all tests
                 echo "Running Vitest tests..."
-                # if dist is ubuntu, install playwright
-                if [[ "$(uname -s)" == "Linux" ]]; then
-                    echo "On Linux"
-
-                    # Install playwright system dependencies for Ubuntu
-                    npx playwright install-deps
-                fi
+                npx playwright install-deps
                 bun test:run
                 TEST_EXIT_CODE=$?
 
