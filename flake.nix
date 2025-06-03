@@ -397,7 +397,7 @@
               name = "runTests";
               runtimeInputs = with pkgs; [
                 bun
-                nodejs_20
+                nodejs_24
                 playwright-driver
                 playwright-driver.browsers
                 doppler
