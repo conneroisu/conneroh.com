@@ -452,7 +452,7 @@
 
                 # Run all tests
                 echo "Running Vitest tests..."
-                sudo npx playwright install-deps
+                npx playwright install
                 bun test:run
                 TEST_EXIT_CODE=$?
 
