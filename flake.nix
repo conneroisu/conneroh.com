@@ -50,6 +50,27 @@
             deps = [pkgs.go];
             description = "Run all go tests";
           };
+          test-ui = {
+            exec = rooted ''
+              cd "$REPO_ROOT" && bun test --ui
+            '';
+            deps = with pkgs; [bun nodejs_20 playwright-driver playwright-driver.browsers];
+            description = "Run Vitest with UI";
+          };
+          test = {
+            exec = rooted ''
+              cd "$REPO_ROOT" && bun test
+            '';
+            deps = with pkgs; [bun nodejs_20 playwright-driver playwright-driver.browsers];
+            description = "Run Vitest tests";
+          };
+          test-ci = {
+            exec = rooted ''
+              cd "$REPO_ROOT" && bun test run --reporter=verbose
+            '';
+            deps = with pkgs; [bun nodejs_20 playwright-driver playwright-driver.browsers];
+            description = "Run Vitest tests for CI";
+          };
           lint = {
             exec = rooted ''
               templ generate "$REPO_ROOT"
@@ -180,9 +201,9 @@
             PLAYWRIGHT_NODEJS_PATH = "${pkgs.nodejs_20}/bin/node";
 
             # Browser executable paths
-            PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH = "${ #
-              "${pkgs.playwright-driver.browsers}/chromium-1155"
-            }";
+            PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH = "${pkgs.playwright-driver.browsers}/chromium-1155/chrome-linux/chrome";
+            PLAYWRIGHT_FIREFOX_EXECUTABLE_PATH = "${pkgs.playwright-driver.browsers}/firefox-1468/firefox/firefox";
+            PLAYWRIGHT_WEBKIT_EXECUTABLE_PATH = "${pkgs.playwright-driver.browsers}/webkit-2010/webkit-linux/minibrowser";
           };
           shell-packages = with pkgs;
             [
@@ -221,6 +242,11 @@
               htmx-lsp
               vscode-langservers-extracted
               sqlite
+              
+              # Testing
+              nodejs_20
+              playwright-driver
+              playwright-driver.browsers
 
               flyctl # Infra
               openssl.dev
@@ -275,6 +301,11 @@
             type = "app";
             meta.description = "Deploys the conneroh.com Docker image to Fly.io";
             program = "${self.packages.${system}.deployPackage}/bin/deployPackage";
+          };
+          runTests = {
+            type = "app";
+            meta.description = "Run all tests (unit and browser)";
+            program = "${self.packages.${system}.runTests}/bin/runTests";
           };
         };
 
@@ -362,6 +393,56 @@
                 '')
               ];
             };
+            runTests = pkgs.writeShellApplication {
+              name = "runTests";
+              runtimeInputs = with pkgs; [
+                bun
+                nodejs_20
+                playwright-driver
+                playwright-driver.browsers
+                doppler
+                air
+                templ
+                tailwindcss
+                go_1_24
+              ];
+              bashOptions = ["errexit" "pipefail"];
+              text = ''
+                set -e
+                
+                echo "Running tests..."
+                
+                # Install dependencies
+                bun install
+                
+                # Generate necessary files
+                ${self.packages."${system}".generate-all}/bin/generate-all
+                
+                # Initialize database (allow failure for CI)
+                ${self.packages."${system}".generate-db}/bin/generate-db || echo "Database initialization skipped"
+                
+                # Start the application in background
+                echo "Starting application for browser tests..."
+                ${self.packages."${system}".run}/bin/run &
+                APP_PID=$!
+                
+                # Wait for server to be ready
+                echo "Waiting for server to start..."
+                timeout 30 bash -c 'until curl -s http://localhost:8080 > /dev/null 2>&1; do sleep 1; done'
+                
+                # Run all tests
+                echo "Running Vitest tests..."
+                bun test:run
+                TEST_EXIT_CODE=$?
+                
+                # Kill the application
+                kill $APP_PID || true
+                
+                # Exit with test exit code
+                exit $TEST_EXIT_CODE
+              '';
+            };
+            
             deployPackage = pkgs.writeShellApplication {
               name = "deployPackage";
               runtimeInputs = with pkgs; [doppler skopeo flyctl cacert];
