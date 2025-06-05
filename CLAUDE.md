@@ -182,7 +182,6 @@ When editing markdown files in `internal/data/`, always run `nix develop -c upda
 ## Development Guidelines
 
 ### Code Style & Patterns
-- **Use 2-space indentation** for Go code (matches existing codebase)
 - **Follow existing naming conventions**: CamelCase for exported functions, lowercase for internal
 - **Error handling**: Always wrap errors with Eris for better debugging context
 - **Concurrent processing**: Use `github.com/sourcegraph/conc` for goroutine pools
