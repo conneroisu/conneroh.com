@@ -315,7 +315,7 @@
           processes = ["app"];
           version = self.shortRev or "dirty";
           src = pkgs.lib.cleanSourceWith {
-            src = ./.;
+            src = self;
             filter = path: type: let
               baseName = baseNameOf path;
               path' = toString path;

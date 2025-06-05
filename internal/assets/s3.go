@@ -1,7 +1,10 @@
 package assets
 
 import (
+	"bytes"
 	"context"
+	"errors"
+	"log/slog"
 	"net/http"
 	"time"
 
@@ -69,36 +72,36 @@ func UploadToS3(
 	path string,
 	data []byte,
 ) error {
-	// // Use custom content type function instead of mime.TypeByExtension
-	// contentType := GetContentType(path)
-	//
-	// timeout := defaultS3Timeout
-	//
-	// if isVideoType(contentType) {
-	// 	return nil
-	// }
-	// // Use a timeout context to prevent hanging on S3 operations
-	// uploadCtx, cancel := context.WithTimeout(ctx, timeout)
-	// defer cancel()
-	//
-	// slog.Info("Uploading to S3", "path", path)
-	// _, err := client.PutObject(uploadCtx, &s3.PutObjectInput{
-	// 	Bucket:      &bucket,
-	// 	Key:         aws.String(path),
-	// 	Body:        bytes.NewReader(data),
-	// 	ContentType: aws.String(contentType),
-	// })
-	//
-	// if err != nil {
-	// 	if errors.Is(err, context.DeadlineExceeded) {
-	// 		return eris.Wrapf(err, "S3 upload timed out: %s", path)
-	// 	}
-	//
-	// 	return eris.Wrapf(err, "failed to upload to S3: %s", path)
-	// }
-	//
-	// slog.Debug("uploaded to S3", "path", path)
-	//
+	// Use custom content type function instead of mime.TypeByExtension
+	contentType := GetContentType(path)
+
+	timeout := defaultS3Timeout
+
+	if isVideoType(contentType) {
+		return nil
+	}
+	// Use a timeout context to prevent hanging on S3 operations
+	uploadCtx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
+	slog.Info("Uploading to S3", "path", path)
+	_, err := client.PutObject(uploadCtx, &s3.PutObjectInput{
+		Bucket:      &bucket,
+		Key:         aws.String(path),
+		Body:        bytes.NewReader(data),
+		ContentType: aws.String(contentType),
+	})
+
+	if err != nil {
+		if errors.Is(err, context.DeadlineExceeded) {
+			return eris.Wrapf(err, "S3 upload timed out: %s", path)
+		}
+
+		return eris.Wrapf(err, "failed to upload to S3: %s", path)
+	}
+
+	slog.Debug("uploaded to S3", "path", path)
+
 	return nil
 }
 
