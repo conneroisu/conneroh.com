@@ -58,6 +58,7 @@ go run main.go
 # Update database manually
 doppler run -- go run ./cmd/update
 
+
 # Run tests manually
 bun install && bun test
 go test ./...
