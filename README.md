@@ -106,6 +106,9 @@ interpolate - Interpolate templates; Usage: interpolate input_file start_marker 
 lint - Run Nix/Go Linting Steps.
 reset-db - Reset the database
 run - Run the application with air for hot reloading
+test - Run Vitest tests
+test-ci - Run Vitest tests for CI
+test-ui - Run Vitest with UI
 tests - Run all go tests
 <!-- END_MARKER -->
 ```
@@ -147,6 +150,61 @@ update
 # Without Nix
 go run ./cmd/update
 ```
+
+## Testing
+
+The project uses Vitest with Playwright for comprehensive testing including unit tests and browser-based integration tests.
+
+### Running Tests
+
+```bash
+# Enter development shell (if using Nix)
+nix develop
+
+# Install dependencies
+bun install
+
+# Run all tests
+test
+# or
+bun test
+
+# Run tests with UI
+test-ui
+# or
+bun test:ui
+
+# Run tests once (CI mode)
+test-ci
+# or
+bun test:run
+
+# Coverage report
+bun test:coverage
+
+# Run comprehensive test suite (includes app startup)
+nix run .#runTests
+```
+
+### Test Structure
+
+- `tests/browser/` - Browser integration tests using Playwright
+- `tests/unit/` - Unit tests for utility functions
+- `tests/setup.ts` - Test setup and utilities
+
+Tests cover:
+- Homepage functionality and navigation
+- Project and blog post pages
+- HTMX dynamic content loading
+- Alpine.js interactivity
+- Responsive design across viewports
+- Accessibility compliance
+
+### CI Integration
+
+Tests run automatically before deployment:
+- On PR creation/updates before preview deployment
+- On main branch pushes before production deployment
 
 ## Deployment
 

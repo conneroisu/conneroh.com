@@ -15,9 +15,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: DeterminateSystems/nix-installer-action@main
+      
+      - name: Run Tests
+        run: |
+          echo "Running tests before deployment..."
+          nix run --accept-flake-config .#runTests
+        env:
+          CI: true
+          
       - name: Deploy to Production
         run: |
-          echo "Deploying to Production environment on Fly.io..."
+          echo "Tests passed! Deploying to Production environment on Fly.io..."
           nix run --accept-flake-config .#deployPackage
         env:
           FLY_AUTH_TOKEN: ${{ secrets.FLY_AUTH_TOKEN }}
