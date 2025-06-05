@@ -8,6 +8,7 @@ tags:
   - programming-language/java
   - framework/maven
   - edu/iastate/cs228
+  - ideology/data-structures
 banner_path: projects/java-pac-man.webp
 created_at: 2023-11-15T10:00:00.000-06:00
 description: A sophisticated Java implementation of Pac-Man featuring advanced AI ghost personalities and professional-grade software engineering practices
