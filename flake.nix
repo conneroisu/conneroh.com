@@ -47,18 +47,10 @@
           tests = {
             exec = rooted ''
               go test -v "$REPO_ROOT"/...
-              cd "$REPO_ROOT" && bun test
-              cd "$REPO_ROOT" && bun test --ui
+              cd "$REPO_ROOT" && bun run test
             '';
-            deps = [pkgs.go];
+            deps = with pkgs; [go bun];
             description = "Run all go tests";
-          };
-          test-ui = {
-            exec = rooted ''
-              cd "$REPO_ROOT" && bun test --ui
-            '';
-            deps = with pkgs; [bun nodejs_20 playwright-driver playwright-driver.browsers];
-            description = "Run Vitest with UI";
           };
           test-ci = {
             exec = rooted ''

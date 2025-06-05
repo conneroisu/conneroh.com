@@ -20,7 +20,7 @@ export default defineConfig({
       enabled: true,
       headless: true,
       name: 'chromium',
-      screenshotOnFailure: false,
+      screenshotFailures: true,
       viewport: {
         width: 1280,
         height: 720,
