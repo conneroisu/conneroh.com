@@ -10,5 +10,14 @@
   },
   "env": {
     "CLAUDE_CODE_ENABLE_TELEMETRY": "0"
+  },
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest",
+        "--vision"
+      ]
+    }
   }
 }
