@@ -118,10 +118,7 @@
           generate-js = {
             exec = rooted ''
               bun build "$REPO_ROOT"/index.js \
-                --minify \
-                --minify-syntax \
-                --minify-whitespace \
-                --minify-identifiers \
+                --minify --minify-syntax --minify-whitespace --minify-identifiers \
                 --outdir "$REPO_ROOT"/cmd/conneroh/_static/dist/
             '';
             deps = with pkgs; [bun git];
