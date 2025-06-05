@@ -133,7 +133,11 @@
               generate-js &
               wait
             '';
-            deps = with self.packages."${system}"; [generate-css generate-db generate-js];
+            deps = with self.packages."${system}"; [
+              generate-css
+              generate-db
+              generate-js
+            ];
             description = "Generate all files in parallel";
           };
           format = {
