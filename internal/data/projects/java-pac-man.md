@@ -9,11 +9,11 @@ tags:
   - framework/maven
   - edu/iastate/cs228
   - ideology/data-structures
-banner_path: projects/java-pac-man.webp
+banner_path: projects/java-pacman.webp
 created_at: 2023-11-15T10:00:00.000-06:00
 description: A sophisticated Java implementation of Pac-Man featuring advanced AI ghost personalities and professional-grade software engineering practices
 title: Java Pac-Man Implementation
-updated_at: 2025-06-05T10:35:14.000-06:00
+updated_at: 2025-06-05T13:34:16.000-06:00
 ---
 
 # Engineering Excellence in Retro Gaming: My Java Pac-Man Implementation
