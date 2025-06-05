@@ -10,5 +10,18 @@
   },
   "env": {
     "CLAUDE_CODE_ENABLE_TELEMETRY": "0"
+  },
+  "mcpServers": {
+    "playwright-mcp-server": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@smithery/cli@latest",
+        "run",
+        "@showfive/playwright-mcp-server",
+        "--key",
+        "95ec55ed-e661-4079-a75b-c02a3ba038fb"
+      ]
+    }
   }
 }
