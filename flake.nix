@@ -24,6 +24,7 @@
         };
 
         buildWithSpecificGo = pkg: pkg.override {buildGoModule = pkgs.buildGo124Module;};
+
         rooted = exec:
           builtins.concatStringsSep "\n"
           [
