@@ -128,26 +128,7 @@
               generate-db
               generate-js
             ];
-            description = "Generate all files in parallel";
-          };
-          format = {
-            exec = rooted ''
-              go fmt "$REPO_ROOT"/...
-              git ls-files \
-                  --others \
-                  --exclude-standard \
-                  --cached \
-                  -- '*.js' '*.ts' '*.css' '*.md' '*.json' \
-                  | xargs prettier --write
-              golines \
-                  -l \
-                  -w \
-                  --max-len=80 \
-                  --shorten-comments \
-                  --ignored-dirs=.direnv "$REPO_ROOT"
-            '';
-            deps = with pkgs; [go git golines];
-            description = "Format code files";
+            description = "Generate all artifacts in parallel.";
           };
           generate-templates = {
             exec = ''templ generate "$REPO_ROOT"'';
