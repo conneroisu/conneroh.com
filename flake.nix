@@ -106,21 +106,8 @@
           };
           generate-reload = {
             text = rooted ''
-              TEMPL_HASH=$(nix-hash --type sha256 --base32 "$REPO_ROOT"/cmd/conneroh/**/*.templ | sha256sum | cut -d' ' -f1)
-              OLD_TEMPL_HASH=$(cat "$REPO_ROOT"/internal/cache/templ.hash || echo "")
-              DOCS_HASH=$(nix-hash --type sha256 --base32 ./internal/data/**/*.md | sha256sum | cut -d' ' -f1)
-              OLD_DOCS_HASH=$(cat "$REPO_ROOT"/internal/cache/docs.hash || echo "")
-
-              if [ "$OLD_TEMPL_HASH" != "$TEMPL_HASH" ]; then
-                echo "OLD_TEMPL_HASH: $OLD_TEMPL_HASH; NEW_TEMPL_HASH: $TEMPL_HASH"
-                generate-css
-                echo "$TEMPL_HASH" > ./internal/cache/templ.hash
-              fi
-              if [ "$OLD_DOCS_HASH" != "$DOCS_HASH" ]; then
-                echo "OLD_DOCS_HASH: $OLD_DOCS_HASH; NEW_DOCS_HASH: $DOCS_HASH"
-                generate-db
-                echo "$DOCS_HASH" > ./internal/cache/docs.hash
-              fi
+              generate-css &
+              generate-db &
             '';
             runtimeInputs = with self.packages."${system}"; [generate-db generate-css];
             description = "Code Generation Steps for specific directory changes.";
