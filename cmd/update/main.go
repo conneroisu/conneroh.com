@@ -22,16 +22,14 @@ import (
 )
 
 const (
-
-	numWorkers         = 20
-	taskBufferInt      = 1000
-	fullAssetLoc       = assets.AssetsLoc
-	fullPostLoc        = assets.PostsLoc
-	fullProjectLoc     = assets.ProjectsLoc
-	fullTagLoc         = assets.TagsLoc
-	fullEmploymentLoc  = assets.EmploymentsLoc
+	numWorkers        = 20
+	taskBufferInt     = 1000
+	fullAssetLoc      = assets.AssetsLoc
+	fullPostLoc       = assets.PostsLoc
+	fullProjectLoc    = assets.ProjectsLoc
+	fullTagLoc        = assets.TagsLoc
+	fullEmploymentLoc = assets.EmploymentsLoc
 )
-
 
 func main() {
 	flag.Parse()

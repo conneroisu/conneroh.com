@@ -6,11 +6,13 @@
     systems.url = "github:nix-systems/default";
     bun2nix.url = "github:baileyluTCD/bun2nix";
     flake-utils.url = "github:numtide/flake-utils";
+    treefmt-nix.url = "github:numtide/treefmt-nix";
   };
 
   outputs = inputs @ {
     self,
     flake-utils,
+    treefmt-nix,
     ...
   }:
     flake-utils.lib.eachSystem ["x86_64-linux" "aarch64-linux" "aarch64-darwin"] (
@@ -579,6 +581,21 @@
           // pkgs.lib.genAttrs (builtins.attrNames scripts) (
             name: scriptPackages.${name}
           );
+
+        formatter = let
+          treefmtModule = {
+            projectRootFile = "flake.nix";
+            programs = {
+              alejandra.enable = true; # Nix formatter
+              golines.enable = true; # Golang formatter
+              gofumpt.enable = true; # Golang formatter
+              rustfmt.enable = true; # Rust formatter
+              black.enable = true; # Python formatter
+              asmfmt.enable = true; # Assembly formatter
+            };
+          };
+        in
+          treefmt-nix.lib.mkWrapper pkgs treefmtModule;
       }
     );
 }

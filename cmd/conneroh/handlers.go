@@ -340,7 +340,7 @@ func HandleHome(db *bun.DB) func(w http.ResponseWriter, r *http.Request) error {
 				)
 			}
 		}
-		var home = views.Home(
+		home := views.Home(
 			&allPosts,
 			&allProjects,
 			&allTags,
@@ -384,7 +384,7 @@ func HandleProjects(db *bun.DB) routing.APIFunc {
 				)
 			}
 		}
-		var projects = views.List(
+		projects := views.List(
 			routing.ProjectPluralPath,
 			nil,
 			&allProjects,
@@ -407,7 +407,7 @@ func HandleProjects(db *bun.DB) routing.APIFunc {
 // HandlePost handles the post page. aka /post/{slug...}.
 func HandlePost(db *bun.DB) routing.APIFunc {
 	// Handler Component Slug-Mapped Cache
-	var postMap = map[string]templ.Component{}
+	postMap := map[string]templ.Component{}
 
 	return func(w http.ResponseWriter, r *http.Request) error {
 		var (
@@ -452,7 +452,7 @@ func HandlePost(db *bun.DB) routing.APIFunc {
 // HandleProject handles the project page. aka /project/{slug...}.
 func HandleProject(db *bun.DB) routing.APIFunc {
 	// Handler Component Slug-Mapped Cache
-	var projectMap = map[string]templ.Component{}
+	projectMap := map[string]templ.Component{}
 
 	return func(w http.ResponseWriter, r *http.Request) error {
 		var (
@@ -518,7 +518,7 @@ func HandleTags(db *bun.DB) routing.APIFunc {
 				"failed to scan tags for tags page",
 			)
 		}
-		var tags = views.List(
+		tags := views.List(
 			routing.TagsPluralPath,
 			nil,
 			nil,
@@ -541,7 +541,7 @@ func HandleTags(db *bun.DB) routing.APIFunc {
 // HandleTag handles the tag page. aka /tag/{slug...}.
 func HandleTag(db *bun.DB) routing.APIFunc {
 	// Handler Component Slug-Mapped Cache
-	var tagMap = map[string]templ.Component{}
+	tagMap := map[string]templ.Component{}
 
 	return func(w http.ResponseWriter, r *http.Request) error {
 		var (
@@ -609,7 +609,7 @@ func HandlePosts(db *bun.DB) routing.APIFunc {
 				)
 			}
 		}
-		var posts = views.List(
+		posts := views.List(
 			routing.PostPluralPath,
 			&allPosts,
 			nil,
@@ -658,7 +658,7 @@ func HandleEmployments(db *bun.DB) routing.APIFunc {
 				)
 			}
 		}
-		var employments = views.List(
+		employments := views.List(
 			routing.EmploymentPluralPath,
 			nil,
 			nil,
@@ -681,7 +681,7 @@ func HandleEmployments(db *bun.DB) routing.APIFunc {
 // HandleEmployment handles the employment page. aka /employment/{slug...}.
 func HandleEmployment(db *bun.DB) routing.APIFunc {
 	// Handler Component Slug-Mapped Cache
-	var employmentMap = map[string]templ.Component{}
+	employmentMap := map[string]templ.Component{}
 
 	return func(w http.ResponseWriter, r *http.Request) error {
 		var (

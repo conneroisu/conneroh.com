@@ -26,7 +26,12 @@ func Make(fn APIFunc) http.HandlerFunc {
 			)
 			target := r.Header.Get(HdrTarget)
 			if target != "" {
-				http.Redirect(w, r, "/500", http.StatusFound) // 302 Found or http.StatusTemporaryRedirect (307)
+				http.Redirect(
+					w,
+					r,
+					"/500",
+					http.StatusFound,
+				) // 302 Found or http.StatusTemporaryRedirect (307)
 			}
 		}
 	}
@@ -40,7 +45,7 @@ func MorphableHandler(
 	morph templ.Component,
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var header = r.Header.Get(HdrRequest)
+		header := r.Header.Get(HdrRequest)
 		if header == "" {
 			templ.Handler(wrapper(morph)).ServeHTTP(w, r)
 		} else {
