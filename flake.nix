@@ -51,14 +51,15 @@
               go test -v "$REPO_ROOT"/...
               cd "$REPO_ROOT" && bun run test
             '';
-            deps = with pkgs; [go bun];
+            runtimeInputs = with pkgs; [go bun];
             description = "Run all go tests";
           };
           test-ci = {
             exec = rooted ''
-              cd "$REPO_ROOT" && bun test run --reporter=verbose
+              bun install
+              cd "$REPO_ROOT" && bun test
             '';
-            deps = with pkgs; [bun nodejs_20 playwright-driver playwright-driver.browsers];
+            runtimeInputs = with pkgs; [bun nodejs_20 playwright-driver playwright-driver.browsers];
             description = "Run Vitest tests for CI";
           };
           lint = {
@@ -69,7 +70,7 @@
               deadnix "$REPO_ROOT"/flake.nix
               nix flake check
             '';
-            deps = with pkgs; [golangci-lint statix deadnix templ rustc cargo];
+            runtimeInputs = with pkgs; [golangci-lint statix deadnix templ rustc cargo];
             description = "Run Nix/Go/Rust Linting Steps.";
           };
           generate-css = {
@@ -80,12 +81,12 @@
                   -o "$REPO_ROOT"/cmd/conneroh/_static/dist/style.css \
                   --cwd "$REPO_ROOT"
             '';
-            deps = with pkgs; [tailwindcss templ go];
+            runtimeInputs = with pkgs; [tailwindcss templ go];
             description = "Update the generated html and css files.";
           };
           generate-db = {
             exec = rooted ''doppler run -- go run "$REPO_ROOT"/cmd/update'';
-            deps = with pkgs; [doppler];
+            runtimeInputs = with pkgs; [doppler];
             description = "Update the generated go files from the md docs.";
           };
           generate-reload = {
@@ -106,7 +107,7 @@
                 echo "$DOCS_HASH" > ./internal/cache/docs.hash
               fi
             '';
-            deps = with self.packages."${system}"; [generate-db generate-css];
+            runtimeInputs = with self.packages."${system}"; [generate-db generate-css];
             description = "Code Generation Steps for specific directory changes.";
           };
           generate-js = {
@@ -115,7 +116,7 @@
                 --minify --minify-syntax --minify-whitespace --minify-identifiers \
                 --outdir "$REPO_ROOT"/cmd/conneroh/_static/dist/
             '';
-            deps = with pkgs; [bun git];
+            runtimeInputs = with pkgs; [bun git];
             description = "Generate JS files";
           };
           generate-all = {
@@ -125,7 +126,7 @@
               generate-js &
               wait
             '';
-            deps = with self.packages."${system}"; [
+            runtimeInputs = with self.packages."${system}"; [
               generate-css
               generate-db
               generate-js
@@ -134,7 +135,7 @@
           };
           generate-templates = {
             exec = ''templ generate "$REPO_ROOT"'';
-            deps = with pkgs; [templ];
+            runtimeInputs = with pkgs; [templ];
             description = "Generate templates";
           };
           run = {
@@ -142,10 +143,11 @@
               cd "$REPO_ROOT" && air
             '';
             env.DEBUG = "true";
-            deps = with pkgs; [air git];
+            runtimeInputs = with pkgs; [air git];
             description = "Run the application with air for hot reloading";
           };
         };
+
         scriptPackages =
           pkgs.lib.mapAttrs
           (
@@ -153,7 +155,7 @@
               pkgs.writeShellApplication {
                 inherit name;
                 text = script.exec;
-                runtimeInputs = script.deps or [];
+                runtimeInputs = script.runtimeInputs or [];
                 runtimeEnv = script.env or {};
               }
           )
