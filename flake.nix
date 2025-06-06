@@ -15,7 +15,11 @@
     treefmt-nix,
     ...
   }:
-    flake-utils.lib.eachSystem ["x86_64-linux" "aarch64-linux" "aarch64-darwin"] (
+    flake-utils.lib.eachSystem [
+      "x86_64-linux"
+      "aarch64-linux"
+      "aarch64-darwin"
+    ] (
       system: let
         pkgs = import inputs.nixpkgs {
           inherit system;
@@ -25,45 +29,56 @@
           config.allowUnfree = true;
         };
 
-        buildWithSpecificGo = pkg: pkg.override {buildGoModule = pkgs.buildGo124Module;};
+        buildWithSpecificGo = pkg:
+          pkg.override {
+            buildGoModule = pkgs.buildGo124Module;
+          };
 
-        rooted = exec:
-          builtins.concatStringsSep "\n"
-          [
-            ''REPO_ROOT="$(git rev-parse --show-toplevel)"''
-            exec
+        rooted = text:
+          builtins.concatStringsSep "\n" [
+            ''
+              REPO_ROOT="$(git rev-parse --show-toplevel)"
+            ''
+            text
           ];
+
         scripts = {
           dx = {
-            exec = rooted ''$EDITOR "$REPO_ROOT"/flake.nix'';
+            text = rooted ''$EDITOR "$REPO_ROOT"/flake.nix'';
             description = "Edit flake.nix";
           };
           gx = {
-            exec = rooted ''$EDITOR "$REPO_ROOT"/go.mod'';
+            text = rooted ''$EDITOR "$REPO_ROOT"/go.mod'';
             description = "Edit go.mod";
           };
           clean = {
-            exec = ''git clean -fdx'';
+            text = ''git clean -fdx'';
             description = "Clean Project";
           };
           tests = {
-            exec = rooted ''
-              go test -v "$REPO_ROOT"/...
-              cd "$REPO_ROOT" && bun run test
+            text = rooted ''
+              cd "$REPO_ROOT"
+              go test -v ./...
+              bun run test
             '';
             runtimeInputs = with pkgs; [go bun];
             description = "Run all go tests";
           };
           test-ci = {
-            exec = rooted ''
+            text = rooted ''
               bun install
               cd "$REPO_ROOT" && bun test
             '';
-            runtimeInputs = with pkgs; [bun nodejs_20 playwright-driver playwright-driver.browsers];
+            runtimeInputs = with pkgs; [
+              bun
+              nodejs_20
+              playwright-driver
+              playwright-driver.browsers
+            ];
             description = "Run Vitest tests for CI";
           };
           lint = {
-            exec = rooted ''
+            text = rooted ''
               templ generate "$REPO_ROOT"
               golangci-lint run "$REPO_ROOT"
               statix check "$REPO_ROOT"
@@ -74,7 +89,7 @@
             description = "Run Nix/Go/Rust Linting Steps.";
           };
           generate-css = {
-            exec = rooted ''
+            text = rooted ''
               templ generate --log-level error "$REPO_ROOT"
               go run "$REPO_ROOT"/cmd/update-css --cwd "$REPO_ROOT"
               tailwindcss -i "$REPO_ROOT"/input.css \
@@ -85,12 +100,12 @@
             description = "Update the generated html and css files.";
           };
           generate-db = {
-            exec = rooted ''doppler run -- go run "$REPO_ROOT"/cmd/update'';
+            text = rooted ''doppler run -- go run "$REPO_ROOT"/cmd/update'';
             runtimeInputs = with pkgs; [doppler];
             description = "Update the generated go files from the md docs.";
           };
           generate-reload = {
-            exec = rooted ''
+            text = rooted ''
               TEMPL_HASH=$(nix-hash --type sha256 --base32 "$REPO_ROOT"/cmd/conneroh/**/*.templ | sha256sum | cut -d' ' -f1)
               OLD_TEMPL_HASH=$(cat "$REPO_ROOT"/internal/cache/templ.hash || echo "")
               DOCS_HASH=$(nix-hash --type sha256 --base32 ./internal/data/**/*.md | sha256sum | cut -d' ' -f1)
@@ -111,7 +126,7 @@
             description = "Code Generation Steps for specific directory changes.";
           };
           generate-js = {
-            exec = rooted ''
+            text = rooted ''
               bun build "$REPO_ROOT"/index.js \
                 --minify --minify-syntax --minify-whitespace --minify-identifiers \
                 --outdir "$REPO_ROOT"/cmd/conneroh/_static/dist/
@@ -120,7 +135,7 @@
             description = "Generate JS files";
           };
           generate-all = {
-            exec = ''
+            text = ''
               generate-css &
               generate-db &
               generate-js &
@@ -133,15 +148,8 @@
             ];
             description = "Generate all artifacts in parallel.";
           };
-          generate-templates = {
-            exec = ''templ generate "$REPO_ROOT"'';
-            runtimeInputs = with pkgs; [templ];
-            description = "Generate templates";
-          };
           run = {
-            exec = rooted ''
-              cd "$REPO_ROOT" && air
-            '';
+            text = rooted ''cd "$REPO_ROOT" && air'';
             env.DEBUG = "true";
             runtimeInputs = with pkgs; [air git];
             description = "Run the application with air for hot reloading";
@@ -154,7 +162,7 @@
             name: script:
               pkgs.writeShellApplication {
                 inherit name;
-                text = script.exec;
+                inherit (script) text;
                 runtimeInputs = script.runtimeInputs or [];
                 runtimeEnv = script.env or {};
               }
@@ -174,7 +182,7 @@
             PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = "1";
             PLAYWRIGHT_NODEJS_PATH = "${pkgs.nodejs_20}/bin/node";
 
-            # Browser executable paths
+            # Browser textutable paths
             PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH = "${pkgs.playwright-driver.browsers}/chromium-1155/chrome-linux/chrome";
             PLAYWRIGHT_FIREFOX_EXECUTABLE_PATH = "${pkgs.playwright-driver.browsers}/firefox-1468/firefox/firefox";
             PLAYWRIGHT_WEBKIT_EXECUTABLE_PATH = "${pkgs.playwright-driver.browsers}/webkit-2010/webkit-linux/minibrowser";
