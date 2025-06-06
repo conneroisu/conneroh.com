@@ -6,14 +6,20 @@
     systems.url = "github:nix-systems/default";
     bun2nix.url = "github:baileyluTCD/bun2nix";
     flake-utils.url = "github:numtide/flake-utils";
+    treefmt-nix.url = "github:numtide/treefmt-nix";
   };
 
   outputs = inputs @ {
     self,
     flake-utils,
+    treefmt-nix,
     ...
   }:
-    flake-utils.lib.eachSystem ["x86_64-linux" "aarch64-linux" "aarch64-darwin"] (
+    flake-utils.lib.eachSystem [
+      "x86_64-linux"
+      "aarch64-linux"
+      "aarch64-darwin"
+    ] (
       system: let
         pkgs = import inputs.nixpkgs {
           inherit system;
@@ -23,165 +29,133 @@
           config.allowUnfree = true;
         };
 
-        buildWithSpecificGo = pkg: pkg.override {buildGoModule = pkgs.buildGo124Module;};
+        buildWithSpecificGo = pkg:
+          pkg.override {
+            buildGoModule = pkgs.buildGo124Module;
+          };
 
-        rooted = exec:
-          builtins.concatStringsSep "\n"
-          [
-            ''REPO_ROOT="$(git rev-parse --show-toplevel)"''
-            exec
+        rooted = text:
+          builtins.concatStringsSep "\n" [
+            ''
+              REPO_ROOT="$(git rev-parse --show-toplevel)"
+            ''
+            text
           ];
+
         scripts = {
           dx = {
-            exec = rooted ''$EDITOR "$REPO_ROOT"/flake.nix'';
+            text = rooted ''$EDITOR "$REPO_ROOT"/flake.nix'';
             description = "Edit flake.nix";
           };
           gx = {
-            exec = rooted ''$EDITOR "$REPO_ROOT"/go.mod'';
+            text = rooted ''$EDITOR "$REPO_ROOT"/go.mod'';
             description = "Edit go.mod";
           };
           clean = {
-            exec = ''git clean -fdx'';
+            text = ''git clean -fdx'';
             description = "Clean Project";
           };
           tests = {
-            exec = rooted ''
-              go test -v "$REPO_ROOT"/...
-              cd "$REPO_ROOT" && bun test
-              cd "$REPO_ROOT" && bun test --ui
+            text = rooted ''
+              cd "$REPO_ROOT"
+              go test -v ./...
+              bun run test
             '';
-            deps = [pkgs.go];
+            runtimeInputs = with pkgs; [go bun];
             description = "Run all go tests";
           };
-          test-ui = {
-            exec = rooted ''
-              cd "$REPO_ROOT" && bun test --ui
-            '';
-            deps = with pkgs; [bun nodejs_20 playwright-driver playwright-driver.browsers];
-            description = "Run Vitest with UI";
-          };
           test-ci = {
-            exec = rooted ''
-              cd "$REPO_ROOT" && bun test run --reporter=verbose
+            text = rooted ''
+              bun install
+              cd "$REPO_ROOT" && bun test:run
             '';
-            deps = with pkgs; [bun nodejs_20 playwright-driver playwright-driver.browsers];
+            runtimeInputs = with pkgs; [
+              bun
+              nodejs_20
+              playwright-driver
+              playwright-driver.browsers
+            ];
             description = "Run Vitest tests for CI";
           };
           lint = {
-            exec = rooted ''
+            text = rooted ''
+              gum log --structured --level debug "cmd" txt "templ generate '$REPO_ROOT'"
               templ generate "$REPO_ROOT"
+              gum log --structured --level debug "cmd" txt "golangci-lint run '$REPO_ROOT'"
               golangci-lint run "$REPO_ROOT"
+              gum log --structured --level debug "cmd" txt "statix check '$REPO_ROOT'"
               statix check "$REPO_ROOT"
+              gum log --structured --level debug "cmd" txt "deadnix '$REPO_ROOT'"
               deadnix "$REPO_ROOT"/flake.nix
+              gum log --structured --level debug "cmd" txt "nix flake check"
               nix flake check
             '';
-            deps = with pkgs; [golangci-lint statix deadnix templ rustc cargo];
+            runtimeInputs = with pkgs; [golangci-lint statix deadnix templ rustc cargo gum];
             description = "Run Nix/Go/Rust Linting Steps.";
           };
           generate-css = {
-            exec = rooted ''
+            text = rooted ''
               templ generate --log-level error "$REPO_ROOT"
               go run "$REPO_ROOT"/cmd/update-css --cwd "$REPO_ROOT"
               tailwindcss -i "$REPO_ROOT"/input.css \
                   -o "$REPO_ROOT"/cmd/conneroh/_static/dist/style.css \
                   --cwd "$REPO_ROOT"
             '';
-            deps = with pkgs; [tailwindcss templ go];
+            runtimeInputs = with pkgs; [tailwindcss templ go];
             description = "Update the generated html and css files.";
           };
           generate-db = {
-            exec = rooted ''doppler run -- go run "$REPO_ROOT"/cmd/update'';
-            deps = with pkgs; [doppler];
+            text = rooted ''doppler run -- go run "$REPO_ROOT"/cmd/update'';
+            runtimeInputs = with pkgs; [doppler];
             description = "Update the generated go files from the md docs.";
           };
           generate-reload = {
-            exec = rooted ''
-              TEMPL_HASH=$(nix-hash --type sha256 --base32 "$REPO_ROOT"/cmd/conneroh/**/*.templ | sha256sum | cut -d' ' -f1)
-              OLD_TEMPL_HASH=$(cat "$REPO_ROOT"/internal/cache/templ.hash || echo "")
-              DOCS_HASH=$(nix-hash --type sha256 --base32 ./internal/data/**/*.md | sha256sum | cut -d' ' -f1)
-              OLD_DOCS_HASH=$(cat "$REPO_ROOT"/internal/cache/docs.hash || echo "")
-
-              if [ "$OLD_TEMPL_HASH" != "$TEMPL_HASH" ]; then
-                echo "OLD_TEMPL_HASH: $OLD_TEMPL_HASH; NEW_TEMPL_HASH: $TEMPL_HASH"
-                generate-css
-                echo "$TEMPL_HASH" > ./internal/cache/templ.hash
-              fi
-              if [ "$OLD_DOCS_HASH" != "$DOCS_HASH" ]; then
-                echo "OLD_DOCS_HASH: $OLD_DOCS_HASH; NEW_DOCS_HASH: $DOCS_HASH"
-                generate-db
-                echo "$DOCS_HASH" > ./internal/cache/docs.hash
-              fi
+            text = ''
+              generate-css &
+              generate-db &
             '';
-            deps = with self.packages."${system}"; [generate-db generate-css];
+            runtimeInputs = with self.packages."${system}"; [generate-db generate-css];
             description = "Code Generation Steps for specific directory changes.";
           };
           generate-js = {
-            exec = rooted ''
+            text = rooted ''
               bun build "$REPO_ROOT"/index.js \
-                --minify \
-                --minify-syntax \
-                --minify-whitespace \
-                --minify-identifiers \
+                --minify --minify-syntax --minify-whitespace --minify-identifiers \
                 --outdir "$REPO_ROOT"/cmd/conneroh/_static/dist/
             '';
-            deps = with pkgs; [bun git];
+            runtimeInputs = with pkgs; [bun git];
             description = "Generate JS files";
           };
           generate-all = {
-            exec = ''
+            text = ''
               generate-css &
               generate-db &
               generate-js &
               wait
             '';
-            deps = with self.packages."${system}"; [
+            runtimeInputs = with self.packages."${system}"; [
               generate-css
               generate-db
               generate-js
             ];
-            description = "Generate all files in parallel";
-          };
-          format = {
-            exec = rooted ''
-              go fmt "$REPO_ROOT"/...
-              git ls-files \
-                  --others \
-                  --exclude-standard \
-                  --cached \
-                  -- '*.js' '*.ts' '*.css' '*.md' '*.json' \
-                  | xargs prettier --write
-              golines \
-                  -l \
-                  -w \
-                  --max-len=80 \
-                  --shorten-comments \
-                  --ignored-dirs=.direnv "$REPO_ROOT"
-            '';
-            deps = with pkgs; [go git golines];
-            description = "Format code files";
-          };
-          generate-templates = {
-            exec = ''templ generate "$REPO_ROOT"'';
-            deps = with pkgs; [templ];
-            description = "Generate templates";
+            description = "Generate all artifacts in parallel.";
           };
           run = {
-            exec = rooted ''
-              cd "$REPO_ROOT" && air
-            '';
+            text = rooted ''cd "$REPO_ROOT" && air'';
             env.DEBUG = "true";
-            deps = with pkgs; [air git];
+            runtimeInputs = with pkgs; [air git];
             description = "Run the application with air for hot reloading";
           };
         };
+
         scriptPackages =
           pkgs.lib.mapAttrs
           (
             name: script:
               pkgs.writeShellApplication {
                 inherit name;
-                text = script.exec;
-                runtimeInputs = script.deps or [];
+                inherit (script) text;
+                runtimeInputs = script.runtimeInputs or [];
                 runtimeEnv = script.env or {};
               }
           )
@@ -200,7 +174,7 @@
             PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = "1";
             PLAYWRIGHT_NODEJS_PATH = "${pkgs.nodejs_20}/bin/node";
 
-            # Browser executable paths
+            # Browser textutable paths
             PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH = "${pkgs.playwright-driver.browsers}/chromium-1155/chrome-linux/chrome";
             PLAYWRIGHT_FIREFOX_EXECUTABLE_PATH = "${pkgs.playwright-driver.browsers}/firefox-1468/firefox/firefox";
             PLAYWRIGHT_WEBKIT_EXECUTABLE_PATH = "${pkgs.playwright-driver.browsers}/webkit-2010/webkit-linux/minibrowser";
@@ -609,6 +583,21 @@
           // pkgs.lib.genAttrs (builtins.attrNames scripts) (
             name: scriptPackages.${name}
           );
+
+        formatter = let
+          treefmtModule = {
+            projectRootFile = "flake.nix";
+            programs = {
+              alejandra.enable = true; # Nix formatter
+              golines.enable = true; # Golang formatter
+              gofumpt.enable = true; # Golang formatter
+              rustfmt.enable = true; # Rust formatter
+              black.enable = true; # Python formatter
+              asmfmt.enable = true; # Assembly formatter
+            };
+          };
+        in
+          treefmt-nix.lib.mkWrapper pkgs treefmtModule;
       }
     );
 }

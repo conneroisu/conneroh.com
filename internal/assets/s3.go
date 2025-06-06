@@ -91,7 +91,6 @@ func UploadToS3(
 		Body:        bytes.NewReader(data),
 		ContentType: aws.String(contentType),
 	})
-
 	if err != nil {
 		if errors.Is(err, context.DeadlineExceeded) {
 			return eris.Wrapf(err, "S3 upload timed out: %s", path)

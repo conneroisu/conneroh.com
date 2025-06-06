@@ -52,7 +52,9 @@ func run(ctx context.Context) error {
 	}
 	db := bun.NewDB(sqlDB, sqlitedialect.New())
 	assets.RegisterModels(db)
-	db.AddQueryHook(bundebug.NewQueryHook(bundebug.WithVerbose(true)))
+	if os.Getenv("DEBUG") != "" {
+		db.AddQueryHook(bundebug.NewQueryHook(bundebug.WithVerbose(true)))
+	}
 
 	var (
 		allPosts       []*assets.Post

@@ -32,5 +32,6 @@ var DefaultProdLogger = slog.New(
 			}
 
 			return a
-		}}),
+		},
+	}),
 )

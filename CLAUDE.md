@@ -30,10 +30,7 @@ nix develop -c generate-docs      # Update generated documentation files
 nix develop -c generate-js        # Generate JS files
 nix develop -c lint               # Run Nix/Go linting steps
 nix develop -c run                # Run application with air for hot reloading
-nix develop -c test               # Run Vitest tests
-nix develop -c test-ui            # Run Vitest with UI
-nix develop -c test-ci            # Run Vitest tests for CI
-nix develop -c tests              # Run all Go tests
+nix develop -c tests              # Run Vitest, Go, and Playwright tests
 nix develop -c update             # Update database with content changes
 nix develop -c reset-db           # Reset the database
 ```
@@ -49,8 +46,7 @@ nix develop -c run                # Start server with hot reloading
 nix develop -c update             # Regenerate database from markdown files
 
 # 3. Run tests
-nix develop -c test               # Frontend tests with Vitest/Playwright  
-nix develop -c tests              # Go unit tests
+nix develop -c tests              # Go unit tests, Playwright tests, and Vitest
 ```
 
 ### Build and Run (without Nix)
@@ -60,7 +56,8 @@ go generate ./...
 go run main.go
 
 # Update database manually
-go run ./cmd/update
+doppler run -- go run ./cmd/update
+
 
 # Run tests manually
 bun install && bun test
