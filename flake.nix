@@ -67,7 +67,7 @@
           test-ci = {
             text = rooted ''
               bun install
-              cd "$REPO_ROOT" && bun test
+              cd "$REPO_ROOT" && bun test:run
             '';
             runtimeInputs = with pkgs; [
               bun
@@ -79,13 +79,18 @@
           };
           lint = {
             text = rooted ''
+              gum log --structured --level debug "cmd" txt "templ generate '$REPO_ROOT'"
               templ generate "$REPO_ROOT"
+              gum log --structured --level debug "cmd" txt "golangci-lint run '$REPO_ROOT'"
               golangci-lint run "$REPO_ROOT"
+              gum log --structured --level debug "cmd" txt "statix check '$REPO_ROOT'"
               statix check "$REPO_ROOT"
+              gum log --structured --level debug "cmd" txt "deadnix '$REPO_ROOT'"
               deadnix "$REPO_ROOT"/flake.nix
+              gum log --structured --level debug "cmd" txt "nix flake check"
               nix flake check
             '';
-            runtimeInputs = with pkgs; [golangci-lint statix deadnix templ rustc cargo];
+            runtimeInputs = with pkgs; [golangci-lint statix deadnix templ rustc cargo gum];
             description = "Run Nix/Go/Rust Linting Steps.";
           };
           generate-css = {
@@ -105,7 +110,7 @@
             description = "Update the generated go files from the md docs.";
           };
           generate-reload = {
-            text = rooted ''
+            text = ''
               generate-css &
               generate-db &
             '';
