@@ -22,11 +22,11 @@ templ ProjectItem(
 			{ attrs... }
 		>
 			<div class={ twerge.It("relative w-full") }>
-				@Image(
-					project.BannerPath,
-					project.Title,
-					twerge.It("w-full h-48 object-cover"),
-				)
+                                @Image(
+                                        project.BannerPath,
+                                        project.Title,
+                                        twerge.It("w-full h-48 object-cover box"),
+                                )
 			</div>
 			<div
 				class={ twerge.It("flex-grow flex p-6 flex-col") }
@@ -88,11 +88,11 @@ templ PostItem(post *assets.Post, attrs templ.Attributes) {
 			aria-label={ post.Title }
 			{ attrs... }
 		>
-			@Image(
-				post.BannerPath,
-				post.Title,
-				twerge.It("w-full h-48 object-cover"),
-			)
+                        @Image(
+                                post.BannerPath,
+                                post.Title,
+                                twerge.It("w-full h-48 object-cover box"),
+                        )
 			<div
 				class={ twerge.It("p-6") }
 			>
@@ -190,11 +190,11 @@ templ EmploymentItem(employment *assets.Employment, attrs templ.Attributes) {
 			aria-label={ employment.Title }
 			{ attrs... }
 		>
-			@Image(
-				employment.BannerPath,
-				employment.Title,
-				twerge.It("w-full h-48 object-cover"),
-			)
+                        @Image(
+                                employment.BannerPath,
+                                employment.Title,
+                                twerge.It("w-full h-48 object-cover box"),
+                        )
 			<div
 				class={ twerge.It("p-6") }
 			>

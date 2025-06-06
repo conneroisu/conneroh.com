@@ -1387,6 +1387,11 @@ div[style*="color:#f8f8f2;background-color:#272822"] td:last-child {
 	scrollbar-color: #555 #1e1e1e;
 }
 
+/* Banner mask styling */
+.box {
+        mask: radial-gradient(30px at top,#0000 calc(100% - 1px),#000) 50%/55.5px 100%;
+}
+
 /* Mobile responsive */
 @media (max-width: 768px) {
 	div[style*="color:#f8f8f2;background-color:#272822"] {
