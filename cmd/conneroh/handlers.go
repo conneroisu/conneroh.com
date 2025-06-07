@@ -55,6 +55,7 @@ func handleContactForm(emailSender email.Sender) routing.APIFunc {
 		}
 
 		// Send email if service is available
+		emailSent := false
 		if emailSender != nil {
 			contactMsg := email.ContactMessage{
 				Name:    form.Name,
@@ -69,12 +70,13 @@ func handleContactForm(emailSender email.Sender) routing.APIFunc {
 				// Don't return error - still show thank you page
 			} else {
 				slog.Info("contact email sent successfully", "email_id", emailID)
+				emailSent = true
 			}
 		} else {
 			slog.Warn("email service not configured, email not sent")
 		}
 
-		templ.Handler(components.ThankYou()).ServeHTTP(w, r)
+		templ.Handler(components.ThankYou(emailSent)).ServeHTTP(w, r)
 
 		return nil
 	}
