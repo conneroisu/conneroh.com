@@ -728,9 +728,21 @@ test('contact form XSS prevention with malicious input', async () => {
     // Verify form data is properly escaped when displayed
     const displayDiv = document.createElement('div')
     displayDiv.textContent = nameInput.value // textContent automatically escapes
-    expect(displayDiv.innerHTML).not.toContain('<script>')
-    expect(displayDiv.innerHTML).not.toContain('javascript:')
-    expect(displayDiv.innerHTML).not.toContain('onerror')
+    
+    // Check that dangerous HTML elements are escaped
+    if (maliciousInput.includes('<script>')) {
+      expect(displayDiv.innerHTML).not.toContain('<script>')
+      expect(displayDiv.innerHTML).toContain('&lt;script&gt;')
+    }
+    if (maliciousInput.includes('<img') && maliciousInput.includes('onerror')) {
+      expect(displayDiv.innerHTML).toContain('&lt;img')
+      expect(displayDiv.innerHTML).toContain('&gt;')
+    }
+    // For javascript: we just verify the content is text-only  
+    if (maliciousInput.includes('javascript:')) {
+      // The dangerous part is when it's in href/src attributes, not in text content
+      expect(displayDiv.innerHTML).toContain('javascript:') // It's safe as text
+    }
   })
 })
 

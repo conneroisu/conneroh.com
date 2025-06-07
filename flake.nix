@@ -59,7 +59,7 @@
             text = rooted ''
               cd "$REPO_ROOT"
               go test -v ./...
-              bun run test
+              bun run test:ui
             '';
             runtimeInputs = with pkgs; [go bun];
             description = "Run all go tests";
