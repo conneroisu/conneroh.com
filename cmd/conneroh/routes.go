@@ -28,6 +28,8 @@ func AddRoutes(
 	slog.Debug("adding routes")
 	defer slog.Debug("added routes")
 
+	emailService := createEmailService()
+
 	h.Handle(
 		"GET /dist/",
 		http.FileServer(http.FS(static.Dist)))
@@ -37,7 +39,7 @@ func AddRoutes(
 		routing.Make(HandleHome(db)))
 	h.HandleFunc(
 		"POST /contact",
-		routing.Make(handleContactForm()))
+		routing.Make(handleContactForm(emailService)))
 	h.HandleFunc(
 		"GET /posts",
 		routing.Make(HandlePosts(db)))

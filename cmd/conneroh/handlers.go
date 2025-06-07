@@ -3,6 +3,7 @@ package conneroh
 import (
 	"log/slog"
 	"net/http"
+	"os"
 	"sort"
 	"strconv"
 	"strings"
@@ -13,6 +14,7 @@ import (
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/layouts"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/views"
 	"github.com/conneroisu/conneroh.com/internal/assets"
+	"github.com/conneroisu/conneroh.com/internal/email"
 	"github.com/conneroisu/conneroh.com/internal/routing"
 	"github.com/gorilla/schema"
 	"github.com/rotisserie/eris"
@@ -28,13 +30,13 @@ type ContactForm struct {
 	Message string `schema:"message,required"`
 }
 
-var encoder = schema.NewEncoder()
+var decoder = schema.NewDecoder()
 
 const (
 	maxSearchRoutines = 10
 )
 
-func handleContactForm() routing.APIFunc {
+func handleContactForm(emailSender email.Sender) routing.APIFunc {
 	return func(w http.ResponseWriter, r *http.Request) error {
 		var form ContactForm
 		err := r.ParseForm()
@@ -44,19 +46,47 @@ func handleContactForm() routing.APIFunc {
 				"failed to parse contact form",
 			)
 		}
-		err = encoder.Encode(form, r.PostForm)
+		err = decoder.Decode(&form, r.PostForm)
 		if err != nil {
 			return eris.Wrap(
 				err,
-				"failed to encode contact form",
+				"failed to decode contact form",
 			)
 		}
-		// TODO: Send email
+
+		// Send email if service is available
+		if emailSender != nil {
+			contactMsg := email.ContactMessage{
+				Name:    form.Name,
+				Email:   form.Email,
+				Subject: form.Subject,
+				Message: form.Message,
+			}
+			
+			emailID, err := emailSender.SendContactEmail(contactMsg)
+			if err != nil {
+				slog.Error("failed to send contact email", "error", err)
+				// Don't return error - still show thank you page
+			} else {
+				slog.Info("contact email sent successfully", "email_id", emailID)
+			}
+		} else {
+			slog.Warn("email service not configured, email not sent")
+		}
 
 		templ.Handler(components.ThankYou()).ServeHTTP(w, r)
 
 		return nil
 	}
+}
+
+// createEmailService creates an email service from environment variables
+func createEmailService() email.Sender {
+	resendAPIKey := os.Getenv("RESEND_API_KEY")
+	if resendAPIKey == "" {
+		return nil
+	}
+	return email.NewService(resendAPIKey)
 }
 
 func listHandler(
