@@ -49,6 +49,15 @@ nix develop -c update             # Regenerate database from markdown files
 nix develop -c tests              # Go unit tests, Playwright tests, and Vitest
 ```
 
+### Environment Variables
+The application supports the following environment variables:
+
+- **`RESEND_API_KEY`** - API key for Resend email service to enable contact form email sending
+  - Required for production contact form functionality
+  - If not set, contact form will still work but emails won't be sent
+  - Obtain from https://resend.com dashboard
+  - Example: `export RESEND_API_KEY="re_xxxxxxxxx"`
+
 ### Build and Run (without Nix)
 ```bash
 # Generate templates and run
