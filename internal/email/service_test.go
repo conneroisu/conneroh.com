@@ -95,3 +95,48 @@ func TestContactMessage_Fields(t *testing.T) {
 		t.Error("Message should not be empty")
 	}
 }
+
+func TestNewServiceWithConfig(t *testing.T) {
+	config := Config{
+		FromEmail: "test@example.com",
+		ToEmail:   "recipient@example.com",
+	}
+	
+	service := NewServiceWithConfig("test-api-key", config)
+	
+	if service == nil {
+		t.Fatal("expected service to be created")
+	}
+	
+	if service.config.FromEmail != config.FromEmail {
+		t.Errorf("expected FromEmail %s, got %s", config.FromEmail, service.config.FromEmail)
+	}
+	
+	if service.config.ToEmail != config.ToEmail {
+		t.Errorf("expected ToEmail %s, got %s", config.ToEmail, service.config.ToEmail)
+	}
+	
+	if service.tmpl == nil {
+		t.Error("expected template to be parsed")
+	}
+	
+	if service.client == nil {
+		t.Error("expected client to be initialized")
+	}
+}
+
+func TestNewService_DefaultConfig(t *testing.T) {
+	service := NewService("test-api-key")
+	
+	if service == nil {
+		t.Fatal("expected service to be created")
+	}
+	
+	if service.config.FromEmail != "noreply@conneroh.com" {
+		t.Errorf("expected default FromEmail 'noreply@conneroh.com', got %s", service.config.FromEmail)
+	}
+	
+	if service.config.ToEmail != "conneroisu@outlook.com" {
+		t.Errorf("expected default ToEmail 'conneroisu@outlook.com', got %s", service.config.ToEmail)
+	}
+}

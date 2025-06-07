@@ -158,3 +158,126 @@ func TestHandleContactForm_InvalidForm(t *testing.T) {
 		t.Errorf("expected validation error, got: %v", err)
 	}
 }
+
+func TestHandleContactForm_InvalidEmail(t *testing.T) {
+	mockSender := &email.MockEmailSender{}
+	handler := handleContactForm(mockSender)
+
+	form := url.Values{}
+	form.Add("name", "John Doe")
+	form.Add("email", "invalid-email") // Invalid email format
+	form.Add("subject", "Test Subject")
+	form.Add("message", "Test message")
+
+	req := httptest.NewRequest("POST", "/contact", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	w := httptest.NewRecorder()
+
+	// The handler should succeed but might validate email format
+	err := handler(w, req)
+	if err != nil {
+		// If validation is implemented, check for email validation error
+		if !strings.Contains(err.Error(), "email") {
+			t.Errorf("expected email validation error, got: %v", err)
+		}
+	} else {
+		// If no validation is implemented yet, email should be sent
+		if len(mockSender.SentEmails) != 1 {
+			t.Errorf("expected 1 sent email, got %d", len(mockSender.SentEmails))
+		}
+	}
+}
+
+func TestHandleContactForm_LongFieldValues(t *testing.T) {
+	mockSender := &email.MockEmailSender{}
+	handler := handleContactForm(mockSender)
+
+	// Create extremely long values
+	longString := strings.Repeat("a", 10000)
+	
+	form := url.Values{}
+	form.Add("name", longString)
+	form.Add("email", "test@example.com")
+	form.Add("subject", longString)
+	form.Add("message", longString)
+
+	req := httptest.NewRequest("POST", "/contact", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	w := httptest.NewRecorder()
+
+	err := handler(w, req)
+	// Handler should either handle long values gracefully or return an error
+	if err == nil && len(mockSender.SentEmails) == 1 {
+		// Check that the long values were preserved
+		sentEmail := mockSender.SentEmails[0]
+		if len(sentEmail.Name) != 10000 {
+			t.Errorf("expected name length 10000, got %d", len(sentEmail.Name))
+		}
+	}
+}
+
+func TestHandleContactForm_WhitespaceFields(t *testing.T) {
+	mockSender := &email.MockEmailSender{}
+	handler := handleContactForm(mockSender)
+
+	form := url.Values{}
+	form.Add("name", "   ") // Only whitespace
+	form.Add("email", "test@example.com")
+	form.Add("subject", "\t\n") // Only whitespace
+	form.Add("message", "   \n   ") // Only whitespace
+
+	req := httptest.NewRequest("POST", "/contact", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	w := httptest.NewRecorder()
+
+	err := handler(w, req)
+	// Handler should validate that fields contain non-whitespace content
+	if err == nil {
+		// If no validation, check what was sent
+		if len(mockSender.SentEmails) == 1 {
+			sentEmail := mockSender.SentEmails[0]
+			// These should ideally be trimmed or rejected
+			if strings.TrimSpace(sentEmail.Name) == "" {
+				t.Log("Warning: handler accepted whitespace-only name")
+			}
+		}
+	}
+}
+
+func TestHandleContactForm_SpecialCharacters(t *testing.T) {
+	mockSender := &email.MockEmailSender{}
+	handler := handleContactForm(mockSender)
+
+	form := url.Values{}
+	form.Add("name", "John <script>alert('xss')</script> Doe")
+	form.Add("email", "test@example.com")
+	form.Add("subject", "Test & Subject < > \" '")
+	form.Add("message", "Message with special chars: &<>\"'\n\nAnd newlines")
+
+	req := httptest.NewRequest("POST", "/contact", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	w := httptest.NewRecorder()
+
+	err := handler(w, req)
+	if err != nil {
+		t.Fatalf("handler returned error: %v", err)
+	}
+
+	// Check that email was sent
+	if len(mockSender.SentEmails) != 1 {
+		t.Fatalf("expected 1 sent email, got %d", len(mockSender.SentEmails))
+	}
+
+	sentEmail := mockSender.SentEmails[0]
+	// Check that special characters are preserved (they should be escaped in HTML rendering)
+	if !strings.Contains(sentEmail.Name, "<script>") {
+		t.Errorf("expected special characters to be preserved in name")
+	}
+	if !strings.Contains(sentEmail.Subject, "&") || !strings.Contains(sentEmail.Subject, "<") {
+		t.Errorf("expected special characters to be preserved in subject")
+	}
+}

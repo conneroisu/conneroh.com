@@ -13,9 +13,17 @@ type Sender interface {
 	SendContactEmail(msg ContactMessage) (string, error)
 }
 
+// Config holds configuration for the email service
+type Config struct {
+	FromEmail string
+	ToEmail   string
+}
+
 // Service implements the Sender interface using Resend
 type Service struct {
 	client *resend.Client
+	config Config
+	tmpl   *template.Template
 }
 
 type ContactMessage struct {
@@ -26,33 +34,15 @@ type ContactMessage struct {
 }
 
 func NewService(apiKey string) *Service {
-	return &Service{
-		client: resend.NewClient(apiKey),
+	// Use default config for backward compatibility
+	defaultConfig := Config{
+		FromEmail: "noreply@conneroh.com",
+		ToEmail:   "conneroisu@outlook.com",
 	}
+	return NewServiceWithConfig(apiKey, defaultConfig)
 }
 
-// MockEmailSender is a mock implementation of the Sender interface for testing
-type MockEmailSender struct {
-	SentEmails []ContactMessage
-	ShouldFail bool
-	EmailID    string
-}
-
-func (m *MockEmailSender) SendContactEmail(msg ContactMessage) (string, error) {
-	if m.ShouldFail {
-		return "", fmt.Errorf("mock email send failed")
-	}
-	
-	m.SentEmails = append(m.SentEmails, msg)
-	
-	if m.EmailID != "" {
-		return m.EmailID, nil
-	}
-	
-	return "mock-email-id-123", nil
-}
-
-func (s *Service) SendContactEmail(msg ContactMessage) (string, error) {
+func NewServiceWithConfig(apiKey string, config Config) *Service {
 	htmlTemplate := `
 <!DOCTYPE html>
 <html>
@@ -86,19 +76,48 @@ func (s *Service) SendContactEmail(msg ContactMessage) (string, error) {
 
 	tmpl, err := template.New("contact").Parse(htmlTemplate)
 	if err != nil {
-		return "", fmt.Errorf("failed to parse email template: %w", err)
+		panic(fmt.Sprintf("failed to parse email template: %v", err))
 	}
 
+	return &Service{
+		client: resend.NewClient(apiKey),
+		config: config,
+		tmpl:   tmpl,
+	}
+}
+
+// MockEmailSender is a mock implementation of the Sender interface for testing
+type MockEmailSender struct {
+	SentEmails []ContactMessage
+	ShouldFail bool
+	EmailID    string
+}
+
+func (m *MockEmailSender) SendContactEmail(msg ContactMessage) (string, error) {
+	if m.ShouldFail {
+		return "", fmt.Errorf("mock email send failed")
+	}
+	
+	m.SentEmails = append(m.SentEmails, msg)
+	
+	if m.EmailID != "" {
+		return m.EmailID, nil
+	}
+	
+	return "mock-email-id-123", nil
+}
+
+func (s *Service) SendContactEmail(msg ContactMessage) (string, error) {
 	var htmlContent string
 	buf := &bytes.Buffer{}
-	if err := tmpl.Execute(buf, msg); err != nil {
+	if err := s.tmpl.Execute(buf, msg); err != nil {
 		return "", fmt.Errorf("failed to execute email template: %w", err)
 	}
 	htmlContent = buf.String()
 
 	params := &resend.SendEmailRequest{
-		From:    "Contact Form <noreply@conneroh.com>",
-		To:      []string{"conneroisu@outlook.com"},
+		From:    fmt.Sprintf("Contact Form <%s>", s.config.FromEmail),
+		To:      []string{s.config.ToEmail},
 		Html:    htmlContent,
 		Subject: fmt.Sprintf("Contact Form: %s", msg.Subject),
 		ReplyTo: msg.Email,
