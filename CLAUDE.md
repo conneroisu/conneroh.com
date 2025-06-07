@@ -54,8 +54,8 @@ The application supports the following environment variables:
 
 - **`RESEND_API_KEY`** - API key for Resend email service to enable contact form email sending
   - Required for production contact form functionality
-  - If not set, contact form will still work but emails won't be sent
-  - Obtain from https://resend.com dashboard
+  - If not set, contact form will still work, but emails won't be sent
+  - Obtain from [Resend dashboard](https://resend.com)
   - Example: `export RESEND_API_KEY="re_xxxxxxxxx"`
 
 ### Build and Run (without Nix)
