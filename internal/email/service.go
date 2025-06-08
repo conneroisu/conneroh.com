@@ -2,8 +2,8 @@ package email
 
 import (
 	"bytes"
+	"context"
 	"fmt"
-	"html/template"
 
 	"github.com/resend/resend-go/v2"
 )
@@ -23,7 +23,6 @@ type Config struct {
 type Service struct {
 	client *resend.Client
 	config Config
-	tmpl   *template.Template
 }
 
 type ContactMessage struct {
@@ -43,46 +42,9 @@ func NewService(apiKey string) *Service {
 }
 
 func NewServiceWithConfig(apiKey string, config Config) *Service {
-	htmlTemplate := `
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <title>Contact Form Submission</title>
-</head>
-<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h2 style="color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;">
-            New Contact Form Submission
-        </h2>
-        
-        <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
-            <p><strong>From:</strong> {{.Name}} ({{.Email}})</p>
-            <p><strong>Subject:</strong> {{.Subject}}</p>
-        </div>
-        
-        <div style="background-color: #fff; padding: 20px; border-left: 4px solid #3498db; margin: 20px 0;">
-            <h3 style="margin-top: 0; color: #2c3e50;">Message:</h3>
-            <p style="white-space: pre-wrap;">{{.Message}}</p>
-        </div>
-        
-        <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
-        <p style="font-size: 12px; color: #666; text-align: center;">
-            This email was sent from the contact form on conneroh.com
-        </p>
-    </div>
-</body>
-</html>`
-
-	tmpl, err := template.New("contact").Parse(htmlTemplate)
-	if err != nil {
-		panic(fmt.Sprintf("failed to parse email template: %v", err))
-	}
-
 	return &Service{
 		client: resend.NewClient(apiKey),
 		config: config,
-		tmpl:   tmpl,
 	}
 }
 
@@ -108,12 +70,13 @@ func (m *MockEmailSender) SendContactEmail(msg ContactMessage) (string, error) {
 }
 
 func (s *Service) SendContactEmail(msg ContactMessage) (string, error) {
-	var htmlContent string
+	// Render the email template using templ
 	buf := &bytes.Buffer{}
-	if err := s.tmpl.Execute(buf, msg); err != nil {
-		return "", fmt.Errorf("failed to execute email template: %w", err)
+	component := ContactEmailTemplate(msg)
+	if err := component.Render(context.Background(), buf); err != nil {
+		return "", fmt.Errorf("failed to render email template: %w", err)
 	}
-	htmlContent = buf.String()
+	htmlContent := buf.String()
 
 	params := &resend.SendEmailRequest{
 		From:    fmt.Sprintf("Contact Form <%s>", s.config.FromEmail),

@@ -116,10 +116,6 @@ func TestNewServiceWithConfig(t *testing.T) {
 		t.Errorf("expected ToEmail %s, got %s", config.ToEmail, service.config.ToEmail)
 	}
 	
-	if service.tmpl == nil {
-		t.Error("expected template to be parsed")
-	}
-	
 	if service.client == nil {
 		t.Error("expected client to be initialized")
 	}

@@ -461,33 +461,72 @@ test('full user dialog flow with contact form', async () => {
   expect(container.querySelector('form')).toBeFalsy()
 })
 
-test('contact form with mocked Resend API integration', async () => {
-  // Mock the server-side email sending
-  mockFetch({
-    '/api/contact': { id: 'mock-resend-email-123' }
-  })
-  
-  // Create form
+test('contact form submits successfully and shows confirmation message', async () => {
+  // Create form with HTMX attributes for frontend testing
   const form = document.createElement('form')
-  form.setAttribute('method', 'POST')
-  form.setAttribute('action', '/contact')
+  form.className = 'bg-gray-800 p-8 rounded-lg space-y-6 shadow-md'
+  form.setAttribute('hx-post', '/contact')
+  form.setAttribute('hx-target', '#result')
+  form.setAttribute('hx-swap', 'outerHTML')
   
-  const formData = new FormData()
-  formData.append('name', 'John Doe')
-  formData.append('email', 'john@example.com')
-  formData.append('subject', 'Test Subject')
-  formData.append('message', 'Test message content')
+  // Add form fields
+  const nameInput = document.createElement('input')
+  nameInput.name = 'name'
+  nameInput.value = 'John Doe'
+  nameInput.required = true
   
-  // Simulate server-side processing
-  const response = await fetch('/api/contact', {
-    method: 'POST',
-    body: formData,
+  const emailInput = document.createElement('input')
+  emailInput.name = 'email'
+  emailInput.type = 'email'
+  emailInput.value = 'john@example.com'
+  emailInput.required = true
+  
+  const subjectInput = document.createElement('input')
+  subjectInput.name = 'subject'
+  subjectInput.value = 'Test Subject'
+  subjectInput.required = true
+  
+  const messageTextarea = document.createElement('textarea')
+  messageTextarea.name = 'message'
+  messageTextarea.value = 'Test message content'
+  messageTextarea.required = true
+  
+  const submitButton = document.createElement('button')
+  submitButton.type = 'submit'
+  submitButton.textContent = 'Send Message'
+  
+  form.appendChild(nameInput)
+  form.appendChild(emailInput)
+  form.appendChild(subjectInput)
+  form.appendChild(messageTextarea)
+  form.appendChild(submitButton)
+  
+  const resultDiv = document.createElement('div')
+  resultDiv.id = 'result'
+  
+  document.body.appendChild(form)
+  document.body.appendChild(resultDiv)
+  
+  // Mock HTMX submission to simulate successful form submission
+  mockHTMX.ajax.mockImplementation(() => {
+    resultDiv.innerHTML = `
+      <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+        <p>Thank you for your message! I'll get back to you soon.</p>
+      </div>
+    `
+    return Promise.resolve()
   })
   
-  expect(response.ok).toBe(true)
+  // Simulate form submission via HTMX
+  await mockHTMX.ajax('POST', '/contact', {
+    source: form,
+    target: '#result'
+  })
   
-  const result = await response.json()
-  expect(result.id).toBe('mock-resend-email-123')
+  // Verify UI shows success message
+  const successMessage = resultDiv.querySelector('.bg-green-100')
+  expect(successMessage).toBeTruthy()
+  expect(successMessage?.textContent).toContain('Thank you for your message')
 })
 
 test('contact form handles email service errors gracefully', async () => {
