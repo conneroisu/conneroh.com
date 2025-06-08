@@ -35,3 +35,4 @@ tigris.yaml
 *.db-wal
 *_templ.go
 target
+playwright-report

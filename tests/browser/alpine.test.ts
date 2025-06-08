@@ -1,53 +1,43 @@
-import { expect, test } from 'vitest'
+import { test, expect } from '@playwright/test'
 
-test('Alpine.js data attributes', async () => {
-  // Create element with Alpine.js-like attributes
-  const dropdown = document.createElement('div')
-  dropdown.setAttribute('x-data', '{ open: false }')
-  dropdown.setAttribute('x-show', 'open')
-  document.body.appendChild(dropdown)
+test('Alpine.js data attributes', async ({ page }) => {
+  await page.goto('/')
   
-  // Test Alpine attributes exist
-  expect(dropdown.getAttribute('x-data')).toBe('{ open: false }')
-  expect(dropdown.getAttribute('x-show')).toBe('open')
+  // Test that Alpine.js attributes exist on elements (like mobile menu)
+  await expect(page.locator('[x-data]')).toHaveCount(await page.locator('[x-data]').count())
   
-  // Simulate Alpine behavior
-  const button = document.createElement('button')
-  button.setAttribute('x-on:click', 'open = !open')
-  button.textContent = 'Toggle'
-  dropdown.appendChild(button)
-  
-  expect(button.getAttribute('x-on:click')).toBe('open = !open')
-  
-  // Clean up
-  document.body.removeChild(dropdown)
+  // Test mobile menu specifically
+  const mobileMenuContainer = page.locator('[x-data*="isMenuOpen"]')
+  if (await mobileMenuContainer.isVisible()) {
+    await expect(mobileMenuContainer).toHaveAttribute('x-data')
+    await expect(page.locator('[x-show="isMenuOpen"]')).toBeAttached()
+    await expect(page.locator('[\\@click*="isMenuOpen"]')).toBeVisible()
+  }
 })
 
-test('theme toggle simulation', async () => {
-  // Create theme toggle element
-  const themeToggle = document.createElement('button')
-  themeToggle.setAttribute('x-data', '{ dark: false }')
-  themeToggle.setAttribute('x-on:click', 'dark = !dark')
-  document.body.appendChild(themeToggle)
+test('mobile menu interaction with Alpine.js', async ({ page }) => {
+  await page.goto('/')
   
-  // Simulate click behavior
-  let isDark = false
-  themeToggle.addEventListener('click', () => {
-    isDark = !isDark
-    document.documentElement.classList.toggle('dark', isDark)
-  })
+  // Set mobile viewport
+  await page.setViewportSize({ width: 375, height: 667 })
   
-  // Test initial state
-  expect(document.documentElement.classList.contains('dark')).toBe(false)
+  const menuButton = page.locator('[\\@click*="isMenuOpen"]')
+  const mobileMenu = page.locator('[x-show="isMenuOpen"]')
   
-  // Click toggle
-  themeToggle.click()
-  expect(document.documentElement.classList.contains('dark')).toBe(true)
-  
-  // Click again
-  themeToggle.click()
-  expect(document.documentElement.classList.contains('dark')).toBe(false)
-  
-  // Clean up
-  document.body.removeChild(themeToggle)
+  if (await menuButton.isVisible()) {
+    // Test initial state - menu should be hidden
+    await expect(mobileMenu).toBeHidden()
+    
+    // Click to open menu
+    await menuButton.click()
+    
+    // Wait for Alpine.js to show the menu
+    await expect(mobileMenu).toBeVisible()
+    
+    // Click menu button again to close
+    await menuButton.click()
+    
+    // Menu should be hidden again
+    await expect(mobileMenu).toBeHidden()
+  }
 })

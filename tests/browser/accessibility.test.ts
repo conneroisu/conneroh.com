@@ -1,87 +1,57 @@
-import { expect, test } from 'vitest'
+import { test, expect } from '@playwright/test'
 
-test('heading hierarchy validation', async () => {
-  // Create proper heading hierarchy
-  const h1 = document.createElement('h1')
-  h1.textContent = 'Main Title'
-  
-  const h2 = document.createElement('h2')
-  h2.textContent = 'Section Title'
-  
-  const h3 = document.createElement('h3')
-  h3.textContent = 'Subsection Title'
-  
-  document.body.append(h1, h2, h3)
+test('heading hierarchy validation', async ({ page }) => {
+  await page.goto('/')
   
   // Test heading hierarchy
-  const headings = document.querySelectorAll('h1, h2, h3, h4, h5, h6')
-  expect(headings.length).toBeGreaterThan(0)
+  const headings = await page.locator('h1, h2, h3, h4, h5, h6').count()
+  expect(headings).toBeGreaterThan(0)
   
   // Check if h1 exists
-  expect(document.querySelector('h1')).toBeTruthy()
-  
-  // Clean up
-  document.body.removeChild(h1)
-  document.body.removeChild(h2)
-  document.body.removeChild(h3)
+  await expect(page.locator('h1')).toBeVisible()
 })
 
-test('image alt text validation', async () => {
-  // Create image with alt text
-  const img = document.createElement('img')
-  img.src = '/test.jpg'
-  img.alt = 'Test image description'
-  document.body.appendChild(img)
+test('image alt text validation', async ({ page }) => {
+  await page.goto('/')
   
-  // Test alt text exists
-  expect(img.alt).toBeTruthy()
-  expect(img.alt).toBe('Test image description')
-  
-  // Clean up
-  document.body.removeChild(img)
+  // Check that all images have alt text with debug output
+  const images = await page.locator('img').all()
+  for (let i = 0; i < images.length; i++) {
+    const img = images[i]
+    const alt = await img.getAttribute('alt')
+    const src = await img.getAttribute('src')
+    
+    try {
+      expect(alt).toBeTruthy()
+    } catch (error) {
+      console.log(`Image ${i} with src "${src}" is missing alt text. Alt attribute value: "${alt}"`)
+      throw error
+    }
+  }
 })
 
-test('form label associations', async () => {
-  // Create form with proper labels
-  const form = document.createElement('form')
+test('form label associations', async ({ page }) => {
+  await page.goto('/')
   
-  const label = document.createElement('label')
-  label.htmlFor = 'test-input'
-  label.textContent = 'Test Input'
-  
-  const input = document.createElement('input')
-  input.id = 'test-input'
-  input.type = 'text'
-  
-  form.append(label, input)
-  document.body.appendChild(form)
-  
-  // Test label association
-  expect(label.htmlFor).toBe(input.id)
-  expect(document.querySelector(`label[for="${input.id}"]`)).toBeTruthy()
-  
-  // Clean up
-  document.body.removeChild(form)
+  // Check contact form if it exists
+  const contactSection = page.locator('#contact')
+  if (await contactSection.isVisible()) {
+    const inputs = await contactSection.locator('input, textarea, select').all()
+    for (const input of inputs) {
+      const id = await input.getAttribute('id')
+      if (id) {
+        await expect(page.locator(`label[for="${id}"]`)).toBeVisible()
+      }
+    }
+  }
 })
 
-test('landmarks and semantic structure', async () => {
-  // Create semantic landmarks
-  const header = document.createElement('header')
-  const main = document.createElement('main')
-  const footer = document.createElement('footer')
-  const nav = document.createElement('nav')
-  
-  document.body.append(header, nav, main, footer)
+test('landmarks and semantic structure', async ({ page }) => {
+  await page.goto('/')
   
   // Test landmarks exist
-  expect(document.querySelector('header')).toBeTruthy()
-  expect(document.querySelector('main')).toBeTruthy()
-  expect(document.querySelector('footer')).toBeTruthy()
-  expect(document.querySelector('nav')).toBeTruthy()
-  
-  // Clean up
-  document.body.removeChild(header)
-  document.body.removeChild(nav)
-  document.body.removeChild(main)
-  document.body.removeChild(footer)
+  await expect(page.locator('header')).toBeVisible()
+  await expect(page.locator('main')).toBeVisible()
+  await expect(page.locator('footer')).toBeVisible()
+  await expect(page.locator('nav')).toBeVisible()
 })

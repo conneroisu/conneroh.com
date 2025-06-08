@@ -1,150 +1,86 @@
-import { expect, test, beforeEach } from 'vitest'
-import { page, userEvent } from '@vitest/browser/context'
+import { test, expect } from '@playwright/test'
 
-beforeEach(async () => {
-  // Clear the page content before each test
-  document.body.innerHTML = ''
-})
+test('homepage structure matches template', async ({ page }) => {
+  await page.goto('/')
 
-test('homepage structure matches template', async () => {
-  // Create homepage structure based on home.templ
-  const main = document.createElement('main')
-  main.id = 'bodiody'
-  main.className = 'flex-grow'
-  
-  // Hero section
-  const heroSection = document.createElement('section')
-  heroSection.className = 'bg-gradient-to-b from-gray-900 to-gray-800 py-20'
-  
-  const heroTitle = document.createElement('h1')
-  heroTitle.textContent = 'Conner Ohnesorge'
-  heroTitle.setAttribute('aria-label', 'Name')
-  heroTitle.className = 'mb-4 md:text-5xl text-4xl leading-tight font-bold lg:text-6xl text-white'
-  
-  const heroSummary = document.createElement('p')
-  heroSummary.setAttribute('aria-label', 'summary')
-  heroSummary.textContent = 'Electrical Engineer & Software Developer specialized in creating robust, scalable, and elegant solutions.'
-  
-  heroSection.appendChild(heroTitle)
-  heroSection.appendChild(heroSummary)
-  main.appendChild(heroSection)
-  
-  // Projects section
-  const projectsSection = document.createElement('section')
-  projectsSection.id = 'projects'
-  projectsSection.className = 'bg-gray-800 py-16'
-  
-  const projectsTitle = document.createElement('h2')
-  projectsTitle.textContent = 'Featured Projects'
-  projectsTitle.className = 'mb-4 text-3xl font-bold text-white'
-  
-  projectsSection.appendChild(projectsTitle)
-  main.appendChild(projectsSection)
-  
-  // Contact section
-  const contactSection = document.createElement('section')
-  contactSection.id = 'contact'
-  contactSection.className = 'bg-gray-8  00 py-16'
-  contactSection.setAttribute('aria-label', 'Contact')
-  
-  const contactTitle = document.createElement('h2')
-  contactTitle.textContent = 'Get In Touch'
-  contactTitle.className = 'mb-4 text-3xl font-bold text-white'
-  
-  contactSection.appendChild(contactTitle)
-  main.appendChild(contactSection)
-  
-  document.body.appendChild(main)
-  
   // Test homepage structure
-  expect(document.getElementById('bodiody')).toBeTruthy()
-  expect(document.querySelector('h1[aria-label="Name"]')?.textContent).toBe('Conner Ohnesorge')
-  expect(document.querySelector('p[aria-label="summary"]')).toBeTruthy()
-  expect(document.getElementById('projects')).toBeTruthy()
-  expect(document.getElementById('contact')).toBeTruthy()
+  await expect(page.locator('#bodiody')).toBeVisible()
+
+  // Test name header with debug output
+  const nameHeader = page.locator('h1[aria-label="Name"]')
+  try {
+    await expect(nameHeader).toContainText('Conner Ohnesorge')
+  } catch (error) {
+    const actualText = await nameHeader.textContent()
+    console.log(`Name header selector 'h1[aria-label="Name"]' contains: "${actualText}"`)
+    throw error
+  }
+
+  await expect(page.locator('p[aria-label="summary"]')).toBeVisible()
+  await expect(page.locator('#projects')).toBeVisible()
+  await expect(page.locator('#contact')).toBeVisible()
 })
 
-test('navigation structure', async () => {
-  // Create header with navigation based on layout.templ
-  const header = document.createElement('header')
-  const nav = document.createElement('nav')
-  nav.className = 'border-gray-800 border-b'
-  
-  const container = document.createElement('div')
-  container.className = 'container mx-auto lg:px-8 sm:px-6 px-4'
-  container.setAttribute('x-data', '{ isMenuOpen: false }')
-  
-  // Logo
-  const logo = document.createElement('a')
-  logo.className = 'text-white cursor-pointer pr-4 text-xl font-bold'
-  logo.setAttribute('hx-get', '/')
-  logo.setAttribute('hx-push-url', '/')
-  logo.setAttribute('hx-target', '#bodiody')
-  logo.setAttribute('aria-label', 'Back to Home')
-  logo.textContent = 'Conner Ohnesorge'
-  
-  // Desktop navigation
-  const desktopNav = document.createElement('div')
-  desktopNav.className = 'space-x-8 hidden sm:flex items-center ml-8'
-  
-  const projectsLink = document.createElement('a')
-  projectsLink.className = 'hover:text-white cursor-pointer text-gray-300'
-  projectsLink.setAttribute('hx-target', '#bodiody')
-  projectsLink.setAttribute('hx-get', '/projects')
-  projectsLink.setAttribute('hx-push-url', 'true')
-  projectsLink.textContent = 'Projects'
-  
-  const postsLink = document.createElement('a')
-  postsLink.className = 'hover:text-white cursor-pointer text-gray-300'
-  postsLink.setAttribute('hx-target', '#bodiody')
-  postsLink.setAttribute('hx-get', '/posts')
-  postsLink.setAttribute('hx-push-url', 'true')
-  postsLink.textContent = 'Posts'
-  
-  desktopNav.appendChild(projectsLink)
-  desktopNav.appendChild(postsLink)
-  container.appendChild(logo)
-  container.appendChild(desktopNav)
-  nav.appendChild(container)
-  header.appendChild(nav)
-  document.body.appendChild(header)
-  
-  // Test navigation
-  expect(document.querySelector('a[aria-label="Back to Home"]')?.textContent).toBe('Conner Ohnesorge')
-  expect(document.querySelector('a[hx-get="/projects"]')?.textContent).toBe('Projects')
-  expect(document.querySelector('a[hx-get="/posts"]')?.textContent).toBe('Posts')
+test('navigation structure', async ({ page }) => {
+  await page.goto('/')
+
+  // Test navigation with debug output
+  const homeLink = page.locator('a[aria-label="Back to Home"]')
+  try {
+    await expect(homeLink).toContainText('Conner Ohnesorge')
+  } catch (error) {
+    const actualText = await homeLink.textContent()
+    console.log(`Home link selector 'a[aria-label="Back to Home"]' contains: "${actualText}"`)
+    throw error
+  }
+
+  // Desktop projects link - use first visible one
+  const projectsLink = page.locator('a[hx-get="/projects"]').first()
+  try {
+    await expect(projectsLink).toContainText('Projects')
+  } catch (error) {
+    const actualText = await projectsLink.textContent()
+    console.log(`Projects link selector 'a[hx-get="/projects"]' contains: "${actualText}"`)
+    throw error
+  }
+
+  // Desktop posts link - use first visible one
+  const postsLink = page.locator('a[hx-get="/posts"]').first()
+  try {
+    await expect(postsLink).toContainText('Posts')
+  } catch (error) {
+    const actualText = await postsLink.textContent()
+    console.log(`Posts link selector 'a[hx-get="/posts"]' contains: "${actualText}"`)
+    throw error
+  }
 })
 
-test('mobile menu functionality', async () => {
-  // Create mobile menu based on layout.templ
-  const container = document.createElement('div')
-  container.setAttribute('x-data', '{ isMenuOpen: false }')
-  
-  // Mobile menu button
-  const menuButton = document.createElement('img')
-  menuButton.className = 'p-2 focus:outline-none sm:hidden hover:text-white hover:bg-gray-700 rounded-md text-gray-300 mr-2'
-  menuButton.setAttribute('x-on:click', 'isMenuOpen = !isMenuOpen')
-  menuButton.src = 'https://conneroisu.fly.storage.tigris.dev/svg/menu.svg'
-  
-  // Mobile menu
-  const mobileMenu = document.createElement('div')
-  mobileMenu.setAttribute('x-show', 'isMenuOpen')
-  mobileMenu.className = 'pb-4 space-y-1 sm:hidden pt-2'
-  
-  const mobileProjectsLink = document.createElement('a')
-  mobileProjectsLink.className = 'text-base text-gray-300 hover:bg-gray-700 hover:text-white pl-3 pr-4 block py-2 font-medium'
-  mobileProjectsLink.setAttribute('hx-target', '#bodiody')
-  mobileProjectsLink.setAttribute('hx-get', '/projects')
-  mobileProjectsLink.setAttribute('x-on:click', 'isMenuOpen = false')
-  mobileProjectsLink.textContent = 'Projects'
-  
-  mobileMenu.appendChild(mobileProjectsLink)
-  container.appendChild(menuButton)
-  container.appendChild(mobileMenu)
-  document.body.appendChild(container)
-  
+test('mobile menu functionality', async ({ page }) => {
+  await page.goto('/')
+
+  // Set mobile viewport
+  await page.setViewportSize({ width: 375, height: 667 })
+
   // Test mobile menu elements
-  expect(document.querySelector('img[src*="menu.svg"]')).toBeTruthy()
-  expect(document.querySelector('div[x-show="isMenuOpen"]')).toBeTruthy()
-  expect(document.querySelector('a[hx-get="/projects"]')?.textContent).toBe('Projects')
+  await expect(page.locator('img[src*="menu.svg"]')).toBeVisible()
+  await expect(page.locator('div[x-show="isMenuOpen"]')).toBeAttached()
+
+  // Test that mobile menu initially hidden
+  await expect(page.locator('div[x-show="isMenuOpen"]')).toBeHidden()
+
+  // Click menu button to open menu
+  await page.locator('img[src*="menu.svg"]').click()
+
+  // Test that mobile menu is now visible
+  await expect(page.locator('div[x-show="isMenuOpen"]')).toBeVisible()
+
+  // Test mobile menu projects link with debug output - mobile menu has different selectors
+  const mobileProjectsLink = page.locator('div[x-show="isMenuOpen"] a[hx-get="/projects"]')
+  try {
+    await expect(mobileProjectsLink).toContainText('Projects')
+  } catch (error) {
+    const actualText = await mobileProjectsLink.textContent()
+    console.log(`Mobile projects link selector 'div[x-show="isMenuOpen"] a[hx-get="/projects"]' contains: "${actualText}"`)
+    throw error
+  }
 })

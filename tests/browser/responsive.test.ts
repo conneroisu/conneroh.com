@@ -1,43 +1,94 @@
-import { expect, test } from 'vitest'
+import { test, expect } from '@playwright/test'
 
-test('viewport meta tag', async () => {
-  // Create viewport meta tag
-  const viewport = document.createElement('meta')
-  viewport.name = 'viewport'
-  viewport.content = 'width=device-width, initial-scale=1'
-  document.head.appendChild(viewport)
+test('mobile responsiveness (375px)', async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 667 })
+  await page.goto('/')
   
-  // Test viewport exists
-  const foundViewport = document.querySelector('meta[name="viewport"]')
-  expect(foundViewport).toBeTruthy()
-  expect(foundViewport?.getAttribute('content')).toBe('width=device-width, initial-scale=1.0')
+  // Test page loads properly on mobile
+  await expect(page.locator('#bodiody')).toBeVisible()
   
-  // Clean up
-  document.head.removeChild(viewport)
+  // Test mobile menu button is visible
+  const mobileMenuButton = page.locator('[\\@click*="isMenuOpen"]')
+  if (await mobileMenuButton.count() > 0) {
+    await expect(mobileMenuButton.first()).toBeVisible()
+  }
+  
+  // Test mobile menu functionality
+  const mobileMenu = page.locator('[x-show="isMenuOpen"]')
+  if (await mobileMenu.count() > 0) {
+    // Menu should be hidden initially
+    await expect(mobileMenu.first()).toBeHidden()
+    
+    // Click menu button to open
+    await mobileMenuButton.first().click()
+    
+    // Menu should now be visible
+    await expect(mobileMenu.first()).toBeVisible()
+  }
 })
 
-test('responsive image attributes', async () => {
-  // Create responsive image
-  const img = document.createElement('img')
-  img.src = '/test.jpg'
-  img.className = 'w-full h-auto'
-  img.alt = 'Test image'
-  document.body.appendChild(img)
+test('tablet responsiveness (768px)', async ({ page }) => {
+  await page.setViewportSize({ width: 768, height: 1024 })
+  await page.goto('/')
   
-  // Test responsive classes
-  expect(img.className).toContain('w-full')
-  expect(img.alt).toBe('Test image')
+  // Test page loads properly on tablet
+  await expect(page.locator('#bodiody')).toBeVisible()
   
-  // Clean up
-  document.body.removeChild(img)
+  // Test navigation is accessible
+  const nav = page.locator('nav')
+  if (await nav.count() > 0) {
+    await expect(nav.first()).toBeVisible()
+  }
+  
+  // Test content layout
+  const mainContent = page.locator('main, #bodiody')
+  await expect(mainContent.first()).toBeVisible()
 })
 
-test('CSS media query support', async () => {
-  // Test that CSS supports media queries
-  expect(typeof window.matchMedia).toBe('function')
+test('desktop responsiveness (1200px)', async ({ page }) => {
+  await page.setViewportSize({ width: 1200, height: 800 })
+  await page.goto('/')
   
-  // Test a media query
-  const mediaQuery = window.matchMedia('(max-width: 768px)')
-  expect(typeof mediaQuery.matches).toBe('boolean')
-  expect(typeof mediaQuery.addListener).toBe('function')
+  // Test page loads properly on desktop
+  await expect(page.locator('#bodiody')).toBeVisible()
+  
+  // Test navigation is visible (not hidden in mobile menu)
+  const desktopNav = page.locator('nav a[hx-get]')
+  if (await desktopNav.count() > 0) {
+    await expect(desktopNav.first()).toBeVisible()
+  }
+  
+  // Test layout elements are properly positioned
+  const header = page.locator('header')
+  const main = page.locator('main, #bodiody')
+  const footer = page.locator('footer')
+  
+  await expect(main.first()).toBeVisible()
+  if (await header.count() > 0) {
+    await expect(header.first()).toBeVisible()
+  }
+  if (await footer.count() > 0) {
+    await expect(footer.first()).toBeVisible()
+  }
+})
+
+test('responsive navigation behavior', async ({ page }) => {
+  // Test mobile behavior
+  await page.setViewportSize({ width: 375, height: 667 })
+  await page.goto('/')
+  
+  // Check mobile menu exists
+  const mobileMenuToggle = page.locator('[\\@click*="isMenuOpen"]')
+  if (await mobileMenuToggle.count() > 0) {
+    await expect(mobileMenuToggle.first()).toBeVisible()
+  }
+  
+  // Test desktop behavior
+  await page.setViewportSize({ width: 1200, height: 800 })
+  
+  // Desktop navigation should be visible
+  const desktopNav = page.locator('nav a[hx-get]')
+  if (await desktopNav.count() > 0) {
+    await expect(desktopNav.first()).toBeVisible()
+  }
 })

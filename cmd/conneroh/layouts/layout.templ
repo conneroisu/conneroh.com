@@ -127,6 +127,7 @@ templ header() {
 								hx-target="#bodiody"
 								hx-get="/projects"
 								hx-push-url="true"
+								aria-label="List of projects"
 							>
 								Projects
 							</a>
@@ -136,6 +137,7 @@ templ header() {
 								hx-get="/posts"
 								hx-push-url="true"
 								preload="mouseover"
+								aria-label="List of posts"
 							>
 								Posts
 							</a>
@@ -145,6 +147,7 @@ templ header() {
 								hx-get="/tags"
 								hx-push-url="true"
 								preload="mouseover"
+								aria-label="List of tags"
 							>
 								Tags
 							</a>
@@ -223,6 +226,7 @@ templ Icon(
 ) {
 	<img
 		src={ fmt.Sprintf("https://conneroisu.fly.storage.tigris.dev/svg/%s.svg", id) }
+		alt={ id }
 		{ attrs... }
 	/>
 }

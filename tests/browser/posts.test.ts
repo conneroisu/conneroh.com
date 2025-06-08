@@ -1,42 +1,77 @@
-import { expect, test } from 'vitest'
+import { test, expect } from '@playwright/test'
 
-test('posts page DOM manipulation', async () => {
-  // Create mock post card
-  const postCard = document.createElement('article')
-  postCard.setAttribute('data-testid', 'post-card')
+test('posts page structure', async ({ page }) => {
+  await page.goto('/posts')
   
-  const title = document.createElement('h2')
-  title.setAttribute('data-testid', 'post-title')
-  title.textContent = 'Test Post'
+  // Test basic page structure
+  await expect(page.locator('#bodiody')).toBeVisible()
   
-  const date = document.createElement('time')
-  date.setAttribute('data-testid', 'post-date')
-  date.textContent = 'January 1, 2025'
+  // Check if posts exist
+  const postElements = page.locator('article, .post, [class*="post"]')
+  if (await postElements.count() > 0) {
+    await expect(postElements.first()).toBeVisible()
+  }
   
-  const description = document.createElement('p')
-  description.setAttribute('data-testid', 'post-description')
-  description.textContent = 'Test description'
-  
-  postCard.appendChild(title)
-  postCard.appendChild(date)
-  postCard.appendChild(description)
-  document.body.appendChild(postCard)
-  
-  // Test post elements exist
-  expect(document.querySelector('[data-testid="post-card"]')).toBeTruthy()
-  expect(document.querySelector('[data-testid="post-title"]')?.textContent).toBe('Test Post')
-  expect(document.querySelector('[data-testid="post-date"]')?.textContent).toBe('January 1, 2025')
-  expect(document.querySelector('[data-testid="post-description"]')?.textContent).toBe('Test description')
-  
-  // Clean up
-  document.body.removeChild(postCard)
+  // Test page title or heading
+  const headings = page.locator('h1, h2')
+  if (await headings.count() > 0) {
+    await expect(headings.first()).toBeVisible()
+  }
 })
 
-test('post date formatting', async () => {
-  const dateElement = document.createElement('time')
-  dateElement.textContent = 'January 1, 2025'
+test('post navigation and links', async ({ page }) => {
+  await page.goto('/posts')
   
-  // Test date format validation
-  const dateRegex = /\w+ \d{1,2}, \d{4}/
-  expect(dateRegex.test(dateElement.textContent)).toBe(true)
+  // Test that post links are clickable
+  const postLinks = page.locator('a[href*="/posts/"], a[hx-get*="/posts/"]')
+  const linkCount = await postLinks.count()
+  
+  if (linkCount > 0) {
+    const firstLink = postLinks.first()
+    await expect(firstLink).toBeVisible()
+    
+    // Test clicking the link
+    await firstLink.click()
+    
+    // Should navigate to post detail or update content
+    await expect(page.locator('#bodiody')).toBeVisible()
+  }
+})
+
+test('post search and filtering', async ({ page }) => {
+  await page.goto('/posts')
+  
+  // Test search functionality if it exists
+  const searchInput = page.locator('input[type="search"], #search, [placeholder*="search" i]')
+  if (await searchInput.count() > 0) {
+    await searchInput.first().fill('test')
+    await page.waitForTimeout(500) // Wait for any debounced search
+    
+    // Check that search works (content should update or filter)
+    await expect(page.locator('#bodiody')).toBeVisible()
+  }
+  
+  // Test tag filtering if it exists
+  const tagFilters = page.locator('a[href*="tag="], button[data-tag], .tag')
+  if (await tagFilters.count() > 0) {
+    await tagFilters.first().click()
+    await expect(page.locator('#bodiody')).toBeVisible()
+  }
+})
+
+test('post date formatting', async ({ page }) => {
+  await page.goto('/posts')
+  
+  // Find time elements and test their format
+  const timeElements = page.locator('time')
+  const timeCount = await timeElements.count()
+  
+  if (timeCount > 0) {
+    const firstTime = timeElements.first()
+    const dateText = await firstTime.textContent()
+    
+    // Test various date formats that might be used
+    const dateRegex = /(\w+ \d{1,2}, \d{4}|\d{4}-\d{2}-\d{2}|\w+ \d{1,2}|\d{1,2}\/\d{1,2}\/\d{4})/
+    expect(dateRegex.test(dateText || '')).toBe(true)
+  }
 })

@@ -46,26 +46,43 @@
           };
           tests = {
             exec = rooted ''
+              generate-all
               go test -v "$REPO_ROOT"/...
-              cd "$REPO_ROOT" && bun test
-              cd "$REPO_ROOT" && bun test --ui
+              cd "$REPO_ROOT" && npx playwright test
             '';
-            deps = [pkgs.go];
-            description = "Run all go tests";
+            deps = with pkgs; [
+              go
+              nodejs_20
+              playwright-driver
+              playwright-driver.browsers
+              self.packages."${system}".generate-all
+            ];
+            description = "Run all tests (Go unit tests and Playwright browser tests)";
+            env = {
+              PLAYWRIGHT_BROWSERS_PATH = "${pkgs.playwright-driver.browsers}";
+              PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = "1";
+            };
+          };
+          test = {
+            exec = rooted ''
+              cd "$REPO_ROOT" && npx playwright test
+            '';
+            deps = with pkgs; [bun nodejs_20 playwright-driver playwright-driver.browsers];
+            description = "Run Playwright tests";
           };
           test-ui = {
             exec = rooted ''
-              cd "$REPO_ROOT" && bun test --ui
+              cd "$REPO_ROOT" && npx playwright test --ui
             '';
             deps = with pkgs; [bun nodejs_20 playwright-driver playwright-driver.browsers];
-            description = "Run Vitest with UI";
+            description = "Run Playwright tests with UI";
           };
           test-ci = {
             exec = rooted ''
-              cd "$REPO_ROOT" && bun test run --reporter=verbose
+              cd "$REPO_ROOT" && npx playwright test --reporter=list
             '';
             deps = with pkgs; [bun nodejs_20 playwright-driver playwright-driver.browsers];
-            description = "Run Vitest tests for CI";
+            description = "Run Playwright tests for CI";
           };
           lint = {
             exec = rooted ''
@@ -198,12 +215,8 @@
           env = {
             PLAYWRIGHT_BROWSERS_PATH = "${pkgs.playwright-driver.browsers}";
             PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = "1";
+            PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS = "true";
             PLAYWRIGHT_NODEJS_PATH = "${pkgs.nodejs_20}/bin/node";
-
-            # Browser executable paths
-            PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH = "${pkgs.playwright-driver.browsers}/chromium-1155/chrome-linux/chrome";
-            PLAYWRIGHT_FIREFOX_EXECUTABLE_PATH = "${pkgs.playwright-driver.browsers}/firefox-1468/firefox/firefox";
-            PLAYWRIGHT_WEBKIT_EXECUTABLE_PATH = "${pkgs.playwright-driver.browsers}/webkit-2010/webkit-linux/minibrowser";
           };
           shell-packages = with pkgs;
             [
@@ -218,8 +231,8 @@
               air
               templ
               golangci-lint
+              gopls
               (buildWithSpecificGo revive)
-              (buildWithSpecificGo gopls)
               (buildWithSpecificGo templ)
               (buildWithSpecificGo golines)
               (buildWithSpecificGo golangci-lint-langserver)
@@ -451,9 +464,8 @@
                 timeout 30 bash -c 'until curl -s http://localhost:8080 > /dev/null 2>&1; do sleep 1; done'
 
                 # Run all tests
-                echo "Running Vitest tests..."
-                npx playwright install
-                bun test:run
+                echo "Running Playwright tests..."
+                npx playwright test
                 TEST_EXIT_CODE=$?
 
                 # Cleanup will be called by the trap
