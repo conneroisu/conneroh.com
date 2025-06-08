@@ -36,3 +36,4 @@ tigris.yaml
 *_templ.go
 target
 playwright-report
+test-results
