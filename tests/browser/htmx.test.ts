@@ -3,16 +3,22 @@ import { test, expect } from '@playwright/test'
 test('HTMX attributes and events', async ({ page }) => {
   await page.goto('/')
   
-  // Test HTMX attributes exist on navigation links (get first visible one)
+  // Set desktop viewport to test navigation
+  await page.setViewportSize({ width: 1024, height: 768 })
+  
+  // Test HTMX attributes exist on navigation links
   const projectsLink = page.locator('a[hx-get="/projects"]').first()
-  await expect(projectsLink).toBeVisible()
+  
+  // Check attributes
   await expect(projectsLink).toHaveAttribute('hx-target', '#bodiody')
+  await expect(projectsLink).toHaveAttribute('hx-get', '/projects')
+  await expect(projectsLink).toBeVisible()
   
   // Test HTMX navigation by clicking the link
   await projectsLink.click()
   
   // Wait for HTMX request to complete and check URL
-  await expect(page).toHaveURL('/projects')
+  await page.waitForURL('/projects', { timeout: 5000 })
   await expect(page.locator('#bodiody')).toBeVisible()
 })
 

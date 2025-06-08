@@ -188,7 +188,7 @@ templ header() {
 						class={ twerge.It("text-base text-gray-300 hover:bg-gray-700 hover:text-white pl-3 pr-4 block py-2 font-medium") }
 						hx-target="#bodiody"
 						hx-get="/posts"
-						hx-push-url="/posts"
+						hx-push-url="true"
 						@click="isMenuOpen = false"
 						preload="ontouchstart"
 					>
@@ -224,11 +224,7 @@ templ Icon(
 	id string,
 	attrs templ.Attributes,
 ) {
-	<img
-		src={ fmt.Sprintf("https://conneroisu.fly.storage.tigris.dev/svg/%s.svg", id) }
-		alt={ id }
-		{ attrs... }
-	/>
+	@components.Icon(id, attrs)
 }
 
 templ footer() {

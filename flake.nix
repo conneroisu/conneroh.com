@@ -183,9 +183,7 @@
             description = "Generate templates";
           };
           run = {
-            exec = rooted ''
-              cd "$REPO_ROOT" && air
-            '';
+            exec = rooted ''cd "$REPO_ROOT" && air'';
             env.DEBUG = "true";
             deps = with pkgs; [air git];
             description = "Run the application with air for hot reloading";

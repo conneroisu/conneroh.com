@@ -28,7 +28,7 @@ type ContactForm struct {
 	Message string `schema:"message,required"`
 }
 
-var encoder = schema.NewEncoder()
+var decoder = schema.NewDecoder()
 
 const (
 	maxSearchRoutines = 10
@@ -44,11 +44,11 @@ func handleContactForm() routing.APIFunc {
 				"failed to parse contact form",
 			)
 		}
-		err = encoder.Encode(form, r.PostForm)
+		err = decoder.Decode(&form, r.PostForm)
 		if err != nil {
 			return eris.Wrap(
 				err,
-				"failed to encode contact form",
+				"failed to decode contact form",
 			)
 		}
 		// TODO: Send email

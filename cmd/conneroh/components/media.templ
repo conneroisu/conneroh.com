@@ -8,9 +8,26 @@ templ Icon(
 ) {
 	<img
 		src={ fmt.Sprintf("https://conneroisu.fly.storage.tigris.dev/assets/svg/%s.svg", id) }
-		alt={ id }
+		alt={ getIconAltText(id) }
 		{ attrs... }
 	/>
+}
+
+func getIconAltText(id string) string {
+	switch id {
+	case "menu":
+		return "Open navigation menu"
+	case "linkedin":
+		return "LinkedIn profile"
+	case "github":
+		return "GitHub profile"  
+	case "twitter":
+		return "Twitter profile"
+	case "mail":
+		return "Send email"
+	default:
+		return id + " icon"
+	}
 }
 
 templ Image(
