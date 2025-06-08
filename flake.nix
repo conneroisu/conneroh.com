@@ -592,8 +592,6 @@
               golines.enable = true; # Golang formatter
               gofumpt.enable = true; # Golang formatter
               rustfmt.enable = true; # Rust formatter
-              black.enable = true; # Python formatter
-              asmfmt.enable = true; # Assembly formatter
             };
           };
         in
