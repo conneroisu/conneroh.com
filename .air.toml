@@ -5,7 +5,7 @@ tmp_dir = "tmp"
 [build]
   args_bin = []
   bin = "./tmp/main"
-  cmd = "doppler run -- go build -o ./tmp/main ."
+  cmd = "go build -o ./tmp/main ."
   delay = 10
   exclude_dir = ["assets", "tmp", "vendor", "testdata", "node_modules", "cmd/conneroh/_static/"]
   exclude_file = ["internal/data/css/classes.go", "internal/data/css/classes.templ"]
