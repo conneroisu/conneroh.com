@@ -9,55 +9,18 @@ import (
 	"sync"
 
 	"github.com/a-h/templ"
-	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/layouts"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/views"
 	"github.com/conneroisu/conneroh.com/internal/assets"
 	"github.com/conneroisu/conneroh.com/internal/routing"
-	"github.com/gorilla/schema"
 	"github.com/rotisserie/eris"
 	"github.com/sourcegraph/conc/pool"
 	"github.com/uptrace/bun"
 )
 
-// ContactForm is the struct schema for the contact form.
-type ContactForm struct {
-	Name    string `schema:"name,required"`
-	Email   string `schema:"email,required"`
-	Subject string `schema:"subject,required"`
-	Message string `schema:"message,required"`
-}
-
-var encoder = schema.NewEncoder()
-
 const (
 	maxSearchRoutines = 10
 )
-
-func handleContactForm() routing.APIFunc {
-	return func(w http.ResponseWriter, r *http.Request) error {
-		var form ContactForm
-		err := r.ParseForm()
-		if err != nil {
-			return eris.Wrap(
-				err,
-				"failed to parse contact form",
-			)
-		}
-		err = encoder.Encode(form, r.PostForm)
-		if err != nil {
-			return eris.Wrap(
-				err,
-				"failed to encode contact form",
-			)
-		}
-		// TODO: Send email
-
-		templ.Handler(components.ThankYou()).ServeHTTP(w, r)
-
-		return nil
-	}
-}
 
 func listHandler(
 	target routing.PluralPath,
