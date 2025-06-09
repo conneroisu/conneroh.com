@@ -36,9 +36,6 @@ func AddRoutes(
 		"GET /{$}",
 		routing.Make(HandleHome(db)))
 	h.HandleFunc(
-		"POST /contact",
-		routing.Make(handleContactForm()))
-	h.HandleFunc(
 		"GET /posts",
 		routing.Make(HandlePosts(db)))
 	h.Handle(
