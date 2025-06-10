@@ -329,9 +329,9 @@
             };
             vm = [
               {
-                memory = "1gb";
+                memory = "512mb";
                 cpu_kind = "shared";
-                cpus = 2;
+                cpus = 1;
               }
             ];
           };
