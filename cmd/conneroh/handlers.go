@@ -873,3 +873,122 @@ func filter[T any](
 	// Paginate the filtered results
 	return routing.Paginate(filtered, page, pageSize)
 }
+
+// HandleGlobalSearch handles the global search page. aka /search.
+func HandleGlobalSearch(db *bun.DB) routing.APIFunc {
+	return func(w http.ResponseWriter, r *http.Request) error {
+		query := r.URL.Query().Get("q")
+		ctx := r.Context()
+
+		// Load data if caches are empty (similar to HandleHome or listHandler)
+		if len(allPosts) == 0 {
+			if err := db.NewSelect().Model(&allPosts).
+				Order("updated_at DESC"). // Ensure consistent ordering if needed later
+				Relation("Tags").
+				Scan(ctx); err != nil {
+				return eris.Wrap(err, "failed to scan posts for global search")
+			}
+		}
+		if len(allProjects) == 0 {
+			if err := db.NewSelect().Model(&allProjects).
+				Order("updated_at DESC").
+				Relation("Tags").
+				Scan(ctx); err != nil {
+				return eris.Wrap(err, "failed to scan projects for global search")
+			}
+		}
+		if len(allTags) == 0 {
+			if err := db.NewSelect().Model(&allTags).
+				Order("updated_at DESC").
+				// Tags might not need relations for simple text search, but filter checks them.
+				// Add them if filter logic for tags uses relations.
+				// For now, keeping it simple. If Tags have sub-items to search, add Relations.
+				Scan(ctx); err != nil {
+				return eris.Wrap(err, "failed to scan tags for global search")
+			}
+		}
+		if len(allEmployments) == 0 {
+			if err := db.NewSelect().Model(&allEmployments).
+				Order("updated_at DESC").
+				Relation("Tags"). // Employments might have tags to search
+				Scan(ctx); err != nil {
+				return eris.Wrap(err, "failed to scan employments for global search")
+			}
+		}
+
+		// Filter each type of content
+		// We pass a large number for pageSize to get all results, as pagination will be done on combined results if needed later.
+		// Or, more simply, the filter function itself might not need page/pageSize if we adapt it or use a version of it.
+		// The current filter function returns paginated results. For global search, we want all matches.
+		// Let's assume page 1 and a very large page size to get all results.
+		// The existing filter function does scoring and might be suitable.
+
+		// For global search, we don't paginate individual slices before combining.
+		// We pass 1 for page and a large number for pageSize to retrieve all items.
+		// The `filter` function itself handles empty query string.
+		const noPaginationPage = 1
+		const effectivelyAllItems = 1_000_000 // Assuming this is larger than any dataset
+
+		filteredPosts, _ := filter(
+			allPosts,
+			query,
+			noPaginationPage,
+			effectivelyAllItems,
+			func(p *assets.Post) string { return p.Title },
+		)
+		filteredProjects, _ := filter(
+			allProjects,
+			query,
+			noPaginationPage,
+			effectivelyAllItems,
+			func(p *assets.Project) string { return p.Title },
+		)
+		filteredTags, _ := filter(
+			allTags,
+			query,
+			noPaginationPage,
+			effectivelyAllItems,
+			func(t *assets.Tag) string { return t.Title },
+		)
+		filteredEmployments, _ := filter(
+			allEmployments,
+			query,
+			noPaginationPage,
+			effectivelyAllItems,
+			func(e *assets.Employment) string { return e.Title },
+		)
+
+		// Combine results
+		var combinedResults []any
+		for _, p := range filteredPosts {
+			combinedResults = append(combinedResults, p)
+		}
+		for _, p := range filteredProjects {
+			combinedResults = append(combinedResults, p)
+		}
+		for _, t := range filteredTags {
+			combinedResults = append(combinedResults, t)
+		}
+		for _, e := range filteredEmployments {
+			combinedResults = append(combinedResults, e)
+		}
+
+		// TODO: Implement views.GlobalSearchResults in the next step
+		// For now, assume it exists and takes (string, []any)
+		// component := views.GlobalSearchResults(query, combinedResults)
+
+		// Render based on HTMX request or full page
+		// This part needs views.GlobalSearchResults to be defined.
+		// Placeholder for now.
+		header := r.Header.Get(routing.HdrRequest)
+		component := views.GlobalSearchResults(query, combinedResults) // This will be created next
+
+		if header == "" { // Not an HTMX request, serve full page
+			templ.Handler(layouts.Page(component)).ServeHTTP(w, r)
+		} else { // HTMX request, serve component directly
+			templ.Handler(component).ServeHTTP(w, r)
+		}
+
+		return nil
+	}
+}

@@ -159,8 +159,61 @@ templ header() {
 							</a>
 						</div>
 					</div>
+					// Right side: Global Search Bar
+					<div class={ twerge.It("flex items-center") }>
+						<form
+							class={ twerge.It("flex items-center relative") }
+							role="search"
+							hx-get="/search"
+							hx-target="#bodiody"
+							hx-push-url="true"
+							hx-indicator="#global-search-indicator"
+						>
+							<input
+								type="search"
+								name="q"
+								class={ twerge.It("w-full sm:w-64 focus:outline-none border rounded-md pr-4 py-2 pl-10 bg-gray-700 text-white focus:ring-2 border-gray-600 focus:ring-green-500 text-sm") }
+								placeholder="Global Search..."
+								aria-label="Global Search"
+							/>
+							<div
+								class={ twerge.It("text-gray-500 absolute left-3 top-1/2 transform -translate-y-1/2") }
+							>
+								@components.Icon("search", templ.Attributes{"class": twerge.It("h-5 w-5")})
+							</div>
+							<button
+								type="submit"
+								class={ twerge.It("ml-2 px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-green-500") }
+							>
+								Search
+							</button>
+							<div id="global-search-indicator" class={ twerge.It("htmx-indicator ml-2") }>
+								<svg
+									class={ twerge.It("animate-spin h-5 w-5 text-white") }
+									xmlns="http://www.w3.org/2000/svg"
+									fill="none"
+									viewBox="0 0 24 24"
+								>
+									<circle
+										class={ twerge.It("opacity-25") }
+										cx="12"
+										cy="12"
+										r="10"
+										stroke="currentColor"
+										stroke-width="4"
+									></circle>
+									<path
+										class={ twerge.It("opacity-75") }
+										fill="currentColor"
+										d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+									></path>
+								</svg>
+							</div>
+						</form>
+					</div>
 				</div>
 				// Mobile navigation menu - toggled by button
+				// TODO: Consider adding search to mobile menu or a dedicated mobile search icon.
 				<div
 					x-show="isMenuOpen"
 					class={ twerge.It("pb-4 space-y-1 sm:hidden pt-2") }

@@ -33,6 +33,9 @@ func AddRoutes(
 		http.FileServer(http.FS(static.Dist)))
 
 	h.HandleFunc(
+		"GET /search",
+		routing.Make(HandleGlobalSearch(db)))
+	h.HandleFunc(
 		"GET /{$}",
 		routing.Make(HandleHome(db)))
 	h.HandleFunc(

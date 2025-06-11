@@ -1,0 +1,79 @@
+package views
+
+import (
+	"fmt"
+	"github.com/conneroisu/conneroh.com/internal/assets"
+	"github.com/conneroisu/conneroh.com/internal/routing"
+	"github.com/conneroisu/twerge"
+)
+
+templ GlobalSearchResults(query string, results []any) {
+	<div class={ twerge.It("px-4 container mx-auto py-8") }>
+		<h1 class={ twerge.It("text-3xl font-bold mb-6 text-white") }>
+			if query != "" {
+				Search results for: { query }
+			} else {
+				Global Search
+			}
+		</h1>
+
+		if len(results) == 0 {
+			if query != "" {
+				<p class={ twerge.It("text-xl text-gray-400") }>No results found for: { query }</p>
+			} else {
+				<p class={ twerge.It("text-xl text-gray-400") }>Enter a search query to find posts, projects, tags, or employments.</p>
+			}
+		} else {
+			<div class={ twerge.It("space-y-4") }>
+				for _, item := range results {
+					switch v := item.(type) {
+						case *assets.Post:
+							<div class={ twerge.It("p-4 bg-gray-800 rounded-lg shadow") }>
+								<h2 class={ twerge.It("text-xl font-semibold text-green-400") }>
+									<span class={ twerge.It("text-gray-500 font-normal text-sm") }>Post: </span>
+									<a href={ templ.URL(routing.PostPath(v.Slug)) } class={ twerge.It("hover:underline") }>{ v.Title }</a>
+								</h2>
+								if v.Description != "" {
+									<p class={ twerge.It("text-gray-300 mt-1") }>{ v.Description }</p>
+								}
+							</div>
+						case *assets.Project:
+							<div class={ twerge.It("p-4 bg-gray-800 rounded-lg shadow") }>
+								<h2 class={ twerge.It("text-xl font-semibold text-blue-400") }>
+									<span class={ twerge.It("text-gray-500 font-normal text-sm") }>Project: </span>
+									<a href={ templ.URL(routing.ProjectPath(v.Slug)) } class={ twerge.It("hover:underline") }>{ v.Title }</a>
+								</h2>
+								if v.Description != "" {
+									<p class={ twerge.It("text-gray-300 mt-1") }>{ v.Description }</p>
+								}
+							</div>
+						case *assets.Tag:
+							<div class={ twerge.It("p-4 bg-gray-800 rounded-lg shadow") }>
+								<h2 class={ twerge.It("text-xl font-semibold text-purple-400") }>
+									<span class={ twerge.It("text-gray-500 font-normal text-sm") }>Tag: </span>
+									<a href={ templ.URL(routing.TagPath(v.Slug)) } class={ twerge.It("hover:underline") }>{ v.Title }</a>
+								</h2>
+								if v.Description != "" {
+									<p class={ twerge.It("text-gray-300 mt-1") }>{ v.Description }</p>
+								}
+							</div>
+						case *assets.Employment:
+							<div class={ twerge.It("p-4 bg-gray-800 rounded-lg shadow") }>
+								<h2 class={ twerge.It("text-xl font-semibold text-yellow-400") }>
+									<span class={ twerge.It("text-gray-500 font-normal text-sm") }>Employment: </span>
+									<a href={ templ.URL(routing.EmploymentPath(v.Slug)) } class={ twerge.It("hover:underline") }>{ v.Title }</a>
+								</h2>
+								if v.Description != "" {
+									<p class={ twerge.It("text-gray-300 mt-1") }>{ v.Description }</p>
+								}
+							</div>
+						default:
+							<div class={ twerge.It("p-4 bg-gray-700 rounded-lg shadow") }>
+								<p class={ twerge.It("text-gray-300") }>Unknown item type in search results.</p>
+							</div>
+					}
+				}
+			</div>
+		}
+	</div>
+}
