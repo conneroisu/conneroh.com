@@ -1378,7 +1378,13 @@ div[style*="color:#f8f8f2;background-color:#272822"] td:last-child {
 }
 
 .highlight::-webkit-scrollbar-thumb:hover {
-	background: #777;
+        background: #777;
+}
+
+/* Preview banner mask for dynamic effects */
+.preview-mask {
+        mask: radial-gradient(30px at top,#0000 calc(100% - 1px),#000) 50%/55.5px 100%;
+        -webkit-mask: radial-gradient(30px at top,#0000 calc(100% - 1px),#000) 50%/55.5px 100%;
 }
 
 /* For Firefox */
