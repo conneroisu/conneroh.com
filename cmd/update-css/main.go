@@ -151,7 +151,6 @@ func run(ctx context.Context) error {
 		&allEmployments,
 	)))
 	comps = append(comps, views.Code500())
-	comps = append(comps, components.ThankYou())
 
 	return twerge.CodeGen(
 		twerge.Default(),
