@@ -36,6 +36,9 @@ func AddRoutes(
 		"GET /{$}",
 		routing.Make(HandleHome(db)))
 	h.HandleFunc(
+		"GET /search",
+		routing.Make(HandleGlobalSearch(db)))
+	h.HandleFunc(
 		"POST /contact",
 		routing.Make(handleContactForm()))
 	h.HandleFunc(

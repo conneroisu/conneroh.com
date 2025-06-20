@@ -159,6 +159,28 @@ templ header() {
 							</a>
 						</div>
 					</div>
+					// Right side: Search input (desktop)
+					<div
+						class={ twerge.It("items-center flex") }
+					>
+						<form
+							class={ twerge.It("relative hidden sm:block") }
+							hx-get="/search"
+							hx-trigger="keyup changed delay:500ms from:input"
+							hx-target="#bodiody"
+							hx-push-url="true"
+						>
+							<input
+								type="search"
+								name="q"
+								placeholder="Search..."
+								class={ twerge.It("w-64 px-10 py-2 pr-4 text-sm text-gray-300 bg-gray-800 border border-gray-700 rounded-md focus:outline-none focus:border-gray-500 placeholder-gray-500") }
+							/>
+							@components.Icon("search", templ.Attributes{
+								"class": twerge.It("absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500"),
+							})
+						</form>
+					</div>
 				</div>
 				// Mobile navigation menu - toggled by button
 				<div
@@ -211,6 +233,25 @@ templ header() {
 					>
 						Employments
 					</a>
+					// Mobile search input
+					<form
+						class={ twerge.It("relative px-3 mt-4") }
+						hx-get="/search"
+						hx-trigger="keyup changed delay:500ms from:input"
+						hx-target="#bodiody"
+						hx-push-url="true"
+					>
+						<input
+							type="search"
+							name="q"
+							placeholder="Search..."
+							class={ twerge.It("w-full px-10 py-2 pr-4 text-sm text-gray-300 bg-gray-800 border border-gray-700 rounded-md focus:outline-none focus:border-gray-500 placeholder-gray-500") }
+							@click="isMenuOpen = false"
+						/>
+						@components.Icon("search", templ.Attributes{
+							"class": twerge.It("absolute left-6 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500"),
+						})
+					</form>
 				</div>
 			</div>
 		</nav>

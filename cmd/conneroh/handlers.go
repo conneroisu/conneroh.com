@@ -725,6 +725,95 @@ func HandleEmployment(db *bun.DB) routing.APIFunc {
 // filter returns a paginated slice of items matching the search query, ranked by relevance across multiple fields.
 // The function scores and filters items concurrently, prioritizing matches in the title, description, content, tags, and icon fields depending on the item type.
 // Results are sorted by descending relevance before pagination. If the query is empty, all items are returned paginated.
+// HandleGlobalSearch handles the global search page. aka /search.
+func HandleGlobalSearch(db *bun.DB) routing.APIFunc {
+	return func(w http.ResponseWriter, r *http.Request) error {
+		query := r.URL.Query().Get("q")
+		pageStr := r.URL.Query().Get("page")
+		if pageStr == "" {
+			pageStr = "1"
+		}
+		page, err := strconv.Atoi(pageStr)
+		if err != nil {
+			return eris.Wrap(err, "failed to parse page")
+		}
+
+		// If empty query, show search page with no results
+		if query == "" {
+			routing.MorphableHandler(
+				layouts.Page,
+				views.GlobalSearch(query, nil, nil, nil, nil, page, 1),
+			).ServeHTTP(w, r)
+			return nil
+		}
+
+		// Load all data if not already cached
+		if len(allPosts) == 0 {
+			err = db.NewSelect().Model(&allPosts).
+				Order("updated_at").
+				Relation("Tags").
+				Relation("Posts").
+				Relation("Projects").
+				Scan(r.Context())
+			if err != nil {
+				return eris.Wrap(err, "failed to scan posts for search")
+			}
+		}
+		if len(allProjects) == 0 {
+			err = db.NewSelect().Model(&allProjects).
+				Order("created_at").
+				Relation("Tags").
+				Relation("Posts").
+				Relation("Projects").
+				Scan(r.Context())
+			if err != nil {
+				return eris.Wrap(err, "failed to scan projects for search")
+			}
+		}
+		if len(allTags) == 0 {
+			err = db.NewSelect().Model(&allTags).
+				Order("title").
+				Relation("Tags").
+				Relation("Posts").
+				Relation("Projects").
+				Relation("Employments").
+				Scan(r.Context())
+			if err != nil {
+				return eris.Wrap(err, "failed to scan tags for search")
+			}
+		}
+		if len(allEmployments) == 0 {
+			err = db.NewSelect().Model(&allEmployments).
+				Order("started_at").
+				Relation("Tags").
+				Relation("Posts").
+				Relation("Projects").
+				Relation("Employments").
+				Scan(r.Context())
+			if err != nil {
+				return eris.Wrap(err, "failed to scan employments for search")
+			}
+		}
+
+		// Search in all content types
+		postResults, _ := filter(allPosts, query, 1, 1000, func(p *assets.Post) string { return p.Title })
+		projectResults, _ := filter(allProjects, query, 1, 1000, func(p *assets.Project) string { return p.Title })
+		tagResults, _ := filter(allTags, query, 1, 1000, func(t *assets.Tag) string { return t.Title })
+		employmentResults, _ := filter(allEmployments, query, 1, 1000, func(e *assets.Employment) string { return e.Title })
+
+		// Calculate total pages based on all results
+		totalResults := len(postResults) + len(projectResults) + len(tagResults) + len(employmentResults)
+		totalPages := (totalResults + routing.MaxListLargeItems - 1) / routing.MaxListLargeItems
+
+		routing.MorphableHandler(
+			layouts.Page,
+			views.GlobalSearch(query, postResults, projectResults, tagResults, employmentResults, page, totalPages),
+		).ServeHTTP(w, r)
+
+		return nil
+	}
+}
+
 func filter[T any](
 	items []T,
 	query string,
