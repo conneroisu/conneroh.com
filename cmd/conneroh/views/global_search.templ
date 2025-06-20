@@ -1,0 +1,66 @@
+package views
+
+import (
+	"fmt"
+	"github.com/conneroisu/conneroh.com/internal/assets"
+	"github.com/conneroisu/twerge"
+)
+
+templ GlobalSearchResults(results []assets.GlobalSearchResult, query string) {
+	<div class={ twerge.It("px-4 container mx-auto py-8") }>
+		<h1 class={ twerge.It("text-3xl font-bold mb-6 text-white") }>
+			Search Results
+		</h1>
+		<div id="global-search-results">
+			@GlobalSearchResultsList(results, query)
+		</div>
+	</div>
+}
+
+templ GlobalSearchResultsList(results []assets.GlobalSearchResult, query string) {
+	if len(results) == 0 && query != "" {
+		<div class={ twerge.It("text-center py-12") }>
+			<p class={ twerge.It("text-gray-400 text-lg") }>
+				No results found for "{ query }"
+			</p>
+		</div>
+	} else if len(results) > 0 {
+		<div class={ twerge.It("space-y-6") }>
+			<p class={ twerge.It("text-gray-400 mb-4") }>
+				Found { fmt.Sprintf("%d", len(results)) } results for "{ query }"
+			</p>
+			for _, result := range results {
+				<div 
+					class={ twerge.It("bg-gray-800 rounded-lg p-6 hover:bg-gray-750 transition-colors cursor-pointer") }
+					hx-get={ result.Path }
+					hx-target="#bodiody"
+					hx-push-url="true"
+					preload="mouseover"
+				>
+					<div class={ twerge.It("flex items-start justify-between mb-2") }>
+						<h2 class={ twerge.It("text-xl font-semibold text-white") }>
+							{ result.Title }
+						</h2>
+						<span class={ twerge.It("text-sm px-3 py-1 rounded-full bg-gray-700 text-gray-300") }>
+							{ result.Type }
+						</span>
+					</div>
+					<p class={ twerge.It("text-gray-400 mb-3") }>
+						{ result.Description }
+					</p>
+					if len(result.Tags) > 0 {
+						<div class={ twerge.It("flex flex-wrap gap-2") }>
+							for _, tag := range result.Tags {
+								if tag != nil {
+									<span class={ twerge.It("text-xs px-2 py-1 rounded bg-gray-700 text-gray-300") }>
+										{ tag.Title }
+									</span>
+								}
+							}
+						</div>
+					}
+				</div>
+			}
+		</div>
+	}
+}

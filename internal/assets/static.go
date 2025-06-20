@@ -311,3 +311,14 @@ func (emb *Tag) String() string {
 func (emb *Employment) String() string {
 	return fmt.Sprintf("Employment: %s %s %s %d", emb.Title, emb.Slug, emb.Description, emb.ID)
 }
+
+// GlobalSearchResult represents a search result from any content type
+type GlobalSearchResult struct {
+	Type        string
+	Title       string
+	Description string
+	Slug        string
+	Path        string
+	Score       int
+	Tags        []*Tag
+}

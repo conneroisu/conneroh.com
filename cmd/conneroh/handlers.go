@@ -722,6 +722,82 @@ func HandleEmployment(db *bun.DB) routing.APIFunc {
 	}
 }
 
+
+// HandleGlobalSearch handles global search across all content types
+func HandleGlobalSearch(db *bun.DB) routing.APIFunc {
+	return func(w http.ResponseWriter, r *http.Request) error {
+		header := r.Header.Get(routing.HdrRequest)
+		query := r.URL.Query().Get("search")
+		
+		if query == "" {
+			if header == "" {
+				templ.Handler(layouts.Page(views.GlobalSearchResults([]assets.GlobalSearchResult{}, query))).ServeHTTP(w, r)
+			} else {
+				templ.Handler(views.GlobalSearchResultsList([]assets.GlobalSearchResult{}, query)).ServeHTTP(w, r)
+			}
+			return nil
+		}
+
+		// Ensure all data is loaded
+		if len(allPosts) == 0 {
+			err := db.NewSelect().Model(&allPosts).
+				Order("updated_at").
+				Relation("Tags").
+				Relation("Posts").
+				Relation("Projects").
+				Scan(r.Context())
+			if err != nil {
+				return eris.Wrap(err, "failed to scan posts for global search")
+			}
+		}
+		if len(allProjects) == 0 {
+			err := db.NewSelect().Model(&allProjects).
+				Order("updated_at").
+				Relation("Tags").
+				Relation("Posts").
+				Relation("Projects").
+				Scan(r.Context())
+			if err != nil {
+				return eris.Wrap(err, "failed to scan projects for global search")
+			}
+		}
+		if len(allTags) == 0 {
+			err := db.NewSelect().Model(&allTags).
+				Order("updated_at").
+				Relation("Tags").
+				Relation("Posts").
+				Relation("Projects").
+				Scan(r.Context())
+			if err != nil {
+				return eris.Wrap(err, "failed to scan tags for global search")
+			}
+		}
+		if len(allEmployments) == 0 {
+			err := db.NewSelect().Model(&allEmployments).
+				Order("updated_at").
+				Relation("Tags").
+				Relation("Posts").
+				Relation("Projects").
+				Relation("Employments").
+				Scan(r.Context())
+			if err != nil {
+				return eris.Wrap(err, "failed to scan employments for global search")
+			}
+		}
+
+		// Search across all content types
+		results := globalSearch(query)
+
+		if header == "" {
+			templ.Handler(layouts.Page(views.GlobalSearchResults(results, query))).ServeHTTP(w, r)
+		} else {
+			templ.Handler(views.GlobalSearchResultsList(results, query)).ServeHTTP(w, r)
+		}
+
+		return nil
+	}
+}
+
 // filter returns a paginated slice of items matching the search query, ranked by relevance across multiple fields.
 // The function scores and filters items concurrently, prioritizing matches in the title, description, content, tags, and icon fields depending on the item type.
 // Results are sorted by descending relevance before pagination. If the query is empty, all items are returned paginated.
@@ -872,4 +948,147 @@ func filter[T any](
 
 	// Paginate the filtered results
 	return routing.Paginate(filtered, page, pageSize)
+}
+
+// globalSearch searches across all content types and returns combined results
+func globalSearch(query string) []assets.GlobalSearchResult {
+	if query == "" {
+		return []assets.GlobalSearchResult{}
+	}
+
+	p := pool.New().WithMaxGoroutines(maxSearchRoutines)
+	query = strings.ToLower(query)
+
+	var mu sync.Mutex
+	results := make([]assets.GlobalSearchResult, 0)
+
+	// Search posts
+	for i := range allPosts {
+		post := allPosts[i]
+		p.Go(func() {
+			score := scoreContent(query, post.Title, post.Description, post.Content, post.Tags)
+			if score > 0 {
+				mu.Lock()
+				results = append(results, assets.GlobalSearchResult{
+					Type:        "post",
+					Title:       post.Title,
+					Description: post.Description,
+					Slug:        post.Slug,
+					Path:        post.PagePath(),
+					Score:       score,
+					Tags:        post.Tags,
+				})
+				mu.Unlock()
+			}
+		})
+	}
+
+	// Search projects
+	for i := range allProjects {
+		project := allProjects[i]
+		p.Go(func() {
+			score := scoreContent(query, project.Title, project.Description, project.Content, project.Tags)
+			if score > 0 {
+				mu.Lock()
+				results = append(results, assets.GlobalSearchResult{
+					Type:        "project",
+					Title:       project.Title,
+					Description: project.Description,
+					Slug:        project.Slug,
+					Path:        project.PagePath(),
+					Score:       score,
+					Tags:        project.Tags,
+				})
+				mu.Unlock()
+			}
+		})
+	}
+
+	// Search tags
+	for i := range allTags {
+		tag := allTags[i]
+		p.Go(func() {
+			score := scoreContent(query, tag.Title, tag.Description, tag.Content, nil)
+			if score > 0 {
+				mu.Lock()
+				results = append(results, assets.GlobalSearchResult{
+					Type:        "tag",
+					Title:       tag.Title,
+					Description: tag.Description,
+					Slug:        tag.Slug,
+					Path:        tag.PagePath(),
+					Score:       score,
+				})
+				mu.Unlock()
+			}
+		})
+	}
+
+	// Search employments
+	for i := range allEmployments {
+		employment := allEmployments[i]
+		p.Go(func() {
+			score := scoreContent(query, employment.Title, employment.Description, employment.Content, employment.Tags)
+			if score > 0 {
+				mu.Lock()
+				results = append(results, assets.GlobalSearchResult{
+					Type:        "employment",
+					Title:       employment.Title,
+					Description: employment.Description,
+					Slug:        employment.Slug,
+					Path:        employment.PagePath(),
+					Score:       score,
+					Tags:        employment.Tags,
+				})
+				mu.Unlock()
+			}
+		})
+	}
+
+	p.Wait()
+
+	// Sort by relevance score
+	sort.Slice(results, func(i, j int) bool {
+		return results[i].Score > results[j].Score
+	})
+
+	// Limit to top 20 results
+	if len(results) > 20 {
+		results = results[:20]
+	}
+
+	return results
+}
+
+// scoreContent calculates relevance score for content
+func scoreContent(query, title, description, content string, tags []*assets.Tag) int {
+	var score int
+	titleLower := strings.ToLower(title)
+	
+	// Title match (highest priority)
+	if strings.Contains(titleLower, query) {
+		score += 100
+		if titleLower == query {
+			score += 50
+		}
+	}
+	
+	// Description match
+	if strings.Contains(strings.ToLower(description), query) {
+		score += 50
+	}
+	
+	// Content match
+	if strings.Contains(strings.ToLower(content), query) {
+		score += 30
+	}
+	
+	// Tag matches
+	for _, tag := range tags {
+		if tag != nil && strings.Contains(strings.ToLower(tag.Title), query) {
+			score += 25
+		}
+	}
+	
+	return score
 }

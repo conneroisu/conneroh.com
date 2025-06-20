@@ -74,6 +74,9 @@ func AddRoutes(
 	h.HandleFunc(
 		"GET /employment/{slug...}",
 		routing.Make(HandleEmployment(db)))
+	h.HandleFunc(
+		"GET /search",
+		routing.Make(HandleGlobalSearch(db)))
 
 	h.HandleFunc(
 		"GET /500",
