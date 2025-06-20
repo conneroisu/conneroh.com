@@ -873,3 +873,191 @@ func filter[T any](
 	// Paginate the filtered results
 	return routing.Paginate(filtered, page, pageSize)
 }
+
+// globalSearchHandler handles global search across all content types
+func globalSearchHandler(db *bun.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		query := r.URL.Query().Get("search")
+		pageStr := r.URL.Query().Get("page")
+		
+		page, err := strconv.Atoi(pageStr)
+		if err != nil || page < 1 {
+			page = 1
+		}
+		
+		isHTMX := r.Header.Get("HX-Request") == "true"
+		
+		var results []views.GlobalSearchResult
+		var mu sync.Mutex
+		pageSize := 10
+		
+		if query != "" {
+			// Create a worker pool for concurrent searches
+			p := pool.New().WithMaxGoroutines(10)
+			
+			// Search Posts
+			p.Go(func() {
+				posts, _ := filter(allPosts, query, 1, 1000) // Get all matching posts
+				for _, post := range posts.Items {
+					score := calculateScore(post.Title, post.Description, post.Content, post.Tags, query)
+					if score > 0 {
+						mu.Lock()
+						results = append(results, views.GlobalSearchResult{
+							Type:        "post",
+							Title:       post.Title,
+							Description: post.Description,
+							Slug:        post.Slug,
+							Score:       score,
+						})
+						mu.Unlock()
+					}
+				}
+			})
+			
+			// Search Projects
+			p.Go(func() {
+				projects, _ := filter(allProjects, query, 1, 1000) // Get all matching projects
+				for _, project := range projects.Items {
+					score := calculateScore(project.Title, project.Description, project.Content, project.Tags, query)
+					if score > 0 {
+						mu.Lock()
+						results = append(results, GlobalSearchResult{
+							Type:        "project",
+							Title:       project.Title,
+							Description: project.Description,
+							Slug:        project.Slug,
+							Score:       score,
+						})
+						mu.Unlock()
+					}
+				}
+			})
+			
+			// Search Employments
+			p.Go(func() {
+				employments, _ := filter(allEmployments, query, 1, 1000) // Get all matching employments
+				for _, employment := range employments.Items {
+					// For employments, use Company as title
+					score := calculateScore(employment.Company, employment.Description, employment.Content, employment.Tags, query)
+					if score > 0 {
+						mu.Lock()
+						results = append(results, GlobalSearchResult{
+							Type:        "employment",
+							Title:       employment.Company,
+							Description: employment.Description,
+							Slug:        employment.Slug,
+							Score:       score,
+						})
+						mu.Unlock()
+					}
+				}
+			})
+			
+			// Search Tags
+			p.Go(func() {
+				tags, _ := filter(allTags, query, 1, 1000) // Get all matching tags
+				for _, tag := range tags.Items {
+					score := calculateScore(tag.Title, tag.Description, "", []assets.Tag{}, query)
+					if score > 0 {
+						mu.Lock()
+						results = append(results, GlobalSearchResult{
+							Type:        "tag",
+							Title:       tag.Title,
+							Description: tag.Description,
+							Slug:        tag.Slug,
+							Score:       score,
+						})
+						mu.Unlock()
+					}
+				}
+			})
+			
+			p.Wait()
+			
+			// Sort results by score (highest first)
+			sort.Slice(results, func(i, j int) bool {
+				return results[i].Score > results[j].Score
+			})
+		}
+		
+		// Paginate results
+		totalItems := len(results)
+		totalPages := (totalItems + pageSize - 1) / pageSize
+		
+		start := (page - 1) * pageSize
+		end := start + pageSize
+		if end > totalItems {
+			end = totalItems
+		}
+		
+		var paginatedResults []GlobalSearchResult
+		if start < totalItems {
+			paginatedResults = results[start:end]
+		}
+		
+		pagination := routing.Pagination[GlobalSearchResult]{
+			Items:       paginatedResults,
+			CurrentPage: page,
+			TotalPages:  totalPages,
+			TotalItems:  totalItems,
+			PageSize:    pageSize,
+		}
+		
+		// If HTMX request, return only the results component
+		if isHTMX {
+			component := views.GlobalSearchResults(&pagination, query)
+			err := component.Render(r.Context(), w)
+			if err != nil {
+				slog.Error("failed to render global search results", "error", err)
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			}
+			return
+		}
+		
+		// Otherwise, return the full page
+		component := layouts.Base(
+			"Search Results",
+			"Global search results",
+			views.GlobalSearchPage(&pagination, query),
+		)
+		err = component.Render(r.Context(), w)
+		if err != nil {
+			slog.Error("failed to render global search page", "error", err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		}
+	}
+}
+
+// calculateScore helper function for global search
+func calculateScore(title, description, content string, tags []assets.Tag, query string) int {
+	score := 0
+	queryLower := strings.ToLower(query)
+	
+	// Title match (highest priority)
+	if strings.Contains(strings.ToLower(title), queryLower) {
+		score += 100
+		if strings.ToLower(title) == queryLower {
+			score += 50 // Exact match bonus
+		}
+	}
+	
+	// Description match
+	if strings.Contains(strings.ToLower(description), queryLower) {
+		score += 50
+	}
+	
+	// Content match
+	if strings.Contains(strings.ToLower(content), queryLower) {
+		score += 30
+	}
+	
+	// Tag match
+	for _, tag := range tags {
+		if strings.Contains(strings.ToLower(tag.Title), queryLower) {
+			score += 25
+			break
+		}
+	}
+	
+	return score
+}

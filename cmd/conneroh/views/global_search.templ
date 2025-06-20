@@ -1,0 +1,197 @@
+package views
+
+import (
+	"fmt"
+	"github.com/conneroisu/conneroh.com/cmd/conneroh/classes/twerge"
+	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
+	"github.com/conneroisu/conneroh.com/internal/routing"
+)
+
+// GlobalSearchResult represents a search result from any content type
+type GlobalSearchResult struct {
+	Type        string
+	Title       string
+	Description string
+	Slug        string
+	Score       int
+}
+
+// GlobalSearchPage renders the full global search page
+templ GlobalSearchPage(pagination *routing.Pagination[GlobalSearchResult], query string) {
+	<div
+		class={ twerge.It("container lg:px-8 sm:px-6 px-4 mx-auto py-8") }
+	>
+		<h1
+			class={ twerge.It("font-bold text-3xl mb-6") }
+		>
+			Search Results
+		</h1>
+		
+		// Search input
+		<div
+			class={ twerge.It("border-gray-700 border rounded-md mb-6") }
+		>
+			<div
+				class={ twerge.It("border-gray-700 border-b p-3") }
+			>
+				<div
+					class={ twerge.It("relative") }
+				>
+					<input
+						id="global-search-page"
+						class={ twerge.It("w-full focus:outline-none border rounded-md pr-4 py-2 pl-10 bg-gray-700 text-white focus:ring-2 border-gray-600 focus:ring-green-500") }
+						placeholder="Search across all content..."
+						hx-get="/search"
+						hx-target="#global-search-results"
+						value={ query }
+						maxLength="100"
+						name="search"
+						hx-push-url="true"
+						hx-trigger="keyup changed delay:300ms"
+						hx-indicator="#global-search-indicator"
+						aria-label="Global Search"
+					/>
+					<div
+						class={ twerge.It("text-gray-500 absolute left-3 top-2.5") }
+					>
+						@components.Icon("search", templ.Attributes{})
+					</div>
+					<div
+						id="global-search-indicator"
+						class={ twerge.It("htmx-indicator top-2.5 text-green-500 absolute right-3") }
+					>
+						<svg
+							class={ twerge.It("animate-spin h-5 w-5") }
+							xmlns="http://www.w3.org/2000/svg"
+							fill="none"
+							viewBox="0 0 24 24"
+						>
+							<circle
+								class={ twerge.It("opacity-25") }
+								cx="12"
+								cy="12"
+								r="10"
+								stroke="currentColor"
+								stroke-width="4"
+							></circle>
+							<path
+								class={ twerge.It("opacity-75") }
+								fill="currentColor"
+								d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+							></path>
+						</svg>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		// Results container
+		<div id="global-search-results">
+			@GlobalSearchResults(pagination, query)
+		</div>
+	</div>
+}
+
+// GlobalSearchResults renders just the search results (for HTMX updates)
+templ GlobalSearchResults(pagination *routing.Pagination[GlobalSearchResult], query string) {
+	if query == "" {
+		<div
+			class={ twerge.It("text-gray-400 text-center py-8") }
+		>
+			Start typing to search across all content...
+		</div>
+	} else if pagination.TotalItems == 0 {
+		<div
+			class={ twerge.It("text-gray-400 text-center py-8") }
+		>
+			No results found for "{ query }"
+		</div>
+	} else {
+		<div
+			class={ twerge.It("space-y-4") }
+		>
+			// Results summary
+			<div
+				class={ twerge.It("text-gray-400 text-sm mb-4") }
+			>
+				Found { fmt.Sprintf("%d", pagination.TotalItems) } results for "{ query }"
+			</div>
+			
+			// Results list
+			for _, result := range pagination.Items {
+				<div
+					class={ twerge.It("border-gray-700 hover:border-gray-600 border rounded-md transition-colors p-4") }
+				>
+					<div
+						class={ twerge.It("items-start justify-between flex") }
+					>
+						<div
+							class={ twerge.It("flex-1") }
+						>
+							// Type badge
+							<span
+								class={ twerge.It("uppercase text-xs font-medium px-2 py-1 rounded-md mb-2 inline-block", getTypeBadgeClass(result.Type)) }
+							>
+								{ result.Type }
+							</span>
+							
+							// Title with link
+							<h3
+								class={ twerge.It("font-medium text-lg mb-2") }
+							>
+								<a
+									href={ templ.SafeURL(fmt.Sprintf("/%ss/%s", result.Type, result.Slug)) }
+									hx-get={ fmt.Sprintf("/%ss/%s", result.Type, result.Slug) }
+									hx-target="#bodiody"
+									hx-push-url="true"
+									class={ twerge.It("hover:text-green-400 transition-colors") }
+								>
+									{ result.Title }
+								</a>
+							</h3>
+							
+							// Description
+							if result.Description != "" {
+								<p
+									class={ twerge.It("text-gray-400 text-sm") }
+								>
+									{ result.Description }
+								</p>
+							}
+						</div>
+					</div>
+				</div>
+			}
+			
+			// Pagination
+			if pagination.TotalPages > 1 {
+				<div
+					class={ twerge.It("mt-8") }
+				>
+					@components.Pagination(
+						pagination.CurrentPage,
+						pagination.TotalPages,
+						fmt.Sprintf("/search?search=%s", query),
+						"#global-search-results",
+					)
+				</div>
+			}
+		</div>
+	}
+}
+
+// getTypeBadgeClass returns the appropriate CSS classes for content type badges
+func getTypeBadgeClass(contentType string) string {
+	switch contentType {
+	case "post":
+		return "bg-blue-900 text-blue-300"
+	case "project":
+		return "bg-green-900 text-green-300"
+	case "employment":
+		return "bg-purple-900 text-purple-300"
+	case "tag":
+		return "bg-yellow-900 text-yellow-300"
+	default:
+		return "bg-gray-700 text-gray-300"
+	}
+}
