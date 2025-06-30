@@ -227,14 +227,14 @@
               skopeo
 
               (
-                pkgs.buildGoModule rec {
+                pkgs.buildGoModule (finalAttrs: {
                   pname = "copygen";
                   version = "0.4.1";
 
                   src = pkgs.fetchFromGitHub {
                     owner = "switchupcb";
                     repo = "copygen";
-                    rev = "v${version}";
+                    rev = "v${finalAttrs.version}";
                     sha256 = "sha256-gdoUvTla+fRoYayUeuRha8Dkix9ACxlt0tkac0CRqwA=";
                   };
 
@@ -245,7 +245,7 @@
                   ldflags = [
                     "-s"
                     "-w"
-                    "-X main.version=${version}"
+                    "-X main.version=${finalAttrs.version}"
                   ];
 
                   meta = with lib; {
@@ -254,7 +254,7 @@
                     license = licenses.mit;
                     mainProgram = "copygen";
                   };
-                }
+                })
               )
             ]
             ++ builtins.attrValues scriptPackages;
