@@ -64,19 +64,6 @@
             runtimeInputs = with pkgs; [go bun];
             description = "Run all go tests";
           };
-          test-ci = {
-            text = rooted ''
-              bun install
-              cd "$REPO_ROOT" && bun test:run
-            '';
-            runtimeInputs = with pkgs; [
-              bun
-              nodejs_20
-              playwright-driver
-              playwright-driver.browsers
-            ];
-            description = "Run Vitest tests for CI";
-          };
           lint = {
             text = rooted ''
               gum log --structured --level debug "cmd" txt "templ generate '$REPO_ROOT'"
@@ -168,17 +155,6 @@
               pkgs.lib.mapAttrsToList (name: script: ''echo "  ${name} - ${script.description}"'') scripts
             )}
           '';
-
-          env = {
-            PLAYWRIGHT_BROWSERS_PATH = "${pkgs.playwright-driver.browsers}";
-            PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = "1";
-            PLAYWRIGHT_NODEJS_PATH = "${pkgs.nodejs_20}/bin/node";
-
-            # Browser textutable paths
-            PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH = "${pkgs.playwright-driver.browsers}/chromium-1155/chrome-linux/chrome";
-            PLAYWRIGHT_FIREFOX_EXECUTABLE_PATH = "${pkgs.playwright-driver.browsers}/firefox-1468/firefox/firefox";
-            PLAYWRIGHT_WEBKIT_EXECUTABLE_PATH = "${pkgs.playwright-driver.browsers}/webkit-2010/webkit-linux/minibrowser";
-          };
           shell-packages = with pkgs;
             [
               alejandra # Nix
@@ -219,8 +195,6 @@
 
               # Testing
               nodejs_20
-              playwright-driver
-              playwright-driver.browsers
 
               flyctl # Infra
               openssl.dev
@@ -260,7 +234,7 @@
             ++ builtins.attrValues scriptPackages;
         in {
           default = pkgs.mkShell {
-            inherit shellHook env;
+            inherit shellHook;
             packages = shell-packages;
           };
         };
@@ -367,74 +341,6 @@
                 '')
               ];
             };
-            runTests = pkgs.writeShellApplication {
-              name = "runTests";
-              runtimeInputs = with pkgs; [
-                bun
-                nodejs_24
-                playwright-driver
-                playwright-driver.browsers
-                doppler
-                air
-                templ
-                tailwindcss
-                go_1_24
-                inputs.bun2nix.packages.${system}.default
-              ];
-              bashOptions = ["errexit" "pipefail"];
-              excludeShellChecks = ["SC2317"];
-              text = ''
-                set -e
-
-                echo "Running tests..."
-
-                # Install dependencies
-                bun install
-
-                # Generate necessary files
-                ${preBuild}
-
-                # Build and start the application directly (avoid air for cleaner shutdown)
-                echo "Building application for browser tests..."
-                go build -o ./tmp/test-server ./main.go
-
-                echo "Starting application for browser tests..."
-                ./tmp/test-server &
-                APP_PID=$!
-
-                # Function to cleanup all processes
-                cleanup() {
-                  echo "Cleaning up..."
-                  # Kill the entire process group to catch all children
-                  kill -TERM -"$APP_PID" 2>/dev/null || true
-                  # Also kill any test-server and doppler processes
-                  pkill -f "test-server" 2>/dev/null || true
-                  # Give processes time to clean up
-                  sleep 1
-                  # Force kill if still running
-                  kill -KILL -"$APP_PID" 2>/dev/null || true
-                  pkill -9 -f "test-server" 2>/dev/null || true
-                  echo "Cleanup completed"
-                }
-
-                # Set up trap to cleanup on exit
-                trap cleanup EXIT
-
-                # Wait for server to be ready
-                echo "Waiting for server to start..."
-                timeout 30 bash -c 'until curl -s http://localhost:8080 > /dev/null 2>&1; do sleep 1; done'
-
-                # Run all tests
-                echo "Running Vitest tests..."
-                npx playwright install
-                bun test:run
-                TEST_EXIT_CODE=$?
-
-                # Cleanup will be called by the trap
-                exit $TEST_EXIT_CODE
-              '';
-            };
-
             deployPackage = pkgs.writeShellApplication {
               name = "deployPackage";
               runtimeInputs = with pkgs; [doppler skopeo flyctl cacert];
