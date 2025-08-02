@@ -17,13 +17,13 @@ Alpine.plugin(intersect);
 Alpine.plugin(anchor);
 Alpine.start();
 
-htmx.config.globalViewTransitions = true;
-
 // Scroll to top when HTMX replaces main content
 document.addEventListener('htmx:afterSwap', function(event) {
+  console.log(JSON.stringify(event));
+  const target = event.target as HTMLElement;
   // Check if the swapped element is the main content area
-  if ((event as any).detail.target.id === 'bodiody') {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (target && target.id && target.id.startsWith('bodiody')) {
+    window.scrollTo({ top: 0, behavior: 'instant' });
   }
 });
 
