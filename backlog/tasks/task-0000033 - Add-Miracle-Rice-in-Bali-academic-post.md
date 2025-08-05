@@ -1,9 +1,10 @@
 ---
 id: task-0000033
 title: Add Miracle Rice in Bali academic post
-status: To Do
+status: Done
 assignee: []
 created_date: '2025-08-05'
+updated_date: '2025-08-05'
 labels:
   - content
   - academic
