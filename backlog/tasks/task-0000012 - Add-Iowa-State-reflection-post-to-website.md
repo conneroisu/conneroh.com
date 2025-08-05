@@ -1,9 +1,10 @@
 ---
 id: task-0000012
 title: Add Iowa State reflection post to website
-status: To Do
+status: Done
 assignee: []
 created_date: '2025-08-05'
+updated_date: '2025-08-05'
 labels:
   - content
   - blog
