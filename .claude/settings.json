@@ -1,23 +1,87 @@
 {
   "permissions": {
     "allow": [
-      "Bash(nix develop:*)",
-      "Bash(npm run test:*)"
+      "Bash(mkdir:*)",
+      "Bash(uv:*)",
+      "Bash(find:*)",
+      "Bash(mv:*)",
+      "Bash(grep:*)",
+      "Bash(npm:*)",
+      "Bash(ls:*)",
+      "Bash(cp:*)",
+      "Write",
+      "Edit",
+      "Bash(chmod:*)",
+      "Bash(touch:*)"
     ],
-    "deny": [
-      "Bash(curl:*)"
+    "deny": []
+  },
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun $(git rev-parse --show-toplevel)/.claude/hooks/index.ts user_prompt_submit"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun $(git rev-parse --show-toplevel)/.claude/hooks/index.ts pre_tool_use"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun $(git rev-parse --show-toplevel)/.claude/hooks/index.ts post_tool_use"
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun $(git rev-parse --show-toplevel)/.claude/hooks/index.ts notification"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun $(git rev-parse --show-toplevel)/.claude/hooks/index.ts stop --chat"
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bun $(git rev-parse --show-toplevel)/.claude/hooks/index.ts subagent_stop --chat"
+          }
+        ]
+      }
     ]
-  },
-  "env": {
-    "CLAUDE_CODE_ENABLE_TELEMETRY": "0"
-  },
-  "mcpServers": {
-    "playwright": {
-      "command": "npx",
-      "args": [
-        "@playwright/mcp@latest",
-        "--vision"
-      ]
-    }
   }
 }
