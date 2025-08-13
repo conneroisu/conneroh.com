@@ -19,5 +19,4 @@ Add Chart.js charting library tag for content categorization
 - [ ] Tag appears in tag list
 - [ ] Tag can be assigned to posts/projects
 - [ ] Tag filtering works correctly
-- [ ] - [ ] Tag is in the frameworks directory
-- [ ]
+- [ ] Tag is found in the frameworks directory
