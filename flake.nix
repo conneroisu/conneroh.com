@@ -253,7 +253,7 @@
           runTests = {
             type = "app";
             meta.description = "Run all tests (unit and browser)";
-            program = "${self.packages.${system}.tests}/bin/tests";
+            program = "${pkgs.templ}/bin/templ generate && ${self.packages.${system}.tests}/bin/tests";
           };
         };
 
