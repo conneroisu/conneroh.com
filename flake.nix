@@ -253,7 +253,7 @@
           runTests = {
             type = "app";
             meta.description = "Run all tests (unit and browser)";
-            program = "${self.packages.${system}.runTests}/bin/runTests";
+            program = "${self.packages.${system}.tests}/bin/tests";
           };
         };
 
