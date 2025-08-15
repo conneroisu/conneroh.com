@@ -16,7 +16,6 @@ package-lock.json
 # Testing
 **/__screenshots__/
 coverage/
-.vitest-cache/
 
 # Generated Build Files
 cmd/conneroh/classes/classes.go

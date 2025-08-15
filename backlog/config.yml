@@ -28,12 +28,11 @@ labels: [
   "webpack", "rollup", "parcel", "esbuild", "turbopack", "vite", "snowpack",
   
   # Testing & Quality
-  "testing", "unit-testing", "integration-testing", "e2e-testing", "jest", "vitest", "mocha",
-  "chai", "cypress", "playwright", "puppeteer", "selenium", "testng", "junit", "pytest",
+  "testing", "unit-testing", "integration-testing", "e2e-testing", "jest", 
   
   # UI/UX & Design
   "ui", "ux", "design", "design-system", "accessibility", "responsive", "css", "scss", "sass",
-  "tailwind", "bootstrap", "material-ui", "chakra", "antd", "styled-components", "emotion",
+  "tailwind", "bootstrap", "material-ui", "antd", "styled-components", "emotion",
   
   # Task Categories
   "bug", "feature", "enhancement", "refactor", "maintenance", "optimization", "security",
