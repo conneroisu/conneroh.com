@@ -58,10 +58,11 @@
           tests = {
             text = rooted ''
               cd "$REPO_ROOT"
+              templ generate "$REPO_ROOT"
               go test -v ./...
               bun run test
             '';
-            runtimeInputs = with pkgs; [go bun];
+            runtimeInputs = with pkgs; [go bun templ];
             description = "Run all go tests";
           };
           lint = {
@@ -253,7 +254,7 @@
           runTests = {
             type = "app";
             meta.description = "Run all tests (unit and browser)";
-            program = "${pkgs.templ}/bin/templ generate && ${self.packages.${system}.tests}/bin/tests";
+            program = "${self.packages.${system}.tests}/bin/tests";
           };
         };
 
