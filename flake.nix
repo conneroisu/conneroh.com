@@ -60,7 +60,7 @@
               cd "$REPO_ROOT"
               templ generate "$REPO_ROOT"
               go test -v ./...
-              bun run test
+              cd -
             '';
             runtimeInputs = with pkgs; [go bun templ];
             description = "Run all go tests";
