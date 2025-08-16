@@ -106,9 +106,6 @@ interpolate - Interpolate templates; Usage: interpolate input_file start_marker 
 lint - Run Nix/Go Linting Steps.
 reset-db - Reset the database
 run - Run the application with air for hot reloading
-test - Run Vitest tests
-test-ci - Run Vitest tests for CI
-test-ui - Run Vitest with UI
 tests - Run all go tests
 <!-- END_MARKER -->
 ```
@@ -145,7 +142,7 @@ To update the database with new or modified content:
 
 ```bash
 # With Nix
-update
+nix develop -c update
 
 # Without Nix
 go run ./cmd/update
@@ -153,37 +150,10 @@ go run ./cmd/update
 
 ## Testing
 
-The project uses Vitest with Playwright for comprehensive testing including unit tests and browser-based integration tests.
-
 ### Running Tests
 
 ```bash
-# Enter development shell (if using Nix)
-nix develop
-
-# Install dependencies
-bun install
-
-# Run all tests
-test
-# or
-bun test
-
-# Run tests with UI
-test-ui
-# or
-bun test:ui
-
-# Run tests once (CI mode)
-test-ci
-# or
-bun test:run
-
-# Coverage report
-bun test:coverage
-
-# Run comprehensive test suite (includes app startup)
-nix run .#runTests
+nix develop -c tests
 ```
 
 ### Test Structure

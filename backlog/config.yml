@@ -1,7 +1,71 @@
 project_name: "conneroh.com"
 default_status: "To Do"
 statuses: ["To Do", "In Progress", "Done"]
-labels: []
+labels: [
+  # Development Areas
+  "frontend", "backend", "fullstack", "mobile", "desktop", "web", "api", "database", "devops", "infrastructure",
+  
+  # Technology Stacks & Frameworks  
+  "react", "vue", "angular", "svelte", "next", "nuxt", "gatsby", "vite", "astro", "remix",
+  "node", "express", "fastify", "nest", "koa", "django", "flask", "rails", "laravel", "spring",
+  "asp-net", "gin", "echo", "fiber", "chi", "actix", "rocket", "warp", "axum",
+  
+  # Programming Languages
+  "javascript", "typescript", "python", "java", "csharp", "cpp", "rust", "go", "php", "ruby",
+  "kotlin", "swift", "dart", "scala", "elixir", "clojure", "haskell", "ocaml", "fsharp", "erlang",
+  "lua", "perl", "r", "matlab", "julia", "assembly", "verilog", "vhdl", "sql",
+  
+  # Databases & Storage
+  "postgresql", "mysql", "sqlite", "mongodb", "redis", "elasticsearch", "neo4j", "cassandra",
+  "dynamodb", "firestore", "supabase", "planetscale", "turso", "clickhouse", "influxdb",
+  
+  # Cloud & Infrastructure
+  "aws", "azure", "gcp", "cloudflare", "vercel", "netlify", "heroku", "digitalocean", "linode",
+  "docker", "kubernetes", "terraform", "ansible", "helm", "istio", "prometheus", "grafana",
+  
+  # Development Tools
+  "git", "github", "gitlab", "bitbucket", "jenkins", "github-actions", "circleci", "travis-ci",
+  "webpack", "rollup", "parcel", "esbuild", "turbopack", "vite", "snowpack",
+  
+  # Testing & Quality
+  "testing", "unit-testing", "integration-testing", "e2e-testing", "jest", 
+  
+  # UI/UX & Design
+  "ui", "ux", "design", "design-system", "accessibility", "responsive", "css", "scss", "sass",
+  "tailwind", "bootstrap", "material-ui", "antd", "styled-components", "emotion",
+  
+  # Task Categories
+  "bug", "feature", "enhancement", "refactor", "maintenance", "optimization", "security",
+  "documentation", "research", "spike", "proof-of-concept", "prototype", "mvp",
+  
+  # Priority & Status
+  "critical", "urgent", "high-priority", "medium-priority", "low-priority", "hot-fix",
+  "technical-debt", "deprecated", "legacy", "migration", "upgrade", "rollback",
+  
+  # Development Phases  
+  "planning", "development", "staging", "production", "alpha", "beta", "stable",
+  "deployment", "ci-cd", "monitoring", "logging", "analytics",
+  
+  # Architecture & Patterns
+  "microservices", "monolith", "serverless", "jamstack", "spa", "ssr", "ssg", "pwa",
+  "rest", "graphql", "grpc", "websocket", "oauth", "jwt", "auth", "session",
+  
+  # Content & Media
+  "content", "blog", "documentation", "tutorial", "guide", "video", "podcast", "image",
+  "seo", "cms", "markdown", "mdx", "latex", "pdf", "json", "yaml", "xml", "csv",
+  
+  # Performance & Optimization  
+  "performance", "caching", "cdn", "compression", "lazy-loading", "code-splitting",
+  "bundling", "minification", "tree-shaking", "dead-code-elimination",
+  
+  # Specialized Areas
+  "machine-learning", "ai", "data-science", "blockchain", "iot", "embedded", "robotics",
+  "game-dev", "ar-vr", "computer-vision", "nlp", "data-viz", "analytics",
+  
+  # Tools & Utilities
+  "cli", "automation", "scripting", "workflow", "pipeline", "backup", "migration",
+  "validation", "linting", "formatting", "type-checking", "bundler", "compiler"
+]
 milestones: []
 date_format: yyyy-mm-dd
 max_column_width: 20
