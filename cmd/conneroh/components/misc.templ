@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/conneroisu/conneroh.com/internal/assets"
 	"github.com/conneroisu/conneroh.com/internal/routing"
-	"github.com/conneroisu/twerge"
 	"strconv"
 )
 
@@ -19,7 +18,7 @@ templ TagControl(
 	tag *assets.Tag,
 ) {
 	<div
-		class={ twerge.It("text-sm px-3 items-center hover:underline bg-emerald-800 w-full transition-colors py-1 hover:bg-emerald-600 h-8 rounded-sm justify-between font-medium text-emerald-300 hover:text-white flex flex-row") }
+		class={ "text-sm px-3 items-center hover:underline bg-emerald-800 w-full transition-colors py-1 hover:bg-emerald-600 h-8 rounded-sm justify-between font-medium text-emerald-300 hover:text-white flex flex-row" }
 		hx-get={ tag.PagePath() }
 		hx-target="#bodiody"
 		hx-push-url="true"
@@ -27,14 +26,14 @@ templ TagControl(
 		preload="mouseover"
 	>
 		<div
-			class={ twerge.It("items-center flex pr-3") }
+			class={ "items-center flex pr-3" }
 		>
 			@Icon(tag.Icon, templ.Attributes{
 				"style": "width: 2em; height: 2em;",
 			})
 		</div>
 		<div
-			class={ twerge.It("items-center flex") }
+			class={ "items-center flex" }
 		>
 			<a>
 				{ tag.Title }
@@ -45,12 +44,12 @@ templ TagControl(
 
 // Main pagination component
 templ Pagination(page, pageCount int, target routing.PluralPath) {
-	<div class={ twerge.It("flex justify-center items-center mt-8 space-x-2") }>
+	<div class={ "flex justify-center items-center mt-8 space-x-2" }>
 		@previousPageButton(page, target)
-		<div class={ twerge.It("hidden md:flex space-x-2") }>
+		<div class={ "hidden md:flex space-x-2" }>
 			@renderPageNumbers(page, pageCount, target, routing.MaxDesktopPageNumber)
 		</div>
-		<div class={ twerge.It("flex md:hidden space-x-2") }>
+		<div class={ "flex md:hidden space-x-2" }>
 			@renderPageNumbers(page, pageCount, target, routing.MaxMobilePageNumber)
 		</div>
 		@nextPageButton(page, pageCount, target)
@@ -67,13 +66,13 @@ templ renderPageNumbers(page, pageCount int, target routing.PluralPath, maxPageN
 // Reusable page button component
 templ pageButton(pageNum string, currentPage int, target routing.PluralPath) {
 	if pageNum == strconv.Itoa(currentPage) {
-		<span class={ twerge.It(activeBtnStyle) }>
+		<span class={ activeBtnStyle }>
 			{ pageNum }
 		</span>
 	} else {
 		if pageNum == "..." {
 			@Icon("ellipsis", templ.Attributes{
-				"class": twerge.It(ellipsisStyle),
+				"class": ellipsisStyle,
 			})
 		} else {
 			<a
@@ -82,7 +81,7 @@ templ pageButton(pageNum string, currentPage int, target routing.PluralPath) {
 				hx-target="#listi"
 				hx-include="[name='search']"
 				hx-push-url="true"
-				class={ twerge.It(inactiveBtnStyle) }
+				class={ inactiveBtnStyle }
 			>
 				{ pageNum }
 			</a>
@@ -98,14 +97,14 @@ templ previousPageButton(currentPage int, target routing.PluralPath) {
 			hx-target="#listi"
 			hx-include="[name='search']"
 			hx-push-url="true"
-			class={ twerge.It(inactiveBtnStyle + " flex items-center") }
+			class={ inactiveBtnStyle + " flex items-center" }
 			aria-label="Previous page"
 		>
 			{ "<" }
 		</a>
 	} else {
 		<span
-			class={ twerge.It(inactiveBtnStyle + " opacity-50 flex items-center") }
+			class={ inactiveBtnStyle + " opacity-50 flex items-center" }
 			aria-disabled="true"
 		>
 			{ "<" }
@@ -122,14 +121,14 @@ templ nextPageButton(currentPage, pageCount int, target routing.PluralPath) {
 			hx-include="[name='search']"
 			hx-swap="innerHTML"
 			hx-push-url="true"
-			class={ twerge.It(inactiveBtnStyle + " flex items-center") }
+			class={ inactiveBtnStyle + " flex items-center" }
 			aria-label="Next page"
 		>
 			{ ">" }
 		</a>
 	} else {
 		<span
-			class={ twerge.It(inactiveBtnStyle + " opacity-50 flex items-center") }
+			class={ inactiveBtnStyle + " opacity-50 flex items-center" }
 			aria-disabled="true"
 		>
 			{ ">" }

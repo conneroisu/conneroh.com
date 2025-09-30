@@ -5,38 +5,37 @@ import (
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
 	"github.com/conneroisu/conneroh.com/internal/assets"
 	"github.com/conneroisu/conneroh.com/internal/routing"
-	"github.com/conneroisu/twerge"
 )
 
 templ Tag(
 	tag *assets.Tag,
 ) {
 	<div
-		class={ twerge.It("px-4 container mx-auto py-8") }
+		class={ "px-4 container mx-auto py-8" }
 	>
 		<header
-			class={ twerge.It("mb-12 text-center") }
+			class={ "mb-12 text-center" }
 		>
 			@components.Icon(tag.Icon, templ.Attributes{
 				"style": "width: 8em; height: 8em;",
-				"class": twerge.It("p-4 inline-block"),
+				"class": "p-4 inline-block",
 			})
 			<h1
-				class={ twerge.It("font-bold text-white mb-4 text-4xl") }
+				class={ "font-bold text-white mb-4 text-4xl" }
 			>
 				{ tag.Title }
 			</h1>
 			<div
-				class={ twerge.It("text-xl text-gray-300 max-w-2xl mx-auto") }
+				class={ "text-xl text-gray-300 max-w-2xl mx-auto" }
 			>
 				{ tag.Description }
 			</div>
 		</header>
 		<div
-			class={ twerge.It("bg-gray-800 rounded-lg mb-8 overflow-hidden p-6 shadow-lg") }
+			class={ "bg-gray-800 rounded-lg mb-8 overflow-hidden p-6 shadow-lg" }
 		>
 			<div
-				class={ twerge.It("max-w-none my-6 text-gray-300 leading-relaxed") }
+				class={ "max-w-none my-6 text-gray-300 leading-relaxed" }
 			>
 				<article>
 					@templ.Raw(tag.Content)
@@ -45,24 +44,24 @@ templ Tag(
 		</div>
 		<div
 			x-data="{ activeTab: 'posts' }"
-			class={ twerge.It("mb-8") }
+			class={ "mb-8" }
 		>
 			// Tabs
 			<div
-				class={ twerge.It("border-b border-gray-700 mb-6") }
+				class={ "border-b border-gray-700 mb-6" }
 			>
 				<nav
-					class={ twerge.It("space-x-8 flex") }
+					class={ "space-x-8 flex" }
 				>
 					<button
 						@click="activeTab = 'posts'"
 						:aria-selected="activeTab === 'posts'"
 						:class={
 							fmt.Sprintf("{'%s': activeTab === 'posts', '%s': activeTab !== 'posts'}",
-								twerge.It("text-green-500 border-green-500"),
-								twerge.It("text-gray-400 hover:text-gray-300 border-transparent")),
+								"text-green-500 border-green-500",
+								"text-gray-400 hover:text-gray-300 border-transparent"),
 						}
-						class={ twerge.It("px-1 sm:text-base text-sm font-medium py-4 border-b-2") }
+						class={ "px-1 sm:text-base text-sm font-medium py-4 border-b-2" }
 					>
 						Posts ({ fmt.Sprintf("%d", len(tag.Posts)) })
 					</button>
@@ -71,10 +70,10 @@ templ Tag(
 						:aria-selected="activeTab === 'projects'"
 						:class={
 							fmt.Sprintf("{'%s': activeTab === 'projects', '%s': activeTab !== 'projects'}",
-								twerge.It("text-green-500 border-green-500"),
-								twerge.It("text-gray-400 hover:text-gray-300 border-transparent")),
+								"text-green-500 border-green-500",
+								"text-gray-400 hover:text-gray-300 border-transparent"),
 						}
-						class={ twerge.It("px-1 sm:text-base text-sm font-medium py-4 border-b-2") }
+						class={ "px-1 sm:text-base text-sm font-medium py-4 border-b-2" }
 					>
 						Projects ({ fmt.Sprintf("%d", len(tag.Projects)) })
 					</button>
@@ -83,10 +82,10 @@ templ Tag(
 						:aria-current="activeTab === 'related'"
 						:class={
 							fmt.Sprintf("{'%s': activeTab === 'related', '%s': activeTab !== 'related'}",
-								twerge.It("text-green-500 border-green-500"),
-								twerge.It("text-gray-400 hover:text-gray-300 border-transparent")),
+								"text-green-500 border-green-500",
+								"text-gray-400 hover:text-gray-300 border-transparent"),
 						}
-						class={ twerge.It("px-1 sm:text-base text-sm font-medium py-4 border-b-2") }
+						class={ "px-1 sm:text-base text-sm font-medium py-4 border-b-2" }
 					>
 						Related Tags ({ fmt.Sprintf("%d", len(tag.Tags)) })
 					</button>

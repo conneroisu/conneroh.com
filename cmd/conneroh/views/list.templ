@@ -5,7 +5,6 @@ import (
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
 	"github.com/conneroisu/conneroh.com/internal/assets"
 	"github.com/conneroisu/conneroh.com/internal/routing"
-	"github.com/conneroisu/twerge"
 )
 
 templ List(
@@ -19,10 +18,10 @@ templ List(
 	pageCount int,
 ) {
 	<div
-		class={ twerge.It("px-4 container mx-auto py-8") }
+		class={ "px-4 container mx-auto py-8" }
 	>
 		<h1
-			class={ twerge.It("text-3xl font-bold mb-6 text-white") }
+			class={ "text-3xl font-bold mb-6 text-white" }
 		>
 			Search { target }
 		</h1>
@@ -51,14 +50,14 @@ templ search(
 	query string,
 ) {
 	<div
-		class={ twerge.It("border-gray-700 border-b p-3") }
+		class={ "border-gray-700 border-b p-3" }
 	>
 		<div
-			class={ twerge.It("relative") }
+			class={ "relative" }
 		>
 			<input
 				id="search"
-				class={ twerge.It("w-full focus:outline-none border rounded-md pr-4 py-2 pl-10 bg-gray-700 text-white focus:ring-2 border-gray-600 focus:ring-green-500") }
+				class={ "w-full focus:outline-none border rounded-md pr-4 py-2 pl-10 bg-gray-700 text-white focus:ring-2 border-gray-600 focus:ring-green-500" }
 				placeholder={ fmt.Sprintf("Search %s...", target) }
 				hx-get={ fmt.Sprintf("/search/%s", target) }
 				hx-target="#listi"
@@ -71,22 +70,22 @@ templ search(
 				aria-label="Local Search"
 			/>
 			<div
-				class={ twerge.It("text-gray-500 absolute left-3 top-2.5") }
+				class={ "text-gray-500 absolute left-3 top-2.5" }
 			>
 				@components.Icon("search", templ.Attributes{})
 			</div>
 			<div
 				id="search-indicator"
-				class={ twerge.It("htmx-indicator top-2.5 text-green-500 absolute right-3") }
+				class={ "htmx-indicator top-2.5 text-green-500 absolute right-3" }
 			>
 				<svg
-					class={ twerge.It("animate-spin h-5 w-5") }
+					class={ "animate-spin h-5 w-5" }
 					xmlns="http://www.w3.org/2000/svg"
 					fill="none"
 					viewBox="0 0 24 24"
 				>
 					<circle
-						class={ twerge.It("opacity-25") }
+						class={ "opacity-25" }
 						cx="12"
 						cy="12"
 						r="10"
@@ -94,7 +93,7 @@ templ search(
 						stroke-width="4"
 					></circle>
 					<path
-						class={ twerge.It("opacity-75") }
+						class={ "opacity-75" }
 						fill="currentColor"
 						d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
 					></path>
@@ -103,7 +102,7 @@ templ search(
 		</div>
 		<div
 			id={ fmt.Sprintf("list-suggest-%s", target) }
-			class={ twerge.It("mt-2") }
+			class={ "mt-2" }
 		></div>
 	</div>
 }
@@ -117,19 +116,19 @@ templ ListResults(
 	page, pageCount int,
 ) {
 	<div
-		class={ twerge.It("px-4 container mx-auto py-2") }
+		class={ "px-4 container mx-auto py-2" }
 	>
 		@components.Pagination(page, pageCount, target)
 	</div>
 	<div
-		class={ twerge.It("grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 grid pt-2") }
+		class={ "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 grid pt-2" }
 	>
 		switch target {
 			case routing.PostPluralPath:
 				for i, post := range *posts {
 					if i < routing.MaxListLargeItems {
 						@components.PostItem(post, templ.Attributes{
-							"class":       twerge.It("overflow-hidden bg-gray-800 transform rounded-lg transition-all hover:shadow-lg duration-300 shadow-md hover:-translate-y-1 cursor-pointer h-full"),
+							"class":       "overflow-hidden bg-gray-800 transform rounded-lg transition-all hover:shadow-lg duration-300 shadow-md hover:-translate-y-1 cursor-pointer h-full",
 							"hx-target":   "#bodiody",
 							"hx-get":      post.PagePath(),
 							"hx-push-url": post.PagePath(),
@@ -143,7 +142,7 @@ templ ListResults(
 						@components.ProjectItem(
 							project,
 							templ.Attributes{
-								"class":       twerge.It("bg-gray-800 transition-all flex transform hover:-translate-y-3 flex-col shadow-md rounded-lg hover:shadow-lg duration-300 overflow-hidden h-full cursor-pointer"),
+								"class":       "bg-gray-800 transition-all flex transform hover:-translate-y-3 flex-col shadow-md rounded-lg hover:shadow-lg duration-300 overflow-hidden h-full cursor-pointer",
 								"hx-target":   "#bodiody",
 								"hx-get":      project.PagePath(),
 								"hx-push-url": "true",
@@ -156,7 +155,7 @@ templ ListResults(
 				for i, tag := range *tags {
 					if i < routing.MaxListSmallItems {
 						@components.TagItem(tag, templ.Attributes{
-							"class":       twerge.It("p-6 rounded-lg overflow-hidden bg-gray-800 shadow-md hover:shadow-lg duration-300 transform transition-all hover:-translate-y-1 cursor-pointer h-full"),
+							"class":       "p-6 rounded-lg overflow-hidden bg-gray-800 shadow-md hover:shadow-lg duration-300 transform transition-all hover:-translate-y-1 cursor-pointer h-full",
 							"hx-target":   "#bodiody",
 							"hx-get":      tag.PagePath(),
 							"hx-push-url": "true",
@@ -168,7 +167,7 @@ templ ListResults(
 				for i, employment := range *employments {
 					if i < routing.MaxListLargeItems {
 						@components.EmploymentItem(employment, templ.Attributes{
-							"class":       twerge.It("overflow-hidden bg-gray-800 transform rounded-lg transition-all hover:shadow-lg duration-300 shadow-md hover:-translate-y-1 cursor-pointer h-full"),
+							"class":       "overflow-hidden bg-gray-800 transform rounded-lg transition-all hover:shadow-lg duration-300 shadow-md hover:-translate-y-1 cursor-pointer h-full",
 							"hx-target":   "#bodiody",
 							"hx-get":      employment.PagePath(),
 							"hx-push-url": employment.PagePath(),
@@ -179,7 +178,7 @@ templ ListResults(
 		}
 	</div>
 	<div
-		class={ twerge.It("px-4 container mx-auto py-2") }
+		class={ "px-4 container mx-auto py-2" }
 	>
 		@components.Pagination(page, pageCount, target)
 	</div>

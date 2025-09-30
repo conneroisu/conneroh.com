@@ -3,7 +3,6 @@ package layouts
 import (
 	"fmt"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
-	"github.com/conneroisu/twerge"
 	"time"
 )
 
@@ -66,13 +65,13 @@ templ Layout(title string) {
 			</script>
 		</head>
 		<body
-			class={ twerge.It("bg-gray-900 flex flex-col min-h-screen") }
+			class={ "bg-gray-900 flex flex-col min-h-screen" }
 			hx-ext="preload"
 		>
 			@header()
 			<main
 				id="bodiody"
-				class={ twerge.It("flex-grow") }
+				class={ "flex-grow" }
 			>
 				{ children... }
 			</main>
@@ -89,27 +88,27 @@ func currentYear() string {
 templ header() {
 	<header>
 		<nav
-			class={ twerge.It("border-gray-800 border-b") }
+			class={ "border-gray-800 border-b" }
 		>
 			<div
-				class={ twerge.It("container mx-auto lg:px-8 sm:px-6 px-4") }
+				class={ "container mx-auto lg:px-8 sm:px-6 px-4" }
 				x-data="{ isMenuOpen: false }"
 			>
 				<div
-					class={ twerge.It("justify-between h-16 flex items-center") }
+					class={ "justify-between h-16 flex items-center" }
 				>
 					// Left side: Logo and navigation links
 					<div
-						class={ twerge.It("items-center flex") }
+						class={ "items-center flex" }
 					>
 						// Mobile menu button
 						@components.Icon("menu", templ.Attributes{
-							"class":  twerge.It("p-2 focus:outline-none sm:hidden hover:text-white hover:bg-gray-700 rounded-md text-gray-300 mr-2"),
+							"class":  "p-2 focus:outline-none sm:hidden hover:text-white hover:bg-gray-700 rounded-md text-gray-300 mr-2",
 							"@click": "isMenuOpen = !isMenuOpen",
 						})
 						// Logo - visible on all screens
 						<a
-							class={ twerge.It("text-white cursor-pointer pr-4 text-xl font-bold") }
+							class={ "text-white cursor-pointer pr-4 text-xl font-bold" }
 							hx-get="/"
 							hx-push-url="/"
 							hx-target="#bodiody"
@@ -119,11 +118,11 @@ templ header() {
 						</a>
 						// Desktop navigation links
 						<div
-							class={ twerge.It("space-x-8 hidden sm:flex items-center ml-8") }
+							class={ "space-x-8 hidden sm:flex items-center ml-8" }
 							preload="mouseover"
 						>
 							<a
-								class={ twerge.It("hover:text-white cursor-pointer text-gray-300") }
+								class={ "hover:text-white cursor-pointer text-gray-300" }
 								hx-target="#bodiody"
 								hx-get="/projects"
 								hx-push-url="true"
@@ -131,7 +130,7 @@ templ header() {
 								Projects
 							</a>
 							<a
-								class={ twerge.It("hover:text-white cursor-pointer text-gray-300") }
+								class={ "hover:text-white cursor-pointer text-gray-300" }
 								hx-target="#bodiody"
 								hx-get="/posts"
 								hx-push-url="true"
@@ -140,7 +139,7 @@ templ header() {
 								Posts
 							</a>
 							<a
-								class={ twerge.It("hover:text-white cursor-pointer text-gray-300") }
+								class={ "hover:text-white cursor-pointer text-gray-300" }
 								hx-target="#bodiody"
 								hx-get="/tags"
 								hx-push-url="true"
@@ -149,7 +148,7 @@ templ header() {
 								Tags
 							</a>
 							<a
-								class={ twerge.It("hover:text-white cursor-pointer text-gray-300") }
+								class={ "hover:text-white cursor-pointer text-gray-300" }
 								hx-target="#bodiody"
 								hx-get="/employments"
 								hx-push-url="true"
@@ -163,7 +162,7 @@ templ header() {
 				// Mobile navigation menu - toggled by button
 				<div
 					x-show="isMenuOpen"
-					class={ twerge.It("pb-4 space-y-1 sm:hidden pt-2") }
+					class={ "pb-4 space-y-1 sm:hidden pt-2" }
 					x-transition:enter="transition ease-out duration-200"
 					x-transition:enter-start="opacity-0 transform -translate-y-2"
 					x-transition:enter-end="transform translate-y-0 opacity-100"
@@ -172,7 +171,7 @@ templ header() {
 					x-transition:leave-end="opacity-0 transform -translate-y-2"
 				>
 					<a
-						class={ twerge.It("text-base text-gray-300 hover:bg-gray-700 hover:text-white pl-3 pr-4 block py-2 font-medium") }
+						class={ "text-base text-gray-300 hover:bg-gray-700 hover:text-white pl-3 pr-4 block py-2 font-medium" }
 						hx-target="#bodiody"
 						hx-get="/projects"
 						hx-push-url="true"
@@ -182,7 +181,7 @@ templ header() {
 						Projects
 					</a>
 					<a
-						class={ twerge.It("text-base text-gray-300 hover:bg-gray-700 hover:text-white pl-3 pr-4 block py-2 font-medium") }
+						class={ "text-base text-gray-300 hover:bg-gray-700 hover:text-white pl-3 pr-4 block py-2 font-medium" }
 						hx-target="#bodiody"
 						hx-get="/posts"
 						hx-push-url="/posts"
@@ -192,7 +191,7 @@ templ header() {
 						Posts
 					</a>
 					<a
-						class={ twerge.It("text-base text-gray-300 hover:bg-gray-700 hover:text-white pl-3 pr-4 block py-2 font-medium") }
+						class={ "text-base text-gray-300 hover:bg-gray-700 hover:text-white pl-3 pr-4 block py-2 font-medium" }
 						hx-target="#bodiody"
 						hx-get="/tags"
 						hx-push-url="true"
@@ -202,7 +201,7 @@ templ header() {
 						Tags
 					</a>
 					<a
-						class={ twerge.It("text-base text-gray-300 hover:bg-gray-700 hover:text-white pl-3 pr-4 block py-2 font-medium") }
+						class={ "text-base text-gray-300 hover:bg-gray-700 hover:text-white pl-3 pr-4 block py-2 font-medium" }
 						hx-target="#bodiody"
 						hx-get="/employments"
 						hx-push-url="true"
@@ -228,70 +227,70 @@ templ Icon(
 }
 
 templ footer() {
-	<footer class={ twerge.It("bg-gray-800 border-t border-gray-700 py-12") }>
-		<div class={ twerge.It("container mx-auto px-4") }>
-			<div class={ twerge.It("flex flex-col md:flex-row justify-between items-center") }>
-				<div class={ twerge.It("mb-6 md:mb-0") }>
-					<h3 class={ twerge.It("text-white text-xl font-bold mb-2") }>Conner Ohnesorge</h3>
-					<p class={ twerge.It("text-gray-400") }>Electrical Engineer & Software Developer</p>
+	<footer class={ "bg-gray-800 border-t border-gray-700 py-12" }>
+		<div class={ "container mx-auto px-4" }>
+			<div class={ "flex flex-col md:flex-row justify-between items-center" }>
+				<div class={ "mb-6 md:mb-0" }>
+					<h3 class={ "text-white text-xl font-bold mb-2" }>Conner Ohnesorge</h3>
+					<p class={ "text-gray-400" }>Electrical Engineer & Software Developer</p>
 				</div>
-				<div class={ twerge.It("flex flex-wrap gap-4 justify-center") }>
+				<div class={ "flex flex-wrap gap-4 justify-center" }>
 					<a
 						href="https://www.linkedin.com/in/conner-ohnesorge-b720a4238"
-						class={ twerge.It("text-gray-400 hover:text-green-400 transition-colors") }
+						class={ "text-gray-400 hover:text-green-400 transition-colors" }
 					>
 						LinkedIn
 					</a>
 					<a
 						href="https://github.com/conneroisu"
-						class={ twerge.It("text-gray-400 hover:text-green-400 transition-colors") }
+						class={ "text-gray-400 hover:text-green-400 transition-colors" }
 					>
 						GitHub
 					</a>
 					<a
 						href="https://x.com/ConnerOhnesorge"
-						class={ twerge.It("text-gray-400 hover:text-green-400 transition-colors") }
+						class={ "text-gray-400 hover:text-green-400 transition-colors" }
 					>
 						Twitter
 					</a>
 					<a
 						href="mailto:conneroisu@outlook.com"
-						class={ twerge.It("text-gray-400 hover:text-green-400 transition-colors") }
+						class={ "text-gray-400 hover:text-green-400 transition-colors" }
 					>
 						Email
 					</a>
 				</div>
 			</div>
 			<div
-				class={ twerge.It("mt-8 pt-8 border-t border-gray-700 flex flex-col md:flex-row justify-between items-center") }
+				class={ "mt-8 pt-8 border-t border-gray-700 flex flex-col md:flex-row justify-between items-center" }
 			>
 				<p
-					class={ twerge.It("text-gray-500 text-sm") }
+					class={ "text-gray-500 text-sm" }
 				>
 					&copy; { currentYear() } Conner Ohnesorge. All rights reserved.
 				</p>
-				<div class={ twerge.It("mt-4 md:mt-0") }>
+				<div class={ "mt-4 md:mt-0" }>
 					<a
 						href="/posts"
-						class={ twerge.It("text-gray-500 hover:text-gray-300 text-sm mx-2 transition-colors") }
+						class={ "text-gray-500 hover:text-gray-300 text-sm mx-2 transition-colors" }
 					>
 						Posts
 					</a>
 					<a
 						href="/projects"
-						class={ twerge.It("text-gray-500 hover:text-gray-300 text-sm mx-2 transition-colors") }
+						class={ "text-gray-500 hover:text-gray-300 text-sm mx-2 transition-colors" }
 					>
 						Projects
 					</a>
 					<a
 						href="/tags"
-						class={ twerge.It("text-gray-500 hover:text-gray-300 text-sm mx-2 transition-colors") }
+						class={ "text-gray-500 hover:text-gray-300 text-sm mx-2 transition-colors" }
 					>
 						Tags
 					</a>
 					<a
 						href="#contact"
-						class={ twerge.It("text-gray-500 hover:text-gray-300 text-sm mx-2 transition-colors") }
+						class={ "text-gray-500 hover:text-gray-300 text-sm mx-2 transition-colors" }
 					>
 						Contact
 					</a>

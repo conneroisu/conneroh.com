@@ -3,7 +3,7 @@ id: framework
 aliases: []
 tags: []
 created_at: 2025-01-06T12:00:00.000-06:00
-description: Software frameworks and libraries for application development
+description: Software frameworks/libraries that provide a foundation for building applications, systems, or products.
 icon: box
 title: Framework
 updated_at: 2025-01-06T12:00:00.000-06:00

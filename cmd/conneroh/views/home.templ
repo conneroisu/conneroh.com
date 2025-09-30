@@ -3,7 +3,6 @@ package views
 import (
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
 	"github.com/conneroisu/conneroh.com/internal/assets"
-	"github.com/conneroisu/twerge"
 )
 
 templ Home(
@@ -14,82 +13,82 @@ templ Home(
 ) {
 	// Hero Section (top)
 	<section
-		class={ twerge.It("bg-gradient-to-b from-gray-900 to-gray-800 py-20") }
+		class={ "bg-gradient-to-b from-gray-900 to-gray-800 py-20" }
 	>
 		<div
-			class={ twerge.It("container px-4 mx-auto") }
+			class={ "container px-4 mx-auto" }
 		>
 			<div
-				class={ twerge.It("flex-col lg:flex-row items-center justify-between flex") }
+				class={ "flex-col lg:flex-row items-center justify-between flex" }
 			>
 				<div
-					class={ twerge.It("lg:w-1/2 mb-10 lg:mb-0") }
+					class={ "lg:w-1/2 mb-10 lg:mb-0" }
 				>
 					<h1
 						aria-label="Name"
-						class={ twerge.It("mb-4 md:text-5xl text-4xl leading-tight font-bold lg:text-6xl text-white") }
+						class={ "mb-4 md:text-5xl text-4xl leading-tight font-bold lg:text-6xl text-white" }
 					>
 						Conner Ohnesorge
 					</h1>
 					<p
 						aria-label="summary"
-						class={ twerge.It("text-xl text-gray-300 mb-8 max-w-md") }
+						class={ "text-xl text-gray-300 mb-8 max-w-md" }
 					>
 						Electrical Engineer & Software Developer specialized in creating robust, scalable, and elegant solutions.
 					</p>
 					<p
 						aria-label="education"
-						class={ twerge.It("text-xl text-gray-300 mb-8 max-w-md") }
+						class={ "text-xl text-gray-300 mb-8 max-w-md" }
 					>
 						Electrical Engineering Bachelors Degree and Minor in Computer Science from
 						<a
 							href="https://iastate.edu/"
-							class={ twerge.It("hover:underline") }
+							class={ "hover:underline" }
 						>
 							Iowa State University
 						</a>
 					</p>
 					<div
-						class={ twerge.It("flex-wrap gap-4 flex") }
+						class={ "flex-wrap gap-4 flex" }
 					>
 						<a
 							aria-label="View Projects"
 							href="#projects"
-							class={ twerge.It("py-3 text-gray-900 rounded-md hover:opacity-90 font-medium transition-opacity bg-white px-6") }
+							class={ "py-3 text-gray-900 rounded-md hover:opacity-90 font-medium transition-opacity bg-white px-6" }
 						>
 							View Projects
 						</a>
 						<a
 							aria-label="Contact Me"
 							href="#contact"
-							class={ twerge.It("font-medium border-gray-600 py-3 rounded-md px-6 text-gray-300 transition-colors hover:bg-gray-800 border") }
+							class={ "font-medium border-gray-600 py-3 rounded-md px-6 text-gray-300 transition-colors hover:bg-gray-800 border" }
 						>
 							Contact Me
 						</a>
 					</div>
 				</div>
 				<div
-					class={ twerge.It("lg:w-1/2 relative") }
+					class={ "lg:w-1/2 relative" }
 				>
 					<div
-						class={ twerge.It("mx-auto rounded-full h-64 bg-blue-600 relative md:w-80 md:h-80 w-64 shadow-lg") }
+						class={ "mx-auto rounded-full h-64 bg-blue-600 relative md:w-80 md:h-80 w-64 shadow-lg" }
 					>
 						<div
-							class={ twerge.It("flex text-white justify-center inset-0 font-bold items-center absolute text-xl") }
+							class={ "flex text-white justify-center inset-0 font-bold items-center absolute text-xl" }
 						>
 							<img
 								src="/dist/hero.jpeg"
 								alt="me"
 								aria-label="Photo of Me"
-								class={ twerge.It("rounded-full bg-blue-600 relative mx-auto shadow-lg") }
+								class={ "rounded-full bg-blue-600 relative mx-auto shadow-lg" }
 							/>
 						</div>
 						// Decorative elements
 						<div
-							class={ twerge.It("-right-4 h-24 -bottom-4 rounded-full w-24 z-0 absolute bg-purple-600") }
+							class={ "-right-4 h-24 -bottom-4 rounded-full w-24 z-0 absolute bg-purple-600" }
 						></div>
 						<div
-							class={ twerge.It("z-0 absolute h-16 bg-pink-600 -top-4 rounded-full -left-4 w-16") }
+							class={ "z-0 absolute h-16 bg-pink-600 -top-4 rounded-full -left-4 w-16" }
 						></div>
 					</div>
 				</div>
@@ -99,16 +98,16 @@ templ Home(
 	// Featured Projects Section
 	<section
 		id="projects"
-		class={ twerge.It("bg-gray-800 py-16") }
+		class={ "bg-gray-800 py-16" }
 	>
 		<div
-			class={ twerge.It("container px-4 mx-auto") }
+			class={ "container px-4 mx-auto" }
 		>
 			<div
-				class={ twerge.It("justify-between items-center mb-12 pr-4 flex flex-col md:flex-row") }
+				class={ "justify-between items-center mb-12 pr-4 flex flex-col md:flex-row" }
 			>
 				<h2
-					class={ twerge.It("mb-4 text-3xl font-bold text-white") }
+					class={ "mb-4 text-3xl font-bold text-white" }
 				>
 					Featured Projects
 				</h2>
@@ -117,20 +116,20 @@ templ Home(
 					hx-push-url="true"
 					hx-target="#bodiody"
 					preload="mouseover"
-					class={ twerge.It("font-medium flex items-center text-green-400 hover:underline text-lg cursor-pointer") }
+					class={ "font-medium flex items-center text-green-400 hover:underline text-lg cursor-pointer" }
 				>
 					View All Projects &rarr;
 				</a>
 			</div>
 			<div
-				class={ twerge.It("grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 grid") }
+				class={ "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 grid" }
 			>
 				for i, project := range *fullProjects {
 					if i < 6 {
 						@components.ProjectItem(
 							project,
 							templ.Attributes{
-								"class":       twerge.It("bg-gray-900 transition-all flex transform hover:-translate-y-3 flex-col shadow-md rounded-lg hover:shadow-lg duration-300 overflow-hidden cursor-pointer h-full"),
+								"class":       "bg-gray-900 transition-all flex transform hover:-translate-y-3 flex-col shadow-md rounded-lg hover:shadow-lg duration-300 overflow-hidden cursor-pointer h-full",
 								"aria-label":  project.Title,
 								"hx-target":   "#bodiody",
 								"hx-get":      project.PagePath(),
@@ -145,45 +144,45 @@ templ Home(
 	</section>
 	// Employment Timeline Section
 	<section
-		class={ twerge.It("bg-gray-900 py-16") }
+		class={ "bg-gray-900 py-16" }
 	>
 		<div
-			class={ twerge.It("container px-4 mx-auto") }
+			class={ "container px-4 mx-auto" }
 		>
 			<div
-				class={ twerge.It("text-center mb-12") }
+				class={ "text-center mb-12" }
 			>
 				<h2
-					class={ twerge.It("mb-4 text-3xl font-bold text-white") }
+					class={ "mb-4 text-3xl font-bold text-white" }
 				>
 					Professional Experience
 				</h2>
-				<p class={ twerge.It("text-gray-300 max-w-2xl mx-auto") }>
+				<p class={ "text-gray-300 max-w-2xl mx-auto" }>
 					My journey through various roles in engineering and technology
 				</p>
 			</div>
 			// Desktop timeline
-			<div class={ twerge.It("hidden md:block") }>
+			<div class={ "hidden md:block" }>
 				@components.EmploymentTimeline(*fullEmployments)
 			</div>
 			// Mobile timeline
-			<div class={ twerge.It("md:hidden") }>
+			<div class={ "md:hidden" }>
 				@components.EmploymentTimelineMobile(*fullEmployments)
 			</div>
 		</div>
 	</section>
 	// Recent Posts Section
 	<section
-		class={ twerge.It("bg-gray-800 py-16") }
+		class={ "bg-gray-800 py-16" }
 	>
 		<div
-			class={ twerge.It("container px-4 mx-auto") }
+			class={ "container px-4 mx-auto" }
 		>
 			<div
-				class={ twerge.It("justify-between items-center mb-12 pr-4 flex flex-col md:flex-row") }
+				class={ "justify-between items-center mb-12 pr-4 flex flex-col md:flex-row" }
 			>
 				<h2
-					class={ twerge.It("mb-4 text-3xl font-bold text-white") }
+					class={ "mb-4 text-3xl font-bold text-white" }
 				>
 					Recent Posts
 				</h2>
@@ -191,19 +190,19 @@ templ Home(
 					hx-get="/posts"
 					hx-push-url="true"
 					hx-target="#bodiody"
-					class={ twerge.It("font-medium flex items-center text-green-400 hover:underline text-lg cursor-pointer") }
+					class={ "font-medium flex items-center text-green-400 hover:underline text-lg cursor-pointer" }
 					preload="mouseover"
 				>
 					View All Posts &rarr;
 				</a>
 			</div>
 			<div
-				class={ twerge.It("grid grid-cols-1 lg:grid-cols-2 gap-8") }
+				class={ "grid grid-cols-1 lg:grid-cols-2 gap-8" }
 			>
 				for i, post := range *fullPosts {
 					if i < 4 {
 						@components.PostItem(post, templ.Attributes{
-							"class":       twerge.It("overflow-hidden bg-gray-900 transform rounded-lg transition-all hover:shadow-lg duration-300 shadow-md hover:-translate-y-1 cursor-pointer h-full"),
+							"class":       "overflow-hidden bg-gray-900 transform rounded-lg transition-all hover:shadow-lg duration-300 shadow-md hover:-translate-y-1 cursor-pointer h-full",
 							"hx-target":   "#bodiody",
 							"hx-get":      post.PagePath(),
 							"hx-push-url": post.PagePath(),
@@ -216,16 +215,16 @@ templ Home(
 	</section>
 	// Skills/Tags Section
 	<section
-		class={ twerge.It("bg-gray-900 py-16") }
+		class={ "bg-gray-900 py-16" }
 	>
 		<div
-			class={ twerge.It("container px-4 mx-auto") }
+			class={ "container px-4 mx-auto" }
 		>
 			<div
-				class={ twerge.It("justify-between items-center mb-12 pr-4 flex flex-col md:flex-row") }
+				class={ "justify-between items-center mb-12 pr-4 flex flex-col md:flex-row" }
 			>
 				<h2
-					class={ twerge.It("mb-4 text-3xl font-bold text-white") }
+					class={ "mb-4 text-3xl font-bold text-white" }
 				>
 					Skills & Technologies
 				</h2>
@@ -234,20 +233,20 @@ templ Home(
 					hx-get="/tags"
 					hx-push-url="/tags"
 					preload="mouseover"
-					class={ twerge.It("font-medium flex items-center text-green-400 hover:underline text-lg") }
+					class={ "font-medium flex items-center text-green-400 hover:underline text-lg" }
 				>
 					See All Skills/Technologies &rarr;
 				</a>
 			</div>
 			<div
-				class={ twerge.It("grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8") }
+				class={ "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8" }
 			>
 				for i, tag := range *fullTags {
 					if i < 28 {
 						@components.TagItem(
 							tag,
 							templ.Attributes{
-								"class":       twerge.It("p-6 rounded-lg overflow-hidden bg-gray-800 shadow-md hover:shadow-lg duration-300 transform transition-all hover:-translate-y-1"),
+								"class":       "p-6 rounded-lg overflow-hidden bg-gray-800 shadow-md hover:shadow-lg duration-300 transform transition-all hover:-translate-y-1",
 								"hx-target":   "#bodiody",
 								"hx-get":      tag.PagePath(),
 								"hx-push-url": "true",
@@ -262,50 +261,50 @@ templ Home(
 	// Contact Section
 	<section
 		id="contact"
-		class={ twerge.It("bg-gray-800 py-16") }
+		class={ "bg-gray-800 py-16" }
 		aria-label="Contact"
 	>
 		<div
-			class={ twerge.It("container px-4 mx-auto") }
+			class={ "container px-4 mx-auto" }
 		>
 			<div
-				class={ twerge.It("text-center max-w-2xl mx-auto") }
+				class={ "text-center max-w-2xl mx-auto" }
 			>
 				<h2
-					class={ twerge.It("mb-4 text-3xl font-bold text-white") }
+					class={ "mb-4 text-3xl font-bold text-white" }
 				>
 					Get In Touch
 				</h2>
 				<p
-					class={ twerge.It("text-gray-300 mb-8") }
+					class={ "text-gray-300 mb-8" }
 				>
 					Interested in working together? Feel free to reach out through any of the channels below.
 				</p>
 				<div
-					class={ twerge.It("justify-center gap-4 mb-8 flex flex-wrap") }
+					class={ "justify-center gap-4 mb-8 flex flex-wrap" }
 				>
 					// Social links
 					<a
 						href="https://www.linkedin.com/in/conner-ohnesorge-b720a4238"
-						class={ twerge.It("hover:bg-green-400 w-12 rounded-full bg-gray-700 transition-colors flex text-gray-300 h-12 items-center justify-center") }
+						class={ "hover:bg-green-400 w-12 rounded-full bg-gray-700 transition-colors flex text-gray-300 h-12 items-center justify-center" }
 					>
 						@components.Icon("linkedin", templ.Attributes{})
 					</a>
 					<a
 						href="https://github.com/conneroisu"
-						class={ twerge.It("bg-gray-700 w-12 text-gray-300 justify-center hover:bg-gray-800 transition-colors rounded-full h-12 items-center flex") }
+						class={ "bg-gray-700 w-12 text-gray-300 justify-center hover:bg-gray-800 transition-colors rounded-full h-12 items-center flex" }
 					>
 						@components.Icon("github", templ.Attributes{})
 					</a>
 					<a
 						href="https://x.com/ConnerOhnesorge"
-						class={ twerge.It("hover:bg-green-400 w-12 rounded-full bg-gray-700 transition-colors flex text-gray-300 h-12 items-center justify-center") }
+						class={ "hover:bg-green-400 w-12 rounded-full bg-gray-700 transition-colors flex text-gray-300 h-12 items-center justify-center" }
 					>
 						@components.Icon("twitter", templ.Attributes{})
 					</a>
 					<a
 						href="mailto:conneroisu@outlook.com"
-						class={ twerge.It("h-12 transition-colors justify-center rounded-full text-gray-300 bg-gray-700 flex w-12 items-center hover:bg-red-500") }
+						class={ "h-12 transition-colors justify-center rounded-full text-gray-300 bg-gray-700 flex w-12 items-center hover:bg-red-500" }
 					>
 						@components.Icon("mail", templ.Attributes{})
 					</a>

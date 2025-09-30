@@ -3,7 +3,6 @@ package views
 import (
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
 	"github.com/conneroisu/conneroh.com/internal/assets"
-	"github.com/conneroisu/twerge"
 )
 
 // Individual Post component
@@ -11,48 +10,48 @@ templ Post(
 	post *assets.Post,
 ) {
 	<div
-		class={ twerge.It("px-4 mx-auto py-8 max-w-5xl") }
+		class={ "px-4 mx-auto py-8 max-w-5xl" }
 	>
 		if post.BannerPath != "" {
 			@components.Image(
 				post.BannerPath,
 				post.Title,
-				twerge.It("w-full md:h-96 rounded-lg object-cover shadow-md mb-8 h-64"),
+				"w-full md:h-96 rounded-lg object-cover shadow-md mb-8 h-64",
 			)
 		}
 		<div
-			class={ twerge.It("bg-gray-800 rounded-lg mb-8 overflow-hidden p-6 shadow-lg") }
+			class={ "bg-gray-800 rounded-lg mb-8 overflow-hidden p-6 shadow-lg" }
 		>
 			<div
-				class={ twerge.It("pb-4 mb-4 border-b border-gray-700") }
+				class={ "pb-4 mb-4 border-b border-gray-700" }
 			>
 				<h1
-					class={ twerge.It("font-bold text-white mb-4 text-4xl") }
+					class={ "font-bold text-white mb-4 text-4xl" }
 				>
 					{ post.Title }
 				</h1>
 				<h2
-					class={ twerge.It("font-semibold text-white text-2xl") }
+					class={ "font-semibold text-white text-2xl" }
 				>
 					About this post
 				</h2>
 				<div
-					class={ twerge.It("h-1 bg-green-500 mt-2 w-16") }
+					class={ "h-1 bg-green-500 mt-2 w-16" }
 				></div>
 			</div>
 			<div
-				class={ twerge.It("max-w-none") }
+				class={ "max-w-none" }
 			>
 				<p
-					class={ twerge.It("leading-relaxed whitespace-pre-line text-gray-300") }
+					class={ "leading-relaxed whitespace-pre-line text-gray-300" }
 				>
 					{ post.Description }
 				</p>
 				<div
-					class={ twerge.It("mb-8") }
+					class={ "mb-8" }
 				>
 					if len(post.Tags) > 0 {
-						<span class={ twerge.It("text-gray-400 text-sm pr-2") }>
+						<span class={ "text-gray-400 text-sm pr-2" }>
 							Tags:
 						</span>
 						for _, tag := range post.Tags {
@@ -63,7 +62,7 @@ templ Post(
 								hx-swap="outerHTML"
 								preload="mouseover"
 								hx-target="#bodiody"
-								class={ twerge.It("text-gray-400 text-sm hover:underline hover:text-green-400 transition-colors duration-200 pr-2") }
+								class={ "text-gray-400 text-sm hover:underline hover:text-green-400 transition-colors duration-200 pr-2" }
 							>
 								#{ tag.Slug }
 							</a>
@@ -71,23 +70,23 @@ templ Post(
 					}
 				</div>
 				<div
-					class={ twerge.It("items-center text-sm text-gray-400 mt-6 flex") }
+					class={ "items-center text-sm text-gray-400 mt-6 flex" }
 				>
 					@components.Icon("calendar", templ.Attributes{})
 					<span>Created: { post.CreatedAt.Format("Jan 2, 2006") }</span>
 				</div>
 				<span
-					class={ twerge.It("items-center text-sm text-gray-400 mt-6 flex") }
+					class={ "items-center text-sm text-gray-400 mt-6 flex" }
 				>
 					• { readTime(post.Content) } min read
 				</span>
 			</div>
 		</div>
 		<div
-			class={ twerge.It("bg-gray-800 rounded-lg mb-8 overflow-hidden p-6 shadow-lg") }
+			class={ "bg-gray-800 rounded-lg mb-8 overflow-hidden p-6 shadow-lg" }
 		>
 			<div
-				class={ twerge.It("max-w-none my-6 text-gray-300 leading-relaxed") }
+				class={ "max-w-none my-6 text-gray-300 leading-relaxed" }
 			>
 				<article>
 					@templ.Raw(post.Content)
@@ -96,21 +95,21 @@ templ Post(
 		</div>
 		if len(post.Projects) > 0 {
 			<div
-				class={ twerge.It("pt-8 mt-12 border-t border-gray-700") }
+				class={ "pt-8 mt-12 border-t border-gray-700" }
 			>
 				<h2
-					class={ twerge.It("text-2xl font-bold text-white mb-4") }
+					class={ "text-2xl font-bold text-white mb-4" }
 				>
 					Related Projects
 				</h2>
 				<div
-					class={ twerge.It("grid grid-cols-1 md:grid-cols-2 gap-4") }
+					class={ "grid grid-cols-1 md:grid-cols-2 gap-4" }
 				>
 					for _, project := range post.Projects {
 						@components.ProjectItem(
 							project,
 							templ.Attributes{
-								"class":       twerge.It("bg-gray-800 transition-all flex transform hover:-translate-y-3 flex-col shadow-md rounded-lg hover:shadow-lg duration-300 overflow-hidden h-full"),
+								"class":       "bg-gray-800 transition-all flex transform hover:-translate-y-3 flex-col shadow-md rounded-lg hover:shadow-lg duration-300 overflow-hidden h-full",
 								"hx-target":   "#bodiody",
 								"hx-get":      project.PagePath(),
 								"hx-push-url": "true",
@@ -123,19 +122,19 @@ templ Post(
 		}
 		if len(post.Posts) > 0 {
 			<div
-				class={ twerge.It("pt-8 mt-12 border-t border-gray-700") }
+				class={ "pt-8 mt-12 border-t border-gray-700" }
 			>
 				<h2
-					class={ twerge.It("text-2xl font-bold text-white mb-4") }
+					class={ "text-2xl font-bold text-white mb-4" }
 				>
 					Related Posts
 				</h2>
 				<div
-					class={ twerge.It("gap-6 grid grid-cols-1 md:grid-cols-2") }
+					class={ "gap-6 grid grid-cols-1 md:grid-cols-2" }
 				>
 					for _, post := range post.Posts {
 						@components.PostItem(post, templ.Attributes{
-							"class":       twerge.It("bg-gray-800 rounded-lg shadow-md overflow-hidden p-6"),
+							"class":       "bg-gray-800 rounded-lg shadow-md overflow-hidden p-6",
 							"hx-target":   "#bodiody",
 							"hx-get":      post.PagePath(),
 							"hx-push-url": post.PagePath(),
