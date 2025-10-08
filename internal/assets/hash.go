@@ -2,6 +2,8 @@ package assets
 
 import (
 	"context"
+	"fmt"
+
 	//nolint:gosec
 	"crypto/md5"
 	"database/sql"
@@ -135,7 +137,11 @@ func HashDirMatch(
 			Set("hashed = EXCLUDED.hashed").
 			Exec(ctx)
 		if err != nil {
-			return nil, eris.Wrap(err, "failed to update cache")
+			return nil, eris.Wrap(err, fmt.Sprintf(
+				"failed to update cache?! path: %s, hash: %s",
+				item.Path,
+				item.Hash,
+			))
 		}
 	}
 

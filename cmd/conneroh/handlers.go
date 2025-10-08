@@ -81,7 +81,7 @@ func listHandler(
 		case routing.PostPluralPath:
 			if len(allPosts) == 0 {
 				err = db.NewSelect().Model(&allPosts).
-					Order("updated_at").
+					Order("created_at DESC").
 					Relation("Tags").
 					Relation("Posts").
 					Relation("Projects").
@@ -127,7 +127,7 @@ func listHandler(
 		case routing.ProjectPluralPath:
 			if len(allProjects) == 0 {
 				err = db.NewSelect().Model(&allProjects).
-					Order("updated_at").
+					Order("created_at DESC").
 					Relation("Tags").
 					Relation("Posts").
 					Relation("Projects").
@@ -173,7 +173,7 @@ func listHandler(
 		case routing.TagsPluralPath:
 			if len(allTags) == 0 {
 				err = db.NewSelect().Model(&allTags).
-					Order("updated_at").
+					Order("created_at DESC").
 					Relation("Tags").
 					Relation("Posts").
 					Relation("Projects").
@@ -219,7 +219,7 @@ func listHandler(
 		case routing.EmploymentPluralPath:
 			if len(allEmployments) == 0 {
 				err = db.NewSelect().Model(&allEmployments).
-					Order("updated_at").
+					Order("created_at DESC").
 					Relation("Tags").
 					Relation("Posts").
 					Relation("Projects").
@@ -285,7 +285,7 @@ func HandleHome(db *bun.DB) func(w http.ResponseWriter, r *http.Request) error {
 		}
 		if len(allPosts) == 0 {
 			err = db.NewSelect().Model(&allPosts).
-				Order("updated_at").
+				Order("created_at DESC").
 				Relation("Tags").
 				Relation("Posts").
 				Relation("Projects").
@@ -299,7 +299,7 @@ func HandleHome(db *bun.DB) func(w http.ResponseWriter, r *http.Request) error {
 		}
 		if len(allProjects) == 0 {
 			err = db.NewSelect().Model(&allProjects).
-				Order("updated_at").
+				Order("created_at DESC").
 				Relation("Tags").
 				Relation("Posts").
 				Relation("Projects").
@@ -313,7 +313,7 @@ func HandleHome(db *bun.DB) func(w http.ResponseWriter, r *http.Request) error {
 		}
 		if len(allTags) == 0 {
 			err = db.NewSelect().Model(&allTags).
-				Order("updated_at").
+				Order("created_at DESC").
 				Relation("Tags").
 				Relation("Posts").
 				Relation("Projects").
@@ -327,7 +327,7 @@ func HandleHome(db *bun.DB) func(w http.ResponseWriter, r *http.Request) error {
 		}
 		if len(allEmployments) == 0 {
 			err = db.NewSelect().Model(&allEmployments).
-				Order("updated_at").
+				Order("created_at DESC").
 				Relation("Tags").
 				Relation("Posts").
 				Relation("Projects").
