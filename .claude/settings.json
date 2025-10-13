@@ -17,46 +17,24 @@
     "deny": []
   },
   "hooks": {
+    "PreCompact": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "conclaude PreCompact"
+          }
+        ]
+      }
+    ],
     "UserPromptSubmit": [
       {
         "matcher": "",
         "hooks": [
           {
             "type": "command",
-            "command": "bun $(git rev-parse --show-toplevel)/.claude/hooks/index.ts user_prompt_submit"
-          }
-        ]
-      }
-    ],
-    "PreToolUse": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bun $(git rev-parse --show-toplevel)/.claude/hooks/index.ts pre_tool_use"
-          }
-        ]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bun $(git rev-parse --show-toplevel)/.claude/hooks/index.ts post_tool_use"
-          }
-        ]
-      }
-    ],
-    "Notification": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bun $(git rev-parse --show-toplevel)/.claude/hooks/index.ts notification"
+            "command": "conclaude UserPromptSubmit"
           }
         ]
       }
@@ -67,7 +45,29 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bun $(git rev-parse --show-toplevel)/.claude/hooks/index.ts stop --chat"
+            "command": "conclaude Stop"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "conclaude SessionStart"
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "conclaude Notification"
           }
         ]
       }
@@ -78,7 +78,29 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bun $(git rev-parse --show-toplevel)/.claude/hooks/index.ts subagent_stop --chat"
+            "command": "conclaude SubagentStop"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "conclaude PreToolUse"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "conclaude PostToolUse"
           }
         ]
       }
