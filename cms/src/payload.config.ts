@@ -9,6 +9,11 @@ import sharp from 'sharp'
 
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
+import { Posts } from './collections/Posts'
+import { Projects } from './collections/Projects'
+import { Tags } from './collections/Tags'
+import { Employments } from './collections/Employments'
+import { s3Storage } from '@payloadcms/storage-s3'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -20,11 +25,14 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media],
+  collections: [Users, Media, Posts, Projects, Tags, Employments],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
+  },
+  graphQL: {
+    disable: true,
   },
   db: postgresAdapter({
     pool: {
@@ -34,6 +42,23 @@ export default buildConfig({
   sharp,
   plugins: [
     payloadCloudPlugin(),
+    s3Storage({
+      enabled: process.env.S3_BUCKET ? true : false,
+      collections: {
+        media: true,
+      },
+      bucket: process.env.S3_BUCKET || '',
+      clientUploads: true,
+      config: {
+        credentials: {
+          accessKeyId: process.env.AWS_ACCESS_KEY_ID || '',
+          secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || '',
+        },
+        region: process.env.AWS_REGION || '',
+        // ... Other S3 configuration
+        endpoint: process.env.AWS_ENDPOINT_URL_S3,
+      },
+    }),
     // storage-adapter-placeholder
   ],
 })

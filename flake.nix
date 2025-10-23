@@ -180,6 +180,7 @@
               (buildWithSpecificGo reftools)
               pprof
               graphviz
+              awscli2
 
               doppler
               tailwindcss # Web

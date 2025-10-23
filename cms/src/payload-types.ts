@@ -69,6 +69,10 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
+    posts: Post;
+    projects: Project;
+    tags: Tag;
+    employments: Employment;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -77,6 +81,10 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    posts: PostsSelect<false> | PostsSelect<true>;
+    projects: ProjectsSelect<false> | ProjectsSelect<true>;
+    tags: TagsSelect<false> | TagsSelect<true>;
+    employments: EmploymentsSelect<false> | EmploymentsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -158,6 +166,177 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "posts".
+ */
+export interface Post {
+  id: number;
+  title: string;
+  slug: string;
+  /**
+   * Brief description for SEO and previews
+   */
+  description?: string | null;
+  content: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * Banner image for the post
+   */
+  bannerPath?: (number | null) | Media;
+  tags?: (number | Tag)[] | null;
+  projects?: (number | Project)[] | null;
+  employments?: (number | Employment)[] | null;
+  createdAt: string;
+  updatedAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tags".
+ */
+export interface Tag {
+  id: number;
+  title: string;
+  slug: string;
+  /**
+   * Brief description of the tag
+   */
+  description?: string | null;
+  /**
+   * Detailed content about the tag
+   */
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Banner image for the tag
+   */
+  bannerPath?: (number | null) | Media;
+  /**
+   * Icon name or emoji for the tag
+   */
+  icon?: string | null;
+  /**
+   * Related tags
+   */
+  tags?: (number | Tag)[] | null;
+  posts?: (number | Post)[] | null;
+  projects?: (number | Project)[] | null;
+  employments?: (number | Employment)[] | null;
+  createdAt: string;
+  updatedAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "projects".
+ */
+export interface Project {
+  id: number;
+  title: string;
+  slug: string;
+  /**
+   * Brief description for SEO and previews
+   */
+  description?: string | null;
+  content: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * Banner image for the project
+   */
+  bannerPath?: (number | null) | Media;
+  tags?: (number | Tag)[] | null;
+  posts?: (number | Post)[] | null;
+  /**
+   * Related projects
+   */
+  projects?: (number | Project)[] | null;
+  employments?: (number | Employment)[] | null;
+  createdAt: string;
+  updatedAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "employments".
+ */
+export interface Employment {
+  id: number;
+  title: string;
+  slug: string;
+  /**
+   * Brief description of the employment
+   */
+  description?: string | null;
+  content: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * Company logo or banner image
+   */
+  bannerPath?: (number | null) | Media;
+  tags?: (number | Tag)[] | null;
+  posts?: (number | Post)[] | null;
+  projects?: (number | Project)[] | null;
+  /**
+   * Related employments
+   */
+  employments?: (number | Employment)[] | null;
+  createdAt: string;
+  /**
+   * End date (leave empty if current employment)
+   */
+  endDate?: string | null;
+  updatedAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
@@ -170,6 +349,22 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'media';
         value: number | Media;
+      } | null)
+    | ({
+        relationTo: 'posts';
+        value: number | Post;
+      } | null)
+    | ({
+        relationTo: 'projects';
+        value: number | Project;
+      } | null)
+    | ({
+        relationTo: 'tags';
+        value: number | Tag;
+      } | null)
+    | ({
+        relationTo: 'employments';
+        value: number | Employment;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -252,6 +447,75 @@ export interface MediaSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "posts_select".
+ */
+export interface PostsSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  description?: T;
+  content?: T;
+  bannerPath?: T;
+  tags?: T;
+  projects?: T;
+  employments?: T;
+  createdAt?: T;
+  updatedAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "projects_select".
+ */
+export interface ProjectsSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  description?: T;
+  content?: T;
+  bannerPath?: T;
+  tags?: T;
+  posts?: T;
+  projects?: T;
+  employments?: T;
+  createdAt?: T;
+  updatedAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tags_select".
+ */
+export interface TagsSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  description?: T;
+  content?: T;
+  bannerPath?: T;
+  icon?: T;
+  tags?: T;
+  posts?: T;
+  projects?: T;
+  employments?: T;
+  createdAt?: T;
+  updatedAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "employments_select".
+ */
+export interface EmploymentsSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  description?: T;
+  content?: T;
+  bannerPath?: T;
+  tags?: T;
+  posts?: T;
+  projects?: T;
+  employments?: T;
+  createdAt?: T;
+  endDate?: T;
+  updatedAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
