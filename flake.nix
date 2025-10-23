@@ -81,28 +81,22 @@
             runtimeInputs = with pkgs; [golangci-lint statix deadnix templ rustc cargo gum];
             description = "Run Nix/Go/Rust Linting Steps.";
           };
-          generate-css = {
+          generate-live = {
             text = rooted ''
               templ generate --log-level error "$REPO_ROOT"
-              go run "$REPO_ROOT"/cmd/update-css --cwd "$REPO_ROOT"
+              doppler run -- go run "$REPO_ROOT"/cmd/update-live --cwd "$REPO_ROOT"
               tailwindcss -i "$REPO_ROOT"/input.css \
                   -o "$REPO_ROOT"/cmd/conneroh/_static/dist/style.css \
                   --cwd "$REPO_ROOT"
             '';
-            runtimeInputs = with pkgs; [tailwindcss templ go];
-            description = "Update the generated html and css files.";
-          };
-          generate-db = {
-            text = rooted ''doppler run -- go run "$REPO_ROOT"/cmd/update'';
-            runtimeInputs = with pkgs; [doppler];
-            description = "Update the generated go files from the md docs.";
+            runtimeInputs = with pkgs; [tailwindcss templ go doppler];
+            description = "Update the generated HTML, CSS, and database files.";
           };
           generate-reload = {
             text = ''
-              generate-css &
-              generate-db &
+              generate-live
             '';
-            runtimeInputs = with self.packages."${system}"; [generate-db generate-css];
+            runtimeInputs = with self.packages."${system}"; [generate-live];
             description = "Code Generation Steps for specific directory changes.";
           };
           generate-js = {
@@ -116,14 +110,12 @@
           };
           generate-all = {
             text = ''
-              generate-css &
-              generate-db &
+              generate-live &
               generate-js &
               wait
             '';
             runtimeInputs = with self.packages."${system}"; [
-              generate-css
-              generate-db
+              generate-live
               generate-js
             ];
             description = "Generate all artifacts in parallel.";
