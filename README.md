@@ -38,7 +38,7 @@ It follows a modern server-side rendering approach with HTMX for dynamic content
 │   │   ├── views/       # View templates
 │   │   ├── components/  # Component templates
 │   │   └── _static/     # Static assets
-│   └── update/          # Content update utility
+│   └── update-live/     # Combined content and CSS update utility
 ├── internal/            # Private application code
 │   ├── data/            # Data access layer
 │   │   ├── assets/      # Assets Data Structure definitions
@@ -79,10 +79,10 @@ cd conneroh.com
 nix develop
 
 # Generate code and assets
-nix-generate-all
+generate-all
 
-# Initialize the database
-update
+# Initialize the database and regenerate assets
+generate-live
 
 # Run the application with live reloading
 run
@@ -96,8 +96,7 @@ clean - Clean Project
 dx - Edit flake.nix
 format - Format code files
 generate-all - Generate all files in parallel
-generate-css - Update the generated html and css files.
-generate-db - Update the generated go files from the md docs.
+generate-live - Update the generated HTML, CSS, and database files.
 generate-docs - Update the generated documentation files.
 generate-js - Generate JS files
 generate-reload - Code Generation Steps for specific directory changes.
@@ -142,10 +141,10 @@ To update the database with new or modified content:
 
 ```bash
 # With Nix
-nix develop -c update
+nix develop -c generate-live
 
 # Without Nix
-go run ./cmd/update
+doppler run -- go run ./cmd/update-live
 ```
 
 ## Testing
