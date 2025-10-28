@@ -34,3 +34,6 @@ tigris.yaml
 *.db-wal
 *_templ.go
 target
+
+# Generated Fly.io configuration
+fly.toml
