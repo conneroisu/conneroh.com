@@ -34,3 +34,6 @@ tigris.yaml
 *.db-wal
 *_templ.go
 target
+
+# Deployment
+fly.toml
