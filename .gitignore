@@ -35,5 +35,5 @@ tigris.yaml
 *_templ.go
 target
 
-# Generated Fly.io configuration
+# Deployment
 fly.toml
