@@ -180,6 +180,18 @@ Tests run automatically before deployment:
 
 The site is deployed using Fly.io. The deployment process is automated in the GitHub workflow located in `.github/workflows/fly-deploy.yml`.
 
+### Generating fly.toml Configuration
+
+To generate the `fly.toml` configuration file in the repository root:
+
+```bash
+nix run .#write-fly-toml
+```
+
+This will create a `fly.toml` file based on the configuration defined in `flake.nix`.
+
+### Manual Deployment
+
 To deploy manually:
 
 ```bash

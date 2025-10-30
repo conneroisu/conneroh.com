@@ -257,6 +257,11 @@
             meta.description = "Run all tests (unit and browser)";
             program = "${self.packages.${system}.tests}/bin/tests";
           };
+          write-fly-toml = {
+            type = "app";
+            meta.description = "Writes the fly.toml configuration file to the repository root";
+            program = "${self.packages.${system}.write-fly-toml}/bin/write-fly-toml";
+          };
         };
 
         packages = let
@@ -315,6 +320,14 @@
           flyProdToml = settingsFormat.generate "fly.toml" flyProdConfig;
         in
           {
+            write-fly-toml = pkgs.writeShellApplication {
+              name = "write-fly-toml";
+              runtimeInputs = with pkgs; [coreutils];
+              text = ''
+                cp ${flyProdToml} ./fly.toml
+                echo "fly.toml written to $(pwd)/fly.toml"
+              '';
+            };
             conneroh = pkgs.buildGoModule {
               inherit src version preBuild;
               vendorHash = "sha256-447MwdXuirsxql/A+BvUoQHW+FhiWkfCtet4eyCa5qI=";
