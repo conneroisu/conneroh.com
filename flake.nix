@@ -181,11 +181,13 @@
               pprof
               graphviz
               awscli2
-
+              postgresql
+              infisical
               doppler
               tailwindcss # Web
               tailwindcss-language-server
               bun
+              litefs
               yaml-language-server
               nodePackages.typescript-language-server
               nodePackages.prettier
