@@ -36,7 +36,8 @@ func IsAllowedMediaType(path string) bool {
 
 // IsAllowedAsset returns true if the provided path is an allowed asset.
 func IsAllowedAsset(path string) bool {
-	return IsAllowedMediaType(path) || IsAllowedDocumentType(path)
+	return IsAllowedMediaType(path) ||
+		IsAllowedDocumentType(path)
 }
 
 // IsAllowedDocumentType returns true if the provided path is an allowed document type.

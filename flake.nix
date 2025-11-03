@@ -187,7 +187,7 @@
               tailwindcss # Web
               tailwindcss-language-server
               bun
-              litefs
+              sqlc
               yaml-language-server
               nodePackages.typescript-language-server
               nodePackages.prettier
@@ -195,7 +195,6 @@
               harper
               htmx-lsp
               vscode-langservers-extracted
-              sqlite
 
               # Testing
               nodejs_20
