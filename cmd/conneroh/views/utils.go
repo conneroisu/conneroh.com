@@ -3,8 +3,6 @@ package views
 
 import "strconv"
 
-//go:generate gomarkdoc -o README.md -e .
-
 func readTime(content string) string {
 	// Rough estimate - 200 words per minute reading speed
 	words := len(content) / 5 // Average word length is 5 characters

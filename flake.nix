@@ -24,15 +24,13 @@
         pkgs = import inputs.nixpkgs {
           inherit system;
           overlays = [
-            (final: prev: {final.go = prev.go_1_24;})
+            (final: prev: {
+              final.buildGoModule = prev.buildGo125Module;
+              buildGoModule = prev.buildGo125Module;
+            })
           ];
           config.allowUnfree = true;
         };
-
-        buildWithSpecificGo = pkg:
-          pkg.override {
-            buildGoModule = pkgs.buildGo124Module;
-          };
 
         rooted = text:
           builtins.concatStringsSep "\n" [
@@ -105,6 +103,13 @@
             runtimeInputs = with self.packages."${system}"; [generate-db generate-css];
             description = "Code Generation Steps for specific directory changes.";
           };
+          migrate = {
+            text = ''
+              pg_dump --schema-only --host="''${DB_HOST}" --port="''${DB_PORT}" --username="''${DB_USER}" "''${DB_DATABASE}" > ./internal/db/migrations/001_init.sql
+            '';
+            runtimeInputs = with pkgs; [postgresql];
+            description = "Migrate the database";
+          };
           generate-js = {
             text = rooted ''
               bun build "$REPO_ROOT"/index.js \
@@ -151,10 +156,18 @@
       in {
         devShells = let
           shellHook = ''
-            echo "Available commands:"
-            ${pkgs.lib.concatStringsSep "\n" (
-              pkgs.lib.mapAttrsToList (name: script: ''echo "  ${name} - ${script.description}"'') scripts
-            )}
+            if [ ! -f .env ]; then
+              echo "⚠️  .env not found, fetching from Infisical..."
+              if infisical export --env prod > .env 2>/dev/null; then
+                echo "✓ Successfully fetched secrets from Infisical"
+              else
+                echo "⚠️  Failed to fetch secrets from Infisical. Please run: infisical export --env prod > .env"
+              fi
+            fi
+
+            set -a
+            source .env
+            set +a
           '';
           shell-packages = with pkgs;
             [
@@ -163,24 +176,21 @@
               nil
               statix
               deadnix
-              inputs.bun2nix.packages.${system}.default
+              sqlc
 
               go_1_24 # Go Tools
               air
               templ
               golangci-lint
-              (buildWithSpecificGo revive)
-              (buildWithSpecificGo gopls)
-              (buildWithSpecificGo templ)
-              (buildWithSpecificGo golines)
-              (buildWithSpecificGo golangci-lint-langserver)
-              (buildWithSpecificGo gomarkdoc)
-              (buildWithSpecificGo gotests)
-              (buildWithSpecificGo gotools)
-              (buildWithSpecificGo reftools)
-              pprof
-              graphviz
-              awscli2
+              revive
+              gopls
+              templ
+              golines
+              golangci-lint-langserver
+              gomarkdoc
+              gotests
+              gotools
+              reftools
               postgresql
               infisical
               doppler
@@ -191,7 +201,6 @@
               yaml-language-server
               nodePackages.typescript-language-server
               nodePackages.prettier
-              svgcleaner
               harper
               htmx-lsp
               vscode-langservers-extracted
@@ -202,37 +211,6 @@
               flyctl # Infra
               openssl.dev
               skopeo
-
-              (
-                pkgs.buildGoModule (finalAttrs: {
-                  pname = "copygen";
-                  version = "0.4.1";
-
-                  src = pkgs.fetchFromGitHub {
-                    owner = "switchupcb";
-                    repo = "copygen";
-                    rev = "v${finalAttrs.version}";
-                    sha256 = "sha256-gdoUvTla+fRoYayUeuRha8Dkix9ACxlt0tkac0CRqwA=";
-                  };
-
-                  vendorHash = "sha256-dOIGGZWtr8F82YJRXibdw3MvohLFBQxD+Y4OkZIJc2s=";
-                  subPackages = ["."];
-                  proxyVendor = true;
-
-                  ldflags = [
-                    "-s"
-                    "-w"
-                    "-X main.version=${finalAttrs.version}"
-                  ];
-
-                  meta = with lib; {
-                    description = "Copygen";
-                    homepage = "https://github.com/switchupcb/copygen";
-                    license = licenses.mit;
-                    mainProgram = "copygen";
-                  };
-                })
-              )
             ]
             ++ builtins.attrValues scriptPackages;
         in {
@@ -314,11 +292,21 @@
           };
 
           flyProdToml = settingsFormat.generate "fly.toml" flyProdConfig;
+
+          bunNix =
+            pkgs.runCommand "bun.nix" {
+              buildInputs = [inputs.bun2nix.packages.${system}.default];
+            } ''
+              bun2nix --lock-file ${./bun.lock} --output-file $out
+            '';
         in
           {
+            inherit bunNix;
+
+            default = self.packages.${system}.conneroh;
             conneroh = pkgs.buildGoModule {
               inherit src version preBuild;
-              vendorHash = "sha256-447MwdXuirsxql/A+BvUoQHW+FhiWkfCtet4eyCa5qI=";
+              vendorHash = "sha256-tNAJcSFFyY84JuFn4ePI560G9A8//fRJNzHCow3Ecko=";
               name = "conneroh.com";
               goSum = ./go.sum;
               subPackages = ["."];
@@ -338,10 +326,6 @@
               };
               copyToRoot = [
                 self.packages."${system}".conneroh
-                (pkgs.runCommand "database-files" {} ''
-                  mkdir -p $out/root
-                  cp ${./master.db} $out/root/master.db
-                '')
               ];
             };
             deployPackage = pkgs.writeShellApplication {

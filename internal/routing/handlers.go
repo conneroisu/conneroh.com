@@ -31,7 +31,7 @@ func Make(fn APIFunc) http.HandlerFunc {
 					r,
 					"/500",
 					http.StatusFound,
-				) // 302 Found or http.StatusTemporaryRedirect (307)
+				)
 			}
 		}
 	}

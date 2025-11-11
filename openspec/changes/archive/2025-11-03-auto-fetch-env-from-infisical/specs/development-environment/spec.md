@@ -1,6 +1,6 @@
 # Development Environment - Spec Delta
 
-## MODIFIED Requirements
+## ADDED Requirements
 
 ### Requirement: Shell Environment Initialization (REQ-DEV-001)
 

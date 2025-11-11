@@ -1,6 +1,6 @@
 module github.com/conneroisu/conneroh.com
 
-go 1.24.1
+go 1.25.0
 
 require (
 	github.com/VojtaStruhar/goldmark-obsidian-callout v0.1.0
@@ -9,6 +9,7 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.36.3
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.79.3
 	github.com/conneroisu/twerge v0.4.5
+	github.com/cridenour/go-postgis v1.0.1
 	github.com/gorilla/schema v1.4.1
 	github.com/jackc/pgx/v5 v5.7.6
 	github.com/litao91/goldmark-mathjax v0.0.0-20210217064022-a43cf739a50f

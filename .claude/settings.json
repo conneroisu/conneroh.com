@@ -23,7 +23,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bun $(git rev-parse --show-toplevel)/.claude/hooks/index.ts user_prompt_submit"
+            "command": "conclaude UserPromptSubmit"
           }
         ]
       }
@@ -34,40 +34,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bun $(git rev-parse --show-toplevel)/.claude/hooks/index.ts pre_tool_use"
-          }
-        ]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bun $(git rev-parse --show-toplevel)/.claude/hooks/index.ts post_tool_use"
-          }
-        ]
-      }
-    ],
-    "Notification": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bun $(git rev-parse --show-toplevel)/.claude/hooks/index.ts notification"
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bun $(git rev-parse --show-toplevel)/.claude/hooks/index.ts stop --chat"
+            "command": "conclaude PreToolUse"
           }
         ]
       }
@@ -78,7 +45,73 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bun $(git rev-parse --show-toplevel)/.claude/hooks/index.ts subagent_stop --chat"
+            "command": "conclaude SubagentStop"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "conclaude PostToolUse"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "conclaude SessionEnd"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "conclaude Stop"
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "conclaude Notification"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "conclaude PreCompact"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "conclaude SessionStart"
           }
         ]
       }

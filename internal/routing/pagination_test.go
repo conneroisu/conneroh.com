@@ -1,6 +1,7 @@
 package routing_test
 
 import (
+	"slices"
 	"testing"
 
 	"github.com/conneroisu/conneroh.com/internal/routing"
@@ -162,24 +163,9 @@ func TestPaginate(t *testing.T) {
 				t.Errorf("paginate() totalPages = %v, want %v", gotPages, tt.expectedPages)
 			}
 
-			// Check if returned items match expected
-			if !slicesEqual(gotItems, tt.expectedItems) {
+			if !slices.Equal(gotItems, tt.expectedItems) {
 				t.Errorf("paginate() items = %v, want %v", gotItems, tt.expectedItems)
 			}
 		})
 	}
-}
-
-// Helper function to compare slices.
-func slicesEqual[T comparable](a, b []T) bool {
-	if len(a) != len(b) {
-		return false
-	}
-	for i, v := range a {
-		if v != b[i] {
-			return false
-		}
-	}
-
-	return true
 }

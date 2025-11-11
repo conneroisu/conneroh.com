@@ -12,6 +12,7 @@
 node_modules
 .env
 package-lock.json
+bun.nix
 
 # Testing
 **/__screenshots__/

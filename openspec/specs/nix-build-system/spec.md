@@ -1,7 +1,8 @@
-# Nix Build System - Spec Delta
+# nix-build-system Specification
 
-## MODIFIED Requirements
-
+## Purpose
+TBD - created by archiving change inline-bun-nix-generation. Update Purpose after archive.
+## Requirements
 ### Requirement: Bun Package Dependencies Resolution
 
 The Nix build system SHALL generate the `bun.nix` dependency mapping inline during the flake evaluation phase rather than relying on a pre-committed file.
@@ -52,26 +53,3 @@ The Nix build system SHALL maintain reproducible builds where the same `bun.lock
 - **AND** the new dependency set is used
 - **AND** the package is rebuilt with updated dependencies
 
-## REMOVED Requirements
-
-### Requirement: Pre-committed bun.nix file
-
-**Removed**: The requirement to maintain a committed `bun.nix` file in the repository
-
-**Reason**: Inline generation eliminates the need for version controlling generated files, reducing repository size and maintenance burden.
-
-**Migration**:
-- Delete `bun.nix` from repository
-- Add to `.gitignore`
-- No code changes required for consumers (the file was only used internally by Nix)
-
-### Requirement: Manual bun.nix regeneration
-
-**Removed**: The requirement for developers to manually run `bun2nix` via `postinstall` scripts or CLI commands
-
-**Reason**: Inline generation happens automatically during Nix evaluation, eliminating manual steps.
-
-**Migration**:
-- Remove `postinstall` script from `package.json`
-- No action required from developers
-- Build process remains: `nix build`, `nix develop`, etc.

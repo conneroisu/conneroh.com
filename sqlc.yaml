@@ -9,6 +9,11 @@ sql:
       # pg_dump --schema-only --host=${DB_HOST} --port=${DB_PORT} --username="${DB_USER}:${DB_PASSWORD}" ${DB_DATABASE}
     gen:
       go:
+        overrides:
+          - db_type: "geometry"
+            go_type: "github.com/cridenour/go-postgis.Point"
+          - db_type: "public.geometry"
+            go_type: "github.com/cridenour/go-postgis.Point"
         package: db
         sql_package: "pgx/v5"
         out: ./internal/db

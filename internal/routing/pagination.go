@@ -10,9 +10,12 @@ const (
 	// MaxListSmallItems is the maximum number of items in a list view.
 	MaxListSmallItems = 27
 
-	// MaxMobilePageNumber is the maximum number of pages to display before ... is shown.
+	// MaxMobilePageNumber is the maximum number of pages to display before
+	// '...' is shown.
 	MaxMobilePageNumber = 5
-	// MaxDesktopPageNumber is the maximum number of pages to display before ... is shown.
+
+	// MaxDesktopPageNumber is the maximum number of pages to display before
+	// '...' is shown.
 	MaxDesktopPageNumber = 10
 
 	// Ellipsis represents pagination gaps.
@@ -21,7 +24,8 @@ const (
 	// PaginationHalfDivisor is used to calculate pagination ranges.
 	PaginationHalfDivisor = 2
 
-	// PaginationEndAdjustment is used to adjust the end range in pagination.
+	// PaginationEndAdjustment is used to adjust the end range in
+	// pagination.
 	PaginationEndAdjustment = 2
 )
 
