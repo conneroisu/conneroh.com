@@ -14,6 +14,14 @@ const config = defineConfig({
     tanstackStart(),
     viteSolid({ ssr: true }),
   ],
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: [],
+    deps: {
+      inline: [/solid-js/],
+    },
+  },
 })
 
 export default config
