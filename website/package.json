@@ -13,13 +13,14 @@
     "check": "prettier --write . && eslint --fix"
   },
   "dependencies": {
+    "@sanity/client": "^7.12.1",
     "@tailwindcss/vite": "^4.1.13",
+    "@tanstack/router-plugin": "^1.135.2",
     "@tanstack/solid-devtools": "^0.7.0",
     "@tanstack/solid-router": "^1.135.2",
     "@tanstack/solid-router-devtools": "^1.135.2",
     "@tanstack/solid-router-ssr-query": "^1.135.2",
     "@tanstack/solid-start": "^1.135.2",
-    "@tanstack/router-plugin": "^1.135.2",
     "solid-js": "^1.9.10",
     "tailwindcss": "^4.1.13",
     "vite-tsconfig-paths": "^5.1.4"

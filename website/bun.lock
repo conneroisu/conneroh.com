@@ -4,6 +4,7 @@
     "": {
       "name": "tanstack-solid-start-bun-hosting",
       "dependencies": {
+        "@sanity/client": "^7.12.1",
         "@tailwindcss/vite": "^4.1.13",
         "@tanstack/router-plugin": "^1.135.2",
         "@tanstack/solid-devtools": "^0.7.0",
