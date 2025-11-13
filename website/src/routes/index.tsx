@@ -35,7 +35,7 @@ function HomePage() {
   return (
     <div class="min-h-screen bg-gray-900">
       {/* Hero Section */}
-      <section class="bg-gradient-to-b from-gray-900 to-gray-800 py-20">
+      <section class="bg-linear-to-b from-gray-900 to-gray-800 py-20">
         <div class="container mx-auto px-4">
           <div class="flex flex-col lg:flex-row items-center justify-between gap-12">
             {/* Left side - Text content */}
@@ -146,7 +146,7 @@ function HomePage() {
                   startDate: (emp as any).startDate || emp.createdAt || new Date().toISOString(),
                   endDate: emp.endDate,
                   tags: emp.tags,
-                  href: `/experience/${emp.slug?.current}`,
+                  href: `/employments/${emp.slug?.current}`,
                 }))}
               />
             </Show>
@@ -183,7 +183,7 @@ function HomePage() {
                   {(post) => (
                     <PostCard
                       title={post.title || 'Untitled Post'}
-                      description={post.excerpt}
+                      description={post.description}
                       bannerPath={post.banner?.asset?._ref ? `https://cdn.sanity.io/images/${post.banner.asset._ref}` : undefined}
                       createdAt={post.publishedAt || post.createdAt}
                       tags={post.tags}

@@ -1,27 +1,21 @@
 import { createFileRoute, Navigate } from '@tanstack/solid-router';
 import { Show, For } from 'solid-js';
-import { fetchSanityContent } from '@/lib/sanity-server';
-import { getPostBySlug, getRelatedPosts } from '@/lib/sanity-queries';
+import { getPostBySlug, getRelatedPosts } from '@/lib/sanity-server-funcs';
 import type { Post } from '@/lib/sanity-types';
 import { PortableText } from '@/components/sanity/PortableText';
 
 export const Route = createFileRoute('/posts/$slug')({
+  ssr: true,
   component: PostDetailPage,
   loader: async ({ params }) => {
-    const post = await fetchSanityContent<Post | null>(
-      getPostBySlug(),
-      { slug: params.slug }
-    );
+    const post = await getPostBySlug(params.slug);
 
     if (!post) {
       return { post: null, relatedPosts: [] };
     }
 
     // Fetch related posts (limit to 3)
-    const relatedPosts = await fetchSanityContent<Post[]>(
-      getRelatedPosts(),
-      { postId: post._id, limit: 3 }
-    );
+    const relatedPosts = await getRelatedPosts(post._id, 3);
 
     return {
       post,

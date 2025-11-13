@@ -1,4 +1,5 @@
 import { createClient, type ClientConfig, type SanityClient } from '@sanity/client';
+import { env } from '../env';
 
 /**
  * Re-export generated Sanity types for convenience
@@ -66,8 +67,8 @@ export interface SanityClientOptions {
  * @throws Error if required environment variables are missing
  */
 export function createSanityClient(options: SanityClientOptions = {}): SanityClient {
-  const projectId = options.projectId || import.meta.env.VITE_SANITY_PROJECT_ID;
-  const dataset = options.dataset || import.meta.env.VITE_SANITY_DATASET;
+  const projectId = options.projectId || env.VITE_SANITY_PROJECT_ID;
+  const dataset = options.dataset || env.VITE_SANITY_DATASET;
 
   if (!projectId) {
     throw new Error(
@@ -127,7 +128,7 @@ export function getSanityClient(): SanityClient {
  * @throws Error if SANITY_API_TOKEN is not set
  */
 export function createServerClient(): SanityClient {
-  const token = process.env.SANITY_API_TOKEN;
+  const token = env.SANITY_API_TOKEN;
 
   if (!token) {
     throw new Error(

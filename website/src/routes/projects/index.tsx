@@ -1,13 +1,12 @@
 import { createFileRoute } from '@tanstack/solid-router';
 import { For, Show } from 'solid-js';
-import { fetchSanityContent } from '@/lib/sanity-server';
-import { listProjects } from '@/lib/sanity-queries';
+import { getProjects } from '@/lib/sanity-server-funcs';
 import type { Project } from '@/lib/sanity-types';
 
 export const Route = createFileRoute('/projects/')({
   component: ProjectsPage,
   loader: async () => {
-    const projects = await fetchSanityContent<Project[]>(listProjects());
+    const projects = await getProjects();
     return { projects };
   },
 });

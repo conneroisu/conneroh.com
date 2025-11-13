@@ -5,8 +5,8 @@ import { getEmploymentBySlug } from '@/lib/sanity-queries';
 import type { Employment } from '@/lib/sanity-types';
 import { PortableText } from '@/components/sanity/PortableText';
 
-export const Route = createFileRoute('/experience/$slug')({
-  component: ExperienceDetailPage,
+export const Route = createFileRoute('/employments/$slug')({
+  component: EmploymnetDetailPage,
   loader: async ({ params }) => {
     const employment = await fetchSanityContent<Employment | null>(
       getEmploymentBySlug(),
@@ -17,7 +17,7 @@ export const Route = createFileRoute('/experience/$slug')({
   },
 });
 
-function ExperienceDetailPage() {
+function EmploymnetDetailPage() {
   const data = Route.useLoaderData();
 
   const formatDate = (dateString: string | undefined) => {
@@ -50,7 +50,7 @@ function ExperienceDetailPage() {
   return (
     <Show
       when={data().employment}
-      fallback={<Navigate to="/experience" />}
+      fallback={<Navigate to="/employments" />}
     >
       <article class="min-h-screen bg-gray-900" data-testid="employment-detail">
         {/* Main Container */}
@@ -215,7 +215,7 @@ function ExperienceDetailPage() {
                   {(employment) => (
                     <Show when={typeof employment !== 'string' && employment._ref}>
                       <a
-                        href={`/experience/${employment._ref}`}
+                        href={`/employments/${employment._ref}`}
                         class="bg-gray-800 rounded-lg p-4 hover:bg-gray-700 transition-colors"
                       >
                         <span class="text-green-400 hover:text-green-300 font-medium">
@@ -229,10 +229,9 @@ function ExperienceDetailPage() {
             </div>
           </Show>
 
-          {/* Back to Experience */}
           <div class="mt-12 text-center">
             <a
-              href="/experience"
+              href="/employments"
               class="inline-flex items-center gap-2 px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
               data-testid="back-to-experience"
             >

@@ -69,7 +69,7 @@ export default function Header() {
                   Tags
                 </Link>
                 <Link
-                  to="/experience"
+                  to="/employments/"
                   class="text-gray-300 hover:text-white transition-colors"
                 >
                   Experience
@@ -80,9 +80,8 @@ export default function Header() {
 
           {/* Mobile Menu */}
           <div
-            class={`sm:hidden overflow-hidden transition-all duration-300 ${
-              isMenuOpen() ? 'max-h-64 opacity-100' : 'max-h-0 opacity-0'
-            }`}
+            class={`sm:hidden overflow-hidden transition-all duration-300 ${isMenuOpen() ? 'max-h-64 opacity-100' : 'max-h-0 opacity-0'
+              }`}
           >
             <div class="py-4 space-y-2">
               <Link
@@ -107,7 +106,7 @@ export default function Header() {
                 Tags
               </Link>
               <Link
-                to="/experience"
+                to="/employments/"
                 class="block px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800 transition-colors rounded"
                 onClick={closeMenu}
               >

@@ -2,6 +2,7 @@ import { createRouter } from '@tanstack/solid-router'
 
 // Import the generated route tree
 import { routeTree } from './routeTree.gen'
+import { NotFoundComponent } from './routes/__root'
 
 // Create a new router instance
 export const getRouter = () => {
@@ -9,5 +10,6 @@ export const getRouter = () => {
     routeTree,
     scrollRestoration: true,
     defaultPreloadStaleTime: 0,
+    defaultNotFoundComponent: NotFoundComponent,
   })
 }

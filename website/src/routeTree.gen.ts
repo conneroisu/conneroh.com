@@ -13,14 +13,11 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as TagsIndexRouteImport } from './routes/tags/index'
 import { Route as ProjectsIndexRouteImport } from './routes/projects/index'
 import { Route as PostsIndexRouteImport } from './routes/posts/index'
-import { Route as ExperienceIndexRouteImport } from './routes/experience/index'
+import { Route as EmploymentsIndexRouteImport } from './routes/employments/index'
 import { Route as TagsSlugRouteImport } from './routes/tags/$slug'
 import { Route as ProjectsSlugRouteImport } from './routes/projects/$slug'
 import { Route as PostsSlugRouteImport } from './routes/posts/$slug'
-import { Route as ExperienceSlugRouteImport } from './routes/experience/$slug'
-import { Route as ApiDemoNamesRouteImport } from './routes/api.demo-names'
-import { Route as DemoStartServerFuncsRouteImport } from './routes/demo.start.server-funcs'
-import { Route as DemoStartApiRequestRouteImport } from './routes/demo.start.api-request'
+import { Route as EmploymentsSlugRouteImport } from './routes/employments/$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -42,9 +39,9 @@ const PostsIndexRoute = PostsIndexRouteImport.update({
   path: '/posts/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ExperienceIndexRoute = ExperienceIndexRouteImport.update({
-  id: '/experience/',
-  path: '/experience/',
+const EmploymentsIndexRoute = EmploymentsIndexRouteImport.update({
+  id: '/employments/',
+  path: '/employments/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TagsSlugRoute = TagsSlugRouteImport.update({
@@ -62,128 +59,92 @@ const PostsSlugRoute = PostsSlugRouteImport.update({
   path: '/posts/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ExperienceSlugRoute = ExperienceSlugRouteImport.update({
-  id: '/experience/$slug',
-  path: '/experience/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiDemoNamesRoute = ApiDemoNamesRouteImport.update({
-  id: '/api/demo-names',
-  path: '/api/demo-names',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoStartServerFuncsRoute = DemoStartServerFuncsRouteImport.update({
-  id: '/demo/start/server-funcs',
-  path: '/demo/start/server-funcs',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoStartApiRequestRoute = DemoStartApiRequestRouteImport.update({
-  id: '/demo/start/api-request',
-  path: '/demo/start/api-request',
+const EmploymentsSlugRoute = EmploymentsSlugRouteImport.update({
+  id: '/employments/$slug',
+  path: '/employments/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/api/demo-names': typeof ApiDemoNamesRoute
-  '/experience/$slug': typeof ExperienceSlugRoute
+  '/employments/$slug': typeof EmploymentsSlugRoute
   '/posts/$slug': typeof PostsSlugRoute
   '/projects/$slug': typeof ProjectsSlugRoute
   '/tags/$slug': typeof TagsSlugRoute
-  '/experience': typeof ExperienceIndexRoute
+  '/employments': typeof EmploymentsIndexRoute
   '/posts': typeof PostsIndexRoute
   '/projects': typeof ProjectsIndexRoute
   '/tags': typeof TagsIndexRoute
-  '/demo/start/api-request': typeof DemoStartApiRequestRoute
-  '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/api/demo-names': typeof ApiDemoNamesRoute
-  '/experience/$slug': typeof ExperienceSlugRoute
+  '/employments/$slug': typeof EmploymentsSlugRoute
   '/posts/$slug': typeof PostsSlugRoute
   '/projects/$slug': typeof ProjectsSlugRoute
   '/tags/$slug': typeof TagsSlugRoute
-  '/experience': typeof ExperienceIndexRoute
+  '/employments': typeof EmploymentsIndexRoute
   '/posts': typeof PostsIndexRoute
   '/projects': typeof ProjectsIndexRoute
   '/tags': typeof TagsIndexRoute
-  '/demo/start/api-request': typeof DemoStartApiRequestRoute
-  '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/api/demo-names': typeof ApiDemoNamesRoute
-  '/experience/$slug': typeof ExperienceSlugRoute
+  '/employments/$slug': typeof EmploymentsSlugRoute
   '/posts/$slug': typeof PostsSlugRoute
   '/projects/$slug': typeof ProjectsSlugRoute
   '/tags/$slug': typeof TagsSlugRoute
-  '/experience/': typeof ExperienceIndexRoute
+  '/employments/': typeof EmploymentsIndexRoute
   '/posts/': typeof PostsIndexRoute
   '/projects/': typeof ProjectsIndexRoute
   '/tags/': typeof TagsIndexRoute
-  '/demo/start/api-request': typeof DemoStartApiRequestRoute
-  '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/api/demo-names'
-    | '/experience/$slug'
+    | '/employments/$slug'
     | '/posts/$slug'
     | '/projects/$slug'
     | '/tags/$slug'
-    | '/experience'
+    | '/employments'
     | '/posts'
     | '/projects'
     | '/tags'
-    | '/demo/start/api-request'
-    | '/demo/start/server-funcs'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/api/demo-names'
-    | '/experience/$slug'
+    | '/employments/$slug'
     | '/posts/$slug'
     | '/projects/$slug'
     | '/tags/$slug'
-    | '/experience'
+    | '/employments'
     | '/posts'
     | '/projects'
     | '/tags'
-    | '/demo/start/api-request'
-    | '/demo/start/server-funcs'
   id:
     | '__root__'
     | '/'
-    | '/api/demo-names'
-    | '/experience/$slug'
+    | '/employments/$slug'
     | '/posts/$slug'
     | '/projects/$slug'
     | '/tags/$slug'
-    | '/experience/'
+    | '/employments/'
     | '/posts/'
     | '/projects/'
     | '/tags/'
-    | '/demo/start/api-request'
-    | '/demo/start/server-funcs'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  ApiDemoNamesRoute: typeof ApiDemoNamesRoute
-  ExperienceSlugRoute: typeof ExperienceSlugRoute
+  EmploymentsSlugRoute: typeof EmploymentsSlugRoute
   PostsSlugRoute: typeof PostsSlugRoute
   ProjectsSlugRoute: typeof ProjectsSlugRoute
   TagsSlugRoute: typeof TagsSlugRoute
-  ExperienceIndexRoute: typeof ExperienceIndexRoute
+  EmploymentsIndexRoute: typeof EmploymentsIndexRoute
   PostsIndexRoute: typeof PostsIndexRoute
   ProjectsIndexRoute: typeof ProjectsIndexRoute
   TagsIndexRoute: typeof TagsIndexRoute
-  DemoStartApiRequestRoute: typeof DemoStartApiRequestRoute
-  DemoStartServerFuncsRoute: typeof DemoStartServerFuncsRoute
 }
 
 declare module '@tanstack/solid-router' {
@@ -216,11 +177,11 @@ declare module '@tanstack/solid-router' {
       preLoaderRoute: typeof PostsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/experience/': {
-      id: '/experience/'
-      path: '/experience'
-      fullPath: '/experience'
-      preLoaderRoute: typeof ExperienceIndexRouteImport
+    '/employments/': {
+      id: '/employments/'
+      path: '/employments'
+      fullPath: '/employments'
+      preLoaderRoute: typeof EmploymentsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tags/$slug': {
@@ -244,32 +205,11 @@ declare module '@tanstack/solid-router' {
       preLoaderRoute: typeof PostsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/experience/$slug': {
-      id: '/experience/$slug'
-      path: '/experience/$slug'
-      fullPath: '/experience/$slug'
-      preLoaderRoute: typeof ExperienceSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/demo-names': {
-      id: '/api/demo-names'
-      path: '/api/demo-names'
-      fullPath: '/api/demo-names'
-      preLoaderRoute: typeof ApiDemoNamesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/start/server-funcs': {
-      id: '/demo/start/server-funcs'
-      path: '/demo/start/server-funcs'
-      fullPath: '/demo/start/server-funcs'
-      preLoaderRoute: typeof DemoStartServerFuncsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/start/api-request': {
-      id: '/demo/start/api-request'
-      path: '/demo/start/api-request'
-      fullPath: '/demo/start/api-request'
-      preLoaderRoute: typeof DemoStartApiRequestRouteImport
+    '/employments/$slug': {
+      id: '/employments/$slug'
+      path: '/employments/$slug'
+      fullPath: '/employments/$slug'
+      preLoaderRoute: typeof EmploymentsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -277,17 +217,14 @@ declare module '@tanstack/solid-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  ApiDemoNamesRoute: ApiDemoNamesRoute,
-  ExperienceSlugRoute: ExperienceSlugRoute,
+  EmploymentsSlugRoute: EmploymentsSlugRoute,
   PostsSlugRoute: PostsSlugRoute,
   ProjectsSlugRoute: ProjectsSlugRoute,
   TagsSlugRoute: TagsSlugRoute,
-  ExperienceIndexRoute: ExperienceIndexRoute,
+  EmploymentsIndexRoute: EmploymentsIndexRoute,
   PostsIndexRoute: PostsIndexRoute,
   ProjectsIndexRoute: ProjectsIndexRoute,
   TagsIndexRoute: TagsIndexRoute,
-  DemoStartApiRequestRoute: DemoStartApiRequestRoute,
-  DemoStartServerFuncsRoute: DemoStartServerFuncsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

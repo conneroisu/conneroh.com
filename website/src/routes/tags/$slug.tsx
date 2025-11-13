@@ -1,24 +1,20 @@
 import { createFileRoute, Navigate } from '@tanstack/solid-router';
 import { Show, For, createSignal } from 'solid-js';
-import { fetchSanityContent } from '@/lib/sanity-server';
-import { getTagBySlug, getPostsByTag, getProjectsByTag } from '@/lib/sanity-queries';
+import { getPostsByTag, getTagBySlug, getProjectsByTag } from '@/lib/sanity-server-funcs';
 import type { Tag, Post, Project } from '@/lib/sanity-types';
 
 export const Route = createFileRoute('/tags/$slug')({
   component: TagDetailPage,
   loader: async ({ params }) => {
-    const tag = await fetchSanityContent<Tag | null>(
-      getTagBySlug(),
-      { slug: params.slug }
-    );
+    const tag = await getTagBySlug(params.slug);
 
     if (!tag) {
       return { tag: null, posts: [], projects: [] };
     }
 
     const [posts, projects] = await Promise.all([
-      fetchSanityContent<Post[]>(getPostsByTag(), { tagSlug: params.slug }),
-      fetchSanityContent<Project[]>(getProjectsByTag(), { tagSlug: params.slug }),
+      getPostsByTag(params.slug),
+      getProjectsByTag(params.slug),
     ]);
 
     return { tag, posts, projects };
