@@ -25,6 +25,11 @@ describe('Sanity Integration Tests', () => {
     });
   });
 
+  // Helper to mock fetch with proper typing
+  function mockFetch<T>(returnValue: T) {
+    return vi.spyOn(mockClient, 'fetch').mockResolvedValue(returnValue as never);
+  }
+
   describe('Content Fetching Pipeline', () => {
     it('should fetch and parse Post documents', async () => {
       // Mock fetch response
@@ -37,21 +42,21 @@ describe('Sanity Integration Tests', () => {
           _rev: 'rev-1',
           title: 'Test Post',
           slug: { _type: 'slug', current: 'test-post' },
-          publishedAt: '2025-01-01T00:00:00Z',
-          excerpt: 'This is a test post',
+          description: 'This is a test post',
           content: [],
+          createdAt: '2025-01-01T00:00:00Z',
         },
       ];
 
-      const fetchSpy = vi.spyOn(mockClient, 'fetch').mockResolvedValue(mockPosts);
+      mockFetch(mockPosts);
 
       const result = await mockClient.fetch<Post[]>('*[_type == "post"]');
 
-      expect(fetchSpy).toHaveBeenCalledWith('*[_type == "post"]');
+      expect(mockClient.fetch).toHaveBeenCalledWith('*[_type == "post"]');
       expect(result).toHaveLength(1);
-      expect(result[0]._type).toBe('post');
-      expect(result[0].title).toBe('Test Post');
-      expect(result[0].slug.current).toBe('test-post');
+      expect(result[0]?._type).toBe('post');
+      expect(result[0]?.title).toBe('Test Post');
+      expect(result[0]?.slug?.current).toBe('test-post');
     });
 
     it('should fetch and parse Project documents', async () => {
@@ -64,20 +69,20 @@ describe('Sanity Integration Tests', () => {
           _rev: 'rev-1',
           title: 'Test Project',
           slug: { _type: 'slug', current: 'test-project' },
-          publishedAt: '2025-01-01T00:00:00Z',
-          excerpt: 'This is a test project',
+          description: 'This is a test project',
           content: [],
+          createdAt: '2025-01-01T00:00:00Z',
         },
       ];
 
-      const fetchSpy = vi.spyOn(mockClient, 'fetch').mockResolvedValue(mockProjects);
+      mockFetch(mockProjects);
 
       const result = await mockClient.fetch<Project[]>('*[_type == "project"]');
 
-      expect(fetchSpy).toHaveBeenCalledWith('*[_type == "project"]');
+      expect(mockClient.fetch).toHaveBeenCalledWith('*[_type == "project"]');
       expect(result).toHaveLength(1);
-      expect(result[0]._type).toBe('project');
-      expect(result[0].title).toBe('Test Project');
+      expect(result[0]?._type).toBe('project');
+      expect(result[0]?.title).toBe('Test Project');
     });
 
     it('should fetch single document by slug', async () => {
@@ -89,37 +94,27 @@ describe('Sanity Integration Tests', () => {
         _rev: 'rev-1',
         title: 'Test Post',
         slug: { _type: 'slug', current: 'test-post' },
-        publishedAt: '2025-01-01T00:00:00Z',
-        excerpt: 'This is a test post',
+        description: 'This is a test post',
         content: [],
+        createdAt: '2025-01-01T00:00:00Z',
       };
 
-      const fetchSpy = vi.spyOn(mockClient, 'fetch').mockResolvedValue(mockPost);
+      mockFetch(mockPost);
 
       const result = await mockClient.fetch<Post>(
         '*[_type == "post" && slug.current == $slug][0]',
         { slug: 'test-post' }
       );
 
-      expect(fetchSpy).toHaveBeenCalledWith(
+      expect(mockClient.fetch).toHaveBeenCalledWith(
         '*[_type == "post" && slug.current == $slug][0]',
         { slug: 'test-post' }
       );
       expect(result._id).toBe('post-1');
-      expect(result.slug.current).toBe('test-post');
+      expect(result.slug?.current).toBe('test-post');
     });
 
     it('should fetch documents with references (tags)', async () => {
-      const mockTag: Tag = {
-        _id: 'tag-1',
-        _type: 'tag',
-        _createdAt: '2025-01-01T00:00:00Z',
-        _updatedAt: '2025-01-01T00:00:00Z',
-        _rev: 'rev-1',
-        title: 'TypeScript',
-        slug: { _type: 'slug', current: 'typescript' },
-      };
-
       const mockPostWithTags: Post = {
         _id: 'post-1',
         _type: 'post',
@@ -128,48 +123,48 @@ describe('Sanity Integration Tests', () => {
         _rev: 'rev-1',
         title: 'Test Post',
         slug: { _type: 'slug', current: 'test-post' },
-        publishedAt: '2025-01-01T00:00:00Z',
-        excerpt: 'This is a test post',
+        description: 'This is a test post',
         content: [],
+        createdAt: '2025-01-01T00:00:00Z',
         tags: [{ _type: 'reference', _ref: 'tag-1', _key: 'key-1' }],
       };
 
-      const fetchSpy = vi.spyOn(mockClient, 'fetch').mockResolvedValue(mockPostWithTags);
+      mockFetch(mockPostWithTags);
 
       const result = await mockClient.fetch<Post>(
         '*[_type == "post"][0]{..., tags[]->{title, slug}}'
       );
 
-      expect(fetchSpy).toHaveBeenCalled();
+      expect(mockClient.fetch).toHaveBeenCalled();
       expect(result.tags).toBeDefined();
     });
 
     it('should handle paginated queries', async () => {
       const mockPosts: Post[] = Array.from({ length: 10 }, (_, i) => ({
         _id: `post-${i}`,
-        _type: 'post',
+        _type: 'post' as const,
         _createdAt: '2025-01-01T00:00:00Z',
         _updatedAt: '2025-01-01T00:00:00Z',
         _rev: `rev-${i}`,
         title: `Post ${i}`,
-        slug: { _type: 'slug', current: `post-${i}` },
-        publishedAt: '2025-01-01T00:00:00Z',
-        excerpt: `Excerpt ${i}`,
+        slug: { _type: 'slug' as const, current: `post-${i}` },
+        description: `Description ${i}`,
         content: [],
+        createdAt: '2025-01-01T00:00:00Z',
       }));
 
-      const fetchSpy = vi.spyOn(mockClient, 'fetch').mockResolvedValue(mockPosts);
+      mockFetch(mockPosts);
 
       const result = await mockClient.fetch<Post[]>('*[_type == "post"][0...10]');
 
-      expect(fetchSpy).toHaveBeenCalledWith('*[_type == "post"][0...10]');
+      expect(mockClient.fetch).toHaveBeenCalledWith('*[_type == "post"][0...10]');
       expect(result).toHaveLength(10);
     });
 
     it('should handle count queries', async () => {
       const mockCount = 42;
 
-      const fetchSpy = vi.spyOn(mockClient, 'fetch').mockResolvedValue(mockCount);
+      const fetchSpy = mockFetch(mockCount);
 
       const result = await mockClient.fetch<number>('count(*[_type == "post"])');
 
@@ -204,7 +199,7 @@ describe('Sanity Integration Tests', () => {
     });
 
     it('should return empty array for no results', async () => {
-      const fetchSpy = vi.spyOn(mockClient, 'fetch').mockResolvedValue([]);
+      const fetchSpy = mockFetch([]);
 
       const result = await mockClient.fetch<Post[]>('*[_type == "nonexistent"]');
 
@@ -214,7 +209,7 @@ describe('Sanity Integration Tests', () => {
     });
 
     it('should return null for single document not found', async () => {
-      const fetchSpy = vi.spyOn(mockClient, 'fetch').mockResolvedValue(null);
+      const fetchSpy = mockFetch(null);
 
       const result = await mockClient.fetch<Post | null>(
         '*[_type == "post" && slug.current == "nonexistent"][0]'
@@ -235,16 +230,16 @@ describe('Sanity Integration Tests', () => {
         _rev: 'rev-1',
         title: 'Test Post',
         slug: { _type: 'slug', current: 'test-post' },
-        publishedAt: '2025-01-01T00:00:00Z',
-        excerpt: 'This is a test post',
+        description: 'This is a test post',
         content: [],
+        createdAt: '2025-01-01T00:00:00Z',
       };
 
-      const fetchSpy = vi.spyOn(mockClient, 'fetch').mockResolvedValue(mockPost);
+      mockFetch(mockPost);
 
       const result = await mockClient.fetch<Post>('*[_type == "post"][0]');
 
-      expect(fetchSpy).toHaveBeenCalled();
+      expect(mockClient.fetch).toHaveBeenCalled();
       expect(result).toMatchObject({
         _type: 'post',
         title: expect.any(String),
@@ -263,22 +258,21 @@ describe('Sanity Integration Tests', () => {
         _rev: 'rev-1',
         title: 'Software Engineer',
         slug: { _type: 'slug', current: 'software-engineer' },
-        company: 'Test Company',
-        location: 'Remote',
-        startDate: '2020-01-01',
+        description: 'Test Company position',
         content: [],
+        createdAt: '2020-01-01',
       };
 
-      const fetchSpy = vi.spyOn(mockClient, 'fetch').mockResolvedValue(mockEmployment);
+      mockFetch(mockEmployment);
 
       const result = await mockClient.fetch<Employment>('*[_type == "employment"][0]');
 
-      expect(fetchSpy).toHaveBeenCalled();
+      expect(mockClient.fetch).toHaveBeenCalled();
       expect(result).toMatchObject({
         _type: 'employment',
-        company: expect.any(String),
-        location: expect.any(String),
-        startDate: expect.any(String),
+        title: expect.any(String),
+        description: expect.any(String),
+        createdAt: expect.any(String),
       });
     });
   });
@@ -294,20 +288,20 @@ describe('Sanity Integration Tests', () => {
           _rev: 'rev-1',
           title: 'TypeScript Post',
           slug: { _type: 'slug', current: 'typescript-post' },
-          publishedAt: '2025-01-01T00:00:00Z',
-          excerpt: 'TypeScript content',
+          description: 'TypeScript content',
           content: [],
+          createdAt: '2025-01-01T00:00:00Z',
         },
       ];
 
-      const fetchSpy = vi.spyOn(mockClient, 'fetch').mockResolvedValue(mockPosts);
+      mockFetch(mockPosts);
 
       const result = await mockClient.fetch<Post[]>(
         '*[_type == $type && references($tagId)]',
         { type: 'post', tagId: 'tag-1' }
       );
 
-      expect(fetchSpy).toHaveBeenCalledWith(
+      expect(mockClient.fetch).toHaveBeenCalledWith(
         '*[_type == $type && references($tagId)]',
         { type: 'post', tagId: 'tag-1' }
       );
@@ -317,18 +311,18 @@ describe('Sanity Integration Tests', () => {
     it('should handle date range parameters', async () => {
       const mockPosts: Post[] = [];
 
-      const fetchSpy = vi.spyOn(mockClient, 'fetch').mockResolvedValue(mockPosts);
+      mockFetch(mockPosts);
 
       await mockClient.fetch<Post[]>(
-        '*[_type == "post" && publishedAt >= $startDate && publishedAt <= $endDate]',
+        '*[_type == "post" && createdAt >= $startDate && createdAt <= $endDate]',
         {
           startDate: '2025-01-01',
           endDate: '2025-12-31',
         }
       );
 
-      expect(fetchSpy).toHaveBeenCalledWith(
-        '*[_type == "post" && publishedAt >= $startDate && publishedAt <= $endDate]',
+      expect(mockClient.fetch).toHaveBeenCalledWith(
+        '*[_type == "post" && createdAt >= $startDate && createdAt <= $endDate]',
         {
           startDate: '2025-01-01',
           endDate: '2025-12-31',
@@ -348,17 +342,17 @@ describe('Sanity Integration Tests', () => {
         _rev: 'rev-1',
         title: 'SSR Post',
         slug: { _type: 'slug', current: 'ssr-post' },
-        publishedAt: '2025-01-01T00:00:00Z',
-        excerpt: 'Server-side rendered post',
+        description: 'Server-side rendered post',
         content: [],
+        createdAt: '2025-01-01T00:00:00Z',
       };
 
-      const fetchSpy = vi.spyOn(mockClient, 'fetch').mockResolvedValue(mockPost);
+      mockFetch(mockPost);
 
       // Simulate route loader behavior
       const loaderData = await mockClient.fetch<Post>('*[_type == "post"][0]');
 
-      expect(fetchSpy).toHaveBeenCalled();
+      expect(mockClient.fetch).toHaveBeenCalled();
       expect(loaderData).toBeDefined();
       expect(loaderData._type).toBe('post');
     });

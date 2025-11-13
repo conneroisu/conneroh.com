@@ -23,21 +23,15 @@ export function PostListComponent() {
 
   return () => {
     const postData = posts();
-    if (!postData) return <div>Loading...</div>;
+    if (!postData) return null;
 
     // TypeScript knows the shape of Post
-    return (
-      <div>
-        {postData.map((post) => (
-          <article key={post._id}>
-            <h2>{post.title}</h2>
-            <p>{post.description}</p>
-            {/* TypeScript autocompletes all Post fields */}
-            <time>{post.createdAt}</time>
-          </article>
-        ))}
-      </div>
-    );
+    return postData.map((post) => ({
+      id: post._id,
+      title: post.title,
+      description: post.description,
+      createdAt: post.createdAt
+    }));
   };
 }
 
@@ -52,17 +46,15 @@ export function PostDetailComponent(props: { slug: string }) {
 
   return () => {
     const postData = post();
-    if (!postData) return <div>Loading...</div>;
+    if (!postData) return null;
 
     // Full type safety on Post fields
-    return (
-      <article>
-        <h1>{postData.title}</h1>
-        <div>{postData.description}</div>
-        {/* BlockContent is also typed */}
-        {postData.content && <div>Content blocks: {postData.content.length}</div>}
-      </article>
-    );
+    return {
+      title: postData.title,
+      description: postData.description,
+      // BlockContent is also typed
+      contentBlocks: postData.content?.length ?? 0
+    };
   };
 }
 
@@ -119,7 +111,9 @@ export async function getPostWithTags(slug: string): Promise<void> {
   // or fetch them separately
   const client = getSanityClient();
 
-  const expandedPost = await client.fetch<Post & { tags: Tag[] }>(
+  type ExpandedPost = Omit<Post, 'tags'> & { tags?: Tag[] };
+
+  const expandedPost = await client.fetch<ExpandedPost>(
     `*[_type == "post" && slug.current == $slug][0] {
       ...,
       tags[]->
@@ -130,7 +124,7 @@ export async function getPostWithTags(slug: string): Promise<void> {
   if (expandedPost?.tags) {
     // Now tags are fully typed Tag objects
     expandedPost.tags.forEach(tag => {
-      console.log(tag.title, tag.description);
+      console.log(tag.title, tag.slug?.current);
     });
   }
 }
@@ -163,10 +157,10 @@ export async function getAnyDocument(id: string): Promise<AllSanitySchemaTypes |
   );
 
   // Type narrowing based on _type
-  if (doc?._type === 'post') {
+  if (doc && '_type' in doc && doc._type === 'post') {
     // TypeScript knows this is a Post
     console.log(doc.title);
-  } else if (doc?._type === 'project') {
+  } else if (doc && '_type' in doc && doc._type === 'project') {
     // TypeScript knows this is a Project
     console.log(doc.description);
   }

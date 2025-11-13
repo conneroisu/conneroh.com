@@ -30,7 +30,7 @@ export type Tag = {
       _weak?: boolean
       [internalGroqTypeReferenceTo]?: 'sanity.imageAsset'
     }
-    media?: unknown
+    media?: {} | undefined
     hotspot?: SanityImageHotspot
     crop?: SanityImageCrop
     alt?: string
@@ -135,7 +135,7 @@ export type BlockContent = Array<
         _weak?: boolean
         [internalGroqTypeReferenceTo]?: 'sanity.imageAsset'
       }
-      media?: unknown
+      media?: {} | undefined
       hotspot?: SanityImageHotspot
       crop?: SanityImageCrop
       alt?: string
@@ -168,7 +168,7 @@ export type Post = {
       _weak?: boolean
       [internalGroqTypeReferenceTo]?: 'sanity.imageAsset'
     }
-    media?: unknown
+    media?: {} | undefined
     hotspot?: SanityImageHotspot
     crop?: SanityImageCrop
     alt?: string
@@ -223,7 +223,7 @@ export type Project = {
       _weak?: boolean
       [internalGroqTypeReferenceTo]?: 'sanity.imageAsset'
     }
-    media?: unknown
+    media?: {} | undefined
     hotspot?: SanityImageHotspot
     crop?: SanityImageCrop
     alt?: string
@@ -277,7 +277,7 @@ export type Employment = {
       _weak?: boolean
       [internalGroqTypeReferenceTo]?: 'sanity.imageAsset'
     }
-    media?: unknown
+    media?: {} | undefined
     hotspot?: SanityImageHotspot
     crop?: SanityImageCrop
     alt?: string

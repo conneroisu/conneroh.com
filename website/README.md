@@ -158,6 +158,101 @@ This project uses [Vitest](https://vitest.dev/) for testing. You can run the tes
 bun run test
 ```
 
+## 📄 Content Management with Sanity CMS
+
+This project integrates [Sanity CMS](https://www.sanity.io) for content management, providing a powerful headless CMS solution with real-time collaboration and structured content.
+
+### Features
+
+- **Type-Safe Content**: Auto-generated TypeScript types from Sanity schema
+- **Reactive Queries**: Solid.js hooks for client-side content fetching
+- **Server-Side Rendering**: Optimized server functions for SSR
+- **Smart Caching**: LRU cache with TTL-based expiration
+- **Error Handling**: Robust retry logic and error recovery
+- **GROQ Queries**: Powerful query language for flexible content retrieval
+
+### Quick Start
+
+1. **Environment Setup**
+
+Create `.env.local` with your Sanity credentials:
+
+```env
+# Sanity CMS Configuration
+VITE_SANITY_PROJECT_ID=z6sd4zry
+VITE_SANITY_DATASET=production
+SANITY_API_TOKEN=your_token_here
+```
+
+2. **Fetch Content (Client-Side)**
+
+```typescript
+import { createSanityQuery } from '@/hooks/use-sanity-content';
+import { listPosts } from '@/lib/sanity-queries';
+import type { Post } from '@/lib/sanity-client';
+
+function BlogPage() {
+  const [posts] = createSanityQuery<Post[]>(listPosts(), {});
+
+  return (
+    <For each={posts()}>
+      {(post) => <article>{post.title}</article>}
+    </For>
+  );
+}
+```
+
+3. **Fetch Content (Server-Side)**
+
+```typescript
+import { createServerFn } from '@tanstack/solid-start/server';
+import { fetchSanityContent } from '@/lib/sanity-server';
+import { listPosts } from '@/lib/sanity-queries';
+import type { Post } from '@/lib/sanity-client';
+
+const getPostsFn = createServerFn('GET', async () => {
+  return fetchSanityContent<Post[]>(listPosts(), {});
+});
+```
+
+### Content Types
+
+The following content types are available:
+
+- **Post** - Blog posts with title, content, tags, and published date
+- **Project** - Portfolio projects with description, images, and links
+- **Tag** - Categories for organizing posts and projects
+- **Employment** - Work history and experience records
+
+### Documentation
+
+- **[Setup Guide](./docs/sanity-setup.md)** - Complete setup and configuration instructions
+- **[Usage Examples](./docs/sanity-usage-examples.md)** - Practical code examples for common use cases
+- **[API Reference](./docs/sanity-api-reference.md)** - Complete API documentation
+- **[Type Generation](./docs/SANITY_TYPEGEN.md)** - TypeScript type generation guide
+
+### Sanity Studio
+
+The Sanity Studio (CMS interface) is located in the `/sanity` directory:
+
+```bash
+# Start Sanity Studio
+cd sanity
+bun sanity dev
+
+# Studio will be available at http://localhost:3333
+```
+
+### Regenerating Types
+
+After updating your Sanity schema, regenerate TypeScript types:
+
+```bash
+cd sanity
+bun sanity typegen generate
+cp sanity.types.ts ../src/lib/sanity-types.ts
+```
+
 ## Styling
 
 This project uses [Tailwind CSS](https://tailwindcss.com/) for styling.

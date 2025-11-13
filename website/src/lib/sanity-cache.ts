@@ -52,8 +52,8 @@ export class SanityCache {
   };
 
   constructor(
-    private maxSize = 100, // Maximum number of cache entries
-    private defaultTtl = DEFAULT_TTLS.default // Default TTL in seconds
+    private maxSize: number = 100, // Maximum number of cache entries
+    private defaultTtl: number = DEFAULT_TTLS.default // Default TTL in seconds
   ) {}
 
   /**

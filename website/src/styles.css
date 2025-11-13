@@ -1,5 +1,15 @@
 @import 'tailwindcss';
 
+/**
+ * Tailwind CSS v4 Configuration
+ * Dark mode: class-based (add 'dark' class to html/body)
+ * All default Tailwind colors are available (gray, green, emerald, etc.)
+ */
+@theme {
+  /* Dark mode is enabled by default via class strategy */
+  /* No custom color configuration needed - using Tailwind defaults */
+}
+
 body {
   @apply m-0;
   font-family:
