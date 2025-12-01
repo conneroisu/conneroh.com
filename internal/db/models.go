@@ -5,10 +5,7 @@
 package db
 
 import (
-<<<<<<< HEAD
-=======
 	"github.com/cridenour/go-postgis"
->>>>>>> a921f8cc (latest)
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
@@ -420,15 +417,6 @@ type DirectusWebhook struct {
 }
 
 type Employment struct {
-<<<<<<< HEAD
-	ID          int32       `db:"id" json:"id"`
-	UserCreated pgtype.UUID `db:"user_created" json:"user_created"`
-	Location    interface{} `db:"location" json:"location"`
-	Start       pgtype.Date `db:"start" json:"start"`
-	End         pgtype.Date `db:"end" json:"end"`
-	Slug        string      `db:"slug" json:"slug"`
-	Title       string      `db:"title" json:"title"`
-=======
 	ID          int32         `db:"id" json:"id"`
 	UserCreated pgtype.UUID   `db:"user_created" json:"user_created"`
 	Location    postgis.Point `db:"location" json:"location"`
@@ -436,7 +424,6 @@ type Employment struct {
 	End         pgtype.Date   `db:"end" json:"end"`
 	Slug        string        `db:"slug" json:"slug"`
 	Title       string        `db:"title" json:"title"`
->>>>>>> a921f8cc (latest)
 }
 
 type EmploymentsCompany struct {

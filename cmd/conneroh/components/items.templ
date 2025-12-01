@@ -1,7 +1,7 @@
 package components
 
 import (
-	"github.com/conneroisu/conneroh.com/internal/assets"
+	"github.com/conneroisu/conneroh.com/internal/db"
 	"github.com/conneroisu/twerge"
 	"strconv"
 )
@@ -11,7 +11,7 @@ const (
 )
 
 templ ProjectItem(
-	project *assets.Project,
+	project *db.Project,
 	attrs templ.Attributes,
 ) {
 	<div
@@ -80,7 +80,7 @@ templ ProjectItem(
 	</div>
 }
 
-templ PostItem(post *assets.Post, attrs templ.Attributes) {
+templ PostItem(post *db.Post, attrs templ.Attributes) {
 	<div
 		x-data="{ allTags: false }"
 	>
@@ -142,7 +142,7 @@ templ PostItem(post *assets.Post, attrs templ.Attributes) {
 	</div>
 }
 
-templ TagItem(tag *assets.Tag, attrs templ.Attributes) {
+templ TagItem(tag *db.Tag, attrs templ.Attributes) {
 	<a
 		aria-label={ tag.Title }
 		{ attrs... }
@@ -182,7 +182,7 @@ templ TagItem(tag *assets.Tag, attrs templ.Attributes) {
 	</a>
 }
 
-templ EmploymentItem(employment *assets.Employment, attrs templ.Attributes) {
+templ EmploymentItem(employment *db.Employment, attrs templ.Attributes) {
 	<div
 		x-data="{ allTags: false }"
 	>

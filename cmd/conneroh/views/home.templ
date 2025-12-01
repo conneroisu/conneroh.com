@@ -2,15 +2,15 @@ package views
 
 import (
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
-	"github.com/conneroisu/conneroh.com/internal/assets"
+	"github.com/conneroisu/conneroh.com/internal/db"
 	"github.com/conneroisu/twerge"
 )
 
 templ Home(
-	fullPosts *[]*assets.Post,
-	fullProjects *[]*assets.Project,
-	fullTags *[]*assets.Tag,
-	fullEmployments *[]*assets.Employment,
+	fullPosts *[]*db.Post,
+	fullProjects *[]*db.Project,
+	fullTags *[]*db.Tag,
+	fullEmployments *[]*db.Employment,
 ) {
 	// Hero Section (top)
 	<section

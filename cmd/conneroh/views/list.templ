@@ -3,17 +3,17 @@ package views
 import (
 	"fmt"
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
-	"github.com/conneroisu/conneroh.com/internal/assets"
+	"github.com/conneroisu/conneroh.com/internal/db"
 	"github.com/conneroisu/conneroh.com/internal/routing"
 	"github.com/conneroisu/twerge"
 )
 
 templ List(
 	target routing.PluralPath,
-	posts *[]*assets.Post,
-	projects *[]*assets.Project,
-	tags *[]*assets.Tag,
-	employments *[]*assets.Employment,
+	posts *[]*db.Post,
+	projects *[]*db.Project,
+	tags *[]*db.Tag,
+	employments *[]*db.Employment,
 	query string,
 	page int,
 	pageCount int,
@@ -110,10 +110,10 @@ templ search(
 
 templ ListResults(
 	target routing.PluralPath,
-	posts *[]*assets.Post,
-	projects *[]*assets.Project,
-	tags *[]*assets.Tag,
-	employments *[]*assets.Employment,
+	posts *[]*db.Post,
+	projects *[]*db.Project,
+	tags *[]*db.Tag,
+	employments *[]*db.Employment,
 	page, pageCount int,
 ) {
 	<div

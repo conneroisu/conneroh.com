@@ -46,22 +46,24 @@ stop:
   rounds: null
   # Example: rounds: 3
 
-# Validation rules for hook processing
-rules:
+# Pre-tool-use hook configuration - runs before tools are executed
+preToolUse:
+  # Validation rules for hook processing
   # Prevent Claude from creating or modifying files at the repository root
   # Helps maintain clean project structure
-  preventRootAdditions: true
+  preventRootAdditions:
+    true
 
-  # Files that Claude cannot edit, using glob patterns
-  # Supports various glob patterns for flexible file protection
+    # Files that Claude cannot edit, using glob patterns
+    # Supports various glob patterns for flexible file protection
   uneditableFiles:
     - ".conclaude.yaml"
     # - "flake.nix"
     - "flake.lock"
     - "internal/db/migrations/*.sql"
 
-  # Tool usage validation rules - control which tools can be used on which files
-  # Allows fine-grained control over tool usage based on file patterns
+    # Tool usage validation rules - control which tools can be used on which files
+    # Allows fine-grained control over tool usage based on file patterns
   toolUsageValidation: []
   # Examples:
   # toolUsageValidation:
@@ -73,9 +75,6 @@ rules:
   #     pattern: ".env*"
   #     action: "block"
   #     message: "Environment files cannot be modified"
-
-# Pre-tool-use hook configuration - runs before tools are executed
-preToolUse:
   # Directories where file additions are prevented (in addition to root)
   # List of directory paths where new files cannot be created
   preventAdditions:

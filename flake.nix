@@ -76,8 +76,8 @@
               gum log --structured --level debug "cmd" txt "nix flake check"
               nix flake check
             '';
-            runtimeInputs = with pkgs; [golangci-lint statix deadnix templ rustc cargo gum];
-            description = "Run Nix/Go/Rust Linting Steps.";
+            runtimeInputs = with pkgs; [golangci-lint statix deadnix templ gum];
+            description = "Run Nix/Go Linting Steps.";
           };
           generate-css = {
             text = rooted ''
@@ -116,7 +116,7 @@
                 --minify --minify-syntax --minify-whitespace --minify-identifiers \
                 --outdir "$REPO_ROOT"/cmd/conneroh/_static/dist/
             '';
-            runtimeInputs = with pkgs; [bun git];
+            runtimeInputs = with pkgs; [bun];
             description = "Generate JS files";
           };
           generate-all = {
@@ -136,7 +136,7 @@
           run = {
             text = rooted ''cd "$REPO_ROOT" && air'';
             env.DEBUG = "true";
-            runtimeInputs = with pkgs; [air git];
+            runtimeInputs = with pkgs; [air];
             description = "Run the application with air for hot reloading";
           };
         };
@@ -199,14 +199,10 @@
               bun
               sqlc
               yaml-language-server
-              nodePackages.typescript-language-server
-              nodePackages.prettier
-              harper
+              typescript-language-server
+              biome
               htmx-lsp
               vscode-langservers-extracted
-
-              # Testing
-              nodejs_20
 
               flyctl # Infra
               openssl.dev
@@ -363,7 +359,7 @@
               set -euo pipefail
 
               export PATH="${
-                pkgs.lib.makeBinPath (with pkgs; [flyctl skopeo jq git gnused coreutils])
+                pkgs.lib.makeBinPath (with pkgs; [flyctl skopeo jq])
               }:$PATH"
 
               readonly APP_PREFIX="pr"
@@ -484,7 +480,6 @@
               alejandra.enable = true; # Nix formatter
               golines.enable = true; # Golang formatter
               gofumpt.enable = true; # Golang formatter
-              rustfmt.enable = true; # Rust formatter
             };
           };
         in

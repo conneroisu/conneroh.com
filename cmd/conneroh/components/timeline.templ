@@ -1,11 +1,11 @@
 package components
 
 import (
-	"github.com/conneroisu/conneroh.com/internal/assets"
+	"github.com/conneroisu/conneroh.com/internal/db"
 	"github.com/conneroisu/twerge"
 )
 
-templ EmploymentTimeline(employments []*assets.Employment) {
+templ EmploymentTimeline(employments []*db.Employment) {
 	<div class={ twerge.It("relative") }>
 		<div class={ twerge.It("absolute left-1/2 -translate-x-1/2 w-0.5 h-full bg-gradient-to-b from-green-500 via-green-400 to-transparent") }></div>
 		<div class={ twerge.It("space-y-12") }>
@@ -35,7 +35,7 @@ templ EmploymentTimeline(employments []*assets.Employment) {
 								<div class={ twerge.If(i%2 == 0, "mt-3 flex flex-wrap gap-2 justify-end", "mt-3 flex flex-wrap gap-2") }>
 									for j, tag := range employment.Tags {
 										if j < 4 {
-											<span 
+											<span
 												class={ twerge.It("text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded hover:bg-green-600 hover:text-white transition-colors cursor-pointer inline-block") }
 												hx-get={ tag.PagePath() }
 												hx-target="#bodiody"
@@ -61,7 +61,7 @@ templ EmploymentTimeline(employments []*assets.Employment) {
 	</div>
 }
 
-templ EmploymentTimelineMobile(employments []*assets.Employment) {
+templ EmploymentTimelineMobile(employments []*db.Employment) {
 	<div class={ twerge.It("relative") }>
 		<div class={ twerge.It("absolute left-4 w-0.5 h-full bg-gradient-to-b from-green-500 via-green-400 to-transparent") }></div>
 		<div class={ twerge.It("space-y-8 pl-12") }>
@@ -91,7 +91,7 @@ templ EmploymentTimelineMobile(employments []*assets.Employment) {
 								<div class={ twerge.It("mt-3 flex flex-wrap gap-2") }>
 									for j, tag := range employment.Tags {
 										if j < 4 {
-											<span 
+											<span
 												class={ twerge.It("text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded hover:bg-green-600 hover:text-white transition-colors cursor-pointer inline-block") }
 												hx-get={ tag.PagePath() }
 												hx-target="#bodiody"

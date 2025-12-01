@@ -327,7 +327,7 @@ func HandleHome(db *bun.DB) func(w http.ResponseWriter, r *http.Request) error {
 		}
 		if len(allEmployments) == 0 {
 			err = db.NewSelect().Model(&allEmployments).
-				Order("updated_at").
+				Order("created_at DESC").
 				Relation("Tags").
 				Relation("Posts").
 				Relation("Projects").

@@ -2,13 +2,13 @@ package views
 
 import (
 	"github.com/conneroisu/conneroh.com/cmd/conneroh/components"
-	"github.com/conneroisu/conneroh.com/internal/assets"
+	"github.com/conneroisu/conneroh.com/internal/db"
 	"github.com/conneroisu/twerge"
 )
 
 // Individual Post component
 templ Post(
-	post *assets.Post,
+	post *db.Post,
 ) {
 	<div
 		class={ twerge.It("px-4 mx-auto py-8 max-w-5xl") }
