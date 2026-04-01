@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@payloadcms/db-postgres": "3.61.0",
-    "@payloadcms/next": "3.61.0",
+    "@payloadcms/next": "3.78.0",
     "@payloadcms/payload-cloud": "3.61.0",
     "@payloadcms/richtext-lexical": "3.61.0",
     "@payloadcms/storage-s3": "^3.61.0",
